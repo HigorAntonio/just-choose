@@ -1,18 +1,20 @@
 const axios = require('axios');
 const knex = require('./database');
 
-async function getData(url) {
+async function getData({ baseURL, url, params = {} }) {
   try {
-    const response = await axios.get(url);
+    const response = await axios({ baseURL, url, params });
     return response.data;
   } catch (err) {
     if (err.response) {
-      console.log(`Erro: arquivo crawler.js, função getData(url). Falha ao obter dados do` + 
-      `servidor. Código de status http ${err.response.status}`);
+      console.log(`Erro: Request: { baseURL: ${baseURL}, url: ${url}, ` + 
+      `params: ${params} }. Código de status http ${err.response.status}`);
     } else if (err.request) {
-      console.log('Erro: arquivo crawler.js, função getData(url). Sem resposta do servidor');
+      console.log(`Erro: Request: { baseURL: ${baseURL}, url: ${url}, ` + 
+      `params: ${params} }. Sem resposta do servidor`);
     } else {
-      console.log('Erro: arquivo crawler.js, função getData(url). ', err.message);
+      console.log(`Erro: Request: { baseURL: ${baseURL}, url: ${url},` + 
+      ` params: ${params} }. ${err.message}`);
     }
     throw err;
   }
@@ -24,7 +26,7 @@ function sanitizeProviders(providersData) {
       { name: clear_name, short_name }
     ));
   } catch (err) {
-    console.log('Erro: arquivo crawler.js, função sanitizeProviders(providersData). ', err.message);
+    console.log(`Erro: sanitizeProviders(). ${err.message}`);
   }
 }
 
@@ -34,16 +36,17 @@ function sanitizeGenres(genresData) {
       { name: translation, short_name }
     ));
   } catch (err) {
-    console.log('Erro: arquivo crawler.js, função sanitizeGenres(genresData). ', err.message);
+    console.log(`Erro: sanitizeGenres(). ${err.message}`);
   }
 }
 
 (async () => {
-  const providersUrl = 'https://apis.justwatch.com/content/providers/locale/pt_BR';
-  const genresUrl = 'https://apis.justwatch.com/content/genres/locale/pt_BR';
+  const baseURL = 'https://apis.justwatch.com/';
+  const providersUrl = '/content/providers/locale/pt_BR';
+  const genresUrl = '/content/genres/locale/pt_BR';
 
   try {
-    const providersData = await getData(providersUrl);
+    const providersData = await getData({ baseURL, url: providersUrl });
     const providers = sanitizeProviders(providersData);
     // console.log(providers);
     
@@ -54,7 +57,7 @@ function sanitizeGenres(genresData) {
     console.log('Banco populado com providers')
 
 
-    const genresData = await getData(genresUrl);
+    const genresData = await getData({ baseURL, url: genresUrl });
     const genres = sanitizeGenres(genresData);
     // console.log(genres);
     
