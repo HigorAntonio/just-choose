@@ -28,8 +28,19 @@ function sanitizeProviders(providersData) {
   }
 }
 
+function sanitizeGenres(genresData) {
+  try {
+    return genresData.map(({ translation, short_name }) => (
+      { name: translation, short_name }
+    ));
+  } catch (err) {
+    console.log('Erro: arquivo crawler.js, função sanitizeGenres(genresData). ', err.message);
+  }
+}
+
 (async () => {
   const providersUrl = 'https://apis.justwatch.com/content/providers/locale/pt_BR';
+  const genresUrl = 'https://apis.justwatch.com/content/genres/locale/pt_BR';
 
   try {
     const providersData = await getData(providersUrl);
@@ -41,6 +52,17 @@ function sanitizeProviders(providersData) {
       console.log(provider);
     }
     console.log('Banco populado com providers')
+
+
+    const genresData = await getData(genresUrl);
+    const genres = sanitizeGenres(genresData);
+    // console.log(genres);
+    
+    for (genre of genres) {
+      await knex('genres').insert(genre);
+      console.log(genre);
+    }
+    console.log('Banco populado com genres')
 
   } catch (err) {
     console.log('Something went wrong ' + err);
