@@ -109,8 +109,12 @@ async function getAllGenresUrl() {
     console.log('Banco populado com genres')
     
     
-    const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
-    // console.log(moviesData);
+    while (true) {
+      const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
+      console.log(moviesData.page, moviesData.total_pages);
+      moviesParams.body.page++;
+      if(moviesData.page >= moviesData.total_pages) break;
+    }
 
   } catch (err) {
     console.log('Something went wrong ' + err);
