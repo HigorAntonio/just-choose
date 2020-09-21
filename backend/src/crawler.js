@@ -125,7 +125,15 @@ async function getAllGenresUrl() {
     while (true) {
       const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
       // console.log(moviesData.page, moviesData.total_pages);
-      console.log(sanitizeMovies(moviesData));
+      // console.log(sanitizeMovies(moviesData));
+      
+      const movies = sanitizeMovies(moviesData);
+      for (movie of movies) {
+        await knex('movies').insert(movie);
+        console.log(movie);
+      }
+      console.log('Banco populado com movies')
+
       moviesParams.body.page++;
       // if(moviesData.page >= moviesData.total_pages) break;
       break
