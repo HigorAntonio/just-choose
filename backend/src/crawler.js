@@ -40,6 +40,19 @@ function sanitizeGenres(genresData) {
   }
 }
 
+async function getAllGenresUrl() {
+  try {
+    const genres = await knex('genres').select('short_name');
+    let genresUrl = '';
+    for (genre of genres) {
+      genresUrl = genresUrl.concat(`"${genre.short_name}", `);
+    }
+    return genresUrl.slice(0, -2);
+  } catch (err) {
+    console.log(`Erro: getAllGenresUrl(). ${err.message}`);
+  }
+}
+
 (async () => {
   const baseURL = 'https://apis.justwatch.com/';
   const providersUrl = '/content/providers/locale/pt_BR';
@@ -79,3 +92,5 @@ function sanitizeGenres(genresData) {
 
   knex.destroy();
 })();
+
+'https://apis.justwatch.com/content/titles/pt_BR/popular?body=%7B"fields":["cinema_release_date","full_path","full_paths","id","localized_release_date","object_type","poster","scoring","title","tmdb_popularity","offers"],"content_types":["movie"],"genres":["msc","act","ani","cmy","crm","fml","eur","hrr","hst","fnt","drm","doc","rly","wsn","war","scf","rma","trl","spt"],"providers":["prv","nfx"],"enable_provider_filter":false,"monetization_types":[],"page":2,"page_size":30,"matching_offers_only":true%7D'
