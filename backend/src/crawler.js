@@ -27,6 +27,7 @@ function sanitizeProviders(providersData) {
     ));
   } catch (err) {
     console.log(`Erro: sanitizeProviders(). ${err.message}`);
+    throw err;
   }
 }
 
@@ -37,6 +38,7 @@ function sanitizeGenres(genresData) {
     ));
   } catch (err) {
     console.log(`Erro: sanitizeGenres(). ${err.message}`);
+    throw err;
   }
 }
 
@@ -50,6 +52,7 @@ async function getAllGenresUrl() {
     return genresUrl.slice(0, -2);
   } catch (err) {
     console.log(`Erro: getAllGenresUrl(). ${err.message}`);
+    throw err;
   }
 }
 
