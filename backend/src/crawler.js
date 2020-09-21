@@ -42,6 +42,19 @@ function sanitizeGenres(genresData) {
   }
 }
 
+function sanitizeMovies(moviesData) {
+  try {
+    return moviesData.items.map(({ title, scoring }) => {
+      const [provider] = scoring.filter(scoring => scoring.provider_type === 'tmdb:id')
+
+      return { title, tmdb_id: provider.value };
+    });
+  } catch (err) {
+    console.log(`Erro: sanitizeMovies(). ${err.message}`);
+    throw err;
+  }
+}
+
 async function getAllGenresUrl() {
   try {
     const genres = await knex('genres').select('short_name');
@@ -111,9 +124,11 @@ async function getAllGenresUrl() {
     
     while (true) {
       const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
-      console.log(moviesData.page, moviesData.total_pages);
+      // console.log(moviesData.page, moviesData.total_pages);
+      console.log(sanitizeMovies(moviesData));
       moviesParams.body.page++;
-      if(moviesData.page >= moviesData.total_pages) break;
+      // if(moviesData.page >= moviesData.total_pages) break;
+      break
     }
 
   } catch (err) {
