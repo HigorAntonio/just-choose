@@ -1,5 +1,6 @@
 exports.up = async knex => knex.schema.createTable('providers', table => {
   table.increments('id');
+  table.integer('jw_id').unique().notNullable();
   table.text('name').unique().notNullable();
   table.text('short_name').unique().notNullable();
   table.text('icon_url').defaultTo(null);

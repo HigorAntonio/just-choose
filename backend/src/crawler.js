@@ -22,8 +22,8 @@ async function getData({ baseURL, url, params = {} }) {
 
 function sanitizeProviders(providersData) {
   try {
-    return providersData.map(({ clear_name, short_name }) => (
-      { name: clear_name, short_name }
+    return providersData.map(({ id, clear_name, short_name }) => (
+      { jw_id: id, name: clear_name, short_name }
     ));
   } catch (err) {
     console.log(`Erro: sanitizeProviders(). ${err.message}`);
@@ -51,7 +51,10 @@ function sanitizeGenres(genresData) {
     // console.log(providers);
     
     for (provider of providers) {
-      await knex('providers').insert(provider);
+      const query = await knex('providers').where({ jw_id: provider.jw_id });
+      if (query.length === 0) {
+        await knex('providers').insert(provider);
+      }
       console.log(provider);
     }
     console.log('Banco populado com providers')
@@ -62,7 +65,10 @@ function sanitizeGenres(genresData) {
     // console.log(genres);
     
     for (genre of genres) {
-      await knex('genres').insert(genre);
+      const query = await knex('genres').where({ short_name: genre.short_name });
+      if (query.length === 0) {
+        await knex('genres').insert(genre);
+      }
       console.log(genre);
     }
     console.log('Banco populado com genres')
