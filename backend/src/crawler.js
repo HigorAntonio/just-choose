@@ -129,14 +129,19 @@ async function getAllGenresUrl() {
       
       const movies = sanitizeMovies(moviesData);
       for (movie of movies) {
-        await knex('movies').insert(movie);
-        console.log(movie);
+        const query = await knex('movies')
+          .where({ tmdb_id: movie.tmdb_id, title: movie.title });
+        if (query.length === 0) {
+          await knex('movies').insert(movie);
+        } else {
+          console.log('Filme duplicado: ')
+          console.log(movie);
+        }
       }
-      console.log('Banco populado com movies')
+      console.log(`Banco populado com movies da pagina ${moviesData.page}`)
 
       moviesParams.body.page++;
-      // if(moviesData.page >= moviesData.total_pages) break;
-      break
+      if(moviesData.page >= moviesData.total_pages) break;
     }
 
   } catch (err) {
