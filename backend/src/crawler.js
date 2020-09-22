@@ -55,14 +55,25 @@ function sanitizeMovies(moviesData) {
   }
 }
 
+async function dbInsertArrayData(arrayData, dbTableName, queryFunc) {
+  try {
+    for (data of arrayData) {
+      const dataExists = await queryFunc(data);
+      if (dataExists.length === 0) {
+        await knex(dbTableName).insert(data);
+      }
+      console.log(data);
+    }
+  } catch (err) {
+    console.log(`Erro: dbInsertArrayData(): { arrayData: ${JSON.stringify(arrayData)},` + 
+      ` dbTableName: ${dbTableName} } . ${err.message}`);
+    throw err;
+  }
+}
+
 async function getAllGenresUrl() {
   try {
     const genres = await knex('genres').select('short_name');
-    // let genresUrl = '';
-    // for (genre of genres) {
-    //   genresUrl = genresUrl.concat(`"${genre.short_name}", `);
-    // }
-    // return genresUrl.slice(0, -2);
     return genres.map(genre => `${genre.short_name}`);
   } catch (err) {
     console.log(`Erro: getAllGenresUrl(). ${err.message}`);
@@ -98,13 +109,9 @@ async function getAllGenresUrl() {
     const providers = sanitizeProviders(providersData);
     // console.log(providers);
     
-    for (provider of providers) {
-      const query = await knex('providers').where({ jw_id: provider.jw_id });
-      if (query.length === 0) {
-        await knex('providers').insert(provider);
-      }
-      console.log(provider);
-    }
+    await dbInsertArrayData(providers, 'providers', 
+      (data) => knex('providers').where({ jw_id: data.jw_id })
+    );
     console.log('Banco populado com providers')
 
 
@@ -112,13 +119,9 @@ async function getAllGenresUrl() {
     const genres = sanitizeGenres(genresData);
     // console.log(genres);
     
-    for (genre of genres) {
-      const query = await knex('genres').where({ short_name: genre.short_name });
-      if (query.length === 0) {
-        await knex('genres').insert(genre);
-      }
-      console.log(genre);
-    }
+    await dbInsertArrayData(genres, 'genres', 
+      (data) => knex('genres').where({ short_name: data.short_name })
+    );
     console.log('Banco populado com genres')
     
     
@@ -128,16 +131,9 @@ async function getAllGenresUrl() {
       // console.log(sanitizeMovies(moviesData));
       
       const movies = sanitizeMovies(moviesData);
-      for (movie of movies) {
-        const query = await knex('movies')
-          .where({ tmdb_id: movie.tmdb_id, title: movie.title });
-        if (query.length === 0) {
-          await knex('movies').insert(movie);
-        } else {
-          console.log('Filme duplicado: ')
-          console.log(movie);
-        }
-      }
+      await dbInsertArrayData(movies, 'movies', 
+        (data) => knex('movies').where({ tmdb_id: data.tmdb_id, title: data.title })
+      );
       console.log(`Banco populado com movies da pagina ${moviesData.page}`)
 
       moviesParams.body.page++;
