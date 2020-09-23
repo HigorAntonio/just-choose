@@ -74,9 +74,20 @@ async function dbInsertArrayData(arrayData, dbTableName, condition) {
 async function getAllGenresUrl() {
   try {
     const genres = await knex('genres').select('short_name');
-    return genres.map(genre => `${genre.short_name}`);
+    return genres.map(genre => genre.short_name);
   } catch (err) {
     console.log(`Erro: getAllGenresUrl(). ${err.message}`);
+    throw err;
+  }
+}
+
+async function getProvidersUrl() {
+  try {
+    const providers = await knex('providers').select('short_name')
+      .where({ name: 'Netflix' }).orWhere({ name: 'Amazon Prime Video' });
+      return providers.map(provider => provider.short_name)
+  } catch (err) {
+    console.log(`Erro: getProvidersUrl(). ${err.message}`);
     throw err;
   }
 }
@@ -124,20 +135,25 @@ async function getAllGenresUrl() {
     console.log('Banco populado com genres')
     
     const allGenres = await getAllGenresUrl();
-    for (genre of allGenres) {
-      moviesParams.body.genres = [genre];
-      moviesParams.body.page = 1;
-      while (true) {
-        const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
-        // console.log(moviesData.page, moviesData.total_pages);
-        // console.log(sanitizeMovies(moviesData));
-        
-        const movies = sanitizeMovies(moviesData);
-        await dbInsertArrayData(movies, 'movies', (data) => ({ tmdb_id: data.tmdb_id }));
-        console.log(`Banco populado com movies do genero ${genre} da pagina ${moviesData.page}`);
+    const allProviders = await getProvidersUrl();
+    for (provider of allProviders) {
+      moviesParams.body.providers = [provider];
+      for (genre of allGenres) {
+        moviesParams.body.genres = [genre];
+        moviesParams.body.page = 1;
+        while (true) {
+          const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
+          // console.log(moviesData.page, moviesData.total_pages);
+          // console.log(sanitizeMovies(moviesData));
+          
+          const movies = sanitizeMovies(moviesData);
+          await dbInsertArrayData(movies, 'movies', (data) => ({ tmdb_id: data.tmdb_id }));
+          console.log(`Banco populado com movies ${provider} do genero ${genre}` + 
+            ` da pagina ${moviesData.page} de ${moviesData.total_pages}`);
 
-        moviesParams.body.page++;
-        if(moviesData.page >= moviesData.total_pages) break;
+          moviesParams.body.page++;
+          if(moviesData.page >= moviesData.total_pages) break;
+        }
       }
     }
 
