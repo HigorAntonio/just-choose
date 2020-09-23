@@ -22,7 +22,7 @@ async function getData({ baseURL, url, params = {} }) {
 
 function sanitizeProviders(providersData) {
   try {
-    return providersData.map(({ id, clear_name, short_name }) => (
+    return providersData.map(({ id = '', clear_name = '', short_name = '' }) => (
       { jw_id: id, name: clear_name, short_name }
     ));
   } catch (err) {
@@ -33,7 +33,7 @@ function sanitizeProviders(providersData) {
 
 function sanitizeGenres(genresData) {
   try {
-    return genresData.map(({ translation, short_name }) => (
+    return genresData.map(({ translation = '', short_name = '' }) => (
       { name: translation, short_name }
     ));
   } catch (err) {
@@ -44,10 +44,10 @@ function sanitizeGenres(genresData) {
 
 function sanitizeMovies(moviesData) {
   try {
-    return moviesData.items.map(({ title, scoring }) => {
+    return moviesData.items.map(({ title = '', scoring = '' }) => {
       const [provider] = scoring.filter(scoring => scoring.provider_type === 'tmdb:id')
 
-      return { title, tmdb_id: provider.value };
+      return { title, tmdb_id: provider ? provider.value : '' };
     });
   } catch (err) {
     console.log(`Erro: sanitizeMovies(). ${err.message}`);
@@ -94,8 +94,11 @@ async function getAllGenresUrl() {
         "scoring", "title", "tmdb_popularity", "offers"
       ],
       content_types: ["movie"],
-      genres: await getAllGenresUrl(),
-      providers:["prv", "nfx"],
+      genres: [
+        "msc","act","ani","cmy","crm","fml","eur","hrr","hst","fnt",
+        "drm","doc","rly","wsn","war","scf","rma","trl","spt"
+      ],
+      providers:["prv"],
       enable_provider_filter: false,
       monetization_types:[],
       page: 1,
@@ -120,18 +123,22 @@ async function getAllGenresUrl() {
     await dbInsertArrayData(genres, 'genres', (data) => ({ short_name: data.short_name }));
     console.log('Banco populado com genres')
     
-    
-    while (true) {
-      const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
-      // console.log(moviesData.page, moviesData.total_pages);
-      // console.log(sanitizeMovies(moviesData));
-      
-      const movies = sanitizeMovies(moviesData);
-      await dbInsertArrayData(movies, 'movies', (data) => ({ tmdb_id: data.tmdb_id, title: data.title }));
-      console.log(`Banco populado com movies da pagina ${moviesData.page}`)
+    const allGenres = await getAllGenresUrl();
+    for (genre of allGenres) {
+      moviesParams.body.genres = [genre];
+      moviesParams.body.page = 1;
+      while (true) {
+        const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
+        // console.log(moviesData.page, moviesData.total_pages);
+        // console.log(sanitizeMovies(moviesData));
+        
+        const movies = sanitizeMovies(moviesData);
+        await dbInsertArrayData(movies, 'movies', (data) => ({ tmdb_id: data.tmdb_id }));
+        console.log(`Banco populado com movies do genero ${genre} da pagina ${moviesData.page}`);
 
-      moviesParams.body.page++;
-      if(moviesData.page >= moviesData.total_pages) break;
+        moviesParams.body.page++;
+        if(moviesData.page >= moviesData.total_pages) break;
+      }
     }
 
   } catch (err) {
