@@ -55,10 +55,10 @@ function sanitizeMovies(moviesData) {
   }
 }
 
-async function dbInsertArrayData(arrayData, dbTableName, queryFunc) {
+async function dbInsertArrayData(arrayData, dbTableName, condition) {
   try {
     for (data of arrayData) {
-      const dataExists = await queryFunc(data);
+      const dataExists = await knex(dbTableName).where(condition(data));
       if (dataExists.length === 0) {
         await knex(dbTableName).insert(data);
       }
@@ -109,9 +109,7 @@ async function getAllGenresUrl() {
     const providers = sanitizeProviders(providersData);
     // console.log(providers);
     
-    await dbInsertArrayData(providers, 'providers', 
-      (data) => knex('providers').where({ jw_id: data.jw_id })
-    );
+    await dbInsertArrayData(providers, 'providers', (data) => ({ jw_id: data.jw_id }));
     console.log('Banco populado com providers')
 
 
@@ -119,9 +117,7 @@ async function getAllGenresUrl() {
     const genres = sanitizeGenres(genresData);
     // console.log(genres);
     
-    await dbInsertArrayData(genres, 'genres', 
-      (data) => knex('genres').where({ short_name: data.short_name })
-    );
+    await dbInsertArrayData(genres, 'genres', (data) => ({ short_name: data.short_name }));
     console.log('Banco populado com genres')
     
     
@@ -131,9 +127,7 @@ async function getAllGenresUrl() {
       // console.log(sanitizeMovies(moviesData));
       
       const movies = sanitizeMovies(moviesData);
-      await dbInsertArrayData(movies, 'movies', 
-        (data) => knex('movies').where({ tmdb_id: data.tmdb_id, title: data.title })
-      );
+      await dbInsertArrayData(movies, 'movies', (data) => ({ tmdb_id: data.tmdb_id, title: data.title }));
       console.log(`Banco populado com movies da pagina ${moviesData.page}`)
 
       moviesParams.body.page++;
