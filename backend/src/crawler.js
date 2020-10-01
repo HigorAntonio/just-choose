@@ -58,8 +58,8 @@ function sanitizeMovies(moviesData) {
 async function dbInsertArrayData(arrayData, dbTableName, condition) {
   try {
     for (data of arrayData) {
-      const dataExists = await knex(dbTableName).where(condition(data));
-      if (dataExists.length === 0) {
+      const dataExists = await knex(dbTableName).where(condition(data)).first();
+      if (!dataExists) {
         await knex(dbTableName).insert(data);
       }
       console.log(data);
@@ -71,21 +71,53 @@ async function dbInsertArrayData(arrayData, dbTableName, condition) {
   }
 }
 
-async function getAllGenresUrl() {
+async function dbInsertMovieData(movieData, providerId, genreId) {
   try {
-    const genres = await knex('genres').select('short_name');
-    return genres.map(genre => genre.short_name);
+    for (movie of movieData) {
+      const movieExists = await knex('movies').where({ tmdb_id: movie.tmdb_id }).first();
+      if (!movieExists) {
+        const [movieId] = await knex('movies').insert(movie, 'id');
+        await knex('movie_providers').insert({ movie_id: movieId, provider_id: providerId });
+        await knex('movie_genres').insert({ movie_id: movieId, genre_id: genreId });
+      } else {
+        const [movieProviderExists] = await knex('movie_providers')
+          .where({ movie_id: movieExists.id, provider_id: providerId })
+          .update({ movie_id: movieExists.id, provider_id: providerId })
+          .returning('id');
+        if (!movieProviderExists) {
+          await knex('movie_providers').insert({ movie_id: movieExists.id, provider_id: providerId });
+        }
+
+        const [movieGenreExists] = await knex('movie_genres')
+          .where({ movie_id: movieExists.id, genre_id: genreId })
+          .update({ movie_id: movieExists.id, genre_id: genreId })
+          .returning('id');
+        if (!movieGenreExists) {
+          await knex('movie_genres').insert({ movie_id: movieExists.id, genre_id: genreId });
+        }
+      }
+    }
+  } catch (err) {
+    console.log(`Erro: dbInsertMovieData(): ${err.message}`);
+    throw err;
+  }
+}
+
+async function getGenres() {
+  try {
+    const genres = await knex('genres').select('id', 'short_name');
+    return genres;
   } catch (err) {
     console.log(`Erro: getAllGenresUrl(). ${err.message}`);
     throw err;
   }
 }
 
-async function getProvidersUrl() {
+async function getProviders() {
   try {
-    const providers = await knex('providers').select('short_name')
+    const providers = await knex('providers').select('id', 'short_name')
       .where({ name: 'Netflix' }).orWhere({ name: 'Amazon Prime Video' });
-      return providers.map(provider => provider.short_name)
+      return providers;
   } catch (err) {
     console.log(`Erro: getProvidersUrl(). ${err.message}`);
     throw err;
@@ -134,12 +166,12 @@ async function getProvidersUrl() {
     await dbInsertArrayData(genres, 'genres', (data) => ({ short_name: data.short_name }));
     console.log('Banco populado com genres')
     
-    const allGenres = await getAllGenresUrl();
-    const allProviders = await getProvidersUrl();
+    const allGenres = await getGenres();
+    const allProviders = await getProviders();
     for (provider of allProviders) {
-      moviesParams.body.providers = [provider];
+      moviesParams.body.providers = [provider.short_name];
       for (genre of allGenres) {
-        moviesParams.body.genres = [genre];
+        moviesParams.body.genres = [genre.short_name];
         moviesParams.body.page = 1;
         while (true) {
           const moviesData = await getData({ baseURL, url: moviesUrl, params: moviesParams });
@@ -147,8 +179,9 @@ async function getProvidersUrl() {
           // console.log(sanitizeMovies(moviesData));
           
           const movies = sanitizeMovies(moviesData);
-          await dbInsertArrayData(movies, 'movies', (data) => ({ tmdb_id: data.tmdb_id }));
-          console.log(`Banco populado com movies ${provider} do genero ${genre}` + 
+          // await dbInsertArrayData(movies, 'movies', (data) => ({ tmdb_id: data.tmdb_id }));
+          await dbInsertMovieData(movies, provider.id, genre.id);
+          console.log(`Banco populado com movies ${provider.short_name} do genero ${genre.short_name}` + 
             ` da pagina ${moviesData.page} de ${moviesData.total_pages}`);
 
           moviesParams.body.page++;
