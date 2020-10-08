@@ -62,7 +62,7 @@ async function dbInsertArrayData(arrayData, dbTableName, condition) {
       if (!dataExists) {
         await knex(dbTableName).insert(data);
       }
-      console.log(data);
+      // console.log(data);
     }
   } catch (err) {
     console.log(`Erro: dbInsertArrayData(): { arrayData: ${JSON.stringify(arrayData)},` + 
@@ -124,6 +124,17 @@ async function getProviders() {
   }
 }
 
+async function deleteOutdatedRelations(lastUpdateTime) {
+  try {
+    await knex('movie_providers')
+      .where('updated_at', '<', lastUpdateTime)
+      .del();
+  } catch (err) {
+    console.log(`Erro: deleteOutdatedRelations(). ${err.message}`);
+    throw err;
+  }
+}
+
 (async () => {
   const baseURL = 'https://apis.justwatch.com/';
   const providersUrl = '/content/providers/locale/pt_BR';
@@ -145,7 +156,7 @@ async function getProviders() {
       enable_provider_filter: false,
       monetization_types:[],
       page: 1,
-      page_size:30,
+      page_size:100,
       matching_offers_only:true
     }
   }
@@ -166,6 +177,7 @@ async function getProviders() {
     await dbInsertArrayData(genres, 'genres', (data) => ({ short_name: data.short_name }));
     console.log('Banco populado com genres')
     
+    const dbUpdateStartTime = new Date();
     const allGenres = await getGenres();
     const allProviders = await getProviders();
     for (provider of allProviders) {
@@ -189,6 +201,7 @@ async function getProviders() {
         }
       }
     }
+    await deleteOutdatedRelations(dbUpdateStartTime);
 
   } catch (err) {
     console.log('Something went wrong ' + err);
