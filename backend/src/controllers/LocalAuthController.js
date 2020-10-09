@@ -21,7 +21,7 @@ const generateAccessToken = params => {
 }
 
 module.exports = {
-  async create(req, res) {
+  async signup(req, res) {
     try {
       const { name, email, password } = req.body;
 
@@ -66,6 +66,81 @@ module.exports = {
       await saddAsync('refreshTokens', refreshToken);
       
       res.json({ accessToken, refreshToken });
+    } catch (err) {
+      return res.status(500).json({ erro: err });
+    }
+  }, 
+
+  async signin(req, res) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email)
+        return res.status(400).json({ erro: 'E-mail não informado' });
+
+      if (!password)
+        return res.status(400).json({ erro: 'Senha não informada' });
+
+      const user = await knex('local_users').where({ email }).first();
+
+      if (!user)
+        return res.status(400).json({ erro: 'Usuário não encontrado' });
+
+      if (!bcrypt.compareSync(password, user.password))
+        return res.status(400).json({ erro: 'Senha inválida' });
+
+      const accessToken = generateAccessToken({ id: user.user_id });
+      const refreshToken = jwt.sign({ id: user.user_id }, REFRESH_TOKEN_SECRET);
+      await saddAsync('refreshTokens', refreshToken);
+
+      res.json({ accessToken, refreshToken });
+    } catch (err) {
+      return res.status(500).json({ erro: err });
+    }
+  },
+
+  async refreshToken(req, res) {
+    try {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken)
+        return res.status(400).json({ erro: 'RefreshToken não informado' });
+      
+      if (await sismemberAsync('refreshTokens', refreshToken) !== 1)
+        return res.status(401).json({ erro: 'RefreshToken inválido' });
+      
+      jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, decoded) => {
+        if (err)
+          return res.status(401).json({ erro: 'RefreshToken inválido' });
+        
+        delete decoded.iat;
+        const accessToken = generateAccessToken(decoded);
+        return res.json({ accessToken });
+      });
+    } catch (err) {
+      return res.status(500).json({ erro: err });
+    }
+  },
+
+  async logout(req, res) {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken)
+        return res.status(400).json({ erro: 'RefreshToken não informado' });
+
+      jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, decoded) => {
+        if (err) 
+          return res.status(403).json({ erro: 'AccessToken inválido' });
+        
+        if (decoded.id !== req.userId)
+          return res.status(403).json({ erro: 'Usuário inválido' });        
+      
+        if (await sremAsync('refreshTokens', refreshToken) === 0)
+          return res.status(400).json({ erro: 'RefreshToken não encontrado' });
+        
+        res.sendStatus(204);
+      });
     } catch (err) {
       return res.status(500).json({ erro: err });
     }
