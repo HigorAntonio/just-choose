@@ -65,9 +65,9 @@ module.exports = {
       const refreshToken = jwt.sign({ id: newUser.user_id }, REFRESH_TOKEN_SECRET);
       await saddAsync('refreshTokens', refreshToken);
       
-      res.json({ accessToken, refreshToken });
+      return res.json({ accessToken, refreshToken });
     } catch (err) {
-      return res.status(500).json({ erro: err });
+      return res.sendStatus(500);
     }
   }, 
 
@@ -93,9 +93,9 @@ module.exports = {
       const refreshToken = jwt.sign({ id: user.user_id }, REFRESH_TOKEN_SECRET);
       await saddAsync('refreshTokens', refreshToken);
 
-      res.json({ accessToken, refreshToken });
+      return res.json({ accessToken, refreshToken });
     } catch (err) {
-      return res.status(500).json({ erro: err });
+      return res.sendStatus(500);
     }
   },
 
@@ -118,7 +118,7 @@ module.exports = {
         return res.json({ accessToken });
       });
     } catch (err) {
-      return res.status(500).json({ erro: err });
+      return res.sendStatus(500);
     }
   },
 
@@ -139,10 +139,10 @@ module.exports = {
         if (await sremAsync('refreshTokens', refreshToken) === 0)
           return res.status(400).json({ erro: 'RefreshToken não encontrado' });
         
-        res.sendStatus(204);
+        return res.sendStatus(204);
       });
     } catch (err) {
-      return res.status(500).json({ erro: err });
+      return res.sendStatus(500);
     }
   }
 };

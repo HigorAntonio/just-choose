@@ -14,9 +14,9 @@ module.exports = {
 
       await knex('polls').insert({ user_id: userId, title });
 
-      res.sendStatus(201);
+      return res.sendStatus(201);
     } catch (err) {
-      return res.status(500).json({ erro: err });
+      return res.sendStatus(500);
     }
   },
 
@@ -90,10 +90,55 @@ module.exports = {
             erro: 'Parâmetros de paginação fora dos limites' 
         });
 
-      res.json(result);    
+      return res.json(result);    
     } catch (err) {
-      console.log(err)
-      return res.status(500).json({ erro: err });
+      return res.sendStatus(500);
+    }
+  },
+
+  async update(req, res) {
+    try {
+      const { title } = req.body;
+      const { id } = req.params;
+      const userId = req.userId;
+
+      if(!title)
+        return res.status(400).json({ erro: 'Título não informado' });
+
+      const poll = await knex('polls').where({ id }).first();
+
+      if(!poll)
+        return res.status(400).json({ erro: 'Id de votação inválido' });
+
+      if (poll.user_id !== userId)
+        return res.status(403).json({ erro: 'Usuário inválido' });
+
+      await knex('polls').update({ title }).where({ id });
+
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const userId = req.userId;
+
+      const poll = await knex('polls').where({ id }).first();
+
+      if(!poll)
+        return res.status(400).json({ erro: 'Id de votação inválido' });
+
+      if (poll.user_id !== userId)
+        return res.status(403).json({ erro: 'Usuário inválido' });
+
+      await knex('polls').del().where({ id });
+
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.sendStatus(500);
     }
   }
 }

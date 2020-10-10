@@ -13,6 +13,8 @@ routes.delete('/logout', authorization, LocalAuthController.logout);
 
 routes.post('/polls', authorization, PollController.create);
 routes.get('/polls', authorization, PollController.index);
+routes.put('/polls/:id', authorization, PollController.update);
+routes.delete('/polls/:id', authorization, PollController.delete);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
