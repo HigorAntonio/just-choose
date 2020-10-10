@@ -17,7 +17,7 @@ const encryptPassword = password => {
 }
 
 const generateAccessToken = params => {
-  return jwt.sign(params, ACCESS_TOKEN_SECRET, { expiresIn: 20 });
+  return jwt.sign(params, ACCESS_TOKEN_SECRET, { expiresIn: '24h' });
 }
 
 module.exports = {
