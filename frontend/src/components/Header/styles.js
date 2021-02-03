@@ -42,6 +42,7 @@ export const SearchInput = styled.input`
   border-radius: 5px 0 0 5px;
   border: 2px solid var(--search);
   background: var(--search);
+  text-overflow: ellipsis;
 
   &::placeholder {
     color: var(--white);
@@ -63,6 +64,7 @@ export const SearchInput = styled.input`
 export const SearchButton = styled.button`
   width: 10%;
   height: 36px;
+  min-width: 30px;
 
   padding: 5px;
 
@@ -177,6 +179,35 @@ export const Tooltip = styled.span`
   ${NewListButton}:hover &,
   ${NewPollButton}:hover & {
     visibility: visible;
+  }
+`;
+
+const signButton = css`
+  font-weight: bold;
+  color: var(--white);
+  height: 35px;
+  padding: 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  outline: none;
+`;
+
+export const SignIn = styled.button`
+  ${signButton}
+  background: rgba(255, 255, 255, .2);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+  }
+`;
+
+export const SignUp = styled.button`
+  ${signButton}
+  background: var(--accent);
+  &:hover {
+    background: #0f6ba8d9;
+    cursor: pointer;
   }
 `;
 

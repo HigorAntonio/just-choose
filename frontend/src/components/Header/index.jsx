@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import SignModal from '../SignModal';
 
 import {
   Container,
@@ -13,10 +15,25 @@ import {
   NewPollButton,
   NewPollIcon,
   Tooltip,
+  SignIn,
+  SignUp,
   Profile,
 } from './styles';
 
 function Header() {
+  const [showSignModal, setShowSignModal] = useState(false);
+  const [navOption, setNavOption] = useState('');
+
+  const handleSignIn = () => {
+    setShowSignModal(true);
+    setNavOption('signIn');
+  };
+
+  const handleSignUp = () => {
+    setShowSignModal(true);
+    setNavOption('signUp');
+  };
+
   return (
     <Container>
       <Logo />
@@ -37,8 +54,17 @@ function Header() {
           <NewPollIcon />
           <Tooltip width="100px">Nova Votação</Tooltip>
         </NewPollButton>
+        <SignIn onClick={handleSignIn}>Entrar</SignIn>
+        <SignUp onClick={handleSignUp}>Cadastrar-se</SignUp>
         <Profile />
       </NavMenu>
+
+      <SignModal
+        show={showSignModal}
+        setShow={setShowSignModal}
+        navOption={navOption}
+        setNavOption={setNavOption}
+      />
     </Container>
   );
 }
