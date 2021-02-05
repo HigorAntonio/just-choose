@@ -13,27 +13,32 @@ export const Logo = styled.img.attrs((props) => ({
   }
 `;
 
-export const ModalWrapper = styled.div`
+export const Container = styled.div`
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background: #000000b3;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+`;
+
+export const ModalWrapper = styled.div`
+  width: min(420px, 90%);
+  max-height: 90%;
 `;
 
 export const ModalContent = styled.div`
-  width: min(420px, 90%);
   background: var(--primary);
   border-radius: 5px;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 30px 20px;
+  position: relative;
+  z-index: 500;
 `;
 
 export const ModalHeader = styled.div``;
@@ -54,6 +59,7 @@ export const ModalSignIn = styled.button`
   padding: 10px 0 5px 0;
   margin-right: 10px;
   font-size: 14px;
+  font-weight: bold;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   outline: none;
@@ -67,6 +73,7 @@ export const ModalSignUp = styled.button`
   padding: 10px 0 5px 0;
   margin: 0 10px;
   font-size: 14px;
+  font-weight: bold;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   outline: none;
@@ -82,56 +89,53 @@ export const FormWrapper = styled.div`
   margin-bottom: 20px;
 `;
 
-const formCSS = css`
-  > div {
-    display: flex;
-    flex-direction: column;
-    margin: 25px 0;
+export const InputWithLabel = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 25px 0;
+`;
+
+export const Label = styled.label`
+  margin-bottom: 5px;
+  font-weight: bold;
+`;
+
+export const Input = styled.input`
+  width: 100%;
+  background: var(--search);
+  padding: 5px 10px;
+  border: 2px solid var(--search);
+  border-radius: 5px;
+  outline: none;
+
+  &:hover {
+    border: 2px solid var(--gray);
+  }
+  &:focus {
+    border: 2px solid var(--accent);
   }
 
-  > div label {
-    margin-bottom: 5px;
-  }
+  transition: border 0.3s;
+`;
 
-  > div input {
-    background: var(--search);
-    padding: 5px 10px;
-    border: 2px solid var(--search);
-    border-radius: 5px;
-    outline: none;
+export const SignFormButton = styled.button`
+  margin-top: 20px;
+  width: 100%;
+  padding: 7px;
+  border-radius: 5px;
+  background: var(--accent);
+  outline: none;
+  font-weight: bold;
 
-    &:hover {
-      border: 2px solid var(--gray);
-    }
-    &:focus {
-      border: 2px solid var(--accent);
-    }
-
-    transition: border 0.3s;
-  }
-
-  > button {
-    margin-top: 20px;
-    width: 100%;
-    padding: 7px;
-    border-radius: 5px;
-    background: var(--accent);
-    outline: none;
-
-    &:hover {
-      cursor: pointer;
-      background: #0f6ba8d9;
-    }
+  &:hover {
+    cursor: pointer;
+    background: #0f6ba8d9;
   }
 `;
 
-export const SignInForm = styled.form`
-  ${formCSS}
-`;
+export const SignInForm = styled.form``;
 
-export const SignUpForm = styled.form`
-  ${formCSS}
-`;
+export const SignUpForm = styled.form``;
 
 export const CloseModal = styled.button`
   width: 30px;
