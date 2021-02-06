@@ -32,5 +32,7 @@ export default createGlobalStyle`
     --white: #FFFFFF;
     --gray: #C4C4C4;
     --black: #000000;
+    --header-border: #001425;
+    --nav-bar: #061F34;
   }
 `;

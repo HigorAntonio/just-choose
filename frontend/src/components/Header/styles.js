@@ -11,6 +11,8 @@ export const Container = styled.div`
 
   padding: 10px 19px;
 
+  border-bottom: 3px solid var(--header-border);
+
   background: var(--primary);
 `;
 
