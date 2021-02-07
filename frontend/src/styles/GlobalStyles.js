@@ -29,7 +29,7 @@ export default createGlobalStyle`
     --accent: #0F6BA8;
     --search: #35495B;
     --search-button: #213D55;
-    --white: #FFFFFF;
+    --white: #efeff1;
     --gray: #C4C4C4;
     --black: #000000;
     --header-border: #001425;

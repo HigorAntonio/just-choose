@@ -9,11 +9,32 @@ export const Container = styled.div`
   display: flex;
   justify-content: space-between;
 
-  padding: 10px 19px;
+  height: 59px;
 
   border-bottom: 3px solid var(--header-border);
 
   background: var(--primary);
+`;
+
+export const LogoWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+export const SearchWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const NavMenuWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 export const Logo = styled.img.attrs((props) => ({
@@ -21,13 +42,14 @@ export const Logo = styled.img.attrs((props) => ({
   alt: props.alt || 'JustChose Logo',
 }))`
   height: 35px;
+  margin-left: 10px;
 
   &:hover {
     cursor: pointer;
   }
 `;
 
-export const SearchWrapper = styled.div`
+export const SearchBar = styled.div`
   display: flex;
   width: min(399px, 100%);
 
@@ -97,6 +119,7 @@ export const NavMenu = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-right: 10px;
 
   > button {
     margin-right: 10px;

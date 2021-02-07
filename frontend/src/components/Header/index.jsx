@@ -4,8 +4,11 @@ import SignModal from '../SignModal';
 
 import {
   Container,
-  Logo,
+  LogoWrapper,
   SearchWrapper,
+  NavMenuWrapper,
+  Logo,
+  SearchBar,
   SearchInput,
   SearchButton,
   SearchIcon,
@@ -36,28 +39,34 @@ function Header() {
 
   return (
     <Container>
-      <Logo />
+      <LogoWrapper>
+        <Logo />
+      </LogoWrapper>
 
       <SearchWrapper>
-        <SearchInput type="search" placeholder="Buscar" />
-        <SearchButton disabled>
-          <SearchIcon />
-        </SearchButton>
+        <SearchBar>
+          <SearchInput type="search" placeholder="Buscar" />
+          <SearchButton disabled>
+            <SearchIcon />
+          </SearchButton>
+        </SearchBar>
       </SearchWrapper>
 
-      <NavMenu>
-        <NewListButton>
-          <NewListIcon />
-          <Tooltip width="80px">Nova Lista</Tooltip>
-        </NewListButton>
-        <NewPollButton>
-          <NewPollIcon />
-          <Tooltip width="100px">Nova Votação</Tooltip>
-        </NewPollButton>
-        <SignIn onClick={handleSignIn}>Entrar</SignIn>
-        <SignUp onClick={handleSignUp}>Cadastrar-se</SignUp>
-        <Profile />
-      </NavMenu>
+      <NavMenuWrapper>
+        <NavMenu>
+          <NewListButton>
+            <NewListIcon />
+            <Tooltip width="80px">Nova Lista</Tooltip>
+          </NewListButton>
+          <NewPollButton>
+            <NewPollIcon />
+            <Tooltip width="100px">Nova Votação</Tooltip>
+          </NewPollButton>
+          <SignIn onClick={handleSignIn}>Entrar</SignIn>
+          <SignUp onClick={handleSignUp}>Cadastrar-se</SignUp>
+          <Profile />
+        </NavMenu>
+      </NavMenuWrapper>
 
       <SignModal
         show={showSignModal}
