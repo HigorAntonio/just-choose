@@ -1,12 +1,51 @@
 import React from 'react';
 
-import { Container } from './styles';
+import {
+  Container,
+  TopSide,
+  Header,
+  Profiles,
+  Profile,
+  ProfileImage,
+  ProfileData,
+  BottomSide,
+  SearchUser,
+  SearchUserInput,
+} from './styles';
 
 const NavBar = () => {
   return (
     <Container>
-      <h1>NavBar</h1>
-      <h2>bottom</h2>
+      <TopSide>
+        <Header>
+          <h5>Seguindo</h5>
+        </Header>
+        <Profiles>
+          <Profile>
+            <ProfileImage></ProfileImage>
+            <ProfileData>
+              <span>Username</span>
+            </ProfileData>
+          </Profile>
+          <Profile>
+            <ProfileImage></ProfileImage>
+            <ProfileData>
+              <span>Username</span>
+            </ProfileData>
+          </Profile>
+          <Profile>
+            <ProfileImage></ProfileImage>
+            <ProfileData>
+              <span>Username</span>
+            </ProfileData>
+          </Profile>
+        </Profiles>
+      </TopSide>
+      <BottomSide>
+        <SearchUser>
+          <SearchUserInput type="text" placeholder="Adicionar amigos" />
+        </SearchUser>
+      </BottomSide>
     </Container>
   );
 };
