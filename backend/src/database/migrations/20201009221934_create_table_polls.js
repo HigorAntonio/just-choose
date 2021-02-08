@@ -10,7 +10,8 @@ exports.up = async (knex) =>
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-      table.text('title').notNullable();
+      table.string('title', 50).notNullable();
+      table.text('description');
       table.text('thumbnail');
 
       table.timestamp('created_at').defaultTo(knex.fn.now());

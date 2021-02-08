@@ -2,23 +2,17 @@ const { onUpdateTrigger } = require('../triggers');
 
 exports.up = async (knex) =>
   knex.schema
-    .createTable('votes', (table) => {
+    .createTable('content_list_types', (table) => {
       table.increments('id').primary();
       table
-        .integer('user_id')
-        .references('users.id')
+        .integer('content_list_id')
+        .references('content_lists.id')
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
       table
-        .integer('movie_id')
-        .references('movies.id')
-        .notNullable()
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE');
-      table
-        .integer('poll_id')
-        .references('polls.id')
+        .integer('content_type_id')
+        .references('content_types.id')
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
@@ -27,6 +21,6 @@ exports.up = async (knex) =>
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
-    .then(() => knex.raw(onUpdateTrigger('votes')));
+    .then(() => knex.raw(onUpdateTrigger('content_list_types')));
 
-exports.down = async (knex) => knex.schema.dropTable('votes');
+exports.down = async (knex) => knex.schema.dropTable('content_list_types');

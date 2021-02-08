@@ -2,15 +2,14 @@ const { onUpdateTrigger } = require('../triggers');
 
 exports.up = async (knex) =>
   knex.schema
-    .createTable('users', (table) => {
+    .createTable('content_types', (table) => {
       table.increments('id').primary();
-      table.text('profile_image_url');
-      table.enu('method', ['local', 'twitch']).notNullable();
+      table.string('name', 50).notNullable();
 
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
-    .then(() => knex.raw(onUpdateTrigger('users')));
+    .then(() => knex.raw(onUpdateTrigger('content_types')));
 
-exports.down = async (knex) => knex.schema.dropTable('users');
+exports.down = async (knex) => knex.schema.dropTable('content_types');
