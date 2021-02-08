@@ -4,6 +4,12 @@ exports.up = async (knex) =>
   knex.schema
     .createTable('content_lists', (table) => {
       table.increments('id').primary();
+      table
+        .integer('user_id')
+        .references('users.id')
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
       table.string('title', 50).notNullable();
       table.text('description');
       table.text('thumbnail');
