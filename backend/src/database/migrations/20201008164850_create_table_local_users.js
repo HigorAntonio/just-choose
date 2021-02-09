@@ -13,7 +13,7 @@ exports.up = async (knex) =>
         .onDelete('CASCADE');
       table.string('name', 50).unique().notNullable();
       table.string('email', 50).unique().notNullable();
-      table.string('password', 50).notNullable();
+      table.text('password').notNullable();
 
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
