@@ -34,7 +34,7 @@ module.exports = {
       }
 
       const contentTypesSet = [...new Set(content_types)];
-      for (let name of contentTypesSet) {
+      for (const name of contentTypesSet) {
         let contentTypeId = await knex
           .select('id')
           .from('content_types')
@@ -53,7 +53,7 @@ module.exports = {
           .insert({ user_id: userId, title, description })
           .returning(['id']);
 
-        for (let contentTypeId of contentTypesIds) {
+        for (const contentTypeId of contentTypesIds) {
           await trx('content_list_types').insert({
             content_list_id: contentListId,
             content_type_id: contentTypeId,
@@ -61,7 +61,7 @@ module.exports = {
         }
 
         const contentListSet = [...new Set(content_list)];
-        for (let content of contentListSet) {
+        for (const content of contentListSet) {
           if (content.type === 'movie') {
             const movie = await knex
               .select('id')
@@ -92,20 +92,66 @@ module.exports = {
 
   async index(req, res) {
     try {
-      const { user_id, page = 1 } = req.query;
+      const { user_id, page = 1, page_size = 30 } = req.query;
 
-      const contentLists = await knex('content_lists').select(
-        'id',
-        'title',
-        'description',
-        'created_at',
-        'updated_at'
-      );
+      const errors = [];
 
-      for (let list of contentLists) {
-        console.log(list.id);
+      if (user_id && isNaN(user_id)) {
+        errors.push('O parâmetro user_id deve ser um número');
+      } else if (user_id) {
+        const user = await knex('users').where({ id: user_id }).first();
+        if (!user) {
+          errors.push('Usuário não encontrado');
+        }
+      }
+      if (isNaN(page)) {
+        errors.push('O parâmetro page deve ser um número');
+      } else if (page < 1) {
+        errors.push('O parâmetro page inválido. Min 1');
+      }
+      if (isNaN(page_size)) {
+        errors.push('O parâmetro page_size deve ser um número');
+      } else if (page_size < 1 || page_size > 100) {
+        errors.push('Parâmetro page_size inválido. Min 1, Max 100');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const contentListsQuery = knex('content_lists')
+        .select(
+          'content_lists.id',
+          'content_lists.user_id',
+          'users.method as login_method',
+          'content_lists.title',
+          'content_lists.description',
+          'content_lists.created_at',
+          'content_lists.updated_at'
+        )
+        .innerJoin('users', 'user_id', 'users.id')
+        .limit(page_size)
+        .offset((page - 1) * page_size)
+        .orderBy('content_lists.updated_at', 'desc');
+
+      if (user_id) {
+        contentListsQuery.where('users.id', user_id);
+      }
+
+      const contentLists = await contentListsQuery;
+
+      for (const [i, list] of contentLists.entries()) {
+        // Adiciona o username para usuários logados com o método local
+        if (list.login_method === 'local') {
+          const { name: userName } = await knex('local_users')
+            .select('name')
+            .where({ id: list.user_id })
+            .first();
+          contentLists[i].user_name = userName;
+        }
+        // TODO: Adicionar o username para usuário logados com o método Twitch
+
         const contentTypes = await knex
-          .select('name as content_type')
+          .select('name')
           .from('content_list_types')
           .innerJoin(
             'content_types',
@@ -113,12 +159,23 @@ module.exports = {
             'content_list_types.content_type_id'
           )
           .andWhere({ content_list_id: list.id });
-        console.log(contentTypes);
+        contentLists[i].content_types = contentTypes.map((type) => type.name);
       }
 
-      return res.json(contentLists);
+      return res.json(
+        contentLists.map((list) => ({
+          id: list.id,
+          user_id: list.user_id,
+          // login_method: list.login_method,
+          user_name: list.user_name,
+          title: list.title,
+          description: list.description,
+          content_types: list.content_types,
+          created_at: list.created_at,
+          updated_at: list.updated_at,
+        }))
+      );
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },
