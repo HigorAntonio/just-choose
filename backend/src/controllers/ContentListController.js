@@ -33,7 +33,8 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      for (let name of content_types) {
+      const contentTypesSet = [...new Set(content_types)];
+      for (let name of contentTypesSet) {
         let contentTypeId = await knex
           .select('id')
           .from('content_types')
@@ -59,7 +60,8 @@ module.exports = {
           });
         }
 
-        for (let content of content_list) {
+        const contentListSet = [...new Set(content_list)];
+        for (let content of contentListSet) {
           if (content.type === 'movie') {
             const movie = await knex
               .select('id')
@@ -84,6 +86,39 @@ module.exports = {
       if (error instanceof MovieValidationError) {
         return res.status(400).json({ erro: error.message });
       }
+      return res.sendStatus(500);
+    }
+  },
+
+  async index(req, res) {
+    try {
+      const { user_id, page = 1 } = req.query;
+
+      const contentLists = await knex('content_lists').select(
+        'id',
+        'title',
+        'description',
+        'created_at',
+        'updated_at'
+      );
+
+      for (let list of contentLists) {
+        console.log(list.id);
+        const contentTypes = await knex
+          .select('name as content_type')
+          .from('content_list_types')
+          .innerJoin(
+            'content_types',
+            'content_types.id',
+            'content_list_types.content_type_id'
+          )
+          .andWhere({ content_list_id: list.id });
+        console.log(contentTypes);
+      }
+
+      return res.json(contentLists);
+    } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },
