@@ -20,6 +20,7 @@ routes.delete('/polls/:id', authorization, PollController.delete);
 routes.post('/contentlists', authorization, ContentListController.create);
 routes.get('/contentlists', ContentListController.index);
 routes.get('/contentlists/:id', ContentListController.show);
+routes.put('/contentlists/:id', authorization, ContentListController.update);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
