@@ -29,11 +29,6 @@ routes.put(
   authorization,
   ContentListTypesController.update
 );
-routes.delete(
-  '/contentlists/contenttypes/:id',
-  authorization,
-  ContentListTypesController.update
-);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
