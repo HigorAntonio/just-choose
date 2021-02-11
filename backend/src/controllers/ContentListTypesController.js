@@ -58,7 +58,6 @@ module.exports = {
         }
         contentTypesIds.push(contentTypeId.id);
       }
-      // console.log(`contentTypesIds: ${contentTypesIds}`);
 
       const prevContentTypesIds = (
         await knex('content_list_types')
@@ -66,7 +65,6 @@ module.exports = {
           .where({ content_list_id: contentList.id })
           .innerJoin('content_types', 'content_type_id', 'content_types.id')
       ).map((type) => type.id);
-      // console.log(`prevContentTypesIds: ${prevContentTypesIds}`);
 
       const contentTypesToInsert = contentTypesIds.filter(
         (type) => !prevContentTypesIds.includes(type)
@@ -74,11 +72,6 @@ module.exports = {
       const contentTypesToDelete = prevContentTypesIds.filter(
         (type) => !contentTypesIds.includes(type)
       );
-      // console.log(`contentTypesToInsert: ${contentTypesToInsert}`);
-      // console.log(`contentTypesToDelete: ${contentTypesToDelete}`);
-      // console.log(
-      //   '--------------------------------------------------------------'
-      // );
 
       await knex.transaction(async (trx) => {
         for (let contentTypeId of contentTypesToDelete) {
@@ -97,39 +90,6 @@ module.exports = {
       });
 
       return res.sendStatus(200);
-    } catch (error) {
-      console.log(error);
-      return res.sendStatus(500);
-    }
-  },
-
-  async delete(req, res) {
-    try {
-      const userId = req.userId;
-
-      if (!userId) return res.sendStatus(401);
-
-      const contentListId = req.params.id;
-
-      if (isNaN(contentListId)) {
-        return res.sendStatus(404);
-      }
-
-      const contentList = await knex('content_lists')
-        .where({
-          id: contentListId,
-        })
-        .first();
-
-      if (!contentList) {
-        return res
-          .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
-      }
-
-      if (contentList.user_id !== userId) {
-        return res.status(403).json({ erro: 'Usuário inválido' });
-      }
     } catch (error) {
       console.log(error);
       return res.sendStatus(500);
