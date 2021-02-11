@@ -179,4 +179,73 @@ module.exports = {
       return res.sendStatus(500);
     }
   },
+
+  async show(req, res) {
+    try {
+      const contentListId = req.params.id;
+
+      if (isNaN(contentListId)) {
+        return res.sendStatus(404);
+      }
+
+      const contentList = await knex
+        .select(
+          'content_lists.id',
+          'content_lists.user_id',
+          'users.method as login_method',
+          'content_lists.title',
+          'content_lists.description',
+          'content_lists.created_at',
+          'content_lists.updated_at'
+        )
+        .from('content_lists')
+        .where({
+          'content_lists.id': contentListId,
+        })
+        .innerJoin('users', 'content_lists.user_id', 'users.id')
+        .first();
+
+      if (!contentList) {
+        return res
+          .status(400)
+          .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      // Adiciona o username para usuários logados com o método local
+      if (contentList.login_method === 'local') {
+        const { name: userName } = await knex('local_users')
+          .select('name')
+          .where({ id: contentList.user_id })
+          .first();
+        contentList.user_name = userName;
+      }
+      // TODO: Adicionar o username para usuário logados com o método Twitch
+
+      const contentTypes = await knex
+        .select('name')
+        .from('content_list_types')
+        .innerJoin(
+          'content_types',
+          'content_types.id',
+          'content_list_types.content_type_id'
+        )
+        .andWhere({ content_list_id: contentList.id });
+      contentList.content_types = contentTypes.map((type) => type.name);
+
+      return res.json({
+        id: contentList.id,
+        user_id: contentList.user_id,
+        // login_method: contentList.login_method,
+        user_name: contentList.user_name,
+        title: contentList.title,
+        description: contentList.description,
+        content_types: contentList.content_types,
+        created_at: contentList.created_at,
+        updated_at: contentList.updated_at,
+      });
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+  },
 };
