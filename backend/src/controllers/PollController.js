@@ -98,6 +98,8 @@ module.exports = {
       const { id } = req.params;
       const userId = req.userId;
 
+      if (!userId) return res.sendStatus(401);
+
       if (!title) return res.status(400).json({ erro: 'Título não informado' });
 
       const poll = await knex('polls').where({ id }).first();
@@ -120,6 +122,8 @@ module.exports = {
     try {
       const { id } = req.params;
       const userId = req.userId;
+
+      if (!userId) return res.sendStatus(401);
 
       const poll = await knex('polls').where({ id }).first();
 
