@@ -1,6 +1,5 @@
 const knex = require('../database');
 const { MovieValidationError } = require('../errors');
-const { update } = require('./PollController');
 
 module.exports = {
   async create(req, res) {
@@ -289,6 +288,42 @@ module.exports = {
       await knex('content_lists')
         .update({ title, description })
         .where({ id: contentListId });
+
+      return res.sendStatus(200);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async delete(req, res) {
+    try {
+      const userId = req.userId;
+
+      if (!userId) return res.sendStatus(401);
+
+      const contentListId = req.params.id;
+
+      if (isNaN(contentListId)) {
+        return res.sendStatus(404);
+      }
+
+      const contentList = await knex('content_lists')
+        .where({
+          id: contentListId,
+        })
+        .first();
+
+      if (!contentList) {
+        return res
+          .status(400)
+          .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      if (contentList.user_id !== userId) {
+        return res.status(403).json({ erro: 'Usuário inválido' });
+      }
+
+      await knex('content_lists').del().where({ id: contentListId });
 
       return res.sendStatus(200);
     } catch (error) {

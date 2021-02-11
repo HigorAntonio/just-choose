@@ -21,6 +21,7 @@ routes.post('/contentlists', authorization, ContentListController.create);
 routes.get('/contentlists', ContentListController.index);
 routes.get('/contentlists/:id', ContentListController.show);
 routes.put('/contentlists/:id', authorization, ContentListController.update);
+routes.delete('/contentlists/:id', authorization, ContentListController.delete);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
