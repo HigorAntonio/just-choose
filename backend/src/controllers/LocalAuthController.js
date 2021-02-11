@@ -112,8 +112,9 @@ module.exports = {
         return res.status(401).json({ erro: 'RefreshToken inválido' });
 
       jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, decoded) => {
-        if (error)
+        if (err) {
           return res.status(401).json({ erro: 'RefreshToken inválido' });
+        }
 
         delete decoded.iat;
         const accessToken = generateAccessToken(decoded);
@@ -132,8 +133,9 @@ module.exports = {
         return res.status(400).json({ erro: 'RefreshToken não informado' });
 
       jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, decoded) => {
-        if (error)
+        if (err) {
           return res.status(403).json({ erro: 'AccessToken inválido' });
+        }
 
         if (decoded.id !== req.userId)
           return res.status(403).json({ erro: 'Usuário inválido' });
