@@ -22,11 +22,24 @@ module.exports = {
 
       if (!title) {
         errors.push('Título da lista não informado');
+      } else if (typeof title !== 'string') {
+        errors.push('Título da lista, valor inválido');
+      }
+      if (description && typeof description !== 'string') {
+        errors.push('Descrição da lista, valor inválido');
       }
       if (!content_types) {
         errors.push('Tipos de conteúdo da lista não informados');
+      } else if (!Array.isArray(content_types)) {
+        errors.push('Tipos de conteúdo da lista, valor inválido');
+      } else if (!content_types.length) {
+        errors.push('Tipos de conteúdo da lista não informados');
       }
       if (!content_list) {
+        errors.push('Conteúdo da lista não informado');
+      } else if (!Array.isArray(content_list)) {
+        errors.push('Conteúdo da lista, valor inválido');
+      } else if (!content_list.length) {
         errors.push('Conteúdo da lista não informado');
       }
       if (errors.length > 0) {
@@ -281,8 +294,17 @@ module.exports = {
         description = contentList.description,
       } = req.body;
 
+      const errors = [];
       if (!title) {
-        return res.status(400).json({ erro: 'Título da lista não informado' });
+        errors.push('Título da lista não informado');
+      } else if (typeof title !== 'string') {
+        errors.push('Título da lista, valor inválido');
+      }
+      if (description && typeof description !== 'string') {
+        errors.push('Descrição da lista, valor inválido');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
       }
 
       await knex('content_lists')
