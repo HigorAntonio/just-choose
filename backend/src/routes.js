@@ -4,6 +4,7 @@ const authorization = require('./middlewares/authorizationMiddleware');
 const LocalAuthController = require('./controllers/LocalAuthController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
+const ContentListTypesController = require('./controllers/ContentListTypesController');
 
 const routes = express.Router();
 
@@ -22,6 +23,17 @@ routes.get('/contentlists', ContentListController.index);
 routes.get('/contentlists/:id', ContentListController.show);
 routes.put('/contentlists/:id', authorization, ContentListController.update);
 routes.delete('/contentlists/:id', authorization, ContentListController.delete);
+
+routes.put(
+  '/contentlists/contenttypes/:id',
+  authorization,
+  ContentListTypesController.update
+);
+routes.delete(
+  '/contentlists/contenttypes/:id',
+  authorization,
+  ContentListTypesController.update
+);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
