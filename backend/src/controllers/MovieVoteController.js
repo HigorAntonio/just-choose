@@ -9,7 +9,8 @@ module.exports = {
         return res.sendStatus(401);
       }
 
-      const { movieId, pollId } = req.body;
+      const { movieId } = req.body;
+      const pollId = req.params.id;
 
       const errors = [];
       if (!movieId) {
@@ -62,5 +63,40 @@ module.exports = {
     }
   },
 
-  async delete(req, res) {},
+  async delete(req, res) {
+    try {
+      const userId = req.userId;
+      if (!userId) {
+        return res.sendStatus(401);
+      }
+
+      const pollId = req.params.id;
+      if (isNaN(pollId)) {
+        return res.sendStatus(404);
+      }
+
+      const poll = await knex('polls').where({ id: pollId }).first();
+      if (!poll) {
+        return res.status(400).json({ erro: 'Votação não encontrada' });
+      }
+      if (!poll.is_active) {
+        return res.status(403).json({ erro: 'Votação desativada' });
+      }
+
+      const voto = await knex('movie_votes')
+        .where({ user_id: userId, poll_id: pollId })
+        .first();
+      if (!voto) {
+        return res.status(400).json({ erro: 'Voto não encontrado' });
+      }
+
+      await knex('movie_votes')
+        .del()
+        .where({ user_id: userId, poll_id: pollId });
+
+      return res.sendStatus(200);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
 };

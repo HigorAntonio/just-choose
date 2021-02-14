@@ -323,9 +323,7 @@ module.exports = {
         .first();
 
       if (!poll) {
-        return res
-          .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+        return res.status(400).json({ erro: 'Votação não encontrada' });
       }
 
       if (poll.user_id !== userId) {

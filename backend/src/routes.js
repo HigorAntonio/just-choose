@@ -55,8 +55,16 @@ routes.put(
 );
 routes.delete('/polls/:id', authorization, PollController.delete);
 
-routes.post('/votes/movie', authorization, MovieVoteController.create);
-routes.delete('/votes/movie/:id', authorization, MovieVoteController.delete);
+routes.post(
+  '/polls/:id/votes/movie',
+  authorization,
+  MovieVoteController.create
+);
+routes.delete(
+  '/polls/:id/votes/movie',
+  authorization,
+  MovieVoteController.delete
+);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
