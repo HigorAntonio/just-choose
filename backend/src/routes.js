@@ -23,6 +23,7 @@ routes.post(
   PollController.create
 );
 routes.get('/polls', PollController.index);
+routes.get('/polls/:id', PollController.show);
 routes.put(
   '/polls/:id',
   authorization,

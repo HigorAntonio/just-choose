@@ -164,6 +164,71 @@ module.exports = {
     }
   },
 
+  async show(req, res) {
+    try {
+      const pollId = req.params.id;
+
+      if (isNaN(pollId)) {
+        return res.sendStatus(404);
+      }
+
+      const poll = await knex
+        .select(
+          'polls.id',
+          'polls.user_id',
+          'users.method as login_method',
+          'polls.title',
+          'polls.description',
+          'polls.thumbnail',
+          'poll_content_list.content_list_id',
+          'polls.is_active',
+          'polls.created_at',
+          'polls.updated_at'
+        )
+        .from('polls')
+        .where({
+          'polls.id': pollId,
+        })
+        .innerJoin('users', 'polls.user_id', 'users.id')
+        .innerJoin('poll_content_list', 'poll_id', 'polls.id')
+        .first();
+
+      if (!poll) {
+        return res
+          .status(400)
+          .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      // Adiciona o username para usuários logados com o método local
+      if (poll.login_method === 'local') {
+        const { name: userName } = await knex('local_users')
+          .select('name')
+          .where({ id: poll.user_id })
+          .first();
+        poll.user_name = userName;
+      }
+      // TODO: Adicionar o username para usuário logados com o método Twitch
+
+      return res.json({
+        id: poll.id,
+        user_id: poll.user_id,
+        // login_method: poll.login_method,
+        user_name: poll.user_name,
+        title: poll.title,
+        description: poll.description,
+        is_active: poll.is_active,
+        thumbnail: poll.thumbnail,
+        content_list_id: poll.content_list_id,
+        content_types: poll.content_types,
+        created_at: poll.created_at,
+        updated_at: poll.updated_at,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(500);
+    }
+  },
+
   async update(req, res) {
     try {
       const userId = req.userId;
