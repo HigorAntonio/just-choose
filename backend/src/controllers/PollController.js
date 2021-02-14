@@ -234,20 +234,37 @@ module.exports = {
 
   async delete(req, res) {
     try {
-      const { id } = req.params;
       const userId = req.userId;
 
       if (!userId) return res.sendStatus(401);
 
-      const poll = await knex('polls').where({ id }).first();
+      const pollId = req.params.id;
 
-      if (!poll)
-        return res.status(400).json({ erro: 'Id de votação inválido' });
+      if (isNaN(pollId)) {
+        return res.sendStatus(404);
+      }
 
-      if (poll.user_id !== userId)
+      const poll = await knex('polls')
+        .where({
+          id: pollId,
+        })
+        .first();
+
+      if (!poll) {
+        return res
+          .status(400)
+          .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      if (poll.user_id !== userId) {
         return res.status(403).json({ erro: 'Usuário inválido' });
+      }
 
-      await knex('polls').del().where({ id });
+      await knex('polls').del().where({ id: pollId });
+
+      await deleteFile(
+        poll.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
+      );
 
       return res.sendStatus(200);
     } catch (error) {
