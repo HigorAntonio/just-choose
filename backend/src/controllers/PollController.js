@@ -104,6 +104,7 @@ module.exports = {
           'users.method as login_method',
           'polls.title',
           'polls.description',
+          'polls.is_active',
           'polls.thumbnail',
           'poll_content_list.content_list_id',
           'polls.created_at',
@@ -150,6 +151,7 @@ module.exports = {
           user_name: poll.user_name,
           title: poll.title,
           description: poll.description,
+          is_active: poll.is_active,
           thumbnail: poll.thumbnail,
           content_list_id: poll.content_list_id,
           content_types: poll.content_types,
@@ -195,9 +197,11 @@ module.exports = {
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
-      const { title = poll.title, description = poll.description } = JSON.parse(
-        data
-      );
+      const {
+        title = poll.title,
+        description = poll.description,
+        is_active = poll.is_active,
+      } = JSON.parse(data);
 
       const thumbnail = req.file
         ? `${process.env.APP_URL}/files/${req.file.key}`
@@ -212,12 +216,15 @@ module.exports = {
       if (description && typeof description !== 'string') {
         errors.push('Descrição da votação, valor inválido');
       }
+      if (is_active && typeof is_active !== 'boolean') {
+        errors.push('Votação ativa, valor inválido');
+      }
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
 
       await knex('polls')
-        .update({ title, description, thumbnail })
+        .update({ title, description, thumbnail, is_active })
         .where({ id: pollId });
 
       if (req.file) {
