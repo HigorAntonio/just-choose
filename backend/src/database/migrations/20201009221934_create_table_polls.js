@@ -12,7 +12,8 @@ exports.up = async (knex) =>
         .onDelete('CASCADE');
       table.string('title', 50).notNullable();
       table.text('description');
-      table.text('thumbnail');
+      table.boolean('is_active').notNullable().defaultTo(false);
+      table.text('thumbnail').notNullable();
 
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
