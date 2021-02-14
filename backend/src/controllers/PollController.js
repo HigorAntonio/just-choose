@@ -1,4 +1,5 @@
 const knex = require('../database');
+const deleteFile = require('../utils/deleteFile');
 
 module.exports = {
   async create(req, res) {
@@ -64,7 +65,6 @@ module.exports = {
 
       return res.sendStatus(201);
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },
@@ -164,23 +164,67 @@ module.exports = {
 
   async update(req, res) {
     try {
-      const { title } = req.body;
-      const { id } = req.params;
       const userId = req.userId;
 
-      if (!userId) return res.sendStatus(401);
+      if (!userId) {
+        return res.sendStatus(401);
+      }
 
-      if (!title) return res.status(400).json({ erro: 'Título não informado' });
+      const pollId = req.params.id;
 
-      const poll = await knex('polls').where({ id }).first();
+      if (isNaN(pollId)) {
+        return res.sendStatus(404);
+      }
 
-      if (!poll)
-        return res.status(400).json({ erro: 'Id de votação inválido' });
+      const poll = await knex('polls')
+        .where({
+          id: pollId,
+        })
+        .first();
 
-      if (poll.user_id !== userId)
+      if (!poll) {
+        return res.status(400).json({ erro: 'Votação não encontrada' });
+      }
+
+      if (poll.user_id !== userId) {
         return res.status(403).json({ erro: 'Usuário inválido' });
+      }
 
-      await knex('polls').update({ title }).where({ id });
+      const { data } = req.body;
+      if (!data) {
+        return res.status(400).json({ erro: 'Dados da lista não informados' });
+      }
+
+      const { title = poll.title, description = poll.description } = JSON.parse(
+        data
+      );
+
+      const thumbnail = req.file
+        ? `${process.env.APP_URL}/files/${req.file.key}`
+        : poll.thumbnail;
+
+      const errors = [];
+      if (!title) {
+        errors.push('Título da votação não informado');
+      } else if (typeof title !== 'string') {
+        errors.push('Título da votação, valor inválido');
+      }
+      if (description && typeof description !== 'string') {
+        errors.push('Descrição da votação, valor inválido');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      await knex('polls')
+        .update({ title, description, thumbnail })
+        .where({ id: pollId });
+
+      if (req.file) {
+        await deleteFile(
+          poll.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
+        );
+      }
 
       return res.sendStatus(200);
     } catch (error) {

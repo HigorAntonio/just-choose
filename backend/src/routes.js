@@ -23,7 +23,12 @@ routes.post(
   PollController.create
 );
 routes.get('/polls', PollController.index);
-routes.put('/polls/:id', authorization, PollController.update);
+routes.put(
+  '/polls/:id',
+  authorization,
+  multer(multerConfig).single('thumbnail'),
+  PollController.update
+);
 routes.delete('/polls/:id', authorization, PollController.delete);
 
 routes.post(
