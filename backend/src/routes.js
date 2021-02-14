@@ -1,4 +1,7 @@
 const express = require('express');
+const multer = require('multer');
+
+const multerConfig = require('./config/multer');
 
 const authorization = require('./middlewares/authorizationMiddleware');
 const LocalAuthController = require('./controllers/LocalAuthController');
@@ -18,10 +21,20 @@ routes.get('/polls', authorization, PollController.index);
 routes.put('/polls/:id', authorization, PollController.update);
 routes.delete('/polls/:id', authorization, PollController.delete);
 
-routes.post('/contentlists', authorization, ContentListController.create);
+routes.post(
+  '/contentlists',
+  authorization,
+  multer(multerConfig).single('thumbnail'),
+  ContentListController.create
+);
 routes.get('/contentlists', ContentListController.index);
 routes.get('/contentlists/:id', ContentListController.show);
-routes.put('/contentlists/:id', authorization, ContentListController.update);
+routes.put(
+  '/contentlists/:id',
+  authorization,
+  multer(multerConfig).single('thumbnail'),
+  ContentListController.update
+);
 routes.delete('/contentlists/:id', authorization, ContentListController.delete);
 
 routes.put(

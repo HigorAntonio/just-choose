@@ -1,5 +1,6 @@
 const knex = require('../database');
 const { MovieValidationError } = require('../errors');
+const deleteFile = require('../utils/deleteFile');
 
 module.exports = {
   async create(req, res) {
@@ -10,12 +11,17 @@ module.exports = {
         return res.sendStatus(401);
       }
 
+      const { data } = req.body;
+      if (!data) {
+        return res.status(400).json({ erro: 'Dados da lista não informados' });
+      }
+
       const {
         title,
         description,
         content_types,
         content: content_list,
-      } = req.body;
+      } = JSON.parse(data);
 
       const contentTypesIds = [];
       const errors = [];
@@ -27,6 +33,9 @@ module.exports = {
       }
       if (description && typeof description !== 'string') {
         errors.push('Descrição da lista, valor inválido');
+      }
+      if (!req.file) {
+        errors.push('Thumbnail da lista não informada');
       }
       if (!content_types) {
         errors.push('Tipos de conteúdo da lista não informados');
@@ -61,9 +70,12 @@ module.exports = {
         contentTypesIds.push(contentTypeId.id);
       }
 
+      const { key: fileKey } = req.file;
+      const thumbnail = `${process.env.APP_URL}/files/${fileKey}`;
+
       await knex.transaction(async (trx) => {
         const [{ id: contentListId }] = await trx('content_lists')
-          .insert({ user_id: userId, title, description })
+          .insert({ user_id: userId, title, description, thumbnail })
           .returning(['id']);
 
         for (const contentTypeId of contentTypesIds) {
@@ -138,6 +150,7 @@ module.exports = {
           'users.method as login_method',
           'content_lists.title',
           'content_lists.description',
+          'content_lists.thumbnail',
           'content_lists.created_at',
           'content_lists.updated_at'
         )
@@ -183,6 +196,7 @@ module.exports = {
           user_name: list.user_name,
           title: list.title,
           description: list.description,
+          thumbnail: list.thumbnail,
           content_types: list.content_types,
           created_at: list.created_at,
           updated_at: list.updated_at,
@@ -208,6 +222,7 @@ module.exports = {
           'users.method as login_method',
           'content_lists.title',
           'content_lists.description',
+          'content_lists.thumbnail',
           'content_lists.created_at',
           'content_lists.updated_at'
         )
@@ -252,6 +267,7 @@ module.exports = {
         user_name: contentList.user_name,
         title: contentList.title,
         description: contentList.description,
+        thumbnail: contentList.thumbnail,
         content_types: contentList.content_types,
         created_at: contentList.created_at,
         updated_at: contentList.updated_at,
@@ -289,10 +305,19 @@ module.exports = {
         return res.status(403).json({ erro: 'Usuário inválido' });
       }
 
+      const { data } = req.body;
+      if (!data) {
+        return res.status(400).json({ erro: 'Dados da lista não informados' });
+      }
+
       const {
         title = contentList.title,
         description = contentList.description,
-      } = req.body;
+      } = JSON.parse(data);
+
+      const thumbnail = req.file
+        ? `${process.env.APP_URL}/files/${req.file.key}`
+        : contentList.thumbnail;
 
       const errors = [];
       if (!title) {
@@ -308,8 +333,14 @@ module.exports = {
       }
 
       await knex('content_lists')
-        .update({ title, description })
+        .update({ title, description, thumbnail })
         .where({ id: contentListId });
+
+      if (req.file) {
+        await deleteFile(
+          contentList.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
+        );
+      }
 
       return res.sendStatus(200);
     } catch (error) {
@@ -346,6 +377,10 @@ module.exports = {
       }
 
       await knex('content_lists').del().where({ id: contentListId });
+
+      await deleteFile(
+        contentList.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
+      );
 
       return res.sendStatus(200);
     } catch (error) {
