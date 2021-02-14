@@ -2,7 +2,7 @@ const { onUpdateTrigger } = require('../triggers');
 
 exports.up = async (knex) =>
   knex.schema
-    .createTable('votes', (table) => {
+    .createTable('movie_votes', (table) => {
       table.increments('id').primary();
       table
         .integer('user_id')
@@ -27,6 +27,6 @@ exports.up = async (knex) =>
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
-    .then(() => knex.raw(onUpdateTrigger('votes')));
+    .then(() => knex.raw(onUpdateTrigger('movie_votes')));
 
-exports.down = async (knex) => knex.schema.dropTable('votes');
+exports.down = async (knex) => knex.schema.dropTable('movie_votes');
