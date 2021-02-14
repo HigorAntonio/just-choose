@@ -5,15 +5,66 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) return res.sendStatus(401);
+      if (!userId) {
+        return res.sendStatus(401);
+      }
 
-      const { title } = req.body;
-      if (!title) return res.status(400).json({ erro: 'Título não informado' });
+      const { data } = req.body;
+      if (!data) {
+        return res.status(400).json({ erro: 'Dados da lista não informados' });
+      }
 
-      await knex('polls').insert({ user_id: userId, title });
+      const { title, description, content_list_id } = JSON.parse(data);
+
+      const errors = [];
+
+      if (!title) {
+        errors.push('Título da votação não informado');
+      } else if (typeof title !== 'string') {
+        errors.push('Título da votação, valor inválido');
+      }
+      if (description && typeof description !== 'string') {
+        errors.push('Descrição da votação, valor inválido');
+      }
+      if (!req.file) {
+        errors.push('Thumbnail da lista não informada');
+      }
+      if (!content_list_id) {
+        errors.push('Lista de conteúdo da votação, id da lista não informado');
+      } else if (isNaN(content_list_id)) {
+        errors.push('Lista de conteúdo da votação, id da lista inválido');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const contentList = await knex('content_lists')
+        .where({ id: content_list_id })
+        .first();
+
+      if (!contentList) {
+        return res
+          .status(400)
+          .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      const { key: fileKey } = req.file;
+      const thumbnail = `${process.env.APP_URL}/files/${fileKey}`;
+
+      await knex.transaction(async (trx) => {
+        const [{ id: pollId }] = await trx('polls')
+          .insert({ user_id: userId, title, description, thumbnail })
+          .returning(['id']);
+
+        await trx('poll_content_list').insert({
+          poll_id: pollId,
+          content_list_id: content_list_id,
+        });
+      });
 
       return res.sendStatus(201);
     } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },
@@ -22,71 +73,90 @@ module.exports = {
     try {
       const { user_id, page = 1, page_size = 30 } = req.query;
 
-      if (page_size > 100)
-        return res.status(400).json({
-          erro: 'O tamanho da página não pode ser maior que 100',
-        });
+      const errors = [];
 
-      const queryLocal = knex('polls')
+      if (user_id && isNaN(user_id)) {
+        errors.push('O parâmetro user_id deve ser um número');
+      } else if (user_id) {
+        const user = await knex('users').where({ id: user_id }).first();
+        if (!user) {
+          errors.push('Usuário não encontrado');
+        }
+      }
+      if (isNaN(page)) {
+        errors.push('O parâmetro page deve ser um número');
+      } else if (page < 1) {
+        errors.push('O parâmetro page inválido. Min 1');
+      }
+      if (isNaN(page_size)) {
+        errors.push('O parâmetro page_size deve ser um número');
+      } else if (page_size < 1 || page_size > 100) {
+        errors.push('Parâmetro page_size inválido. Min 1, Max 100');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const pollsQuery = knex('polls')
         .select(
           'polls.id',
           'polls.user_id',
-          'local_users.name as created_by',
+          'users.method as login_method',
           'polls.title',
+          'polls.description',
+          'polls.thumbnail',
+          'poll_content_list.content_list_id',
           'polls.created_at',
           'polls.updated_at'
         )
-        .join('local_users', 'local_users.user_id', '=', 'polls.user_id');
-
-      const queryTwitch = knex('polls')
-        .select(
-          'polls.id',
-          'polls.user_id',
-          'twitch_users.name as created_by',
-          'polls.title',
-          'polls.created_at',
-          'polls.updated_at'
-        )
-        .join('twitch_users', 'twitch_users.user_id', '=', 'polls.user_id');
+        .innerJoin('users', 'user_id', 'users.id')
+        .innerJoin('poll_content_list', 'poll_id', 'polls.id')
+        .limit(page_size)
+        .offset((page - 1) * page_size)
+        .orderBy('polls.updated_at', 'desc');
 
       const countObj = knex('polls').count();
 
       if (user_id) {
-        const userExists = await knex('users').where({ id: user_id }).first();
-
-        if (!userExists)
-          return res.status(400).json({ erro: 'Usuário inválido' });
-
-        queryLocal.where('polls.user_id', '=', user_id);
-
-        queryTwitch.where('polls.user_id', '=', user_id);
-
+        pollsQuery.where('users.id', user_id);
         countObj.where({ user_id });
       }
 
-      const [count] = await countObj;
+      const polls = await pollsQuery;
+      const [{ count }] = await countObj;
 
-      const queryResult = await queryLocal
-        .union(queryTwitch)
-        .limit(parseInt(page_size))
-        .offset((parseInt(page) - 1) * parseInt(page_size))
-        .orderBy('created_at', 'desc');
+      for (const [i, list] of polls.entries()) {
+        // Adiciona o username para usuários logados com o método local
+        if (list.login_method === 'local') {
+          const { name: userName } = await knex('local_users')
+            .select('name')
+            .where({ id: list.user_id })
+            .first();
+          polls[i].user_name = userName;
+        }
+        // TODO: Adicionar o username para usuário logados com o método Twitch
+      }
 
-      const total_pages = Math.ceil(count['count'] / page_size);
-      const result = {
+      const total_pages = Math.ceil(count / page_size);
+      return res.json({
         page: parseInt(page),
         page_size: parseInt(page_size),
         total_pages: total_pages === 0 ? 1 : total_pages,
-        total_results: parseInt(count['count']),
-        items: queryResult,
-      };
-
-      if (page > result.total_pages)
-        return res.status(400).json({
-          erro: 'Parâmetros de paginação fora dos limites',
-        });
-
-      return res.json(result);
+        total_results: parseInt(count),
+        items: polls.map((poll) => ({
+          id: poll.id,
+          user_id: poll.user_id,
+          // login_method: poll.login_method,
+          user_name: poll.user_name,
+          title: poll.title,
+          description: poll.description,
+          thumbnail: poll.thumbnail,
+          content_list_id: poll.content_list_id,
+          content_types: poll.content_types,
+          created_at: poll.created_at,
+          updated_at: poll.updated_at,
+        })),
+      });
     } catch (error) {
       return res.sendStatus(500);
     }

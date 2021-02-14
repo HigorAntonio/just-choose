@@ -16,8 +16,13 @@ routes.post('/signin', LocalAuthController.signin);
 routes.post('/token', LocalAuthController.refreshToken);
 routes.delete('/logout', authorization, LocalAuthController.logout);
 
-routes.post('/polls', authorization, PollController.create);
-routes.get('/polls', authorization, PollController.index);
+routes.post(
+  '/polls',
+  authorization,
+  multer(multerConfig).single('thumbnail'),
+  PollController.create
+);
+routes.get('/polls', PollController.index);
 routes.put('/polls/:id', authorization, PollController.update);
 routes.delete('/polls/:id', authorization, PollController.delete);
 
