@@ -159,11 +159,15 @@ module.exports = {
         .offset((page - 1) * page_size)
         .orderBy('content_lists.updated_at', 'desc');
 
+      const countObj = knex('content_lists').count();
+
       if (user_id) {
         contentListsQuery.where('users.id', user_id);
+        countObj.where({ user_id });
       }
 
       const contentLists = await contentListsQuery;
+      const [{ count }] = await countObj;
 
       for (const [i, list] of contentLists.entries()) {
         // Adiciona o username para usuários logados com o método local
@@ -188,8 +192,13 @@ module.exports = {
         contentLists[i].content_types = contentTypes.map((type) => type.name);
       }
 
-      return res.json(
-        contentLists.map((list) => ({
+      const total_pages = Math.ceil(count / page_size);
+      return res.json({
+        page: parseInt(page),
+        page_size: parseInt(page_size),
+        total_pages: total_pages === 0 ? 1 : total_pages,
+        total_results: parseInt(count),
+        items: contentLists.map((list) => ({
           id: list.id,
           user_id: list.user_id,
           // login_method: list.login_method,
@@ -200,8 +209,8 @@ module.exports = {
           content_types: list.content_types,
           created_at: list.created_at,
           updated_at: list.updated_at,
-        }))
-      );
+        })),
+      });
     } catch (error) {
       return res.sendStatus(500);
     }
