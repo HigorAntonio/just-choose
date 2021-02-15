@@ -35,7 +35,17 @@ module.exports = {
         return res.status(403).json({ erro: 'Votação desativada' });
       }
 
-      const movie = await knex('movies').where({ id: movieId });
+      const movie = await knex
+        .from('poll_content_list')
+        .where({ poll_id: pollId })
+        .innerJoin('content_list_movies', function () {
+          this.on(
+            'poll_content_list.content_list_id',
+            '=',
+            'content_list_movies.content_list_id'
+          ).andOn({ 'content_list_movies.movie_id': movieId });
+        })
+        .first();
       if (!movie) {
         return res.status(400).json({ erro: 'Filme não encontrado' });
       }
