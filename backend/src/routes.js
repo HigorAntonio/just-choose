@@ -19,6 +19,8 @@ routes.post('/token', LocalAuthController.refreshToken);
 routes.delete('/logout', authorization, LocalAuthController.logout);
 routes.post('/forgotpassword', LocalAuthController.forgotPassword);
 routes.post('/resetpassword', LocalAuthController.resetPassword);
+routes.get('/devices', authorization, LocalAuthController.userDevices);
+routes.delete('/devices', authorization, LocalAuthController.exitDevice);
 
 routes.post(
   '/contentlists',

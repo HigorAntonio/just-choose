@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const knex = require('../database');
 const { promisify } = require('util');
+const uaParser = require('ua-parser-js');
+
 const redisClient = require('../redisClient');
 const mailer = require('../modules/mailer');
 
@@ -12,6 +14,7 @@ const FORGOT_PASSWORD_TOKEN_SECRET = process.env.FORGOT_PASSWORD_TOKEN_SECRET;
 const saddAsync = promisify(redisClient.sadd).bind(redisClient);
 const sremAsync = promisify(redisClient.srem).bind(redisClient);
 const sismemberAsync = promisify(redisClient.sismember).bind(redisClient);
+const smembersAsync = promisify(redisClient.smembers).bind(redisClient);
 
 const encryptPassword = (password) => {
   const salt = bcrypt.genSaltSync(10);
@@ -74,8 +77,9 @@ module.exports = {
       });
 
       const accessToken = generateAccessToken({ id: newUser.user_id });
+      const ua = uaParser(req.headers['user-agent']);
       const refreshToken = jwt.sign(
-        { id: newUser.user_id },
+        { id: newUser.user_id, os: ua.os.name, browser: ua.browser.name },
         REFRESH_TOKEN_SECRET
       );
       await saddAsync(`refreshTokensUser${newUser.user_id}`, refreshToken);
@@ -114,7 +118,11 @@ module.exports = {
         return res.status(400).json({ erro: 'Senha inválida' });
 
       const accessToken = generateAccessToken({ id: user.user_id });
-      const refreshToken = jwt.sign({ id: user.user_id }, REFRESH_TOKEN_SECRET);
+      const ua = uaParser(req.headers['user-agent']);
+      const refreshToken = jwt.sign(
+        { id: user.user_id, os: ua.os.name, browser: ua.browser.name },
+        REFRESH_TOKEN_SECRET
+      );
       await saddAsync(`refreshTokensUser${user.user_id}`, refreshToken);
 
       return res.json({ accessToken, refreshToken });
@@ -133,29 +141,23 @@ module.exports = {
         return res.status(400).json({ erro: 'RefreshToken, valor inválido' });
       }
 
-      jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
+      try {
+        const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+        if (
+          (await sismemberAsync(
+            `refreshTokensUser${decoded.id}`,
+            refreshToken
+          )) !== 1
+        ) {
           return res.status(401).json({ erro: 'RefreshToken inválido' });
         }
-        (async () => {
-          try {
-            if (
-              (await sismemberAsync(
-                `refreshTokensUser${decoded.id}`,
-                refreshToken
-              )) !== 1
-            ) {
-              return res.status(401).json({ erro: 'RefreshToken inválido' });
-            }
 
-            delete decoded.iat;
-            const accessToken = generateAccessToken(decoded);
-            return res.json({ accessToken });
-          } catch (error) {
-            return res.sendStatus(500);
-          }
-        })();
-      });
+        delete decoded.iat;
+        const accessToken = generateAccessToken(decoded);
+        return res.json({ accessToken });
+      } catch (error) {
+        return res.status(401).json({ erro: 'RefreshToken inválido' });
+      }
     } catch (error) {
       return res.sendStatus(500);
     }
@@ -172,11 +174,8 @@ module.exports = {
         return res.status(400).json({ error: 'RefreshToken, valor inválido' });
       }
 
-      jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, decoded) => {
-        if (err) {
-          return res.status(403).json({ erro: 'RefreshToken inválido' });
-        }
-
+      try {
+        const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
         if (decoded.id !== req.userId) {
           return res.status(403).json({ erro: 'Usuário inválido' });
         }
@@ -189,7 +188,9 @@ module.exports = {
         }
 
         return res.sendStatus(204);
-      });
+      } catch (error) {
+        return res.status(403).json({ erro: 'RefreshToken inválido' });
+      }
     } catch (error) {
       return res.sendStatus(500);
     }
@@ -271,29 +272,87 @@ module.exports = {
         return res.status(403).json({ erro: 'Token inválido' });
       }
 
-      jwt.verify(token, FORGOT_PASSWORD_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-          return res.status(403).json({ erro: 'Token inválido' });
+      try {
+        const decoded = jwt.verify(token, FORGOT_PASSWORD_TOKEN_SECRET);
+
+        if (decoded.id !== user.id) {
+          return res.status(403).json({ error: 'E-mail inválido' });
         }
-        (async () => {
-          try {
-            if (decoded.id !== user.id) {
-              return res.status(403).json({ error: 'E-mail inválido' });
-            }
-            const encryptedPassword = encryptPassword(password);
+        const encryptedPassword = encryptPassword(password);
 
-            await knex('local_users')
-              .update({ password: encryptedPassword })
-              .where({ id: user.id });
+        await sremAsync('forgotPasswordTokens', token);
 
-            await sremAsync('forgotPasswordTokens', token);
+        await knex('local_users')
+          .update({ password: encryptedPassword })
+          .where({ id: user.id });
 
-            return res.sendStatus(200);
-          } catch (error) {
-            return res.sendStatus(500);
-          }
-        })();
+        return res.sendStatus(200);
+      } catch (error) {
+        return res.status(403).json({ erro: 'Token inválido' });
+      }
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async userDevices(req, res) {
+    try {
+      const userId = req.userId;
+      if (!userId) {
+        return res.status(403).json({ erro: 'Usuário inválido' });
+      }
+
+      const devicesTokens = await smembersAsync(`refreshTokensUser${userId}`);
+      const decodedTokens = devicesTokens.map((token) => {
+        const decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
+        return { ...decoded, token };
       });
+
+      return res.json(decodedTokens);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async exitDevice(req, res) {
+    try {
+      const userId = req.userId;
+      if (!userId) {
+        return res.status(403).json({ erro: 'Usuário inválido' });
+      }
+
+      const { password, refreshToken } = req.body;
+      const errors = [];
+      if (!password) {
+        errors.push('Senha não informada');
+      } else if (typeof password !== 'string') {
+        errors.push('Senha, valor inválido');
+      }
+      if (!refreshToken) {
+        errors.push('RefreshToken não informado');
+      } else if (typeof refreshToken !== 'string') {
+        errors.push('RefreshToken, valor inválido');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const user = knex('local_users').where({ id: userId }).first();
+      if (!user) {
+        return res.status(403).json({ erro: 'Usuário não encontrado' });
+      }
+      if (!bcrypt.compareSync(password, user.password)) {
+        return res.status(400).json({ erro: 'Senha inválida' });
+      }
+
+      if (
+        (await sremAsync(`refreshTokensUser${user.id}`, refreshToken)) === 0
+      ) {
+        return res.status(400).json({ erro: 'RefreshToken não encontrado' });
+      }
+      // TODO: Enviar um email ao usuário, informando que a "sessão" em um dos seus dispositivos foi encerrada
+
+      return res.sendStatus(200);
     } catch (error) {
       return res.sendStatus(500);
     }
