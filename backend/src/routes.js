@@ -21,6 +21,12 @@ routes.post('/forgotpassword', LocalAuthController.forgotPassword);
 routes.post('/resetpassword', LocalAuthController.resetPassword);
 routes.get('/devices', authorization, LocalAuthController.userDevices);
 routes.delete('/devices', authorization, LocalAuthController.exitDevice);
+routes.patch('/confirmation/:token', LocalAuthController.confirmEmail);
+routes.get(
+  '/confirmation',
+  authorization,
+  LocalAuthController.resendConfirmEmail
+);
 
 routes.post(
   '/contentlists',

@@ -9,6 +9,7 @@ const mailer = require('../modules/mailer');
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
+const CONFIRM_EMAIL_TOKEN_SECRET = process.env.CONFIRM_EMAIL_TOKEN_SECRET;
 const FORGOT_PASSWORD_TOKEN_SECRET = process.env.FORGOT_PASSWORD_TOKEN_SECRET;
 
 const saddAsync = promisify(redisClient.sadd).bind(redisClient);
@@ -23,6 +24,28 @@ const encryptPassword = (password) => {
 
 const generateAccessToken = (params) => {
   return jwt.sign(params, ACCESS_TOKEN_SECRET, { expiresIn: '24h' });
+};
+
+const sendEmailConfimation = (userId, email) => {
+  const emailConfirmationToken = jwt.sign(
+    { id: userId },
+    CONFIRM_EMAIL_TOKEN_SECRET,
+    { expiresIn: '15m' }
+  );
+
+  mailer.sendMail(
+    {
+      to: email,
+      from: 'justchoose@juschoose.com.br',
+      template: 'auth/confirm_email',
+      context: { emailConfirmationToken },
+    },
+    (error) => {
+      if (error) {
+        throw error;
+      }
+    }
+  );
 };
 
 module.exports = {
@@ -78,11 +101,14 @@ module.exports = {
 
       const accessToken = generateAccessToken({ id: newUser.user_id });
       const ua = uaParser(req.headers['user-agent']);
+      // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
       const refreshToken = jwt.sign(
         { id: newUser.user_id, os: ua.os.name, browser: ua.browser.name },
         REFRESH_TOKEN_SECRET
       );
       await saddAsync(`refreshTokensUser${newUser.user_id}`, refreshToken);
+
+      sendEmailConfimation(newUser.user_id, email);
 
       return res.json({ accessToken, refreshToken });
     } catch (error) {
@@ -119,6 +145,7 @@ module.exports = {
 
       const accessToken = generateAccessToken({ id: user.user_id });
       const ua = uaParser(req.headers['user-agent']);
+      // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
       const refreshToken = jwt.sign(
         { id: user.user_id, os: ua.os.name, browser: ua.browser.name },
         REFRESH_TOKEN_SECRET
@@ -219,7 +246,7 @@ module.exports = {
         {
           to: email,
           from: 'justchoose@juschoose.com.br',
-          template: 'auth/forgotpassword',
+          template: 'auth/forgot_password',
           context: { token },
         },
         (error) => {
@@ -337,7 +364,7 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const user = knex('local_users').where({ id: userId }).first();
+      const user = await knex('local_users').where({ id: userId }).first();
       if (!user) {
         return res.status(403).json({ erro: 'Usuário não encontrado' });
       }
@@ -351,6 +378,56 @@ module.exports = {
         return res.status(400).json({ erro: 'RefreshToken não encontrado' });
       }
       // TODO: Enviar um email ao usuário, informando que a "sessão" em um dos seus dispositivos foi encerrada
+
+      return res.sendStatus(200);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async confirmEmail(req, res) {
+    try {
+      const token = req.params.token;
+      if (!token) {
+        return res.status(400).json({ erro: 'Token não informado' });
+      }
+      if (typeof token !== 'string') {
+        return res.status(400).json({ erro: 'Token, valor inválido' });
+      }
+
+      const decoded = jwt.verify(token, CONFIRM_EMAIL_TOKEN_SECRET);
+
+      const user = await knex('local_users').where({ id: decoded.id }).first();
+      if (!user) {
+        return res.status(400).json({ erro: 'Usuário não encontrado' });
+      }
+
+      await knex('local_users')
+        .update({ is_active: true })
+        .where({ id: decoded.id });
+
+      return res.sendStatus(200);
+    } catch (error) {
+      if (error instanceof jwt.JsonWebTokenError) {
+        return res.status(403).json({ erro: 'Token inválido' });
+      }
+      return res.sendStatus(500);
+    }
+  },
+
+  async resendConfirmEmail(req, res) {
+    try {
+      const userId = req.userId;
+      if (!userId) {
+        return res.status(403).json({ erro: 'Usuário inválido' });
+      }
+
+      const user = await knex('local_users').where({ id: userId }).first();
+      if (!user) {
+        return res.status(403).json({ erro: 'Usuário não encontrado' });
+      }
+
+      sendEmailConfimation(userId, user.email);
 
       return res.sendStatus(200);
     } catch (error) {
