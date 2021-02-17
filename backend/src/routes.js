@@ -17,6 +17,8 @@ routes.post('/signup', LocalAuthController.signup);
 routes.post('/signin', LocalAuthController.signin);
 routes.post('/token', LocalAuthController.refreshToken);
 routes.delete('/logout', authorization, LocalAuthController.logout);
+routes.post('/forgotpassword', LocalAuthController.forgotPassword);
+routes.post('/resetpassword', LocalAuthController.resetPassword);
 
 routes.post(
   '/contentlists',

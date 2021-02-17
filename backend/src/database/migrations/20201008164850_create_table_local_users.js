@@ -14,6 +14,7 @@ exports.up = async (knex) =>
       table.string('name', 50).unique().notNullable();
       table.string('email', 50).unique().notNullable();
       table.text('password').notNullable();
+      table.boolean('is_active').notNullable().defaultTo(false);
 
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
