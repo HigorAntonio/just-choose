@@ -2,8 +2,10 @@ require('dotenv/config');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const routes = require('./routes');
+
 const updateMovieData = require('./schedule/updateMovieDataSchedule');
+
+module.exports.redisClient = require('./lib/redisClient');
 
 const app = express();
 
@@ -18,7 +20,7 @@ app.use(
   express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
 );
 
-app.use(routes);
+app.use(require('./routes'));
 
 const PORT = process.env.PORT;
 

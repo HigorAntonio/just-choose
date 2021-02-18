@@ -4,8 +4,8 @@ const knex = require('../database');
 const { promisify } = require('util');
 const uaParser = require('ua-parser-js');
 
-const redisClient = require('../redisClient');
-const mailer = require('../modules/mailer');
+const { redisClient } = require('../server');
+const mailer = require('../lib/mailer');
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
