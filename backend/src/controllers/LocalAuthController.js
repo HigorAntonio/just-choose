@@ -4,8 +4,8 @@ const knex = require('../database');
 const { promisify } = require('util');
 const uaParser = require('ua-parser-js');
 
+const Queue = require('../lib/Queue');
 const { redisClient } = require('../server');
-const mailer = require('../lib/mailer');
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
@@ -26,26 +26,19 @@ const generateAccessToken = (params) => {
   return jwt.sign(params, ACCESS_TOKEN_SECRET, { expiresIn: '24h' });
 };
 
-const sendEmailConfimation = (userId, email) => {
-  const emailConfirmationToken = jwt.sign(
-    { id: userId },
-    CONFIRM_EMAIL_TOKEN_SECRET,
-    { expiresIn: '15m' }
-  );
+const sendEmailConfimation = async (userId, email) => {
+  try {
+    const emailConfirmationToken = jwt.sign(
+      { id: userId },
+      CONFIRM_EMAIL_TOKEN_SECRET,
+      { expiresIn: '15m' }
+    );
 
-  mailer.sendMail(
-    {
-      to: email,
-      from: 'justchoose@juschoose.com.br',
-      template: 'auth/confirm_email',
-      context: { emailConfirmationToken },
-    },
-    (error) => {
-      if (error) {
-        throw error;
-      }
-    }
-  );
+    // TODO: Enviar email usando a fila
+    await Queue.add('ConfirmationMail', { email, emailConfirmationToken });
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = {
@@ -97,6 +90,8 @@ module.exports = {
         newUser.password = encryptedPassword;
 
         await trx('local_users').insert(newUser);
+
+        await sendEmailConfimation(newUser.user_id, email);
       });
 
       const accessToken = generateAccessToken({ id: newUser.user_id });
@@ -107,8 +102,6 @@ module.exports = {
         REFRESH_TOKEN_SECRET
       );
       await saddAsync(`refreshTokensUser${newUser.user_id}`, refreshToken);
-
-      sendEmailConfimation(newUser.user_id, email);
 
       return res.json({ accessToken, refreshToken });
     } catch (error) {
@@ -242,23 +235,9 @@ module.exports = {
       });
       await saddAsync('forgotPasswordTokens', token);
 
-      mailer.sendMail(
-        {
-          to: email,
-          from: 'justchoose@juschoose.com.br',
-          template: 'auth/forgot_password',
-          context: { token },
-        },
-        (error) => {
-          if (error) {
-            return res.status(400).json({
-              erro: 'Não foi possível enviar o e-mail de recuperação de senha',
-            });
-          }
+      await Queue.add('ForgotPasswordMail', { email, token });
 
-          return res.sendStatus(200);
-        }
-      );
+      return res.sendStatus(200);
     } catch (error) {
       return res.sendStatus(500);
     }
@@ -427,7 +406,7 @@ module.exports = {
         return res.status(403).json({ erro: 'Usuário não encontrado' });
       }
 
-      sendEmailConfimation(userId, user.email);
+      await sendEmailConfimation(userId, user.email);
 
       return res.sendStatus(200);
     } catch (error) {
