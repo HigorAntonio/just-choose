@@ -1,5 +1,4 @@
 const knex = require('../database');
-const { MovieValidationError } = require('../errors');
 const deleteFile = require('../utils/deleteFile');
 
 module.exports = {
@@ -8,22 +7,21 @@ module.exports = {
       const userId = req.userId;
 
       if (!userId) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.sendStatus(401);
       }
 
       const { data } = req.body;
       if (!data) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
-      const {
-        title,
-        description,
-        content_types,
-        content: content_list,
-      } = JSON.parse(data);
-
-      const contentTypesIds = [];
+      const { title, description, content: content_list } = JSON.parse(data);
       const errors = [];
 
       if (!title) {
@@ -37,80 +35,78 @@ module.exports = {
       if (!req.file) {
         errors.push('Thumbnail da lista não informada');
       }
-      if (!content_types) {
-        errors.push('Tipos de conteúdo da lista não informados');
-      } else if (!Array.isArray(content_types)) {
-        errors.push('Tipos de conteúdo da lista, valor inválido');
-      } else if (!content_types.length) {
-        errors.push('Tipos de conteúdo da lista não informados');
-      }
       if (!content_list) {
         errors.push('Conteúdo da lista não informado');
       } else if (!Array.isArray(content_list)) {
         errors.push('Conteúdo da lista, valor inválido');
-      } else if (!content_list.length) {
-        errors.push('Conteúdo da lista não informado');
+      } else if (content_list.length < 1 || content_list.length > 100) {
+        errors.push(
+          'Conteúdo da lista inválido. O número de items deve ficar entre 1 e 100'
+        );
       }
       if (errors.length > 0) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erros: errors });
-      }
-
-      const contentTypesSet = [...new Set(content_types)];
-      for (const name of contentTypesSet) {
-        let contentTypeId = await knex
-          .select('id')
-          .from('content_types')
-          .where({ name })
-          .first();
-        if (!contentTypeId) {
-          return res
-            .status(400)
-            .json({ erro: `Tipo de conteúdo '${name}' inválido` });
-        }
-        contentTypesIds.push(contentTypeId.id);
       }
 
       const { key: fileKey } = req.file;
       const thumbnail = `${process.env.APP_URL}/files/${fileKey}`;
+
+      const contentNames = [
+        ...new Set(content_list.map((content) => content.type)),
+      ];
+      const contentTypes = [];
+      for (const name of contentNames) {
+        const contentType = await knex('content_types')
+          .select('id')
+          .where({ name })
+          .first();
+        if (contentType) {
+          contentTypes.push({ id: contentType.id, name });
+        }
+      }
+
+      const contentToInsert = {};
+      contentNames.forEach(
+        (name) => (contentToInsert[`content_list_${name}s`] = [])
+      );
+      for (const content of [...new Set(content_list)]) {
+        contentToInsert[`content_list_${content.type}s`].push(
+          content.contentId
+        );
+      }
 
       await knex.transaction(async (trx) => {
         const [{ id: contentListId }] = await trx('content_lists')
           .insert({ user_id: userId, title, description, thumbnail })
           .returning(['id']);
 
-        for (const contentTypeId of contentTypesIds) {
-          await trx('content_list_types').insert({
+        await trx('content_list_types').insert(
+          contentTypes.map((contentType) => ({
             content_list_id: contentListId,
-            content_type_id: contentTypeId,
-          });
-        }
+            content_type_id: contentType.id,
+          }))
+        );
 
-        const contentListSet = [...new Set(content_list)];
-        for (const content of contentListSet) {
-          if (content.type === 'movie') {
-            const movie = await knex
-              .select('id')
-              .from('movies')
-              .where({ id: content.contentId })
-              .first();
-            if (!movie) {
-              throw new MovieValidationError(
-                `Movie id '${content.contentId}' inválido`
-              );
-            }
-            await trx('content_list_movies').insert({
-              content_list_id: contentListId,
-              movie_id: content.contentId,
-            });
-          }
+        for (const contentType of contentTypes) {
+          await trx(`content_list_${contentType.name}s`).insert(
+            contentToInsert[`content_list_${contentType.name}s`].map(
+              (contentId) => ({
+                content_list_id: contentListId,
+                [`${contentType.name}_id`]: contentId,
+              })
+            )
+          );
         }
       });
 
       return res.sendStatus(201);
     } catch (error) {
-      if (error instanceof MovieValidationError) {
-        return res.status(400).json({ erro: error.message });
-      }
+      try {
+        await deleteFile(req.file.key);
+      } catch (error) {}
       return res.sendStatus(500);
     }
   },
