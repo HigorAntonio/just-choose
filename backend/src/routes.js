@@ -10,6 +10,7 @@ const ContentListController = require('./controllers/ContentListController');
 const ContentListTypesController = require('./controllers/ContentListTypesController');
 const MovieVoteController = require('./controllers/MovieVoteController');
 const PollVoteController = require('./controllers/PollVoteController');
+const MovieController = require('./controllers/MovieController');
 
 const routes = express.Router();
 
@@ -82,5 +83,7 @@ routes.get('/polls/:id/result', PollVoteController.show);
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
 });
+
+routes.get('/movies', MovieController.index);
 
 module.exports = routes;

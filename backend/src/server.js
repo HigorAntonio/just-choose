@@ -3,13 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const updateMovieData = require('./schedule/updateMovieDataSchedule');
-
 module.exports.redisClient = require('./lib/redisClient');
 
 const app = express();
-
-updateMovieData();
 
 app.use(cors());
 
