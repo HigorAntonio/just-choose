@@ -4,7 +4,7 @@ exports.up = async (knex) =>
   knex.schema
     .createTable('movies', (table) => {
       table.increments('id').primary();
-      table.text('tmdb_id').unique().notNullable();
+      table.integer('tmdb_id').unique().notNullable();
       table.text('original_title').notNullable();
       table.text('title').notNullable();
       table.text('poster_path').notNullable();

@@ -4,7 +4,7 @@ exports.up = async (knex) =>
   knex.schema
     .createTable('games', (table) => {
       table.increments('id').primary();
-      table.text('rawg_id').unique().notNullable();
+      table.integer('rawg_id').unique().notNullable();
       table.text('name').notNullable();
       table.text('background_image').notNullable();
 

@@ -10,7 +10,7 @@ exports.up = async (knex) =>
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-      table.string('title', 50).notNullable();
+      table.text('title').notNullable();
       table.text('description');
       table.boolean('is_active').notNullable().defaultTo(false);
       table.text('thumbnail').notNullable();

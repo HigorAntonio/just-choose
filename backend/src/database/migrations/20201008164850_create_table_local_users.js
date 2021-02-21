@@ -11,8 +11,8 @@ exports.up = async (knex) =>
         .unique()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-      table.string('name', 50).unique().notNullable();
-      table.string('email', 50).unique().notNullable();
+      table.text('name').unique().notNullable();
+      table.text('email').unique().notNullable();
       table.text('password').notNullable();
       table.boolean('is_active').notNullable().defaultTo(false);
 
