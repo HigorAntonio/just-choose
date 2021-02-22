@@ -7,11 +7,17 @@ module.exports = {
       const userId = req.userId;
 
       if (!userId) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.sendStatus(401);
       }
 
       const { data } = req.body;
       if (!data) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
@@ -36,6 +42,9 @@ module.exports = {
         errors.push('Lista de conteúdo da votação, id da lista inválido');
       }
       if (errors.length > 0) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erros: errors });
       }
 
@@ -44,6 +53,9 @@ module.exports = {
         .first();
 
       if (!contentList) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
@@ -65,6 +77,9 @@ module.exports = {
 
       return res.sendStatus(201);
     } catch (error) {
+      try {
+        await deleteFile(req.file.key);
+      } catch (error) {}
       return res.sendStatus(500);
     }
   },
@@ -234,12 +249,18 @@ module.exports = {
       const userId = req.userId;
 
       if (!userId) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.sendStatus(401);
       }
 
       const pollId = req.params.id;
 
       if (isNaN(pollId)) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.sendStatus(404);
       }
 
@@ -250,15 +271,24 @@ module.exports = {
         .first();
 
       if (!poll) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erro: 'Votação não encontrada' });
       }
 
       if (poll.user_id !== userId) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(403).json({ erro: 'Usuário inválido' });
       }
 
       const { data } = req.body;
       if (!data) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
@@ -285,6 +315,9 @@ module.exports = {
         errors.push('Votação ativa, valor inválido');
       }
       if (errors.length > 0) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erros: errors });
       }
 
@@ -300,6 +333,9 @@ module.exports = {
 
       return res.sendStatus(200);
     } catch (error) {
+      try {
+        await deleteFile(req.file.key);
+      } catch (error) {}
       return res.sendStatus(500);
     }
   },

@@ -8,7 +8,7 @@ const LocalAuthController = require('./controllers/LocalAuthController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
 const ContentListTypesController = require('./controllers/ContentListTypesController');
-const MovieVoteController = require('./controllers/MovieVoteController');
+const VoteController = require('./controllers/VoteController');
 const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
 const ShowController = require('./controllers/ShowController');
@@ -68,16 +68,8 @@ routes.put(
 );
 routes.delete('/polls/:id', authorization, PollController.delete);
 
-routes.post(
-  '/polls/:id/votes/movie',
-  authorization,
-  MovieVoteController.create
-);
-routes.delete(
-  '/polls/:id/votes/movie',
-  authorization,
-  MovieVoteController.delete
-);
+routes.post('/polls/:id/votes', authorization, VoteController.create);
+routes.delete('/polls/:id/votes', authorization, VoteController.delete);
 
 routes.get('/polls/:id/result', PollVoteController.show);
 

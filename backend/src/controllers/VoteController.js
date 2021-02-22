@@ -9,14 +9,19 @@ module.exports = {
         return res.sendStatus(401);
       }
 
-      const { movieId } = req.body;
+      const { contentId, type } = req.body;
       const pollId = req.params.id;
 
       const errors = [];
-      if (!movieId) {
-        errors.push('Filme a ser votado não informado');
-      } else if (isNaN(movieId)) {
-        errors.push('Filme a ser votado, valor inválido');
+      if (!contentId) {
+        errors.push('Conteúdo a ser votado não informado');
+      } else if (isNaN(contentId)) {
+        errors.push('Conteúdo a ser votado, valor inválido');
+      }
+      if (!type) {
+        errors.push('Tipo do conteúdo a ser votado não informado');
+      } else if (typeof type !== 'string') {
+        errors.push('Tipo do conteúdo a ser votado, valor inválido');
       }
       if (!pollId) {
         errors.push('Votação não informada');
@@ -35,35 +40,43 @@ module.exports = {
         return res.status(403).json({ erro: 'Votação desativada' });
       }
 
-      const movie = await knex
+      const contentTypes = (
+        await knex.select('name').from('content_types')
+      ).map((type) => type.name);
+      if (!contentTypes.includes(type)) {
+        return res
+          .status(400)
+          .json({ erro: 'Tipo de conteúdo não encontrada' });
+      }
+
+      for (const name of contentTypes) {
+        const vote = await knex(`${name}_votes`)
+          .where({ user_id: userId, poll_id: pollId })
+          .first();
+        if (vote) {
+          return res.status(403).json({ erro: 'Número de votos excedido' });
+        }
+      }
+
+      const content = await knex
+        .select()
         .from('poll_content_list')
         .where({ poll_id: pollId })
-        .innerJoin('content_list_movies', function () {
+        .innerJoin(`content_list_${type}s`, function () {
           this.on(
             'poll_content_list.content_list_id',
             '=',
-            'content_list_movies.content_list_id'
-          ).andOn({ 'content_list_movies.movie_id': movieId });
+            `content_list_${type}s.content_list_id`
+          ).andOn({ [`content_list_${type}s.${type}_id`]: contentId });
         })
         .first();
-      if (!movie) {
-        return res.status(400).json({ erro: 'Filme não encontrado' });
+      if (!content) {
+        return res.status(400).json({ erro: 'Conteúdo não encontrado' });
       }
 
-      const vote = await knex('movie_votes')
-        .where({
-          user_id: userId,
-          movie_id: movieId,
-          poll_id: pollId,
-        })
-        .first();
-      if (vote) {
-        return res.status(403).json({ erro: 'Número de votos excedido' });
-      }
-
-      await knex('movie_votes').insert({
+      await knex(`${type}_votes`).insert({
         user_id: userId,
-        movie_id: movieId,
+        [`${type}_id`]: contentId,
         poll_id: pollId,
       });
 
@@ -93,14 +106,25 @@ module.exports = {
         return res.status(403).json({ erro: 'Votação desativada' });
       }
 
-      const voto = await knex('movie_votes')
-        .where({ user_id: userId, poll_id: pollId })
-        .first();
-      if (!voto) {
+      const contentTypes = (
+        await knex.select('name').from('content_types')
+      ).map((type) => type.name);
+
+      let vote, contentType;
+      for (const name of contentTypes) {
+        contentType = name;
+        vote = await knex(`${name}_votes`)
+          .where({ user_id: userId, poll_id: pollId })
+          .first();
+        if (vote) {
+          break;
+        }
+      }
+      if (!vote) {
         return res.status(400).json({ erro: 'Voto não encontrado' });
       }
 
-      await knex('movie_votes')
+      await knex(`${contentType}_votes`)
         .del()
         .where({ user_id: userId, poll_id: pollId });
 

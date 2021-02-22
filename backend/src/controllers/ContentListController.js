@@ -1,6 +1,67 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
 
+const createContentListOnDB = async (
+  userId,
+  title,
+  description,
+  thumbnail,
+  content_list
+) => {
+  try {
+    const contentNames = [
+      ...new Set(content_list.map((content) => content.type)),
+    ];
+    const contentTypes = await knex('content_types')
+      .select('id', 'name')
+      .whereIn('name', contentNames);
+
+    const contentToInsert = {};
+    contentNames.forEach(
+      (name) => (contentToInsert[`content_list_${name}s`] = [])
+    );
+    for (const content of content_list) {
+      contentToInsert[`content_list_${content.type}s`].push(content.contentId);
+    }
+
+    // Removendo ids duplicados e ids de conteúdos que não existem no banco de dados
+    for (const type of contentTypes) {
+      contentToInsert[`content_list_${type.name}s`] = (
+        await knex
+          .select('id')
+          .from(`${type.name}s`)
+          .whereIn('id', contentToInsert[`content_list_${type.name}s`])
+      ).map((content) => content.id);
+    }
+
+    await knex.transaction(async (trx) => {
+      const [{ id: contentListId }] = await trx('content_lists')
+        .insert({ user_id: userId, title, description, thumbnail })
+        .returning(['id']);
+
+      await trx('content_list_types').insert(
+        contentTypes.map((contentType) => ({
+          content_list_id: contentListId,
+          content_type_id: contentType.id,
+        }))
+      );
+
+      for (const contentType of contentTypes) {
+        await trx(`content_list_${contentType.name}s`).insert(
+          contentToInsert[`content_list_${contentType.name}s`].map(
+            (contentId) => ({
+              content_list_id: contentListId,
+              [`${contentType.name}_id`]: contentId,
+            })
+          )
+        );
+      }
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   async create(req, res) {
     try {
@@ -54,56 +115,17 @@ module.exports = {
       const { key: fileKey } = req.file;
       const thumbnail = `${process.env.APP_URL}/files/${fileKey}`;
 
-      const contentNames = [
-        ...new Set(content_list.map((content) => content.type)),
-      ];
-      const contentTypes = [];
-      for (const name of contentNames) {
-        const contentType = await knex('content_types')
-          .select('id')
-          .where({ name })
-          .first();
-        if (contentType) {
-          contentTypes.push({ id: contentType.id, name });
-        }
-      }
-
-      const contentToInsert = {};
-      contentNames.forEach(
-        (name) => (contentToInsert[`content_list_${name}s`] = [])
+      await createContentListOnDB(
+        userId,
+        title,
+        description,
+        thumbnail,
+        content_list
       );
-      for (const content of [...new Set(content_list)]) {
-        contentToInsert[`content_list_${content.type}s`].push(
-          content.contentId
-        );
-      }
-
-      await knex.transaction(async (trx) => {
-        const [{ id: contentListId }] = await trx('content_lists')
-          .insert({ user_id: userId, title, description, thumbnail })
-          .returning(['id']);
-
-        await trx('content_list_types').insert(
-          contentTypes.map((contentType) => ({
-            content_list_id: contentListId,
-            content_type_id: contentType.id,
-          }))
-        );
-
-        for (const contentType of contentTypes) {
-          await trx(`content_list_${contentType.name}s`).insert(
-            contentToInsert[`content_list_${contentType.name}s`].map(
-              (contentId) => ({
-                content_list_id: contentListId,
-                [`${contentType.name}_id`]: contentId,
-              })
-            )
-          );
-        }
-      });
 
       return res.sendStatus(201);
     } catch (error) {
+      console.log(error);
       try {
         await deleteFile(req.file.key);
       } catch (error) {}
@@ -286,11 +308,19 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) return res.sendStatus(401);
+      if (!userId) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
+        return res.sendStatus(401);
+      }
 
       const contentListId = req.params.id;
 
       if (isNaN(contentListId)) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.sendStatus(404);
       }
 
@@ -301,17 +331,26 @@ module.exports = {
         .first();
 
       if (!contentList) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
 
       if (contentList.user_id !== userId) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(403).json({ erro: 'Usuário inválido' });
       }
 
       const { data } = req.body;
       if (!data) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
@@ -334,6 +373,9 @@ module.exports = {
         errors.push('Descrição da lista, valor inválido');
       }
       if (errors.length > 0) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
         return res.status(400).json({ erros: errors });
       }
 
@@ -349,6 +391,9 @@ module.exports = {
 
       return res.sendStatus(200);
     } catch (error) {
+      try {
+        await deleteFile(req.file.key);
+      } catch (error) {}
       return res.sendStatus(500);
     }
   },
