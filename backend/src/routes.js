@@ -11,6 +11,7 @@ const ContentListTypesController = require('./controllers/ContentListTypesContro
 const MovieVoteController = require('./controllers/MovieVoteController');
 const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
+const ShowController = require('./controllers/ShowController');
 
 const routes = express.Router();
 
@@ -80,13 +81,17 @@ routes.delete(
 
 routes.get('/polls/:id/result', PollVoteController.show);
 
-routes.get('/', authorization, (req, res) => {
-  res.json({ home: true });
-});
-
 routes.get('/movies', MovieController.index);
 routes.get('/movies/certifications', MovieController.certifications);
 routes.get('/movies/genres', MovieController.genres);
 routes.get('/movies/watch_providers', MovieController.watchProviders);
+
+routes.get('/shows', ShowController.index);
+routes.get('/shows/genres', ShowController.genres);
+routes.get('/shows/watch_providers', ShowController.watchProviders);
+
+routes.get('/', authorization, (req, res) => {
+  res.json({ home: true });
+});
 
 module.exports = routes;
