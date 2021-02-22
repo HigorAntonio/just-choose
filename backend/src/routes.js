@@ -4,10 +4,10 @@ const multer = require('multer');
 const multerConfig = require('./config/multer');
 
 const authorization = require('./middlewares/authorizationMiddleware');
+const isUserActive = require('./middlewares/isUserActive');
 const LocalAuthController = require('./controllers/LocalAuthController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
-const ContentListTypesController = require('./controllers/ContentListTypesController');
 const VoteController = require('./controllers/VoteController');
 const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
@@ -15,6 +15,7 @@ const ShowController = require('./controllers/ShowController');
 
 const routes = express.Router();
 
+// LocalAuthController
 routes.post('/signup', LocalAuthController.signup);
 routes.post('/signin', LocalAuthController.signin);
 routes.post('/token', LocalAuthController.refreshToken);
@@ -30,9 +31,11 @@ routes.get(
   LocalAuthController.resendConfirmEmail
 );
 
+// ContentListController
 routes.post(
   '/contentlists',
   authorization,
+  isUserActive,
   multer(multerConfig).single('thumbnail'),
   ContentListController.create
 );
@@ -41,20 +44,22 @@ routes.get('/contentlists/:id', ContentListController.show);
 routes.put(
   '/contentlists/:id',
   authorization,
+  isUserActive,
   multer(multerConfig).single('thumbnail'),
   ContentListController.update
 );
-routes.delete('/contentlists/:id', authorization, ContentListController.delete);
-
-routes.put(
-  '/contentlists/contenttypes/:id',
+routes.delete(
+  '/contentlists/:id',
   authorization,
-  ContentListTypesController.update
+  isUserActive,
+  ContentListController.delete
 );
 
+// PollController
 routes.post(
   '/polls',
   authorization,
+  isUserActive,
   multer(multerConfig).single('thumbnail'),
   PollController.create
 );
@@ -63,24 +68,59 @@ routes.get('/polls/:id', PollController.show);
 routes.put(
   '/polls/:id',
   authorization,
+  isUserActive,
   multer(multerConfig).single('thumbnail'),
   PollController.update
 );
-routes.delete('/polls/:id', authorization, PollController.delete);
+routes.delete('/polls/:id', authorization, isUserActive, PollController.delete);
 
-routes.post('/polls/:id/votes', authorization, VoteController.create);
-routes.delete('/polls/:id/votes', authorization, VoteController.delete);
+// VoteController
+routes.post(
+  '/polls/:id/votes',
+  authorization,
+  isUserActive,
+  VoteController.create
+);
+routes.delete(
+  '/polls/:id/votes',
+  authorization,
+  isUserActive,
+  VoteController.delete
+);
 
+// PollVoteController
 routes.get('/polls/:id/result', PollVoteController.show);
 
-routes.get('/movies', MovieController.index);
-routes.get('/movies/certifications', MovieController.certifications);
-routes.get('/movies/genres', MovieController.genres);
-routes.get('/movies/watch_providers', MovieController.watchProviders);
+// MovieController
+routes.get('/movies', authorization, isUserActive, MovieController.index);
+routes.get(
+  '/movies/certifications',
+  authorization,
+  isUserActive,
+  MovieController.certifications
+);
+routes.get(
+  '/movies/genres',
+  authorization,
+  isUserActive,
+  MovieController.genres
+);
+routes.get(
+  '/movies/watch_providers',
+  authorization,
+  isUserActive,
+  MovieController.watchProviders
+);
 
-routes.get('/shows', ShowController.index);
-routes.get('/shows/genres', ShowController.genres);
-routes.get('/shows/watch_providers', ShowController.watchProviders);
+// ShowController
+routes.get('/shows', authorization, isUserActive, ShowController.index);
+routes.get('/shows/genres', authorization, isUserActive, ShowController.genres);
+routes.get(
+  '/shows/watch_providers',
+  authorization,
+  isUserActive,
+  ShowController.watchProviders
+);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
