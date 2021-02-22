@@ -113,5 +113,22 @@ module.exports = (queryParams) => {
     }
   }
 
-  return errors;
+  const params = {
+    sort_by,
+    page,
+    certification_country,
+    certification_lte,
+    certification_gte,
+    primary_release_date_gte,
+    primary_release_date_lte,
+    vote_average_gte,
+    vote_average_lte,
+    with_genres,
+    with_runtime_gte,
+    with_runtime_lte,
+    with_watch_providers,
+    watch_region,
+  };
+
+  return { params, errors };
 };

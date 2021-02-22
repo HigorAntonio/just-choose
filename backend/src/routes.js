@@ -85,5 +85,8 @@ routes.get('/', authorization, (req, res) => {
 });
 
 routes.get('/movies', MovieController.index);
+routes.get('/movies/certifications', MovieController.certifications);
+routes.get('/movies/genres', MovieController.genres);
+routes.get('/movies/watch_providers', MovieController.watchProviders);
 
 module.exports = routes;
