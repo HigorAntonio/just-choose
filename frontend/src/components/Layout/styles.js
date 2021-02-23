@@ -11,6 +11,7 @@ export const HeaderWrapper = styled.div`
   flex-shrink: 0;
   position: sticky;
   top: 0;
+  z-index: 100;
 `;
 
 export const BodyWrapper = styled.div`

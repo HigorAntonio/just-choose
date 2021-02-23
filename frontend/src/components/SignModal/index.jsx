@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 
 import Backdrop from '../Backdrop';
 import InputToggleVisibility from '../InputToggleVisibility';
+
+import { AuthContext } from '../../context/AuthContext';
 
 import {
   Container,
@@ -23,6 +25,19 @@ import {
 } from './styles';
 
 const SignModal = ({ show, setShow, navOption, setNavOption }) => {
+  const { authenticated, handleLogin } = useContext(AuthContext);
+  const [signInEmail, setSignInEmail] = useState('');
+  const [signPassword, setSignPassword] = useState('');
+  console.debug('SignModal', authenticated);
+
+  const handleSignIn = async (e) => {
+    try {
+      e.preventDefault();
+      await handleLogin({ email: signInEmail, password: signPassword });
+      setShow(false);
+    } catch (error) {}
+  };
+
   if (!show) return null;
   return (
     <Container>
@@ -49,13 +64,27 @@ const SignModal = ({ show, setShow, navOption, setNavOption }) => {
             {navOption === 'signIn' ? (
               <SignInForm>
                 <InputWithLabel>
-                  <Label htmlFor="username">Usuário</Label>
-                  <Input type="text" id="username" autoFocus />
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input
+                    type="email"
+                    id="email"
+                    value={signInEmail}
+                    onChange={(e) => {
+                      setSignInEmail(e.target.value);
+                    }}
+                  />
                 </InputWithLabel>
                 <InputWithLabel className="password-toggle">
-                  <InputToggleVisibility label="Senha" id="password" />
+                  <InputToggleVisibility
+                    label="Senha"
+                    id="password"
+                    value={signPassword}
+                    onChange={(e) => setSignPassword(e.target.value)}
+                  />
                 </InputWithLabel>
-                <SignFormButton type="submit">Entrar</SignFormButton>
+                <SignFormButton type="submit" onClick={(e) => handleSignIn(e)}>
+                  Entrar
+                </SignFormButton>
               </SignInForm>
             ) : (
               <SignUpForm>

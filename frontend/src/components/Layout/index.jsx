@@ -1,5 +1,12 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
+
+import { AuthContext } from '../../context/AuthContext';
 
 import Header from '../Header';
 import NavBar from '../NavBar';
@@ -14,25 +21,42 @@ import {
   ContentWrapper,
 } from './styles';
 
+const CustomRoute = ({ isPrivate, ...rest }) => {
+  const { loading, authenticated } = useContext(AuthContext);
+
+  if (loading) return <h1>Loading...</h1>;
+
+  if (isPrivate && !authenticated) {
+    return <Redirect to="/" />;
+  }
+
+  return <Route {...rest} />;
+};
+
 const Layout = () => {
   return (
     <Container>
-      <HeaderWrapper>
-        <Header />
-      </HeaderWrapper>
-      <BodyWrapper>
-        <NavBarWrapper>
-          <NavBar />
-        </NavBarWrapper>
-        <ContentWrapper>
-          <Router>
+      <Router>
+        <HeaderWrapper>
+          <Header />
+        </HeaderWrapper>
+        <BodyWrapper>
+          <NavBarWrapper>
+            <NavBar />
+          </NavBarWrapper>
+          <ContentWrapper>
             <Switch>
-              <Route exact path="/" component={Home} />
-              <Route exact path="/movies/list" component={CreateMovieList} />
+              <CustomRoute exact path="/" component={Home} />
+              <CustomRoute
+                isPrivate
+                exact
+                path="/movies/list"
+                component={CreateMovieList}
+              />
             </Switch>
-          </Router>
-        </ContentWrapper>
-      </BodyWrapper>
+          </ContentWrapper>
+        </BodyWrapper>
+      </Router>
     </Container>
   );
 };
