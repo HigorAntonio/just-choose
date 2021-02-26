@@ -131,6 +131,12 @@ export const SignFormButton = styled.button`
     cursor: pointer;
     background: #0f6ba8d9;
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: rgba(256, 256, 256, 0.08);
+    color: #888;
+  }
 `;
 
 export const SignInForm = styled.form``;
@@ -152,5 +158,22 @@ export const CloseModal = styled.button`
   &:hover {
     background: #ffffff4d;
     cursor: pointer;
+  }
+`;
+
+export const FormErrors = styled.div`
+  margin: 25px 0;
+  padding: 10px;
+  border: 2px solid var(--warning);
+  border-radius: 5px;
+  background: #ffffff1a;
+
+  > p {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  > p + p {
+    margin-top: 5px;
   }
 `;

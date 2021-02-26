@@ -22,20 +22,82 @@ import {
   SignInForm,
   SignUpForm,
   CloseModal,
+  FormErrors,
 } from './styles';
 
 const SignModal = ({ show, setShow, navOption, setNavOption }) => {
-  const { authenticated, handleLogin } = useContext(AuthContext);
+  const { handleRegistration, handleLogin } = useContext(AuthContext);
+  const [signUpName, setSignUpName] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
+  const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
+  const [signUpEmail, setSignUpEmail] = useState('');
   const [signInEmail, setSignInEmail] = useState('');
-  const [signPassword, setSignPassword] = useState('');
-  console.debug('SignModal', authenticated);
+  const [signInPassword, setSignInPassword] = useState('');
+  const [signUpErrors, setSignUpErrors] = useState([]);
+  const [signInErrors, setSignInErrors] = useState([]);
+
+  const handleSignUp = async (e) => {
+    try {
+      e.preventDefault();
+      await handleRegistration({
+        name: signUpName,
+        email: signUpEmail,
+        password: signUpPassword,
+      });
+      setShow(false);
+      clearForm();
+    } catch (error) {
+      if (error.response) {
+        const errors = error.response.data.erros
+          ? error.response.data.erros
+          : [error.response.data.erro];
+        if (errors) {
+          setSignUpErrors([...errors]);
+        }
+      }
+    }
+  };
 
   const handleSignIn = async (e) => {
     try {
       e.preventDefault();
-      await handleLogin({ email: signInEmail, password: signPassword });
+      await handleLogin({ email: signInEmail, password: signInPassword });
       setShow(false);
-    } catch (error) {}
+      clearForm();
+    } catch (error) {
+      if (error.response) {
+        const errors = error.response.data.erros
+          ? error.response.data.erros
+          : [error.response.data.erro];
+        if (errors) {
+          setSignInErrors([...errors]);
+        }
+      }
+    }
+  };
+
+  const clearForm = () => {
+    setSignUpName('');
+    setSignUpPassword('');
+    setSignUpConfirmPassword('');
+    setSignUpEmail('');
+    setSignInEmail('');
+    setSignInPassword('');
+    setSignUpErrors([]);
+    setSignInErrors([]);
+  };
+
+  const signUpFormValidation = () => {
+    return (
+      !signUpName ||
+      !signUpPassword ||
+      signUpPassword !== signUpConfirmPassword ||
+      !signUpEmail
+    );
+  };
+
+  const signInFormValidation = () => {
+    return !signInEmail || !signInPassword;
   };
 
   if (!show) return null;
@@ -62,7 +124,14 @@ const SignModal = ({ show, setShow, navOption, setNavOption }) => {
           </ModalNav>
           <FormWrapper>
             {navOption === 'signIn' ? (
-              <SignInForm>
+              <SignInForm noValidate>
+                {signInErrors.length > 0 && (
+                  <FormErrors>
+                    {signInErrors.map((err, i) => (
+                      <p key={`sife${i}`}>{err}</p>
+                    ))}
+                  </FormErrors>
+                )}
                 <InputWithLabel>
                   <Label htmlFor="email">E-mail</Label>
                   <Input
@@ -72,46 +141,95 @@ const SignModal = ({ show, setShow, navOption, setNavOption }) => {
                     onChange={(e) => {
                       setSignInEmail(e.target.value);
                     }}
+                    autoFocus
                   />
                 </InputWithLabel>
                 <InputWithLabel className="password-toggle">
                   <InputToggleVisibility
                     label="Senha"
                     id="password"
-                    value={signPassword}
-                    onChange={(e) => setSignPassword(e.target.value)}
+                    value={signInPassword}
+                    onChange={(e) => setSignInPassword(e.target.value)}
                   />
                 </InputWithLabel>
-                <SignFormButton type="submit" onClick={(e) => handleSignIn(e)}>
+                <SignFormButton
+                  type="submit"
+                  disabled={signInFormValidation()}
+                  onClick={(e) => handleSignIn(e)}
+                >
                   Entrar
                 </SignFormButton>
               </SignInForm>
             ) : (
-              <SignUpForm>
+              <SignUpForm noValidate>
+                {signUpErrors.length > 0 && (
+                  <FormErrors>
+                    {signUpErrors.map((err, i) => (
+                      <p key={`sife${i}`}>{err}</p>
+                    ))}
+                  </FormErrors>
+                )}
                 <InputWithLabel>
                   <Label htmlFor="username">Usuário</Label>
-                  <Input type="text" id="username" autoFocus />
+                  <Input
+                    type="text"
+                    id="username"
+                    value={signUpName}
+                    onChange={(e) => setSignUpName(e.target.value)}
+                    autoFocus
+                  />
                 </InputWithLabel>
                 <InputWithLabel>
-                  <InputToggleVisibility label="Senha" id="password" />
+                  <InputToggleVisibility
+                    label="Senha"
+                    id="password"
+                    value={signUpPassword}
+                    onChange={(e) => setSignUpPassword(e.target.value)}
+                  />
                 </InputWithLabel>
                 <InputWithLabel>
                   <InputToggleVisibility
                     label="Confirmação de senha"
                     id="passwordConfirm"
+                    value={signUpConfirmPassword}
+                    onChange={(e) => setSignUpConfirmPassword(e.target.value)}
                   />
                 </InputWithLabel>
                 <InputWithLabel>
                   <Label htmlFor="email">E-mail</Label>
-                  <Input type="email" id="email" />
+                  <Input
+                    type="email"
+                    id="email"
+                    value={signUpEmail}
+                    onChange={(e) => setSignUpEmail(e.target.value)}
+                  />
                 </InputWithLabel>
-                <SignFormButton type="submit">Cadastrar-se</SignFormButton>
+                <SignFormButton
+                  type="submit"
+                  disabled={signUpFormValidation()}
+                  onClick={(e) => handleSignUp(e)}
+                >
+                  Cadastrar-se
+                </SignFormButton>
               </SignUpForm>
             )}
           </FormWrapper>
-          <CloseModal onClick={() => setShow(false)}>&#x2715;</CloseModal>
+          <CloseModal
+            onClick={() => {
+              setShow(false);
+              clearForm();
+            }}
+          >
+            &#x2715;
+          </CloseModal>
         </ModalContent>
-        <Backdrop show={show} clicked={() => setShow(false)} />
+        <Backdrop
+          show={show}
+          clicked={() => {
+            setShow(false);
+            clearForm();
+          }}
+        />
       </ModalWrapper>
     </Container>
   );

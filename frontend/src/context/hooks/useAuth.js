@@ -19,6 +19,22 @@ const useAuth = () => {
     setLoading(false);
   }, []);
 
+  const handleRegistration = async (body) => {
+    try {
+      const {
+        data: { accessToken, refreshToken },
+      } = await justChooseApi.post('/signup', body);
+
+      localStorage.setItem('accessToken', JSON.stringify(accessToken));
+      localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+      justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
+      setAuthenticated(true);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const handleLogin = async (body) => {
     try {
       const {
@@ -35,7 +51,28 @@ const useAuth = () => {
     }
   };
 
-  return { loading, authenticated, handleLogin };
+  const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      await justChooseApi.delete('/logout', { refreshToken });
+
+      setAuthenticated(false);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
+      justChooseApi.defaults.headers.Authorization = undefined;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  return {
+    loading,
+    authenticated,
+    handleRegistration,
+    handleLogin,
+    handleLogout,
+  };
 };
 
 export default useAuth;
