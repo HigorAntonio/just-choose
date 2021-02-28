@@ -29,12 +29,11 @@ export const FilterDropDown = styled.div`
   display: flex;
   flex-direction: column;
   background: var(--nav-bar);
-  background: green;
+  border: 0.1px solid var(--search);
   border-radius: 5px;
+  padding: 10px;
   position: absolute;
   top: 35px;
-  left: 50%;
-  transform: translate(-50%);
   z-index: 200;
 `;
 

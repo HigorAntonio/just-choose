@@ -1,6 +1,7 @@
 import React from 'react';
 
 import CustomSelect from '../../components/CustomSelect';
+import ContentProvider from '../../components/ContentProvider';
 
 import {
   Container,
@@ -52,7 +53,7 @@ const CreateMovieList = () => {
             <Filters>
               <label>Filtrar por</label>
               <CustomSelect label="Provedor">
-                <h1>Option</h1>
+                <ContentProvider>Google Play Movies</ContentProvider>
               </CustomSelect>
               <CustomSelect label="Gênero"></CustomSelect>
             </Filters>
