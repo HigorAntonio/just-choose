@@ -13,6 +13,7 @@ import microsoftStore from '../assets/contentProviders/microsoft_store.jpg';
 import netflix from '../assets/contentProviders/netflix.jpg';
 import now from '../assets/contentProviders/now.jpg';
 import telecinePlay from '../assets/contentProviders/telecine_play.jpg';
+import crunchyroll from '../assets/contentProviders/crunchyroll.jpg';
 
 const contentProviders = {
   'Amazon Prime Video': amazonPrimeVideo,
@@ -30,6 +31,7 @@ const contentProviders = {
   Netflix: netflix,
   NOW: now,
   'TeleCine Play': telecinePlay,
+  Crunchyroll: crunchyroll,
 };
 
 export default contentProviders;

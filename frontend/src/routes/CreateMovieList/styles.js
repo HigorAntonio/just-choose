@@ -129,3 +129,9 @@ export const Filters = styled.div`
     margin-right: 15px;
   }
 `;
+
+export const Genres = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+`;

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import CustomSelect from '../../components/CustomSelect';
+import CustomOption from '../../components/CustomOption';
 import ContentProvider from '../../components/ContentProvider';
 
 import {
@@ -12,6 +13,7 @@ import {
   ThumbnailWrapper,
   ContentList,
   Filters,
+  Genres,
 } from './styles';
 
 const CreateMovieList = () => {
@@ -55,7 +57,13 @@ const CreateMovieList = () => {
               <CustomSelect label="Provedor">
                 <ContentProvider>Google Play Movies</ContentProvider>
               </CustomSelect>
-              <CustomSelect label="Gênero"></CustomSelect>
+              <CustomSelect label="Gênero">
+                <Genres>
+                  <CustomOption>Ficção Científica</CustomOption>
+                  <CustomOption>Ficção Científica</CustomOption>
+                  <CustomOption>Ficção Científica</CustomOption>
+                </Genres>
+              </CustomSelect>
             </Filters>
             <div>Content</div>
           </ContentList>

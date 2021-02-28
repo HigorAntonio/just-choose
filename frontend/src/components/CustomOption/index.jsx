@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
 import { ImCheckboxUnchecked, ImCheckboxChecked } from 'react-icons/im';
 
-import { Container, Logo } from './styles';
+import { Container } from './styles';
 
-const ContentProvider = (props) => {
+const CustomOption = (props) => {
   const [check, setCheck] = useState(false);
 
   return (
-    <Container
-      onClick={() => {
-        setCheck((prevState) => !prevState);
-      }}
-    >
-      <div>
-        <Logo src={props.children} />
-        <span>{props.children}</span>
-      </div>
+    <Container onClick={() => setCheck((prevState) => !prevState)}>
+      <span>{props.children}</span>
       {check ? (
         <ImCheckboxChecked size={15} color="#fff" style={{ flexShrink: 0 }} />
       ) : (
@@ -25,4 +18,4 @@ const ContentProvider = (props) => {
   );
 };
 
-export default ContentProvider;
+export default CustomOption;
