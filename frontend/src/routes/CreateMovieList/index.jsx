@@ -3,6 +3,7 @@ import React from 'react';
 import CustomSelect from '../../components/CustomSelect';
 import CustomOption from '../../components/CustomOption';
 import ContentProvider from '../../components/ContentProvider';
+import DataPicker from '../../components/DataPicker';
 
 import {
   Container,
@@ -14,6 +15,7 @@ import {
   ContentList,
   Filters,
   Genres,
+  ReleaseDate,
 } from './styles';
 
 const CreateMovieList = () => {
@@ -63,6 +65,11 @@ const CreateMovieList = () => {
                   <CustomOption>Ficção Científica</CustomOption>
                   <CustomOption>Ficção Científica</CustomOption>
                 </Genres>
+              </CustomSelect>
+              <CustomSelect label="Data de lançamento">
+                <ReleaseDate>
+                  <DataPicker />
+                </ReleaseDate>
               </CustomSelect>
             </Filters>
             <div>Content</div>
