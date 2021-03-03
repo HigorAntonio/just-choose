@@ -15,8 +15,8 @@ const ValueLabelComponent = (props) => {
   );
 };
 
-const RangeSlider = () => {
-  const [value, setValue] = useState([0, 10]);
+const RangeSlider = ({ min, max, step }) => {
+  const [value, setValue] = useState([min, max]);
 
   const handleChange = (e, newValue) => {
     setValue(newValue);
@@ -29,9 +29,9 @@ const RangeSlider = () => {
         onChange={handleChange}
         valueLabelDisplay="auto"
         ValueLabelComponent={ValueLabelComponent}
-        min={0}
-        max={10}
-        step={1}
+        min={min}
+        max={max}
+        step={step}
       />
     </ThemeProvider>
   );

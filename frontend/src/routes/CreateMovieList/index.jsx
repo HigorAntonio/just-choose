@@ -17,7 +17,9 @@ import {
   Filters,
   Genres,
   ReleaseDate,
-  VoteAverage,
+  DataPickerWrapper,
+  RangeWrapper,
+  Certification,
 } from './styles';
 
 const CreateMovieList = () => {
@@ -54,7 +56,7 @@ const CreateMovieList = () => {
           </ThumbnailWrapper>
         </div>
         <h3>Conteúdo</h3>
-        <div>
+        <div className="content-list">
           <ContentList>
             <Filters>
               <label>Filtrar por</label>
@@ -68,17 +70,52 @@ const CreateMovieList = () => {
                   <CustomOption>Ficção Científica</CustomOption>
                 </Genres>
               </CustomSelect>
-              <CustomSelect label="Data de lançamento">
+              <CustomSelect label="Data de lançamento" dropDownAlign="center">
                 <ReleaseDate>
-                  <DataPicker />
+                  <div>
+                    <span>de</span>
+                    <DataPickerWrapper>
+                      <DataPicker />
+                    </DataPickerWrapper>
+                  </div>
+                  <div>
+                    <span>até</span>
+                    <DataPickerWrapper>
+                      <DataPicker />
+                    </DataPickerWrapper>
+                  </div>
                 </ReleaseDate>
               </CustomSelect>
-              <CustomSelect label="Pontuação do usuário">
-                <VoteAverage>
+              <CustomSelect
+                label="Classificação indicativa"
+                dropDownAlign="center"
+              >
+                <Certification>
+                  <CustomOption>L</CustomOption>
+                  <CustomOption>10</CustomOption>
+                  <CustomOption>12</CustomOption>
+                  <CustomOption>14</CustomOption>
+                  <CustomOption>16</CustomOption>
+                  <CustomOption>18</CustomOption>
+                </Certification>
+              </CustomSelect>
+              <CustomSelect label="Pontuação do usuário" dropDownAlign="right">
+                <RangeWrapper>
                   <span className="label-left">0</span>
-                  <RangeSlider />
+                  <RangeSlider min={0} max={10} step={1} />
                   <span className="label-right">10</span>
-                </VoteAverage>
+                </RangeWrapper>
+              </CustomSelect>
+              <CustomSelect label="Duração" dropDownAlign="right">
+                <RangeWrapper title="Duração em minutos">
+                  <span className="label-left" title="0 minutos">
+                    0
+                  </span>
+                  <RangeSlider min={0} max={400} step={1} />
+                  <span className="label-right" title="400 minutos">
+                    400
+                  </span>
+                </RangeWrapper>
               </CustomSelect>
             </Filters>
             <div>Content</div>

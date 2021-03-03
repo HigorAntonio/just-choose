@@ -47,7 +47,9 @@ const CustomSelect = (props) => {
       </button>
       {show && (
         <>
-          <FilterDropDown>{props.children}</FilterDropDown>
+          <FilterDropDown align={props.dropDownAlign}>
+            {props.children}
+          </FilterDropDown>
           <Backdrop onClick={() => setShow(false)} />
         </>
       )}

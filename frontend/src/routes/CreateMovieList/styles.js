@@ -92,6 +92,11 @@ export const Main = styled.main`
     margin-bottom: 40px;
   }
 
+  > .content-list {
+    width: 100%;
+    max-width: 100%;
+  }
+
   & ${InputWrapper} + ${InputWrapper} {
     border-top: 0.1px solid var(--search);
   }
@@ -131,14 +136,34 @@ export const Filters = styled.div`
 `;
 
 export const Genres = styled.div`
+  width: 400px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 10px;
 `;
 
-export const ReleaseDate = styled.div``;
+export const ReleaseDate = styled.div`
+  width: 200px;
+  display: flex;
+  flex-direction: column;
 
-export const VoteAverage = styled.div`
+  > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+  }
+
+  > div + div {
+    margin-top: 10px;
+  }
+`;
+
+export const DataPickerWrapper = styled.div`
+  width: 150px;
+`;
+
+export const RangeWrapper = styled.div`
   display: flex;
   align-items: center;
   background: var(--search);
@@ -146,10 +171,17 @@ export const VoteAverage = styled.div`
   border-radius: 5px;
 
   > .label-left {
-    margin-right: 15px;
+    margin-right: 20px;
   }
 
   > .label-right {
-    margin-left: 15px;
+    margin-left: 20px;
   }
+`;
+
+export const Certification = styled.div`
+  width: 300px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 10px;
 `;

@@ -34,6 +34,11 @@ export const FilterDropDown = styled.div`
   padding: 10px;
   position: absolute;
   top: 35px;
+
+  ${(props) => props.align === 'left' && `left: 0;`};
+  ${(props) => props.align === 'right' && `right: 0;`};
+  ${(props) =>
+    props.align === 'center' && `left: 50%; transform: translateX(-50%);`};
   z-index: 200;
 `;
 

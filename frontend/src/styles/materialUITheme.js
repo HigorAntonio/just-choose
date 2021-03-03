@@ -25,6 +25,12 @@ theme.overrides = {
       color: '#efeff1',
     },
   },
+  MuiFormControl: {
+    marginNormal: {
+      marginTop: '0',
+      marginBottom: '0',
+    },
+  },
   MuiInput: {
     root: {
       border: '2px solid #35495B',
