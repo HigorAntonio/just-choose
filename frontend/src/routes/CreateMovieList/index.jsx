@@ -4,6 +4,7 @@ import CustomSelect from '../../components/CustomSelect';
 import CustomOption from '../../components/CustomOption';
 import ContentProvider from '../../components/ContentProvider';
 import DataPicker from '../../components/DataPicker';
+import RangeSlider from '../../components/RangeSlider';
 
 import {
   Container,
@@ -16,6 +17,7 @@ import {
   Filters,
   Genres,
   ReleaseDate,
+  VoteAverage,
 } from './styles';
 
 const CreateMovieList = () => {
@@ -70,6 +72,13 @@ const CreateMovieList = () => {
                 <ReleaseDate>
                   <DataPicker />
                 </ReleaseDate>
+              </CustomSelect>
+              <CustomSelect label="Pontuação do usuário">
+                <VoteAverage>
+                  <span className="label-left">0</span>
+                  <RangeSlider />
+                  <span className="label-right">10</span>
+                </VoteAverage>
               </CustomSelect>
             </Filters>
             <div>Content</div>

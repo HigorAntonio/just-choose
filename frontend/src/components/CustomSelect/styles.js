@@ -5,7 +5,7 @@ export const Container = styled.div`
 
   > button {
     font-size: 16px;
-    padding: 5px 30px 5px 10px;
+    padding: 6px 30px 6px 10px;
     background: var(--search);
     border-radius: 5px;
     position: relative;

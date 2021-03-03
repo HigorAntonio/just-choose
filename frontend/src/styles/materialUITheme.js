@@ -81,6 +81,28 @@ theme.overrides = {
       },
     },
   },
+  MuiSlider: {
+    root: {
+      width: '250px',
+    },
+    rail: {
+      color: '#0F6BA8',
+    },
+    track: {
+      color: '#0F6BA8',
+    },
+    thumb: {
+      color: '#0F6BA8',
+    },
+  },
+  MuiTooltip: {
+    tooltip: {
+      backgroundColor: '#0F6BA8',
+    },
+    arrow: {
+      color: '#0F6BA8',
+    },
+  },
 };
 
 export default theme;

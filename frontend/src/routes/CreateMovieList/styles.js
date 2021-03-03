@@ -137,3 +137,19 @@ export const Genres = styled.div`
 `;
 
 export const ReleaseDate = styled.div``;
+
+export const VoteAverage = styled.div`
+  display: flex;
+  align-items: center;
+  background: var(--search);
+  padding: 0 10px;
+  border-radius: 5px;
+
+  > .label-left {
+    margin-right: 15px;
+  }
+
+  > .label-right {
+    margin-left: 15px;
+  }
+`;
