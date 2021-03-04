@@ -38,16 +38,17 @@ export const FilterDropDown = styled.div`
   ${(props) => props.align === 'left' && `left: 0;`};
   ${(props) => props.align === 'right' && `right: 0;`};
   ${(props) =>
-    props.align === 'center' && `left: 50%; transform: translateX(-50%);`};
+    props.align === 'center' &&
+    `left: 50%; transform: translate(-50%, -10px);`};
   z-index: 200;
-`;
 
-export const Backdrop = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 100;
-  cursor: pointer;
+  ${(props) =>
+    props.show
+      ? props.align === 'center'
+        ? 'opacity: 1; pointer-events: all; transform: translate(-50%, 0);'
+        : 'opacity: 1; pointer-events: all; transform: translateY(0);'
+      : props.align === 'center'
+      ? 'opacity: 0; pointer-events: none; transform: translate(-50%, -10px);'
+      : 'opacity: 0; pointer-events: none; transform: translateY(-10px);'}
+  transition: all 0.4s ease;
 `;
