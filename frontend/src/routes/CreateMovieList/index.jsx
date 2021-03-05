@@ -22,6 +22,7 @@ import {
   DataPickerWrapper,
   RangeWrapper,
   Certification,
+  SearchContent,
 } from './styles';
 
 const compareCertifications = (a, b) => {
@@ -40,7 +41,7 @@ const CreateMovieList = () => {
   const [movieCertifications, setMovieCertifications] = useState();
   const [selectedMovieProviders, setSelectedMovieProviders] = useState([]);
   const [selectedMovieGenres, setSelectedMovieGenres] = useState([]);
-  const [movieReleaseDateGte, setMovieReleaseDateGte] = useState(new Date());
+  const [movieReleaseDateGte, setMovieReleaseDateGte] = useState();
   const [movieReleaseDateLte, setMovieReleaseDateLte] = useState(new Date());
   const [
     selectedMovieCertifications,
@@ -96,7 +97,36 @@ const CreateMovieList = () => {
     }
   };
 
-  useEffect(() => console.log(movieRuntime), [movieRuntime]);
+  const handleMovieSearch = async () => {
+    const orderedMovieCertifications = selectedMovieCertifications.sort(
+      compareCertifications
+    );
+    const params = {};
+    if (selectedMovieProviders.length) {
+      params.with_watch_providers = selectedMovieProviders.join(',');
+    }
+    if (selectedMovieGenres.length) {
+      params.with_genres = selectedMovieGenres.join(',');
+    }
+    if (movieReleaseDateGte) {
+      params['release_date.gte'] = movieReleaseDateGte;
+    }
+    params['release_date.lte'] = movieReleaseDateLte;
+    if (orderedMovieCertifications.length) {
+      params['certification.gte'] = orderedMovieCertifications[0];
+      params['certification.lte'] =
+        orderedMovieCertifications[orderedMovieCertifications.length - 1];
+    }
+    params['vote_average.gte'] = movieVoteAverage[0];
+    params['vote_average.lte'] = movieVoteAverage[1];
+    params['with_runtime.gte'] = movieRuntime[0];
+    params['with_runtime.lte'] = movieRuntime[1];
+
+    try {
+      const { data } = await justChooseApi.get('/movies', { params });
+      console.log(data);
+    } catch (error) {}
+  };
 
   return (
     <Container>
@@ -220,7 +250,7 @@ const CreateMovieList = () => {
                   <RangeSlider
                     min={0}
                     max={400}
-                    step={1}
+                    step={5}
                     value={movieRuntime}
                     setValue={setMovieRuntime}
                   />
@@ -229,6 +259,7 @@ const CreateMovieList = () => {
                   </span>
                 </RangeWrapper>
               </CustomSelect>
+              <SearchContent onClick={handleMovieSearch}>Buscar</SearchContent>
             </Filters>
             <div>Content</div>
           </ContentList>

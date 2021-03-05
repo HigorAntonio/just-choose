@@ -194,3 +194,21 @@ export const Certification = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 10px;
 `;
+
+export const SearchContent = styled.button`
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: var(--white);
+  height: 35px;
+  padding: 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  outline: none;
+  background: var(--accent);
+
+  &:hover {
+    background: #0f6ba8d9;
+    cursor: pointer;
+  }
+`;

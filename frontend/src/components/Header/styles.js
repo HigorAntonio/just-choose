@@ -213,6 +213,8 @@ export const Tooltip = styled.span`
 `;
 
 const signButton = css`
+  display: flex;
+  align-items: center;
   font-weight: bold;
   color: var(--white);
   height: 35px;
