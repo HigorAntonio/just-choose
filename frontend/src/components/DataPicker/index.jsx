@@ -9,7 +9,7 @@ import {
 
 import theme from '../../styles/materialUITheme';
 
-const DataPicker = () => {
+const DataPicker = ({ value, setValue }) => {
   return (
     <ThemeProvider theme={theme}>
       <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBrLocale}>
@@ -18,7 +18,8 @@ const DataPicker = () => {
           variant="inline"
           format="dd/MM/yyyy"
           margin="normal"
-          onChange={() => console.log()}
+          value={value}
+          onChange={(date) => setValue(date)}
           KeyboardButtonProps={{
             'aria-label': 'mudar data',
             disableFocusRipple: true,

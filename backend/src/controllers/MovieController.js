@@ -27,6 +27,8 @@ module.exports = {
       params.api_key = TMDB_API_KEY;
       params.language = 'pt-BR';
       params.include_adult = false;
+      params.certification_country = 'BR';
+      params.watch_region = 'BR';
 
       const responseData = await getAsync(key);
       if (!responseData) {

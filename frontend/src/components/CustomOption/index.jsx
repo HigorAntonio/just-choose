@@ -7,7 +7,12 @@ const CustomOption = (props) => {
   const [check, setCheck] = useState(false);
 
   return (
-    <Container onClick={() => setCheck((prevState) => !prevState)}>
+    <Container
+      onClick={() => {
+        setCheck((prevState) => !prevState);
+        props.click();
+      }}
+    >
       <span>{props.children}</span>
       {check ? (
         <ImCheckboxChecked size={15} color="#fff" style={{ flexShrink: 0 }} />

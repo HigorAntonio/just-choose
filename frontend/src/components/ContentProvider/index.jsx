@@ -10,6 +10,7 @@ const ContentProvider = (props) => {
     <Container
       onClick={() => {
         setCheck((prevState) => !prevState);
+        props.click();
       }}
     >
       <div>

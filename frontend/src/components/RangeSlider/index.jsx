@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ThemeProvider } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -15,9 +15,7 @@ const ValueLabelComponent = (props) => {
   );
 };
 
-const RangeSlider = ({ min, max, step }) => {
-  const [value, setValue] = useState([min, max]);
-
+const RangeSlider = ({ min, max, step, value, setValue }) => {
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };

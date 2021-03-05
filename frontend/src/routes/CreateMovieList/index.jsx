@@ -38,6 +38,16 @@ const CreateMovieList = () => {
   const [movieProviders, setMovieProviders] = useState();
   const [movieGenres, setMovieGenres] = useState();
   const [movieCertifications, setMovieCertifications] = useState();
+  const [selectedMovieProviders, setSelectedMovieProviders] = useState([]);
+  const [selectedMovieGenres, setSelectedMovieGenres] = useState([]);
+  const [movieReleaseDateGte, setMovieReleaseDateGte] = useState(new Date());
+  const [movieReleaseDateLte, setMovieReleaseDateLte] = useState(new Date());
+  const [
+    selectedMovieCertifications,
+    setSelectedMovieCertifications,
+  ] = useState([]);
+  const [movieVoteAverage, setMovieVoteAverage] = useState([0, 10]);
+  const [movieRuntime, setMovieRuntime] = useState([0, 400]);
 
   useEffect(() => {
     (async () => {
@@ -57,6 +67,36 @@ const CreateMovieList = () => {
       } catch (error) {}
     })();
   }, [setMovieProviders]);
+
+  const handleSelectMovieProvider = (id) => {
+    if (selectedMovieProviders.includes(id)) {
+      setSelectedMovieProviders((prevState) =>
+        prevState.filter((p) => p !== id)
+      );
+    } else {
+      setSelectedMovieProviders((prevState) => [...prevState, id]);
+    }
+  };
+
+  const handleSelectMovieGenre = (id) => {
+    if (selectedMovieGenres.includes(id)) {
+      setSelectedMovieGenres((prevState) => prevState.filter((p) => p !== id));
+    } else {
+      setSelectedMovieGenres((prevState) => [...prevState, id]);
+    }
+  };
+
+  const handleSelectMovieCertification = (order) => {
+    if (selectedMovieCertifications.includes(order)) {
+      setSelectedMovieCertifications((prevState) =>
+        prevState.filter((c) => c !== order)
+      );
+    } else {
+      setSelectedMovieCertifications((prevState) => [...prevState, order]);
+    }
+  };
+
+  useEffect(() => console.log(movieRuntime), [movieRuntime]);
 
   return (
     <Container>
@@ -99,7 +139,12 @@ const CreateMovieList = () => {
                 <Providers>
                   {movieProviders &&
                     movieProviders.map((p) => (
-                      <ContentProvider key={p.id}>{p.name}</ContentProvider>
+                      <ContentProvider
+                        key={p.id}
+                        click={() => handleSelectMovieProvider(p.id)}
+                      >
+                        {p.name}
+                      </ContentProvider>
                     ))}
                 </Providers>
               </CustomSelect>
@@ -107,7 +152,12 @@ const CreateMovieList = () => {
                 <Genres>
                   {movieGenres &&
                     movieGenres.map((g) => (
-                      <CustomOption key={g.id}>{g.name}</CustomOption>
+                      <CustomOption
+                        key={g.id}
+                        click={() => handleSelectMovieGenre(g.id)}
+                      >
+                        {g.name}
+                      </CustomOption>
                     ))}
                 </Genres>
               </CustomSelect>
@@ -116,13 +166,19 @@ const CreateMovieList = () => {
                   <div>
                     <span>de</span>
                     <DataPickerWrapper>
-                      <DataPicker />
+                      <DataPicker
+                        value={movieReleaseDateGte}
+                        setValue={setMovieReleaseDateGte}
+                      />
                     </DataPickerWrapper>
                   </div>
                   <div>
                     <span>até</span>
                     <DataPickerWrapper>
-                      <DataPicker />
+                      <DataPicker
+                        value={movieReleaseDateLte}
+                        setValue={setMovieReleaseDateLte}
+                      />
                     </DataPickerWrapper>
                   </div>
                 </ReleaseDate>
@@ -134,7 +190,10 @@ const CreateMovieList = () => {
                 <Certification>
                   {movieCertifications &&
                     movieCertifications.map((c) => (
-                      <CustomOption key={c.order}>
+                      <CustomOption
+                        key={c.order}
+                        click={() => handleSelectMovieCertification(c.order)}
+                      >
                         {c.certification}
                       </CustomOption>
                     ))}
@@ -143,7 +202,13 @@ const CreateMovieList = () => {
               <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
                 <RangeWrapper>
                   <span className="label-left">0</span>
-                  <RangeSlider min={0} max={10} step={1} />
+                  <RangeSlider
+                    min={0}
+                    max={10}
+                    step={1}
+                    value={movieVoteAverage}
+                    setValue={setMovieVoteAverage}
+                  />
                   <span className="label-right">10</span>
                 </RangeWrapper>
               </CustomSelect>
@@ -152,7 +217,13 @@ const CreateMovieList = () => {
                   <span className="label-left" title="0 minutos">
                     0
                   </span>
-                  <RangeSlider min={0} max={400} step={1} />
+                  <RangeSlider
+                    min={0}
+                    max={400}
+                    step={1}
+                    value={movieRuntime}
+                    setValue={setMovieRuntime}
+                  />
                   <span className="label-right" title="400 minutos">
                     400
                   </span>
