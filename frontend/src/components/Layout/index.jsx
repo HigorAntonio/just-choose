@@ -50,7 +50,7 @@ const Layout = () => {
               <CustomRoute
                 isPrivate
                 exact
-                path="/movies/list"
+                path="/list"
                 component={CreateMovieList}
               />
             </Switch>

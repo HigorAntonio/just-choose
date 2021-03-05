@@ -147,6 +147,7 @@ const navButtonCss = css`
 
 export const NewListButton = styled.button`
   ${navButtonCss}
+  margin-right: 10px;
 `;
 
 export const NewListIcon = styled.img.attrs((props) => ({
@@ -161,6 +162,7 @@ export const NewListIcon = styled.img.attrs((props) => ({
 export const NewPollButton = styled.button`
   ${navButtonCss}
   width: 40px;
+  margin-right: 10px;
 `;
 
 export const NewPollIcon = styled.img.attrs((props) => ({
@@ -171,7 +173,8 @@ export const NewPollIcon = styled.img.attrs((props) => ({
 `;
 
 export const Tooltip = styled.span`
-  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
   width: ${(props) => props.width || '120px'};
   background-color: var(--white);
   color: var(--black);
@@ -203,8 +206,10 @@ export const Tooltip = styled.span`
 
   ${NewListButton}:hover &,
   ${NewPollButton}:hover & {
-    visibility: visible;
+    opacity: 1;
   }
+
+  transition: opacity 0.4s ease-in;
 `;
 
 const signButton = css`
@@ -236,6 +241,10 @@ export const SignUp = styled.button`
   }
 `;
 
+export const ProfileWrapper = styled.div`
+  position: relative;
+`;
+
 export const Profile = styled.div`
   width: 35px;
   height: 35px;
@@ -245,6 +254,49 @@ export const Profile = styled.div`
   background: var(--gray);
 
   &:hover {
+    cursor: pointer;
+  }
+`;
+
+export const ProfileDropDown = styled.div`
+  width: 280px;
+  background: var(--primary);
+  padding: 10px;
+  border-radius: 5px;
+  position: absolute;
+  bottom: -5px;
+  right: 0;
+  transform: translateY(100%);
+
+  ${(props) =>
+    props.show
+      ? 'opacity: 1; pointer-events: all; transform: translateY(100%);'
+      : 'opacity: 0; pointer-events: none; transform: translateY(90%);'}
+  transition: opacity 0.4s ease, transform 0.4s ease;
+`;
+
+export const DropDownOption = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 5px;
+  border-radius: 2.5px;
+
+  > .align-left {
+    flex: 0;
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+  }
+
+  > .align-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
     cursor: pointer;
   }
 `;

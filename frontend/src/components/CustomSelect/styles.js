@@ -50,5 +50,5 @@ export const FilterDropDown = styled.div`
       : props.align === 'center'
       ? 'opacity: 0; pointer-events: none; transform: translate(-50%, -10px);'
       : 'opacity: 0; pointer-events: none; transform: translateY(-10px);'}
-  transition: all 0.4s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 `;

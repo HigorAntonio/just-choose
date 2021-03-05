@@ -60,10 +60,10 @@ const CreateMovieList = () => {
           <ContentList>
             <Filters>
               <label>Filtrar por</label>
-              <CustomSelect label="Provedor">
+              <CustomSelect label="Provedor" dropDownAlign="center">
                 <ContentProvider>Google Play Movies</ContentProvider>
               </CustomSelect>
-              <CustomSelect label="Gênero">
+              <CustomSelect label="Gênero" dropDownAlign="center">
                 <Genres>
                   <CustomOption>Ficção Científica</CustomOption>
                   <CustomOption>Ficção Científica</CustomOption>
@@ -99,14 +99,14 @@ const CreateMovieList = () => {
                   <CustomOption>18</CustomOption>
                 </Certification>
               </CustomSelect>
-              <CustomSelect label="Pontuação do usuário" dropDownAlign="right">
+              <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
                 <RangeWrapper>
                   <span className="label-left">0</span>
                   <RangeSlider min={0} max={10} step={1} />
                   <span className="label-right">10</span>
                 </RangeWrapper>
               </CustomSelect>
-              <CustomSelect label="Duração" dropDownAlign="right">
+              <CustomSelect label="Duração" dropDownAlign="center">
                 <RangeWrapper title="Duração em minutos">
                   <span className="label-left" title="0 minutos">
                     0
