@@ -25,7 +25,7 @@ const contentProviders = {
   'Fox Premium': foxPremium,
   'Globo Play': globoPlay,
   'Google Play Movies': googlePlayMovies,
-  'HBO GO': hboGo,
+  'HBO Go': hboGo,
   Looke: looke,
   'Microsoft Store': microsoftStore,
   Netflix: netflix,

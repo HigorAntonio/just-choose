@@ -135,6 +135,15 @@ export const Filters = styled.div`
   }
 `;
 
+export const Providers = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  > div + div {
+    margin-top: 10px;
+  }
+`;
+
 export const Genres = styled.div`
   width: 400px;
   display: grid;

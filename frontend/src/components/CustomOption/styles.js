@@ -8,5 +8,9 @@ export const Container = styled.div`
   padding: 10px;
   background: var(--search);
   border-radius: 5px;
-  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+  }
 `;

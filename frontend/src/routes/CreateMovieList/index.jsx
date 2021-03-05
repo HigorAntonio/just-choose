@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import CustomSelect from '../../components/CustomSelect';
 import CustomOption from '../../components/CustomOption';
 import ContentProvider from '../../components/ContentProvider';
 import DataPicker from '../../components/DataPicker';
 import RangeSlider from '../../components/RangeSlider';
+import justChooseApi from '../../apis/justChooseApi';
 
 import {
   Container,
@@ -15,6 +16,7 @@ import {
   ThumbnailWrapper,
   ContentList,
   Filters,
+  Providers,
   Genres,
   ReleaseDate,
   DataPickerWrapper,
@@ -22,7 +24,40 @@ import {
   Certification,
 } from './styles';
 
+const compareCertifications = (a, b) => {
+  if (a.order < b.order) {
+    return -1;
+  }
+  if (a.order > b.order) {
+    return 1;
+  }
+  return 0;
+};
+
 const CreateMovieList = () => {
+  const [movieProviders, setMovieProviders] = useState();
+  const [movieGenres, setMovieGenres] = useState();
+  const [movieCertifications, setMovieCertifications] = useState();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await justChooseApi.get('/movies/watch_providers');
+        setMovieProviders(data);
+      } catch (error) {}
+      try {
+        const { data } = await justChooseApi.get('/movies/genres');
+        setMovieGenres(data.genres);
+      } catch (error) {}
+      try {
+        const { data } = await justChooseApi.get('/movies/certifications');
+        setMovieCertifications(
+          data.certifications['BR'].sort(compareCertifications)
+        );
+      } catch (error) {}
+    })();
+  }, [setMovieProviders]);
+
   return (
     <Container>
       <Header>
@@ -61,13 +96,19 @@ const CreateMovieList = () => {
             <Filters>
               <label>Filtrar por</label>
               <CustomSelect label="Provedor" dropDownAlign="center">
-                <ContentProvider>Google Play Movies</ContentProvider>
+                <Providers>
+                  {movieProviders &&
+                    movieProviders.map((p) => (
+                      <ContentProvider key={p.id}>{p.name}</ContentProvider>
+                    ))}
+                </Providers>
               </CustomSelect>
               <CustomSelect label="Gênero" dropDownAlign="center">
                 <Genres>
-                  <CustomOption>Ficção Científica</CustomOption>
-                  <CustomOption>Ficção Científica</CustomOption>
-                  <CustomOption>Ficção Científica</CustomOption>
+                  {movieGenres &&
+                    movieGenres.map((g) => (
+                      <CustomOption key={g.id}>{g.name}</CustomOption>
+                    ))}
                 </Genres>
               </CustomSelect>
               <CustomSelect label="Data de lançamento" dropDownAlign="center">
@@ -91,12 +132,12 @@ const CreateMovieList = () => {
                 dropDownAlign="center"
               >
                 <Certification>
-                  <CustomOption>L</CustomOption>
-                  <CustomOption>10</CustomOption>
-                  <CustomOption>12</CustomOption>
-                  <CustomOption>14</CustomOption>
-                  <CustomOption>16</CustomOption>
-                  <CustomOption>18</CustomOption>
+                  {movieCertifications &&
+                    movieCertifications.map((c) => (
+                      <CustomOption key={c.order}>
+                        {c.certification}
+                      </CustomOption>
+                    ))}
                 </Certification>
               </CustomSelect>
               <CustomSelect label="Pontuação do usuário" dropDownAlign="center">

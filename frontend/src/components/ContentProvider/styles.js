@@ -10,7 +10,11 @@ export const Container = styled.div`
   background: var(--search);
   border-radius: 5px;
   padding: 10px;
-  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+  }
 
   > div {
     display: flex;
