@@ -113,22 +113,24 @@ module.exports = (queryParams) => {
     }
   }
 
-  const params = {
-    sort_by,
-    page,
-    certification_country,
-    certification_lte,
-    certification_gte,
-    primary_release_date_gte,
-    primary_release_date_lte,
-    vote_average_gte,
-    vote_average_lte,
-    with_genres,
-    with_runtime_gte,
-    with_runtime_lte,
-    with_watch_providers,
-    watch_region,
-  };
+  const params = {};
+  sort_by && (params.sort_by = sort_by);
+  page && (params.page = page);
+  certification_country &&
+    (params.certification_country = certification_country);
+  certification_lte && (params['certification.lte'] = certification_lte);
+  certification_gte && (params['certification.gte'] = certification_gte);
+  primary_release_date_gte &&
+    (params['primary_release_date.gte'] = primary_release_date_gte);
+  primary_release_date_lte &&
+    (params['primary_release_date.lte'] = primary_release_date_lte);
+  vote_average_gte && (params['vote_average.gte'] = vote_average_gte);
+  vote_average_lte && (params['vote_average.lte'] = vote_average_lte);
+  with_genres && (params.with_genres = with_genres);
+  with_runtime_gte && (params['with_runtime.gte'] = with_runtime_gte);
+  with_runtime_lte && (params['with_runtime.lte'] = with_runtime_lte);
+  with_watch_providers && (params.with_watch_providers = with_watch_providers);
+  watch_region && (params.watch_region = watch_region);
 
   return { params, errors };
 };
