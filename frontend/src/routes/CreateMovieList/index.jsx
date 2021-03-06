@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
+import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
 
 import {
@@ -10,9 +11,15 @@ import {
   InputWrapper,
   ThumbnailWrapper,
   ContentList,
+  ContentListHeader,
+  ContentTypes,
+  Option,
 } from './styles';
 
 const CreateMovieList = () => {
+  const [contentType, setContentType] = useState('');
+  const [showOptions, setShowOptions] = useState(false);
+
   return (
     <Container>
       <Header>
@@ -46,10 +53,46 @@ const CreateMovieList = () => {
           </ThumbnailWrapper>
         </div>
         <h3>Conteúdo</h3>
-        <div className="content-list">
+        <div className={!contentType ? null : 'content-list'}>
           <ContentList>
-            <MovieFilters />
-            <div>Content</div>
+            <ContentListHeader>
+              <label>Tipo de conteúdo</label>
+              <SingleOptionSelect
+                label={!contentType ? 'Selecionar' : contentType}
+                dropDownAlign="center"
+                show={showOptions}
+                setShow={setShowOptions}
+              >
+                <ContentTypes>
+                  <Option
+                    onClick={() => {
+                      setContentType('Filme');
+                      setShowOptions(false);
+                    }}
+                  >
+                    Filme
+                  </Option>
+                  <Option
+                    onClick={() => {
+                      setContentType('Série');
+                      setShowOptions(false);
+                    }}
+                  >
+                    Série
+                  </Option>
+                  <Option
+                    onClick={() => {
+                      setContentType('Jogo');
+                      setShowOptions(false);
+                    }}
+                  >
+                    Jogo
+                  </Option>
+                </ContentTypes>
+              </SingleOptionSelect>
+              {contentType === 'Filme' && <MovieFilters />}
+            </ContentListHeader>
+            {/* <div>Content</div> */}
           </ContentList>
         </div>
       </Main>

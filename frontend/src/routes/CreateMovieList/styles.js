@@ -117,3 +117,43 @@ export const ContentList = styled.div`
   flex-direction: column;
   height: 100px;
 `;
+
+export const ContentListHeader = styled.div`
+  height: 76px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 0.1px solid var(--search);
+
+  > label {
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 15px;
+  }
+
+  > div + div {
+    margin-left: 15px;
+  }
+`;
+
+export const ContentTypes = styled.div`
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+
+  > div + div {
+    margin-top: 10px;
+  }
+`;
+
+export const Option = styled.div`
+  background: var(--search);
+  padding: 10px;
+  border-radius: 5px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+  }
+`;

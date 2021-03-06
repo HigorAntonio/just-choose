@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   position: relative;
-  flex-shrink: 0;
 
   > button {
     font-size: 16px;

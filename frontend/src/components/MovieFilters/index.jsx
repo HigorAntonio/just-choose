@@ -117,90 +117,100 @@ const MovieFilters = () => {
 
   return (
     <Container>
-      <label>Filtrar por</label>
-      <CustomSelect label="Provedor" dropDownAlign="center">
-        <Providers>
-          {providers &&
-            providers.map((p) => (
-              <ContentProvider
-                key={p.id}
-                click={() => handleSelectProvider(p.id)}
-              >
-                {p.name}
-              </ContentProvider>
-            ))}
-        </Providers>
-      </CustomSelect>
-      <CustomSelect label="Gênero" dropDownAlign="center">
-        <Genres>
-          {genres &&
-            genres.map((g) => (
-              <CustomOption key={g.id} click={() => handleSelectGenre(g.id)}>
-                {g.name}
-              </CustomOption>
-            ))}
-        </Genres>
-      </CustomSelect>
-      <CustomSelect label="Data de lançamento" dropDownAlign="center">
-        <ReleaseDate>
-          <div>
-            <span>de</span>
-            <DataPickerWrapper>
-              <DataPicker value={releaseDateGte} setValue={setReleaseDateGte} />
-            </DataPickerWrapper>
-          </div>
-          <div>
-            <span>até</span>
-            <DataPickerWrapper>
-              <DataPicker value={releaseDateLte} setValue={setReleaseDateLte} />
-            </DataPickerWrapper>
-          </div>
-        </ReleaseDate>
-      </CustomSelect>
-      <CustomSelect label="Classificação indicativa" dropDownAlign="center">
-        <Certification>
-          {certifications &&
-            certifications.map((c) => (
-              <CustomOption
-                key={c.order}
-                click={() => handleSelectCertification(c.order)}
-              >
-                {c.certification}
-              </CustomOption>
-            ))}
-        </Certification>
-      </CustomSelect>
-      <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
-        <RangeWrapper>
-          <span className="label-left">0</span>
-          <RangeSlider
-            min={0}
-            max={10}
-            step={1}
-            value={voteAverage}
-            setValue={setVoteAverage}
-          />
-          <span className="label-right">10</span>
-        </RangeWrapper>
-      </CustomSelect>
-      <CustomSelect label="Duração" dropDownAlign="center">
-        <RangeWrapper title="Duração em minutos">
-          <span className="label-left" title="0 minutos">
-            0
-          </span>
-          <RangeSlider
-            min={0}
-            max={400}
-            step={5}
-            value={runtime}
-            setValue={setRuntime}
-          />
-          <span className="label-right" title="400 minutos">
-            400
-          </span>
-        </RangeWrapper>
-      </CustomSelect>
-      <SearchContent onClick={handleSearch}>Buscar</SearchContent>
+      <div>
+        <label>Filtrar por</label>
+        <CustomSelect label="Provedor" dropDownAlign="center">
+          <Providers>
+            {providers &&
+              providers.map((p) => (
+                <ContentProvider
+                  key={p.id}
+                  click={() => handleSelectProvider(p.id)}
+                >
+                  {p.name}
+                </ContentProvider>
+              ))}
+          </Providers>
+        </CustomSelect>
+        <CustomSelect label="Gênero" dropDownAlign="center">
+          <Genres>
+            {genres &&
+              genres.map((g) => (
+                <CustomOption key={g.id} click={() => handleSelectGenre(g.id)}>
+                  {g.name}
+                </CustomOption>
+              ))}
+          </Genres>
+        </CustomSelect>
+        <CustomSelect label="Data de lançamento" dropDownAlign="center">
+          <ReleaseDate>
+            <div>
+              <span>de</span>
+              <DataPickerWrapper>
+                <DataPicker
+                  value={releaseDateGte}
+                  setValue={setReleaseDateGte}
+                />
+              </DataPickerWrapper>
+            </div>
+            <div>
+              <span>até</span>
+              <DataPickerWrapper>
+                <DataPicker
+                  value={releaseDateLte}
+                  setValue={setReleaseDateLte}
+                />
+              </DataPickerWrapper>
+            </div>
+          </ReleaseDate>
+        </CustomSelect>
+        <CustomSelect label="Classificação indicativa" dropDownAlign="center">
+          <Certification>
+            {certifications &&
+              certifications.map((c) => (
+                <CustomOption
+                  key={c.order}
+                  click={() => handleSelectCertification(c.order)}
+                >
+                  {c.certification}
+                </CustomOption>
+              ))}
+          </Certification>
+        </CustomSelect>
+        <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
+          <RangeWrapper>
+            <span className="label-left">0</span>
+            <RangeSlider
+              min={0}
+              max={10}
+              step={1}
+              value={voteAverage}
+              setValue={setVoteAverage}
+            />
+            <span className="label-right">10</span>
+          </RangeWrapper>
+        </CustomSelect>
+        <CustomSelect label="Duração" dropDownAlign="center">
+          <RangeWrapper title="Duração em minutos">
+            <span className="label-left" title="0 minutos">
+              0
+            </span>
+            <RangeSlider
+              min={0}
+              max={400}
+              step={5}
+              value={runtime}
+              setValue={setRuntime}
+            />
+            <span className="label-right" title="400 minutos">
+              400
+            </span>
+          </RangeWrapper>
+        </CustomSelect>
+      </div>
+      <div>
+        <SearchContent onClick={handleSearch}>Buscar</SearchContent>
+      </div>
     </Container>
   );
 };

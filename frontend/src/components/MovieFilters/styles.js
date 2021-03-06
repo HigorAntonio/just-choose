@@ -1,29 +1,32 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
-  padding: 20px;
-  border-bottom: 0.1px solid var(--search);
-
-  > label {
-    font-size: 14px;
-    font-weight: bold;
-    margin-right: 15px;
-  }
+  justify-content: space-between;
 
   > div {
-    margin-right: 15px;
+    display: flex;
+    align-items: center;
+
+    > label {
+      flex-shrink: 0;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 15px;
+    }
+
+    > div {
+      margin-right: 15px;
+    }
   }
 `;
 
 export const Providers = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  > div + div {
-    margin-top: 10px;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
 `;
 
 export const Genres = styled.div`
