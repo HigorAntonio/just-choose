@@ -9,14 +9,14 @@ import RangeSlider from '../RangeSlider';
 import justChooseApi from '../../apis/justChooseApi';
 
 import {
-  Container,
   Providers,
   Genres,
   ReleaseDate,
   DataPickerWrapper,
   RangeWrapper,
   Certification,
-  SearchContent,
+  SearchButton,
+  ClearButton,
 } from './styles';
 
 const compareCertifications = (a, b) => {
@@ -116,7 +116,7 @@ const MovieFilters = () => {
   };
 
   return (
-    <Container>
+    <>
       <div>
         <label>Filtrar por</label>
         <CustomSelect label="Provedor" dropDownAlign="center">
@@ -209,9 +209,10 @@ const MovieFilters = () => {
         </CustomSelect>
       </div>
       <div>
-        <SearchContent onClick={handleSearch}>Buscar</SearchContent>
+        <ClearButton onClick={handleSearch}>Limpar filtros</ClearButton>
+        <SearchButton onClick={handleSearch}>Filtrar</SearchButton>
       </div>
-    </Container>
+    </>
   );
 };
 

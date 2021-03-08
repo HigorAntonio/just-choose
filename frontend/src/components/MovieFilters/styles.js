@@ -1,27 +1,4 @@
-import styled from 'styled-components';
-
-export const Container = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  > div {
-    display: flex;
-    align-items: center;
-
-    > label {
-      flex-shrink: 0;
-      font-size: 14px;
-      font-weight: bold;
-      margin-right: 15px;
-    }
-
-    > div {
-      margin-right: 15px;
-    }
-  }
-`;
+import styled, { css } from 'styled-components';
 
 export const Providers = styled.div`
   display: grid;
@@ -80,20 +57,35 @@ export const Certification = styled.div`
   grid-gap: 10px;
 `;
 
-export const SearchContent = styled.button`
+const buttonCss = css`
   display: flex;
   align-items: center;
   font-weight: bold;
+  font-size: 14px;
   color: var(--white);
-  height: 35px;
+  height: 31px;
   padding: 10px;
   border-radius: 5px;
   white-space: nowrap;
   outline: none;
+`;
+
+export const SearchButton = styled.button`
+  ${buttonCss}
   background: var(--accent);
 
   &:hover {
     background: #0f6ba8d9;
+    cursor: pointer;
+  }
+`;
+
+export const ClearButton = styled.button`
+  ${buttonCss}
+  background: var(--search-button);
+
+  &:hover {
+    background: var(--search);
     cursor: pointer;
   }
 `;

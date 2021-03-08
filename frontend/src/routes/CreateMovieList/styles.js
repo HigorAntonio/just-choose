@@ -1,4 +1,11 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+const labelCss = css`
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 15px;
+`;
 
 export const Container = styled.div`
   display: flex;
@@ -53,13 +60,10 @@ export const ThumbnailWrapper = styled.div`
   }
 
   > label {
-    flex-shrink: 0;
-    font-size: 14px;
-    font-weight: bold;
+    ${labelCss}
     padding: 7px 20px;
     background: var(--search);
     border-radius: 5px;
-    margin-right: 15px;
 
     &:hover {
       background: rgba(255, 255, 255, 0.25);
@@ -115,25 +119,45 @@ export const LabelWrapper = styled.div`
 export const ContentList = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100px;
 `;
 
 export const ContentListHeader = styled.div`
-  height: 76px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 20px;
   border-bottom: 0.1px solid var(--search);
 
-  > label {
-    flex-shrink: 0;
-    font-size: 14px;
-    font-weight: bold;
-    margin-right: 15px;
+  > .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    > div {
+      display: flex;
+      align-items: center;
+
+      > div {
+        display: flex;
+        align-items: center;
+
+        > label {
+          ${labelCss}
+        }
+      }
+
+      > div + div,
+      button + button {
+        margin-left: 15px;
+      }
+
+      > label {
+        ${labelCss}
+      }
+    }
   }
 
-  > div + div {
-    margin-left: 15px;
+  > .row + .row {
+    margin-top: 15px;
   }
 `;
 
@@ -155,5 +179,53 @@ export const Option = styled.div`
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     cursor: pointer;
+  }
+`;
+
+export const SearchWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  > label {
+    ${labelCss}
+  }
+
+  > input {
+    width: 580px;
+    padding: 5px 10px;
+    border: 2px solid var(--search);
+    border-radius: 5px;
+    background: var(--search);
+    outline: none;
+    margin-right: 15px;
+
+    &:hover {
+      border: 2px solid var(--gray);
+    }
+    &:focus {
+      border: 2px solid var(--accent);
+    }
+
+    transition: border 0.3s;
+  }
+
+  > button {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--white);
+    height: 31px;
+    padding: 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    outline: none;
+    background: var(--accent);
+
+    &:hover {
+      background: #0f6ba8d9;
+      cursor: pointer;
+    }
   }
 `;

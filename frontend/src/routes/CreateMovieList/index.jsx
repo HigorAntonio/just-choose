@@ -14,6 +14,7 @@ import {
   ContentListHeader,
   ContentTypes,
   Option,
+  SearchWrapper,
 } from './styles';
 
 const CreateMovieList = () => {
@@ -56,41 +57,54 @@ const CreateMovieList = () => {
         <div className={!contentType ? null : 'content-list'}>
           <ContentList>
             <ContentListHeader>
-              <label>Tipo de conteúdo</label>
-              <SingleOptionSelect
-                label={!contentType ? 'Selecionar' : contentType}
-                dropDownAlign="center"
-                show={showOptions}
-                setShow={setShowOptions}
-              >
-                <ContentTypes>
-                  <Option
-                    onClick={() => {
-                      setContentType('Filme');
-                      setShowOptions(false);
-                    }}
+              <div className="row">
+                <div>
+                  <label>Tipo de conteúdo</label>
+                  <SingleOptionSelect
+                    label={!contentType ? 'Selecionar' : contentType}
+                    dropDownAlign="center"
+                    show={showOptions}
+                    setShow={setShowOptions}
                   >
-                    Filme
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      setContentType('Série');
-                      setShowOptions(false);
-                    }}
-                  >
-                    Série
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      setContentType('Jogo');
-                      setShowOptions(false);
-                    }}
-                  >
-                    Jogo
-                  </Option>
-                </ContentTypes>
-              </SingleOptionSelect>
-              {contentType === 'Filme' && <MovieFilters />}
+                    <ContentTypes>
+                      <Option
+                        onClick={() => {
+                          setContentType('Filme');
+                          setShowOptions(false);
+                        }}
+                      >
+                        Filme
+                      </Option>
+                      <Option
+                        onClick={() => {
+                          setContentType('Série');
+                          setShowOptions(false);
+                        }}
+                      >
+                        Série
+                      </Option>
+                      <Option
+                        onClick={() => {
+                          setContentType('Jogo');
+                          setShowOptions(false);
+                        }}
+                      >
+                        Jogo
+                      </Option>
+                    </ContentTypes>
+                  </SingleOptionSelect>
+                </div>
+                {contentType === 'Filme' && <MovieFilters />}
+              </div>
+              {contentType === 'Filme' && (
+                <div className="row">
+                  <SearchWrapper>
+                    <label htmlFor="search">Busca</label>
+                    <input type="text" id="search" autoFocus />
+                    <button>Buscar</button>
+                  </SearchWrapper>
+                </div>
+              )}
             </ContentListHeader>
             {/* <div>Content</div> */}
           </ContentList>
