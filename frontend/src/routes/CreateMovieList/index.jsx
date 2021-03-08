@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
@@ -20,6 +21,13 @@ import {
 const CreateMovieList = () => {
   const [contentType, setContentType] = useState('');
   const [showOptions, setShowOptions] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      console.log(searchValue);
+    }
+  };
 
   return (
     <Container>
@@ -99,9 +107,19 @@ const CreateMovieList = () => {
               {contentType === 'Filme' && (
                 <div className="row">
                   <SearchWrapper>
-                    <label htmlFor="search">Busca</label>
-                    <input type="text" id="search" autoFocus />
-                    <button>Buscar</button>
+                    <GoSearch
+                      size={15}
+                      color="#efeff1"
+                      style={{ flexShrink: 0 }}
+                    />
+                    <input
+                      type="search"
+                      id="search"
+                      placeholder="Buscar"
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                    />
                   </SearchWrapper>
                 </div>
               )}

@@ -135,14 +135,11 @@ export const ContentListHeader = styled.div`
     > div {
       display: flex;
       align-items: center;
+      flex-shrink: 0;
 
       > div {
         display: flex;
         align-items: center;
-
-        > label {
-          ${labelCss}
-        }
       }
 
       > div + div,
@@ -153,6 +150,10 @@ export const ContentListHeader = styled.div`
       > label {
         ${labelCss}
       }
+    }
+
+    > div + div {
+      margin-left: 15px;
     }
   }
 
@@ -186,14 +187,16 @@ export const SearchWrapper = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
+  position: relative;
 
-  > label {
-    ${labelCss}
+  > svg {
+    position: absolute;
+    left: 8.5px;
   }
 
   > input {
-    width: 580px;
-    padding: 5px 10px;
+    width: 350px;
+    padding: 5px 10px 5px 30px;
     border: 2px solid var(--search);
     border-radius: 5px;
     background: var(--search);
@@ -207,25 +210,10 @@ export const SearchWrapper = styled.div`
       border: 2px solid var(--accent);
     }
 
-    transition: border 0.3s;
-  }
-
-  > button {
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-    font-size: 14px;
-    color: var(--white);
-    height: 31px;
-    padding: 10px;
-    border-radius: 5px;
-    white-space: nowrap;
-    outline: none;
-    background: var(--accent);
-
-    &:hover {
-      background: #0f6ba8d9;
-      cursor: pointer;
+    &::placeholder {
+      color: var(--white);
     }
+
+    transition: border 0.3s;
   }
 `;
