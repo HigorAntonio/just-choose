@@ -12,6 +12,7 @@ const VoteController = require('./controllers/VoteController');
 const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
 const ShowController = require('./controllers/ShowController');
+const ConfigurationController = require('./controllers/ConfigurationController');
 
 const routes = express.Router();
 
@@ -121,6 +122,9 @@ routes.get(
   isUserActive,
   ShowController.watchProviders
 );
+
+// ConfigurationController
+routes.get('/configuration/tmdb', authorization, ConfigurationController.tmdb);
 
 routes.get('/', authorization, (req, res) => {
   res.json({ home: true });
