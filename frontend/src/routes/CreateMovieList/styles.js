@@ -217,3 +217,10 @@ export const SearchWrapper = styled.div`
     transition: border 0.3s;
   }
 `;
+
+export const ContentListBody = styled.div`
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-gap: 15px;
+`;

@@ -3,6 +3,7 @@ import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
+import ContentCard from '../../components/ContentCard';
 
 import {
   Container,
@@ -16,6 +17,7 @@ import {
   ContentTypes,
   Option,
   SearchWrapper,
+  ContentListBody,
 } from './styles';
 
 const CreateMovieList = () => {
@@ -124,7 +126,19 @@ const CreateMovieList = () => {
                 </div>
               )}
             </ContentListHeader>
-            {/* <div>Content</div> */}
+            <ContentListBody>
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+              <ContentCard />
+            </ContentListBody>
           </ContentList>
         </div>
       </Main>
