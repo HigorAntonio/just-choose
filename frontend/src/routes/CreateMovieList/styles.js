@@ -125,7 +125,6 @@ export const ContentListHeader = styled.div`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  border-bottom: 0.1px solid var(--search);
 
   > .row {
     display: flex;
@@ -218,9 +217,22 @@ export const SearchWrapper = styled.div`
   }
 `;
 
+export const ContentListWrapper = styled.div`
+  max-height: 550px;
+  overflow-y: auto;
+  border-top: 0.1px solid var(--search);
+`;
+
 export const ContentListBody = styled.div`
   padding: 20px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: ${(props) => {
+    if (props.cardOrientation === 'vertical') {
+      return '1fr 1fr 1fr 1fr 1fr 1fr 1fr;';
+    } else if (props.cardOrientation === 'horizontal') {
+      return '1fr 1fr 1fr 1fr 1fr;';
+    }
+    return '1fr 1fr 1fr 1fr 1fr 1fr 1fr';
+  }};
   grid-gap: 15px;
 `;

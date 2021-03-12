@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
 import ContentCard from '../../components/ContentCard';
+
+import justChooseApi from '../../apis/justChooseApi';
 
 import {
   Container,
@@ -17,6 +19,7 @@ import {
   ContentTypes,
   Option,
   SearchWrapper,
+  ContentListWrapper,
   ContentListBody,
 } from './styles';
 
@@ -24,6 +27,20 @@ const CreateMovieList = () => {
   const [contentType, setContentType] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [configuration, setConfiguration] = useState({});
+  const [content, setContent] = useState();
+
+  useEffect(() => {
+    if (contentType === 'Filme' || contentType === 'Série') {
+      (async () => {
+        try {
+          const { data } = await justChooseApi('/configuration/tmdb');
+          const poster_url = data.images.secure_base_url;
+          setConfiguration((prevState) => ({ ...prevState, poster_url }));
+        } catch (error) {}
+      })();
+    }
+  }, [contentType, setConfiguration]);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -104,7 +121,9 @@ const CreateMovieList = () => {
                     </ContentTypes>
                   </SingleOptionSelect>
                 </div>
-                {contentType === 'Filme' && <MovieFilters />}
+                {contentType === 'Filme' && (
+                  <MovieFilters setContent={setContent} />
+                )}
               </div>
               {contentType === 'Filme' && (
                 <div className="row">
@@ -126,19 +145,22 @@ const CreateMovieList = () => {
                 </div>
               )}
             </ContentListHeader>
-            <ContentListBody>
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-              <ContentCard />
-            </ContentListBody>
+            {content && (
+              <ContentListWrapper>
+                <ContentListBody
+                  cardOrientation={
+                    contentType === 'Jogo' ? 'horizontal' : 'vertical'
+                  }
+                >
+                  {content.results.map((c) => (
+                    <ContentCard
+                      key={c.id}
+                      src={`${configuration.poster_url}w342${c.poster_path}`}
+                    />
+                  ))}
+                </ContentListBody>
+              </ContentListWrapper>
+            )}
           </ContentList>
         </div>
       </Main>

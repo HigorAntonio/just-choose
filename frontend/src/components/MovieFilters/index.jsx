@@ -29,7 +29,7 @@ const compareCertifications = (a, b) => {
   return 0;
 };
 
-const MovieFilters = () => {
+const MovieFilters = (props) => {
   const [providers, setProviders] = useState();
   const [genres, setGenres] = useState();
   const [certifications, setCertifications] = useState();
@@ -110,8 +110,9 @@ const MovieFilters = () => {
 
     try {
       const { data } = await justChooseApi.get('/movies', { params });
-      console.log(params);
-      console.log(data);
+      // console.log(params);
+      // console.log(data);
+      props.setContent(data);
     } catch (error) {}
   };
 
