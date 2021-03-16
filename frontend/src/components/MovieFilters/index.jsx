@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import CustomSelect from '../CustomSelect';
 import ContentProvider from '../ContentProvider';
@@ -6,6 +6,7 @@ import CustomOption from '../CustomOption';
 import DataPicker from '../DataPicker';
 import RangeSlider from '../RangeSlider';
 
+import useMovieFilters from '../../hooks/useMovieFilters';
 import justChooseApi from '../../apis/justChooseApi';
 
 import {
@@ -19,46 +20,26 @@ import {
   ClearButton,
 } from './styles';
 
-const compareCertifications = (a, b) => {
-  if (a.order < b.order) {
-    return -1;
-  }
-  if (a.order > b.order) {
-    return 1;
-  }
-  return 0;
-};
-
 const MovieFilters = (props) => {
-  const [providers, setProviders] = useState();
-  const [genres, setGenres] = useState();
-  const [certifications, setCertifications] = useState();
-  const [selectedProviders, setSelectedProviders] = useState([]);
-  const [selectedGenres, setSelectedGenres] = useState([]);
-  const [releaseDateGte, setReleaseDateGte] = useState();
-  const [releaseDateLte, setReleaseDateLte] = useState(new Date());
-  const [selectedCertifications, setSelectedCertifications] = useState([]);
-  const [voteAverage, setVoteAverage] = useState([0, 10]);
-  const [runtime, setRuntime] = useState([0, 400]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await justChooseApi.get('/movies/watch_providers');
-        setProviders(data);
-      } catch (error) {}
-      try {
-        const { data } = await justChooseApi.get('/movies/genres');
-        setGenres(data.genres);
-      } catch (error) {}
-      try {
-        const { data } = await justChooseApi.get('/movies/certifications');
-        setCertifications(
-          data.certifications['BR'].sort(compareCertifications)
-        );
-      } catch (error) {}
-    })();
-  }, [setProviders, setGenres, setCertifications]);
+  const {
+    providers,
+    genres,
+    certifications,
+    selectedProviders,
+    setSelectedProviders,
+    selectedGenres,
+    setSelectedGenres,
+    releaseDateGte,
+    setReleaseDateGte,
+    releaseDateLte,
+    setReleaseDateLte,
+    selectedCertifications,
+    setSelectedCertifications,
+    voteAverage,
+    setVoteAverage,
+    runtime,
+    setRuntime,
+  } = useMovieFilters();
 
   const handleSelectProvider = (id) => {
     if (selectedProviders.includes(id)) {
@@ -86,9 +67,9 @@ const MovieFilters = (props) => {
     }
   };
 
-  const handleSearch = async () => {
-    const orderedCertifications = selectedCertifications.sort((a, b) => a - b);
+  const sanitizeParams = () => {
     const params = {};
+    const orderedCertifications = selectedCertifications.sort((a, b) => a - b);
     selectedProviders.length &&
       (params.with_watch_providers = selectedProviders.join(','));
     selectedGenres.length && (params.with_genres = selectedGenres.join(','));
@@ -108,8 +89,14 @@ const MovieFilters = (props) => {
     params['with_runtime.gte'] = runtime[0];
     params['with_runtime.lte'] = runtime[1];
 
+    return params;
+  };
+
+  const handleSearch = async () => {
     try {
-      const { data } = await justChooseApi.get('/movies', { params });
+      const { data } = await justChooseApi.get('/movies', {
+        params: sanitizeParams(),
+      });
       // console.log(params);
       // console.log(data);
       props.setContent(data);
