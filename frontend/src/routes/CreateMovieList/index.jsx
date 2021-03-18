@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
 import ContentCard from '../../components/ContentCard';
 
+import useMovieRequest from '../../hooks/useMovieRequest';
 import justChooseApi from '../../apis/justChooseApi';
 
 import {
@@ -28,7 +29,33 @@ const CreateMovieList = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [configuration, setConfiguration] = useState({});
-  const [content, setContent] = useState();
+  const [params, setParams] = useState({});
+  const [pageNumber, setPageNumber] = useState(1);
+  const { movies, hasMore, loading, error } = useMovieRequest(
+    params,
+    pageNumber
+  );
+
+  const observer = useRef();
+  const lastMovieElementRef = useCallback(
+    (node) => {
+      if (loading) {
+        return;
+      }
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPageNumber((prevState) => prevState + 1);
+        }
+      });
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [loading, hasMore]
+  );
 
   useEffect(() => {
     if (contentType === 'Filme' || contentType === 'Série') {
@@ -122,7 +149,10 @@ const CreateMovieList = () => {
                   </SingleOptionSelect>
                 </div>
                 {contentType === 'Filme' && (
-                  <MovieFilters setContent={setContent} />
+                  <MovieFilters
+                    setParams={setParams}
+                    setPageNumber={setPageNumber}
+                  />
                 )}
               </div>
               {contentType === 'Filme' && (
@@ -145,19 +175,31 @@ const CreateMovieList = () => {
                 </div>
               )}
             </ContentListHeader>
-            {content && (
+            {movies && (
               <ContentListWrapper>
                 <ContentListBody
                   cardOrientation={
                     contentType === 'Jogo' ? 'horizontal' : 'vertical'
                   }
                 >
-                  {content.results.map((c) => (
-                    <ContentCard
-                      key={c.id}
-                      src={`${configuration.poster_url}w342${c.poster_path}`}
-                    />
-                  ))}
+                  {movies.map((c, i) => {
+                    if (movies.length === i + 1) {
+                      return (
+                        <div ref={lastMovieElementRef} key={c.id}>
+                          <ContentCard
+                            src={`${configuration.poster_url}w342${c.poster_path}`}
+                          />
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={c.id}>
+                        <ContentCard
+                          src={`${configuration.poster_url}w342${c.poster_path}`}
+                        />
+                      </div>
+                    );
+                  })}
                 </ContentListBody>
               </ContentListWrapper>
             )}

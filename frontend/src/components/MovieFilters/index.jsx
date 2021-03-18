@@ -71,8 +71,8 @@ const MovieFilters = (props) => {
     const params = {};
     const orderedCertifications = selectedCertifications.sort((a, b) => a - b);
     selectedProviders.length &&
-      (params.with_watch_providers = selectedProviders.join(','));
-    selectedGenres.length && (params.with_genres = selectedGenres.join(','));
+      (params.with_watch_providers = selectedProviders.join('|'));
+    selectedGenres.length && (params.with_genres = selectedGenres.join('|'));
     releaseDateGte && (params['primary_release_date.gte'] = releaseDateGte);
     params['primary_release_date.lte'] = releaseDateLte;
     orderedCertifications.length &&
@@ -93,14 +93,10 @@ const MovieFilters = (props) => {
   };
 
   const handleSearch = async () => {
-    try {
-      const { data } = await justChooseApi.get('/movies', {
-        params: sanitizeParams(),
-      });
-      // console.log(params);
-      // console.log(data);
-      props.setContent(data);
-    } catch (error) {}
+    // console.log(params);
+    // console.log(data);
+    props.setParams(sanitizeParams());
+    props.setPageNumber(1);
   };
 
   return (
