@@ -222,17 +222,3 @@ export const ContentListWrapper = styled.div`
   overflow-y: auto;
   border-top: 0.1px solid var(--search);
 `;
-
-export const ContentListBody = styled.div`
-  padding: 20px;
-  display: grid;
-  grid-template-columns: ${(props) => {
-    if (props.cardOrientation === 'vertical') {
-      return '1fr 1fr 1fr 1fr 1fr 1fr 1fr;';
-    } else if (props.cardOrientation === 'horizontal') {
-      return '1fr 1fr 1fr 1fr 1fr;';
-    }
-    return '1fr 1fr 1fr 1fr 1fr 1fr 1fr';
-  }};
-  grid-gap: 15px;
-`;

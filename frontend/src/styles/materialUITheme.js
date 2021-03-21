@@ -109,6 +109,11 @@ theme.overrides = {
       color: '#0F6BA8',
     },
   },
+  MuiSkeleton: {
+    root: {
+      backgroundColor: 'rgba(255, 255, 255, 0.11)',
+    },
+  },
 };
 
 export default theme;

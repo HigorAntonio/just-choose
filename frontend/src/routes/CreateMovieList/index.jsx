@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
-import ContentCard from '../../components/ContentCard';
-
-import useMovieRequest from '../../hooks/useMovieRequest';
-import justChooseApi from '../../apis/justChooseApi';
+import ContentListMovies from '../../components/ContentListMovies';
 
 import {
   Container,
@@ -21,53 +18,19 @@ import {
   Option,
   SearchWrapper,
   ContentListWrapper,
-  ContentListBody,
 } from './styles';
 
 const CreateMovieList = () => {
   const [contentType, setContentType] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [configuration, setConfiguration] = useState({});
   const [params, setParams] = useState({});
   const [pageNumber, setPageNumber] = useState(1);
-  const { movies, hasMore, loading, error } = useMovieRequest(
-    params,
-    pageNumber
-  );
-
-  const observer = useRef();
-  const lastMovieElementRef = useCallback(
-    (node) => {
-      if (loading) {
-        return;
-      }
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPageNumber((prevState) => prevState + 1);
-        }
-      });
-      if (node) {
-        observer.current.observe(node);
-      }
-    },
-    [loading, hasMore]
-  );
+  const [contentList, setContentList] = useState([]);
 
   useEffect(() => {
-    if (contentType === 'Filme' || contentType === 'Série') {
-      (async () => {
-        try {
-          const { data } = await justChooseApi('/configuration/tmdb');
-          const poster_url = data.images.secure_base_url;
-          setConfiguration((prevState) => ({ ...prevState, poster_url }));
-        } catch (error) {}
-      })();
-    }
-  }, [contentType, setConfiguration]);
+    console.log(contentList);
+  }, [contentList]);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -175,32 +138,17 @@ const CreateMovieList = () => {
                 </div>
               )}
             </ContentListHeader>
-            {movies && (
+            {contentType && (
               <ContentListWrapper>
-                <ContentListBody
-                  cardOrientation={
-                    contentType === 'Jogo' ? 'horizontal' : 'vertical'
-                  }
-                >
-                  {movies.map((c, i) => {
-                    if (movies.length === i + 1) {
-                      return (
-                        <div ref={lastMovieElementRef} key={c.id}>
-                          <ContentCard
-                            src={`${configuration.poster_url}w342${c.poster_path}`}
-                          />
-                        </div>
-                      );
-                    }
-                    return (
-                      <div key={c.id}>
-                        <ContentCard
-                          src={`${configuration.poster_url}w342${c.poster_path}`}
-                        />
-                      </div>
-                    );
-                  })}
-                </ContentListBody>
+                {contentType === 'Filme' && (
+                  <ContentListMovies
+                    params={params}
+                    pageNumber={pageNumber}
+                    setPageNumber={setPageNumber}
+                    contentList={contentList}
+                    setContentList={setContentList}
+                  />
+                )}
               </ContentListWrapper>
             )}
           </ContentList>

@@ -7,7 +7,6 @@ import DataPicker from '../DataPicker';
 import RangeSlider from '../RangeSlider';
 
 import useMovieFilters from '../../hooks/useMovieFilters';
-import justChooseApi from '../../apis/justChooseApi';
 
 import {
   Providers,
