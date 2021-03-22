@@ -53,7 +53,7 @@ const ContentListMovies = ({
         {
           type: 'movie',
           contentId,
-          poster: `${process.env.REACT_APP_TMDB_POSTER_URL}w342${posterPath}`,
+          poster: `${process.env.REACT_APP_TMDB_POSTER_URL}w185${posterPath}`,
           title,
         },
       ]);
@@ -71,7 +71,7 @@ const ContentListMovies = ({
             return (
               <div ref={lastMovieElementRef} key={c.id} className="cardWrapper">
                 <ContentCard
-                  src={`${process.env.REACT_APP_TMDB_POSTER_URL}w342${c.poster_path}`}
+                  src={`${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`}
                   title={c.title}
                   click={() =>
                     addMovieToContentList(c.id, c.poster_path, c.title)
@@ -84,7 +84,7 @@ const ContentListMovies = ({
           return (
             <div key={c.id} className="cardWrapper">
               <ContentCard
-                src={`${process.env.REACT_APP_TMDB_POSTER_URL}w342${c.poster_path}`}
+                src={`${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`}
                 title={c.title}
                 click={() =>
                   addMovieToContentList(c.id, c.poster_path, c.title)
