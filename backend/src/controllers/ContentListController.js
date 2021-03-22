@@ -1,6 +1,18 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
 
+const getPlatformId = (contentType) => {
+  if (contentType === 'movie') {
+    return 'tmdb_id';
+  }
+  if (contentType === 'show') {
+    return 'tmdb_id';
+  }
+  if (contentType === 'game') {
+    return 'rawg_id';
+  }
+};
+
 const createContentListOnDB = async (
   userId,
   title,
@@ -26,11 +38,12 @@ const createContentListOnDB = async (
 
     // Removendo ids duplicados e ids de conteúdos que não existem no banco de dados
     for (const type of contentTypes) {
+      let platformId = getPlatformId(type.name);
       contentToInsert[`content_list_${type.name}s`] = (
         await knex
           .select('id')
           .from(`${type.name}s`)
-          .whereIn('id', contentToInsert[`content_list_${type.name}s`])
+          .whereIn(platformId, contentToInsert[`content_list_${type.name}s`])
       ).map((content) => content.id);
     }
 

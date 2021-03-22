@@ -3,13 +3,13 @@ import { ImCheckboxUnchecked, ImCheckboxChecked } from 'react-icons/im';
 
 import { Container, Poster } from './styles';
 
-const ContentCard = ({ src, check, click }) => {
+const ContentCard = ({ src, alt, title, check, click }) => {
   const handleClick = () => {
     click();
   };
 
   return (
-    <Container>
+    <Container title={title}>
       <Poster src={src} alt="" />
       <div onClick={handleClick}>
         {check ? (

@@ -8,7 +8,7 @@ import theme from '../../styles/materialUITheme';
 
 import { Container } from './styles';
 
-const ContentListMovie = ({
+const ContentListMovies = ({
   params,
   pageNumber,
   setPageNumber,
@@ -42,7 +42,7 @@ const ContentListMovie = ({
     [loading, hasMore, setPageNumber]
   );
 
-  const addMovieToContentList = (contentId) => {
+  const addMovieToContentList = (contentId, posterPath, title) => {
     if (contentList.map((c) => c.contentId).includes(contentId)) {
       setContentList((prevState) =>
         prevState.filter((c) => c.contentId !== contentId)
@@ -50,7 +50,12 @@ const ContentListMovie = ({
     } else {
       setContentList((prevState) => [
         ...prevState,
-        { type: 'movie', contentId },
+        {
+          type: 'movie',
+          contentId,
+          poster: `${process.env.REACT_APP_TMDB_POSTER_URL}w342${posterPath}`,
+          title,
+        },
       ]);
     }
   };
@@ -67,7 +72,10 @@ const ContentListMovie = ({
               <div ref={lastMovieElementRef} key={c.id} className="cardWrapper">
                 <ContentCard
                   src={`${process.env.REACT_APP_TMDB_POSTER_URL}w342${c.poster_path}`}
-                  click={() => addMovieToContentList(c.id)}
+                  title={c.title}
+                  click={() =>
+                    addMovieToContentList(c.id, c.poster_path, c.title)
+                  }
                   check={isMovieInContentList(c.id)}
                 />
               </div>
@@ -77,7 +85,10 @@ const ContentListMovie = ({
             <div key={c.id} className="cardWrapper">
               <ContentCard
                 src={`${process.env.REACT_APP_TMDB_POSTER_URL}w342${c.poster_path}`}
-                click={() => addMovieToContentList(c.id)}
+                title={c.title}
+                click={() =>
+                  addMovieToContentList(c.id, c.poster_path, c.title)
+                }
                 check={isMovieInContentList(c.id)}
               />
             </div>
@@ -100,4 +111,4 @@ const ContentListMovie = ({
   );
 };
 
-export default ContentListMovie;
+export default ContentListMovies;

@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ImCheckboxUnchecked, ImCheckboxChecked } from 'react-icons/im';
 
 import { Container } from './styles';
 
-const CustomOption = (props) => {
-  const [check, setCheck] = useState(false);
-
+const CustomOption = ({ click, children, check }) => {
   return (
     <Container
       onClick={() => {
-        setCheck((prevState) => !prevState);
-        props.click();
+        click();
       }}
     >
-      <span>{props.children}</span>
+      <span>{children}</span>
       {check ? (
         <ImCheckboxChecked size={15} color="#fff" style={{ flexShrink: 0 }} />
       ) : (

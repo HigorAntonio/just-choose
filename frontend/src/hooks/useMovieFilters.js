@@ -24,6 +24,16 @@ const useMovieFilters = () => {
   const [voteAverage, setVoteAverage] = useState([0, 10]);
   const [runtime, setRuntime] = useState([0, 400]);
 
+  const clearFilters = () => {
+    setSelectedProviders([]);
+    setSelectedGenres([]);
+    setReleaseDateGte(null);
+    setReleaseDateLte(new Date());
+    setSelectedCertifications([]);
+    setVoteAverage([0, 10]);
+    setRuntime([0, 400]);
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -64,6 +74,7 @@ const useMovieFilters = () => {
     setVoteAverage,
     runtime,
     setRuntime,
+    clearFilters,
   };
 };
 

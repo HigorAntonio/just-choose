@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import CustomSelect from '../CustomSelect';
 import ContentProvider from '../ContentProvider';
@@ -38,6 +38,7 @@ const MovieFilters = (props) => {
     setVoteAverage,
     runtime,
     setRuntime,
+    clearFilters,
   } = useMovieFilters();
 
   const handleSelectProvider = (id) => {
@@ -91,11 +92,27 @@ const MovieFilters = (props) => {
     return params;
   };
 
-  const handleSearch = async () => {
-    // console.log(params);
-    // console.log(data);
+  const handleSearch = () => {
     props.setParams(sanitizeParams());
     props.setPageNumber(1);
+  };
+
+  const handleClearFilters = () => {
+    clearFilters();
+    props.setParams({});
+    props.setPageNumber(1);
+  };
+
+  const isProviderCheck = (providerId) => {
+    return selectedProviders.includes(providerId);
+  };
+
+  const isGenreCheck = (genreId) => {
+    return selectedGenres.includes(genreId);
+  };
+
+  const isCertificationCheck = (order) => {
+    return selectedCertifications.includes(order);
   };
 
   return (
@@ -109,6 +126,7 @@ const MovieFilters = (props) => {
                 <ContentProvider
                   key={p.id}
                   click={() => handleSelectProvider(p.id)}
+                  check={isProviderCheck(p.id)}
                 >
                   {p.name}
                 </ContentProvider>
@@ -119,7 +137,11 @@ const MovieFilters = (props) => {
           <Genres>
             {genres &&
               genres.map((g) => (
-                <CustomOption key={g.id} click={() => handleSelectGenre(g.id)}>
+                <CustomOption
+                  key={g.id}
+                  click={() => handleSelectGenre(g.id)}
+                  check={isGenreCheck(g.id)}
+                >
                   {g.name}
                 </CustomOption>
               ))}
@@ -154,6 +176,7 @@ const MovieFilters = (props) => {
                 <CustomOption
                   key={c.order}
                   click={() => handleSelectCertification(c.order)}
+                  check={isCertificationCheck(c.order)}
                 >
                   {c.certification}
                 </CustomOption>
@@ -192,7 +215,7 @@ const MovieFilters = (props) => {
         </CustomSelect>
       </div>
       <div>
-        <ClearButton onClick={handleSearch}>Limpar filtros</ClearButton>
+        <ClearButton onClick={handleClearFilters}>Limpar filtros</ClearButton>
         <SearchButton onClick={handleSearch}>Filtrar</SearchButton>
       </div>
     </>

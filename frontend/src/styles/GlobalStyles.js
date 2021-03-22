@@ -36,4 +36,24 @@ export default createGlobalStyle`
     --nav-bar: #061F34;
     --warning: #eb0400;
   }
+  /* Scrollbar on Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--search) var(--secondary);
+  }
+
+  /* Scrollbar on Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--secondary);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--search);
+    /* border-radius: 20px; */
+    border: 3px solid var(--secondary);
+  }
 `;
