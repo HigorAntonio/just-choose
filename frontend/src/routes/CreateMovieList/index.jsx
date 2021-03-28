@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
@@ -22,11 +22,15 @@ import {
 
 const CreateMovieList = () => {
   const [contentType, setContentType] = useState('');
-  const [showOptions, setShowOptions] = useState(false);
+  const [showContent, setShowContent] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [params, setParams] = useState({});
   const [pageNumber, setPageNumber] = useState(1);
   const [contentList, setContentList] = useState([]);
+
+  const contentListWrapperRef = useRef();
+
+  const contentTypesList = ['Filme', 'Série', 'Jogo'];
 
   useEffect(() => {
     console.log(contentList);
@@ -80,46 +84,26 @@ const CreateMovieList = () => {
                   <SingleOptionSelect
                     label={!contentType ? 'Selecionar' : contentType}
                     dropDownAlign="center"
-                    show={showOptions}
-                    setShow={setShowOptions}
+                    show={showContent}
+                    setShow={setShowContent}
+                    width="75px"
                   >
                     <ContentTypes>
-                      <Option
-                        onClick={() => {
-                          setContentType('Filme');
-                          setShowOptions(false);
-                        }}
-                      >
-                        Filme
-                      </Option>
-                      <Option
-                        onClick={() => {
-                          setContentType('Série');
-                          setShowOptions(false);
-                        }}
-                      >
-                        Série
-                      </Option>
-                      <Option
-                        onClick={() => {
-                          setContentType('Jogo');
-                          setShowOptions(false);
-                        }}
-                      >
-                        Jogo
-                      </Option>
+                      {contentTypesList.map((ct, i) => (
+                        <Option
+                          key={`contentTypesList${i}`}
+                          onClick={() => {
+                            setContentType(ct);
+                            setShowContent(false);
+                          }}
+                        >
+                          {ct}
+                        </Option>
+                      ))}
                     </ContentTypes>
                   </SingleOptionSelect>
                 </div>
-                {contentType === 'Filme' && (
-                  <MovieFilters
-                    setParams={setParams}
-                    setPageNumber={setPageNumber}
-                  />
-                )}
-              </div>
-              {contentType === 'Filme' && (
-                <div className="row">
+                {contentType && (
                   <SearchWrapper>
                     <GoSearch
                       size={15}
@@ -135,11 +119,19 @@ const CreateMovieList = () => {
                       onKeyPress={handleKeyPress}
                     />
                   </SearchWrapper>
+                )}
+              </div>
+              {contentType === 'Filme' && (
+                <div className="row">
+                  <MovieFilters
+                    setParams={setParams}
+                    setPageNumber={setPageNumber}
+                  />
                 </div>
               )}
             </ContentListHeader>
             {contentType && (
-              <ContentListWrapper>
+              <ContentListWrapper ref={contentListWrapperRef}>
                 {contentType === 'Filme' && (
                   <ContentListMovies
                     params={params}
@@ -147,6 +139,7 @@ const CreateMovieList = () => {
                     setPageNumber={setPageNumber}
                     contentList={contentList}
                     setContentList={setContentList}
+                    wrapperRef={contentListWrapperRef}
                   />
                 )}
               </ContentListWrapper>

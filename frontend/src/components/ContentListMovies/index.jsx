@@ -14,12 +14,21 @@ const ContentListMovies = ({
   setPageNumber,
   contentList,
   setContentList,
+  wrapperRef,
 }) => {
   useEffect(() => {
     setPageNumber(1);
   }, [setPageNumber]);
 
   const { movies, hasMore, loading } = useMovieRequest(params, pageNumber);
+
+  // Quando a lista de conteudo muda move o scroll da contentList pro início
+  useEffect(() => {
+    if (pageNumber === 1) {
+      wrapperRef.current.scrollTop = 0;
+      wrapperRef.current.scrollLeft = 0;
+    }
+  }, [pageNumber, wrapperRef]);
 
   const observer = useRef();
   const lastMovieElementRef = useCallback(

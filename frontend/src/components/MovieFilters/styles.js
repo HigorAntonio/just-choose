@@ -1,5 +1,27 @@
 import styled, { css } from 'styled-components';
 
+export const OrderByOptions = styled.div`
+  width: 200px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  > div + div {
+    margin-top: 10px;
+  }
+`;
+
+export const Option = styled.div`
+  width: 100%;
+  background: var(--search);
+  padding: 10px;
+  border-radius: 5px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+  }
+`;
+
 export const Providers = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;

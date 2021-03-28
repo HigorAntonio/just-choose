@@ -172,6 +172,7 @@ export const ContentTypes = styled.div`
 `;
 
 export const Option = styled.div`
+  width: 100%;
   background: var(--search);
   padding: 10px;
   border-radius: 5px;
@@ -183,9 +184,9 @@ export const Option = styled.div`
 `;
 
 export const SearchWrapper = styled.div`
-  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   position: relative;
 
   > svg {
@@ -200,7 +201,6 @@ export const SearchWrapper = styled.div`
     border-radius: 5px;
     background: var(--search);
     outline: none;
-    margin-right: 15px;
 
     &:hover {
       border: 2px solid var(--gray);
@@ -214,6 +214,10 @@ export const SearchWrapper = styled.div`
     }
 
     transition: border 0.3s;
+  }
+
+  > div label {
+    ${labelCss}
   }
 `;
 

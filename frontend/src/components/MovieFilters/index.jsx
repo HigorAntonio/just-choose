@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
+import SingleOptionSelect from '../SingleOptionSelect';
 import CustomSelect from '../CustomSelect';
 import ContentProvider from '../ContentProvider';
 import CustomOption from '../CustomOption';
@@ -17,10 +18,15 @@ import {
   Certification,
   SearchButton,
   ClearButton,
+  OrderByOptions,
+  Option,
 } from './styles';
 
-const MovieFilters = (props) => {
+const MovieFilters = ({ setParams, setPageNumber }) => {
   const {
+    sortByList,
+    sortBy,
+    setSortBy,
     providers,
     genres,
     certifications,
@@ -40,6 +46,8 @@ const MovieFilters = (props) => {
     setRuntime,
     clearFilters,
   } = useMovieFilters();
+
+  const [showSortOptions, setShowSortOptions] = useState(false);
 
   const handleSelectProvider = (id) => {
     if (selectedProviders.includes(id)) {
@@ -88,19 +96,25 @@ const MovieFilters = (props) => {
     params['vote_average.lte'] = voteAverage[1];
     params['with_runtime.gte'] = runtime[0];
     params['with_runtime.lte'] = runtime[1];
+    params.sort_by = sortBy.value;
 
     return params;
   };
 
   const handleSearch = () => {
-    props.setParams(sanitizeParams());
-    props.setPageNumber(1);
+    setParams(sanitizeParams());
+    setPageNumber(1);
   };
+
+  useEffect(() => {
+    setParams((prevState) => ({ ...prevState, sort_by: sortBy.value }));
+    setPageNumber(1);
+  }, [sortBy, setParams, setPageNumber]);
 
   const handleClearFilters = () => {
     clearFilters();
-    props.setParams({});
-    props.setPageNumber(1);
+    setParams({});
+    setPageNumber(1);
   };
 
   const isProviderCheck = (providerId) => {
@@ -117,6 +131,30 @@ const MovieFilters = (props) => {
 
   return (
     <>
+      <div>
+        <label>Ordenar por</label>
+        <SingleOptionSelect
+          label={!sortBy.key ? 'Selecionar' : sortBy.key}
+          dropDownAlign="center"
+          show={showSortOptions}
+          setShow={setShowSortOptions}
+          width="155px"
+        >
+          <OrderByOptions>
+            {sortByList.map((sb, i) => (
+              <Option
+                key={`movieOrderByList${i}`}
+                onClick={() => {
+                  sortBy.value !== sb.value && setSortBy(sb);
+                  setShowSortOptions(false);
+                }}
+              >
+                {sb.key}
+              </Option>
+            ))}
+          </OrderByOptions>
+        </SingleOptionSelect>
+      </div>
       <div>
         <label>Filtrar por</label>
         <CustomSelect label="Provedor" dropDownAlign="center">
@@ -215,7 +253,7 @@ const MovieFilters = (props) => {
         </CustomSelect>
       </div>
       <div>
-        <ClearButton onClick={handleClearFilters}>Limpar filtros</ClearButton>
+        <ClearButton onClick={handleClearFilters}>Reinicializar</ClearButton>
         <SearchButton onClick={handleSearch}>Filtrar</SearchButton>
       </div>
     </>

@@ -22,6 +22,11 @@ export const Container = styled.div`
       background: rgba(255, 255, 255, 0.25);
       cursor: pointer;
     }
+
+    > div {
+      text-align: left;
+      ${(props) => props.width && `width: ${props.width};`}
+    }
   }
 `;
 
@@ -35,11 +40,11 @@ export const FilterDropDown = styled.div`
   position: absolute;
   top: 35px;
 
-  ${(props) => props.align === 'left' && `left: 0;`};
-  ${(props) => props.align === 'right' && `right: 0;`};
+  ${(props) => props.align === 'left' && 'left: 0;'};
+  ${(props) => props.align === 'right' && 'right: 0;'};
   ${(props) =>
     props.align === 'center' &&
-    `left: 50%; transform: translate(-50%, -10px);`};
+    'left: 50%; transform: translate(-50%, -10px);'};
   z-index: 200;
 
   ${(props) =>

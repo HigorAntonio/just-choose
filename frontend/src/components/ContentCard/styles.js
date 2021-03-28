@@ -5,6 +5,9 @@ export const Container = styled.div`
   width: 100%;
   height: 100%;
   background: rgba(255, 255, 255, 0.11);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   > div {
     display: flex;
@@ -71,4 +74,5 @@ export const Container = styled.div`
 export const Poster = styled.img`
   width: 100%;
   height: 100%;
+  ${(props) => props.error && 'display: none;'}
 `;

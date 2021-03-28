@@ -13,6 +13,10 @@ const compareCertifications = (a, b) => {
 };
 
 const useMovieFilters = () => {
+  const [sortBy, setSortBy] = useState({
+    key: 'Popularidade (maior)',
+    value: 'popularity.desc',
+  });
   const [providers, setProviders] = useState();
   const [genres, setGenres] = useState();
   const [certifications, setCertifications] = useState();
@@ -24,6 +28,17 @@ const useMovieFilters = () => {
   const [voteAverage, setVoteAverage] = useState([0, 10]);
   const [runtime, setRuntime] = useState([0, 400]);
 
+  const sortByList = [
+    { key: 'Popularidade (maior)', value: 'popularity.desc' },
+    { key: 'Popularidade (menor)', value: 'popularity.asc' },
+    { key: 'Avaliação (melhor)', value: 'vote_average.desc' },
+    { key: 'Avaliação (pior)', value: 'vote_average.asc' },
+    { key: 'Lançamento (novo)', value: 'primary_release_date.desc' },
+    { key: 'Lançamento (antigo)', value: 'primary_release_date.asc' },
+    { key: 'Título (A-Z)', value: 'original_title.asc' },
+    { key: 'Título (Z-A)', value: 'original_title.desc' },
+  ];
+
   const clearFilters = () => {
     setSelectedProviders([]);
     setSelectedGenres([]);
@@ -32,6 +47,7 @@ const useMovieFilters = () => {
     setSelectedCertifications([]);
     setVoteAverage([0, 10]);
     setRuntime([0, 400]);
+    setSortBy({ key: 'Popularidade (maior)', value: 'popularity.desc' });
   };
 
   useEffect(() => {
@@ -54,6 +70,9 @@ const useMovieFilters = () => {
   }, [setProviders, setGenres, setCertifications]);
 
   return {
+    sortByList,
+    sortBy,
+    setSortBy,
     providers,
     setProviders,
     genres,

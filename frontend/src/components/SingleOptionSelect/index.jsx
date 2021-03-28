@@ -8,7 +8,7 @@ const SingleOptionSelect = (props) => {
 
   return (
     <ClickAwayListener onClickAway={() => setShow(false)}>
-      <Container>
+      <Container width={props.width}>
         <button onClick={() => setShow((prevState) => !prevState)}>
           <div>{props.label}</div>
           {show ? (
