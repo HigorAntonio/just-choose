@@ -55,25 +55,65 @@ export const ThumbnailWrapper = styled.div`
   align-items: center;
   padding: 20px;
 
-  > input[type='file'] {
-    display: none;
-  }
+  > div.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 
-  > label {
-    ${labelCss}
-    padding: 7px 20px;
-    background: var(--search);
-    border-radius: 5px;
+    > div.file-input {
+      display: flex;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.25);
-      cursor: pointer;
+      > input[type='file'] {
+        display: none;
+      }
+
+      > label {
+        ${labelCss}
+        padding: 7px 20px;
+        background: var(--search);
+        border-radius: 5px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.25);
+          cursor: pointer;
+        }
+      }
+    }
+
+    > p {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    > p.thumb-error {
+      background: var(--warning);
+      padding: 7px 20px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
     }
   }
+`;
 
-  > p {
-    font-size: 14px;
+export const ThumbPreview = styled.div`
+  width: 170px;
+  background: var(--search-button);
+  display: flex;
+  margin-right: 20px;
+
+  &:before {
+    content: '';
+    display: block;
+    height: 0;
+    width: 0;
+    padding-bottom: calc(9 / 16 * 100%);
   }
+
+  background-image: url(${(props) => props.src});
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
 `;
 
 export const Main = styled.main`

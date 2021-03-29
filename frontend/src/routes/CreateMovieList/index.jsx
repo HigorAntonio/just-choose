@@ -12,6 +12,7 @@ import {
   LabelWrapper,
   InputWrapper,
   ThumbnailWrapper,
+  ThumbPreview,
   ContentList,
   ContentListHeader,
   ContentTypes,
@@ -21,6 +22,9 @@ import {
 } from './styles';
 
 const CreateMovieList = () => {
+  const [thumbnail, setThumbnail] = useState();
+  const [thumbPreview, setThumbPreview] = useState();
+  const [thumbError, setThumbError] = useState(false);
   const [contentType, setContentType] = useState('');
   const [showContent, setShowContent] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -35,6 +39,22 @@ const CreateMovieList = () => {
   useEffect(() => {
     console.log(contentList);
   }, [contentList]);
+
+  const handleImage = (e) => {
+    setThumbError(false);
+    if (e.target.files[0].size > 2097152) {
+      setThumbError(true);
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setThumbPreview(reader.result);
+        }
+      };
+      reader.readAsDataURL(e.target.files[0]);
+      setThumbnail(e.target.files[0]);
+    }
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -66,12 +86,29 @@ const CreateMovieList = () => {
         <h3>Miniatura</h3>
         <div>
           <ThumbnailWrapper>
-            <label htmlFor="thumbnail">Selecione uma imagem</label>
-            <input type="file" id="thumbnail" accept="image/*" />
-            <p>
-              A imagem deve estar no formato JPEG, PNG ou GIF e não pode ter
-              mais do que 2 MB.
-            </p>
+            <div className="column">
+              <ThumbPreview src={thumbPreview} />
+            </div>
+            <div className="column">
+              <div className="file-input">
+                <label htmlFor="thumbnail">Selecione uma imagem</label>
+                <input
+                  type="file"
+                  id="thumbnail"
+                  accept="image/*"
+                  onChange={handleImage}
+                />
+              </div>
+              <p>
+                A imagem deve estar no formato JPEG, PNG ou GIF e não pode ter
+                mais do que 2 MB.
+              </p>
+              {thumbError && (
+                <p className="thumb-error">
+                  A imagem não pode ter mais do que 2 MB.
+                </p>
+              )}
+            </div>
           </ThumbnailWrapper>
         </div>
         <h3>Conteúdo</h3>
