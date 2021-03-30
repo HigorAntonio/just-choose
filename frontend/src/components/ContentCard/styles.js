@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import PictureIcon from '../../assets/PictureIcon.png';
+
 export const Container = styled.div`
   position: relative;
   width: 100%;
@@ -9,7 +11,7 @@ export const Container = styled.div`
   align-items: center;
   justify-content: center;
 
-  > div {
+  > div.check-box {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -74,5 +76,6 @@ export const Container = styled.div`
 export const Poster = styled.img`
   width: 100%;
   height: 100%;
+  object-fit: cover;
   ${(props) => props.error && 'display: none;'}
 `;

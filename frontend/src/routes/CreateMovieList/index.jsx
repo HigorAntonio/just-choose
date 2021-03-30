@@ -4,6 +4,7 @@ import { GoSearch } from 'react-icons/go';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
 import ContentListMovies from '../../components/ContentListMovies';
+import MovieListPreview from '../../components/MovieListPreview';
 
 import {
   Container,
@@ -31,6 +32,7 @@ const CreateMovieList = () => {
   const [params, setParams] = useState({});
   const [pageNumber, setPageNumber] = useState(1);
   const [contentList, setContentList] = useState([]);
+  const [showListPreview, setShowListPreview] = useState(false);
 
   const contentListWrapperRef = useRef();
 
@@ -169,7 +171,7 @@ const CreateMovieList = () => {
             </ContentListHeader>
             {contentType && (
               <ContentListWrapper ref={contentListWrapperRef}>
-                {contentType === 'Filme' && (
+                {contentType === 'Filme' && !showListPreview && (
                   <ContentListMovies
                     params={params}
                     pageNumber={pageNumber}
@@ -179,6 +181,9 @@ const CreateMovieList = () => {
                     wrapperRef={contentListWrapperRef}
                   />
                 )}
+                {/* {showListPreview && (
+                  <MovieListPreview movies={}/>
+                )} */}
               </ContentListWrapper>
             )}
           </ContentList>
