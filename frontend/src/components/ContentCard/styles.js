@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-import PictureIcon from '../../assets/PictureIcon.png';
-
 export const Container = styled.div`
   position: relative;
   width: 100%;
