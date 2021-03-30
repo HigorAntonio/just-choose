@@ -95,6 +95,12 @@ routes.get('/polls/:id/result', PollVoteController.show);
 // MovieController
 routes.get('/movies', authorization, isUserActive, MovieController.index);
 routes.get(
+  '/movies/search',
+  authorization,
+  isUserActive,
+  MovieController.search
+);
+routes.get(
   '/movies/certifications',
   authorization,
   isUserActive,
