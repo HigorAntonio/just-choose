@@ -156,7 +156,7 @@ export const LabelWrapper = styled.div`
   }
 `;
 
-export const ContentList = styled.div`
+export const ContentListContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;

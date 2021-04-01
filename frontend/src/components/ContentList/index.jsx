@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
-import ContentCard from '../../components/ContentCard';
-import useMovieRequest from '../../hooks/useMovieRequest';
+import ContentCard from '../ContentCard';
+import useContentRequest from '../../hooks/useContentRequest';
 import theme from '../../styles/materialUITheme';
 
 import { Container } from './styles';
 
-const ContentListMovies = ({
+const ContentList = ({
+  requestType,
+  contentType,
   params,
   pageNumber,
   setPageNumber,
@@ -20,7 +22,29 @@ const ContentListMovies = ({
     setPageNumber(1);
   }, [setPageNumber]);
 
-  const { movies, hasMore, loading } = useMovieRequest(params, pageNumber);
+  const getUrl = () => {
+    if (requestType === 'movie') {
+      return '/movies';
+    }
+    if (requestType === 'movie-search') {
+      return '/movies/search';
+    }
+    if (requestType === 'show') {
+      return '/shows';
+    }
+    if (requestType === 'show-search') {
+      return '/shows/search';
+    }
+    if (requestType === 'game') {
+      return '/games';
+    }
+  };
+
+  const { content, hasMore, loading } = useContentRequest(
+    getUrl(),
+    params,
+    pageNumber
+  );
 
   // Quando a lista de conteudo muda move o scroll da contentList pro início
   useEffect(() => {
@@ -31,7 +55,7 @@ const ContentListMovies = ({
   }, [pageNumber, wrapperRef]);
 
   const observer = useRef();
-  const lastMovieElementRef = useCallback(
+  const lastElementRef = useCallback(
     (node) => {
       if (loading) {
         return;
@@ -51,7 +75,7 @@ const ContentListMovies = ({
     [loading, hasMore, setPageNumber]
   );
 
-  const addMovieToContentList = (contentId, posterPath, title) => {
+  const addToContentList = (contentId, posterPath, title) => {
     if (contentList.map((c) => c.contentId).includes(contentId)) {
       setContentList((prevState) =>
         prevState.filter((c) => c.contentId !== contentId)
@@ -60,32 +84,40 @@ const ContentListMovies = ({
       setContentList((prevState) => [
         ...prevState,
         {
-          type: 'movie',
+          type:
+            contentType === 'Filme'
+              ? 'movie'
+              : contentType === 'Série'
+              ? 'show'
+              : 'game',
           contentId,
-          poster: `${process.env.REACT_APP_TMDB_POSTER_URL}w185${posterPath}`,
+          poster: posterPath,
           title,
         },
       ]);
     }
   };
 
-  const isMovieInContentList = (contentId) =>
+  const isInContentList = (contentId) =>
     contentList.map((c) => c.contentId).includes(contentId);
 
   return (
     <Container>
-      {movies.length > 0 &&
-        movies.map((c, i) => {
-          if (movies.length === i + 1) {
+      {content.length > 0 &&
+        content.map((c, i) => {
+          const src =
+            contentType === 'Jogo'
+              ? c.background_image
+              : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
+          const title = contentType === 'Filme' ? c.title : c.name;
+          if (content.length === i + 1) {
             return (
-              <div ref={lastMovieElementRef} key={c.id} className="cardWrapper">
+              <div ref={lastElementRef} key={c.id} className="cardWrapper">
                 <ContentCard
-                  src={`${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`}
-                  title={c.title}
-                  click={() =>
-                    addMovieToContentList(c.id, c.poster_path, c.title)
-                  }
-                  check={isMovieInContentList(c.id)}
+                  src={src}
+                  title={title}
+                  click={() => addToContentList(c.id, src, title)}
+                  check={isInContentList(c.id)}
                 />
               </div>
             );
@@ -93,12 +125,10 @@ const ContentListMovies = ({
           return (
             <div key={c.id} className="cardWrapper">
               <ContentCard
-                src={`${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`}
-                title={c.title}
-                click={() =>
-                  addMovieToContentList(c.id, c.poster_path, c.title)
-                }
-                check={isMovieInContentList(c.id)}
+                src={src}
+                title={title}
+                click={() => addToContentList(c.id, src, title)}
+                check={isInContentList(c.id)}
               />
             </div>
           );
@@ -120,4 +150,4 @@ const ContentListMovies = ({
   );
 };
 
-export default ContentListMovies;
+export default ContentList;

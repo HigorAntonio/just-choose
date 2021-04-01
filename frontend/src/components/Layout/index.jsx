@@ -11,7 +11,7 @@ import { AuthContext } from '../../context/AuthContext';
 import Header from '../Header';
 import NavBar from '../NavBar';
 import Home from '../../routes/Home';
-import CreateMovieList from '../../routes/CreateMovieList';
+import CreateList from '../../routes/CreateList';
 
 import {
   Container,
@@ -51,7 +51,7 @@ const Layout = () => {
                 isPrivate
                 exact
                 path="/list"
-                component={CreateMovieList}
+                component={CreateList}
               />
             </Switch>
           </ContentWrapper>

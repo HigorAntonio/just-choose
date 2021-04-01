@@ -22,7 +22,7 @@ import {
   Option,
 } from './styles';
 
-const MovieFilters = ({ setParams, setPageNumber }) => {
+const MovieFilters = ({ setParams, setPageNumber, setRequestType }) => {
   const {
     sortByList,
     sortBy,
@@ -102,16 +102,19 @@ const MovieFilters = ({ setParams, setPageNumber }) => {
   };
 
   const handleSearch = () => {
+    setRequestType('movie');
     setParams(sanitizeParams());
     setPageNumber(1);
   };
 
   useEffect(() => {
+    setRequestType('movie');
     setParams((prevState) => ({ ...prevState, sort_by: sortBy.value }));
     setPageNumber(1);
-  }, [sortBy, setParams, setPageNumber]);
+  }, [sortBy, setParams, setPageNumber, setRequestType]);
 
   const handleClearFilters = () => {
+    setRequestType('movie');
     clearFilters();
     setParams({});
     setPageNumber(1);

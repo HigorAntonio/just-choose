@@ -3,7 +3,7 @@ import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
-import ContentListMovies from '../../components/ContentListMovies';
+import ContentList from '../../components/ContentList';
 import MovieListPreview from '../../components/MovieListPreview';
 
 import {
@@ -14,7 +14,7 @@ import {
   InputWrapper,
   ThumbnailWrapper,
   ThumbPreview,
-  ContentList,
+  ContentListContainer,
   ContentListHeader,
   ContentTypes,
   Option,
@@ -28,7 +28,7 @@ const CreateMovieList = () => {
   const [thumbError, setThumbError] = useState(false);
   const [contentType, setContentType] = useState('');
   const [showContent, setShowContent] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
+  const [requestType, setRequestType] = useState('');
   const [params, setParams] = useState({});
   const [pageNumber, setPageNumber] = useState(1);
   const [contentList, setContentList] = useState([]);
@@ -41,6 +41,17 @@ const CreateMovieList = () => {
   useEffect(() => {
     console.log(contentList);
   }, [contentList]);
+
+  useEffect(() => {
+    setPageNumber(1);
+    if (contentType === 'Filme') {
+      setRequestType('movie');
+    } else if (contentType === 'Série') {
+      setRequestType('show');
+    } else if (contentType === 'Jogo') {
+      setRequestType('game');
+    }
+  }, [contentType]);
 
   const handleImage = (e) => {
     setThumbError(false);
@@ -59,8 +70,18 @@ const CreateMovieList = () => {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      console.log(searchValue);
+    if (e.key === 'Enter' && e.target.value) {
+      if (contentType === 'Filme') {
+        setRequestType('movie-search');
+        setParams({ query: e.target.value });
+      } else if (contentType === 'Série') {
+        setRequestType('show-search');
+        setParams({ query: e.target.value });
+      } else if (contentType === 'Jogo') {
+        setRequestType('game');
+        setParams({ search: e.target.value });
+      }
+      setPageNumber(1);
     }
   };
 
@@ -115,7 +136,7 @@ const CreateMovieList = () => {
         </div>
         <h3>Conteúdo</h3>
         <div className={!contentType ? null : 'content-list'}>
-          <ContentList>
+          <ContentListContainer>
             <ContentListHeader>
               <div className="row">
                 <div>
@@ -153,8 +174,6 @@ const CreateMovieList = () => {
                       type="search"
                       id="search"
                       placeholder="Buscar"
-                      value={searchValue}
-                      onChange={(e) => setSearchValue(e.target.value)}
                       onKeyPress={handleKeyPress}
                     />
                   </SearchWrapper>
@@ -165,14 +184,17 @@ const CreateMovieList = () => {
                   <MovieFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
+                    setRequestType={setRequestType}
                   />
                 </div>
               )}
             </ContentListHeader>
             {contentType && (
               <ContentListWrapper ref={contentListWrapperRef}>
-                {contentType === 'Filme' && !showListPreview && (
-                  <ContentListMovies
+                {!showListPreview && (
+                  <ContentList
+                    requestType={requestType}
+                    contentType={contentType}
                     params={params}
                     pageNumber={pageNumber}
                     setPageNumber={setPageNumber}
@@ -186,7 +208,7 @@ const CreateMovieList = () => {
                 )} */}
               </ContentListWrapper>
             )}
-          </ContentList>
+          </ContentListContainer>
         </div>
       </Main>
     </Container>
