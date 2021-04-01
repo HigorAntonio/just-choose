@@ -12,6 +12,7 @@ const VoteController = require('./controllers/VoteController');
 const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
 const ShowController = require('./controllers/ShowController');
+const GameController = require('./controllers/GameController');
 const ConfigurationController = require('./controllers/ConfigurationController');
 
 const routes = express.Router();
@@ -121,6 +122,7 @@ routes.get(
 
 // ShowController
 routes.get('/shows', authorization, isUserActive, ShowController.index);
+routes.get('/shows/search', authorization, isUserActive, ShowController.search);
 routes.get('/shows/genres', authorization, isUserActive, ShowController.genres);
 routes.get(
   '/shows/watch_providers',
@@ -128,6 +130,16 @@ routes.get(
   isUserActive,
   ShowController.watchProviders
 );
+
+// GameController
+routes.get('/games', authorization, isUserActive, GameController.index);
+routes.get(
+  '/games/platforms',
+  authorization,
+  isUserActive,
+  GameController.platforms
+);
+routes.get('/games/genres', authorization, isUserActive, GameController.genres);
 
 // ConfigurationController
 routes.get('/configuration/tmdb', authorization, ConfigurationController.tmdb);

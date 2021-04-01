@@ -1,0 +1,118 @@
+const { promisify } = require('util');
+
+const validateGamesParams = require('../utils/validation/rawgApi/gamesValidation');
+const { rawgApi } = require('../apis');
+const Queue = require('../lib/Queue');
+const { redisClient } = require('../server');
+
+const getAsync = promisify(redisClient.get).bind(redisClient);
+const setAsync = promisify(redisClient.set).bind(redisClient);
+
+const RAWG_API_KEY = process.env.RAWG_API_KEY;
+const API_CACHE_EXPIRATION_TIME = process.env.API_CACHE_EXPIRATION_TIME;
+
+module.exports = {
+  async index(req, res) {
+    try {
+      const queryParams = req.query;
+
+      const { params, errors } = validateGamesParams(queryParams);
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const url = `/games`;
+      const key = url + JSON.stringify(params);
+
+      params.key = RAWG_API_KEY;
+
+      const responseData = await getAsync(key);
+      if (!responseData) {
+        const { data } = await rawgApi.get(url, { params });
+
+        await Queue.add('InsertGamesOnDatabase', data);
+
+        await setAsync(
+          key,
+          JSON.stringify(data),
+          'EX',
+          API_CACHE_EXPIRATION_TIME
+        );
+        return res.json(data);
+      }
+
+      return res.json(JSON.parse(responseData));
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async platforms(req, res) {
+    try {
+      const url = `/platforms`;
+      const key = url;
+      const params = { key: RAWG_API_KEY, page: 1 };
+
+      const responseData = await getAsync(key);
+      if (!responseData) {
+        const data = { platforms: [] };
+        while (true) {
+          const { data: responseData } = await rawgApi.get(url, { params });
+          const { results, next } = responseData;
+          data.platforms = [...data.platforms, ...results];
+          if (!next) {
+            break;
+          }
+          params.page = params.page + 1;
+        }
+
+        await setAsync(
+          key,
+          JSON.stringify(data),
+          'EX',
+          API_CACHE_EXPIRATION_TIME
+        );
+        return res.json(data);
+      }
+
+      return res.json(JSON.parse(responseData));
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async genres(req, res) {
+    try {
+      const url = `/genres`;
+      const key = url;
+      const params = { key: RAWG_API_KEY, ordering: 'name', page: 1 };
+
+      const responseData = await getAsync(key);
+      if (!responseData) {
+        const data = { genres: [] };
+        while (true) {
+          const { data: responseData } = await rawgApi.get(url, { params });
+          const { results, next } = responseData;
+          data.genres = [...data.genres, ...results];
+          if (!next) {
+            break;
+          }
+          params.page = params.page + 1;
+        }
+
+        await setAsync(
+          key,
+          JSON.stringify(data),
+          'EX',
+          API_CACHE_EXPIRATION_TIME
+        );
+        return res.json(data);
+      }
+
+      return res.json(JSON.parse(responseData));
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(500);
+    }
+  },
+};

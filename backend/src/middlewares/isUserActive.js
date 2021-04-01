@@ -7,10 +7,16 @@ module.exports = async (req, res, next) => {
       return res.sendStatus(401);
     }
 
-    const { method } = await knex('users')
+    const user = await knex('users')
       .select('method')
       .where({ id: userId })
       .first();
+
+    if (!user) {
+      return res.status(400).json({ erro: 'Usuário não encontrado' });
+    }
+
+    const { method } = user;
 
     if (method !== 'local') {
       next();

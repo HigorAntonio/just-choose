@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 
 const validateDiscoverMovieParams = require('../utils/validation/tmdbApi/discoverMovieValidation');
-const searchMovieValidation = require('../utils/validation/tmdbApi/searchMovieValidation');
+const validateSearchMovieParams = require('../utils/validation/tmdbApi/searchMovieValidation');
 const { tmdbApi } = require('../apis');
 const Queue = require('../lib/Queue');
 const { redisClient } = require('../server');
@@ -56,7 +56,7 @@ module.exports = {
     try {
       const queryParams = req.query;
 
-      const { params, errors } = searchMovieValidation(queryParams);
+      const { params, errors } = validateSearchMovieParams(queryParams);
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
@@ -122,7 +122,7 @@ module.exports = {
 
       const responseData = await getAsync(key);
       if (!responseData) {
-        const { data } = await tmdbApi(url, { params });
+        const { data } = await tmdbApi.get(url, { params });
 
         await setAsync(
           key,

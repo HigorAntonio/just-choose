@@ -1,6 +1,7 @@
 const { promisify } = require('util');
 
-const validateDiscoverShowValidation = require('../utils/validation/tmdbApi/discoverShowValidation');
+const validateDiscoverShowParams = require('../utils/validation/tmdbApi/discoverShowValidation');
+const validateSearchShowParams = require('../utils/validation/tmdbApi/searchShowValidation');
 const { tmdbApi } = require('../apis');
 const Queue = require('../lib/Queue');
 const { redisClient } = require('../server');
@@ -16,7 +17,7 @@ module.exports = {
     try {
       const queryParams = req.query;
 
-      const { params, errors } = validateDiscoverShowValidation(queryParams);
+      const { params, errors } = validateDiscoverShowParams(queryParams);
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
@@ -26,6 +27,7 @@ module.exports = {
 
       params.api_key = TMDB_API_KEY;
       params.language = 'pt-BR';
+      params.watch_region = 'BR';
 
       const responseData = await getAsync(key);
       if (!responseData) {
@@ -48,6 +50,42 @@ module.exports = {
     }
   },
 
+  async search(req, res) {
+    try {
+      const queryParams = req.query;
+
+      const { params, errors } = validateSearchShowParams(queryParams);
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const url = `/search/tv`;
+      const key = url + JSON.stringify(params);
+
+      params.api_key = TMDB_API_KEY;
+      params.language = 'pt-BR';
+      params.include_adult = false;
+
+      const responseData = await getAsync(key);
+      if (!responseData) {
+        const { data } = await tmdbApi.get(url, { params });
+
+        await setAsync(
+          key,
+          JSON.stringify(data),
+          'EX',
+          API_CACHE_EXPIRATION_TIME
+        );
+
+        return res.json(data);
+      }
+
+      return res.json(JSON.parse(responseData));
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
   async genres(req, res) {
     try {
       const url = `/genre/tv/list`;
@@ -56,7 +94,7 @@ module.exports = {
 
       const responseData = await getAsync(key);
       if (!responseData) {
-        const { data } = await tmdbApi(url, { params });
+        const { data } = await tmdbApi.get(url, { params });
 
         await setAsync(
           key,

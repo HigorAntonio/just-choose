@@ -95,19 +95,18 @@ module.exports = (queryParams) => {
     }
   }
 
-  const params = {
-    sort_by,
-    page,
-    first_air_date_gte,
-    first_air_date_lte,
-    vote_average_gte,
-    vote_average_lte,
-    with_genres,
-    with_runtime_gte,
-    with_runtime_lte,
-    with_watch_providers,
-    watch_region,
-  };
+  const params = {};
+  sort_by && (params.sort_by = sort_by);
+  page && (params.page = page);
+  first_air_date_gte && (params['first_air_date.gte'] = first_air_date_gte);
+  first_air_date_lte && (params['first_air_date.lte'] = first_air_date_lte);
+  vote_average_gte && (params['vote_average.gte'] = vote_average_gte);
+  vote_average_lte && (params['vote_average.lte'] = vote_average_lte);
+  with_genres && (params.with_genres = with_genres);
+  with_runtime_gte && (params['with_runtime.gte'] = with_runtime_gte);
+  with_runtime_lte && (params['with_runtime.lte'] = with_runtime_lte);
+  with_watch_providers && (params.with_watch_providers = with_watch_providers);
+  watch_region && (params.watch_region = watch_region);
 
   return { params, errors };
 };
