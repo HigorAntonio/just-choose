@@ -4,6 +4,7 @@ import { GoSearch } from 'react-icons/go';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
 import ShowFilters from '../../components/ShowFilters';
+import GameFilters from '../../components/GameFilters';
 import ContentList from '../../components/ContentList';
 import MovieListPreview from '../../components/MovieListPreview';
 
@@ -193,6 +194,15 @@ const CreateMovieList = () => {
               {contentType === 'Série' && (
                 <div className="row">
                   <ShowFilters
+                    setParams={setParams}
+                    setPageNumber={setPageNumber}
+                    setRequestType={setRequestType}
+                  />
+                </div>
+              )}
+              {contentType === 'Jogo' && (
+                <div className="row">
+                  <GameFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
                     setRequestType={setRequestType}

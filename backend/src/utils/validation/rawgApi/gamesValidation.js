@@ -11,12 +11,19 @@ module.exports = (queryParams) => {
 
   const ordering_allowed_values = [
     'name',
+    '-name',
     'released',
+    '-released',
     'added',
+    '-added',
     'created',
+    '-created',
     'updated',
+    '-updated',
     'rating',
+    '-rating',
     'metacritic',
+    '-metacritic',
   ];
 
   const errors = [];
