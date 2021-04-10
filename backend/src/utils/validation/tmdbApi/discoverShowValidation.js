@@ -14,20 +14,14 @@ module.exports = (queryParams) => {
   } = queryParams;
 
   const sort_by_allowed_values = [
-    'popularity.asc',
-    'popularity.desc',
-    'release_date.asc',
-    'release_date.desc',
-    'revenue.asc',
-    'revenue.desc',
-    'primary_release_date.asc',
-    'primary_release_date.desc',
+    'vote_average.desc',
+    'vote_average.asc',
+    'first_air_date.desc',
+    'first_air_date.asc',
     'original_title.asc',
     'original_title.desc',
-    'vote_average.asc',
-    'vote_average.desc',
-    'vote_count.asc',
-    'vote_count.desc',
+    'popularity.desc',
+    'popularity.asc',
   ];
 
   const errors = [];

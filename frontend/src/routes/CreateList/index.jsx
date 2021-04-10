@@ -3,6 +3,7 @@ import { GoSearch } from 'react-icons/go';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
+import ShowFilters from '../../components/ShowFilters';
 import ContentList from '../../components/ContentList';
 import MovieListPreview from '../../components/MovieListPreview';
 
@@ -44,6 +45,7 @@ const CreateMovieList = () => {
 
   useEffect(() => {
     setPageNumber(1);
+    setParams({});
     if (contentType === 'Filme') {
       setRequestType('movie');
     } else if (contentType === 'Série') {
@@ -182,6 +184,15 @@ const CreateMovieList = () => {
               {contentType === 'Filme' && (
                 <div className="row">
                   <MovieFilters
+                    setParams={setParams}
+                    setPageNumber={setPageNumber}
+                    setRequestType={setRequestType}
+                  />
+                </div>
+              )}
+              {contentType === 'Série' && (
+                <div className="row">
+                  <ShowFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
                     setRequestType={setRequestType}

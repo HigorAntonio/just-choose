@@ -7,7 +7,7 @@ import CustomOption from '../CustomOption';
 import DataPicker from '../DataPicker';
 import RangeSlider from '../RangeSlider';
 
-import useMovieFilters from '../../hooks/useMovieFilters';
+import useShowFilters from '../../hooks/useShowFilters';
 
 import {
   Providers,
@@ -15,37 +15,33 @@ import {
   ReleaseDate,
   DataPickerWrapper,
   RangeWrapper,
-  Certification,
   SearchButton,
   ClearButton,
   OrderByOptions,
   Option,
 } from './styles';
 
-const MovieFilters = ({ setParams, setPageNumber, setRequestType }) => {
+const ShowFilters = ({ setParams, setPageNumber, setRequestType }) => {
   const {
     sortByList,
     sortBy,
     setSortBy,
     providers,
     genres,
-    certifications,
     selectedProviders,
     setSelectedProviders,
     selectedGenres,
     setSelectedGenres,
-    releaseDateGte,
-    setReleaseDateGte,
-    releaseDateLte,
-    setReleaseDateLte,
-    selectedCertifications,
-    setSelectedCertifications,
+    airDateGte,
+    setAirDateGte,
+    airDateLte,
+    setAirDateLte,
     voteAverage,
     setVoteAverage,
     runtime,
     setRuntime,
     clearFilters,
-  } = useMovieFilters();
+  } = useShowFilters();
 
   const [showSortOptions, setShowSortOptions] = useState(false);
 
@@ -65,33 +61,13 @@ const MovieFilters = ({ setParams, setPageNumber, setRequestType }) => {
     }
   };
 
-  const handleSelectCertification = (order) => {
-    if (selectedCertifications.includes(order)) {
-      setSelectedCertifications((prevState) =>
-        prevState.filter((c) => c !== order)
-      );
-    } else {
-      setSelectedCertifications((prevState) => [...prevState, order]);
-    }
-  };
-
   const sanitizeParams = () => {
     const params = {};
-    const orderedCertifications = selectedCertifications.sort((a, b) => a - b);
     selectedProviders.length &&
       (params.with_watch_providers = selectedProviders.join('|'));
     selectedGenres.length && (params.with_genres = selectedGenres.join('|'));
-    releaseDateGte && (params['primary_release_date.gte'] = releaseDateGte);
-    params['primary_release_date.lte'] = releaseDateLte;
-    orderedCertifications.length &&
-      (params['certification.gte'] = certifications.filter(
-        (c) => c.order === orderedCertifications[0]
-      )[0].certification);
-    orderedCertifications.length &&
-      (params['certification.lte'] = certifications.filter(
-        (c) =>
-          c.order === orderedCertifications[orderedCertifications.length - 1]
-      )[0].certification);
+    airDateGte && (params['first_air_date.gte'] = airDateGte);
+    params['first_air_date.lte'] = airDateLte;
     params['vote_average.gte'] = voteAverage[0];
     params['vote_average.lte'] = voteAverage[1];
     params['with_runtime.gte'] = runtime[0];
@@ -102,19 +78,19 @@ const MovieFilters = ({ setParams, setPageNumber, setRequestType }) => {
   };
 
   const handleSearch = () => {
-    setRequestType('movie');
+    setRequestType('show');
     setParams(sanitizeParams());
     setPageNumber(1);
   };
 
   useEffect(() => {
-    setRequestType('movie');
+    setRequestType('show');
     setParams((prevState) => ({ ...prevState, sort_by: sortBy.value }));
     setPageNumber(1);
   }, [sortBy, setParams, setPageNumber, setRequestType]);
 
   const handleClearFilters = () => {
-    setRequestType('movie');
+    setRequestType('show');
     clearFilters();
     setParams({});
     setPageNumber(1);
@@ -126,10 +102,6 @@ const MovieFilters = ({ setParams, setPageNumber, setRequestType }) => {
 
   const isGenreCheck = (genreId) => {
     return selectedGenres.includes(genreId);
-  };
-
-  const isCertificationCheck = (order) => {
-    return selectedCertifications.includes(order);
   };
 
   return (
@@ -193,36 +165,16 @@ const MovieFilters = ({ setParams, setPageNumber, setRequestType }) => {
             <div>
               <span>de</span>
               <DataPickerWrapper>
-                <DataPicker
-                  value={releaseDateGte}
-                  setValue={setReleaseDateGte}
-                />
+                <DataPicker value={airDateGte} setValue={setAirDateGte} />
               </DataPickerWrapper>
             </div>
             <div>
               <span>até</span>
               <DataPickerWrapper>
-                <DataPicker
-                  value={releaseDateLte}
-                  setValue={setReleaseDateLte}
-                />
+                <DataPicker value={airDateLte} setValue={setAirDateLte} />
               </DataPickerWrapper>
             </div>
           </ReleaseDate>
-        </CustomSelect>
-        <CustomSelect label="Classificação indicativa" dropDownAlign="center">
-          <Certification>
-            {certifications &&
-              certifications.map((c) => (
-                <CustomOption
-                  key={c.order}
-                  click={() => handleSelectCertification(c.order)}
-                  check={isCertificationCheck(c.order)}
-                >
-                  {c.certification}
-                </CustomOption>
-              ))}
-          </Certification>
         </CustomSelect>
         <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
           <RangeWrapper>
@@ -263,4 +215,4 @@ const MovieFilters = ({ setParams, setPageNumber, setRequestType }) => {
   );
 };
 
-export default MovieFilters;
+export default ShowFilters;
