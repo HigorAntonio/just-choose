@@ -266,3 +266,61 @@ export const ContentListWrapper = styled.div`
   overflow-y: auto;
   border-top: 0.1px solid var(--search);
 `;
+
+export const CreationOptions = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  border-top: 0.1px solid var(--search);
+
+  > div {
+    display: flex;
+    > button + button {
+      margin-left: 15px;
+    }
+  }
+`;
+
+const buttonCss = css`
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--white);
+  height: 31px;
+  padding: 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  outline: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+export const ClearButton = styled.button`
+  ${buttonCss}
+  background: var(--search-button);
+
+  &:hover {
+    background: var(--search);
+  }
+`;
+
+export const PreviewButton = styled.button`
+  ${buttonCss}
+  background: var(--search);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+`;
+
+export const CreateButton = styled.button`
+  ${buttonCss}
+  background: var(--accent);
+
+  &:hover {
+    background: #0f6ba8d9;
+  }
+`;

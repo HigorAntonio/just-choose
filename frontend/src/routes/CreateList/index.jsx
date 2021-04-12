@@ -6,7 +6,7 @@ import MovieFilters from '../../components/MovieFilters';
 import ShowFilters from '../../components/ShowFilters';
 import GameFilters from '../../components/GameFilters';
 import ContentList from '../../components/ContentList';
-import MovieListPreview from '../../components/MovieListPreview';
+import ContentListPreview from '../../components/ContentListPreview';
 
 import {
   Container,
@@ -22,6 +22,10 @@ import {
   Option,
   SearchWrapper,
   ContentListWrapper,
+  CreationOptions,
+  ClearButton,
+  PreviewButton,
+  CreateButton,
 } from './styles';
 
 const CreateMovieList = () => {
@@ -86,6 +90,14 @@ const CreateMovieList = () => {
       }
       setPageNumber(1);
     }
+  };
+
+  const handleClearList = () => {
+    setContentList([]);
+  };
+
+  const handlePreviewList = () => {
+    setShowListPreview((prevState) => !prevState);
   };
 
   return (
@@ -224,12 +236,27 @@ const CreateMovieList = () => {
                     wrapperRef={contentListWrapperRef}
                   />
                 )}
-                {/* {showListPreview && (
-                  <MovieListPreview movies={}/>
-                )} */}
+                {showListPreview && (
+                  <ContentListPreview
+                    contentType={contentType}
+                    contentList={contentList}
+                    setContentList={setContentList}
+                  />
+                )}
               </ContentListWrapper>
             )}
           </ContentListContainer>
+          {contentType && (
+            <CreationOptions>
+              <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
+              <div>
+                <PreviewButton onClick={handlePreviewList}>
+                  {showListPreview ? 'Todos os conteúdos' : 'Minha lista'}
+                </PreviewButton>
+                <CreateButton>Criar Lista</CreateButton>
+              </div>
+            </CreationOptions>
+          )}
         </div>
       </Main>
     </Container>
