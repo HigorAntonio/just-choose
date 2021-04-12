@@ -69,9 +69,11 @@ const GameFilters = ({ setParams, setPageNumber, setRequestType }) => {
         releaseDateGte.toISOString().split('T')[0] +
         ',' +
         releaseDateLte.toISOString().split('T')[0]);
-    params.metacritic = `${metacritic[0] === 0 ? 1 : metacritic[0]},${
-      metacritic[1] === 0 ? 1 : metacritic[1]
-    }`;
+    metacritic[0] !== 0 &&
+      metacritic[1] !== 100 &&
+      (params.metacritic = `${metacritic[0] === 0 ? 1 : metacritic[0]},${
+        metacritic[1] === 0 ? 1 : metacritic[1]
+      }`);
     params.ordering = sortBy.value;
 
     return params;
