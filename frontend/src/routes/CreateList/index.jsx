@@ -73,6 +73,15 @@ const CreateMovieList = () => {
     }
   }, [contentType]);
 
+  const clearForm = () => {
+    setTitle('');
+    setDescription('');
+    setThumbnail(null);
+    setThumbPreview(null);
+    setContentList([]);
+    setShowListPreview(false);
+  };
+
   const handleTitle = (e) => {
     setTitle(e.target.value);
   };
@@ -140,6 +149,7 @@ const CreateMovieList = () => {
         method: 'POST',
         data: formData,
       });
+      clearForm();
     } catch (error) {
       setErrorOnCreate(true);
     }

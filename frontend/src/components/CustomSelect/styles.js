@@ -32,9 +32,10 @@ export const FilterDropDown = styled.div`
   background: var(--nav-bar);
   border: 0.1px solid var(--search);
   border-radius: 5px;
-  padding: 10px;
   position: absolute;
   top: 35px;
+  max-height: 550px;
+  overflow: auto;
 
   ${(props) => props.align === 'left' && `left: 0;`};
   ${(props) => props.align === 'right' && `right: 0;`};

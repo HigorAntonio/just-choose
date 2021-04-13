@@ -178,32 +178,36 @@ const ShowFilters = ({ setParams, setPageNumber, setRequestType }) => {
         </CustomSelect>
         <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
           <RangeWrapper>
-            <span className="label-left">0</span>
-            <RangeSlider
-              min={0}
-              max={10}
-              step={1}
-              value={voteAverage}
-              setValue={setVoteAverage}
-            />
-            <span className="label-right">10</span>
+            <div>
+              <span className="label-left">0</span>
+              <RangeSlider
+                min={0}
+                max={10}
+                step={1}
+                value={voteAverage}
+                setValue={setVoteAverage}
+              />
+              <span className="label-right">10</span>
+            </div>
           </RangeWrapper>
         </CustomSelect>
         <CustomSelect label="Duração" dropDownAlign="center">
           <RangeWrapper title="Duração em minutos">
-            <span className="label-left" title="0 minutos">
-              0
-            </span>
-            <RangeSlider
-              min={0}
-              max={400}
-              step={5}
-              value={runtime}
-              setValue={setRuntime}
-            />
-            <span className="label-right" title="400 minutos">
-              400
-            </span>
+            <div>
+              <span className="label-left" title="0 minutos">
+                0
+              </span>
+              <RangeSlider
+                min={0}
+                max={400}
+                step={5}
+                value={runtime}
+                setValue={setRuntime}
+              />
+              <span className="label-right" title="400 minutos">
+                400
+              </span>
+            </div>
           </RangeWrapper>
         </CustomSelect>
         <div>

@@ -21,6 +21,7 @@ export const StatusAlert = styled.div`
   justify-content: center;
   align-items: center;
   transform: translateY(-50%);
+  z-index: 1000;
   ${(props) =>
     props.status === 'creating'
       ? `background: var(--accent);`
@@ -29,8 +30,14 @@ export const StatusAlert = styled.div`
       : `background: var(--success);`}
   ${(props) =>
     props.show
-      ? `opacity: 1; pointer-events: all; transform: translateY(0);`
-      : `opacity: 0; pointer-events: none; height: 0; transform: translateY(-50%);`}
+      ? `opacity: 1;
+        pointer-events: all;
+        transform: translateY(0);`
+      : `opacity: 0;
+        pointer-events: none;
+        max-height: 0;
+        padding: 0;
+        transform: translateY(-50%);`}
   transition: opacity 0.4s ease, transform 0.4s ease;
 
   > p {

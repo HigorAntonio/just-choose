@@ -26,6 +26,7 @@ export const Providers = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 10px;
+  padding: 10px;
 `;
 
 export const Genres = styled.div`
@@ -33,12 +34,14 @@ export const Genres = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 10px;
+  padding: 10px;
 `;
 
 export const ReleaseDate = styled.div`
   width: 200px;
   display: flex;
   flex-direction: column;
+  padding: 10px;
 
   > div {
     display: flex;
@@ -57,18 +60,22 @@ export const DataPickerWrapper = styled.div`
 `;
 
 export const RangeWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  background: var(--search);
-  padding: 0 10px;
-  border-radius: 5px;
+  padding: 10px;
 
-  > .label-left {
-    margin-right: 20px;
-  }
+  > div {
+    display: flex;
+    align-items: center;
+    background: var(--search);
+    padding: 0 10px;
+    border-radius: 5px;
 
-  > .label-right {
-    margin-left: 20px;
+    > .label-left {
+      margin-right: 20px;
+    }
+
+    > .label-right {
+      margin-left: 20px;
+    }
   }
 `;
 

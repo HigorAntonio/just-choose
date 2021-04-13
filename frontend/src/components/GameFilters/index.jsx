@@ -186,15 +186,17 @@ const GameFilters = ({ setParams, setPageNumber, setRequestType }) => {
         </CustomSelect>
         <CustomSelect label="Metacritic" dropDownAlign="center">
           <RangeWrapper>
-            <span className="label-left">0</span>
-            <RangeSlider
-              min={0}
-              max={100}
-              step={1}
-              value={metacritic}
-              setValue={setMetacritic}
-            />
-            <span className="label-right">100</span>
+            <div>
+              <span className="label-left">0</span>
+              <RangeSlider
+                min={0}
+                max={100}
+                step={1}
+                value={metacritic}
+                setValue={setMetacritic}
+              />
+              <span className="label-right">100</span>
+            </div>
           </RangeWrapper>
         </CustomSelect>
         <div>
