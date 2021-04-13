@@ -138,7 +138,6 @@ module.exports = {
 
       return res.sendStatus(201);
     } catch (error) {
-      console.log(error);
       try {
         await deleteFile(req.file.key);
       } catch (error) {}

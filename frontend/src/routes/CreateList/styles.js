@@ -12,6 +12,33 @@ export const Container = styled.div`
   flex-direction: column;
 `;
 
+export const StatusAlert = styled.div`
+  width: 100%;
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-50%);
+  ${(props) =>
+    props.status === 'creating'
+      ? `background: var(--accent);`
+      : props.status === 'error'
+      ? `background: var(--warning);`
+      : `background: var(--success);`}
+  ${(props) =>
+    props.show
+      ? `opacity: 1; pointer-events: all; transform: translateY(0);`
+      : `opacity: 0; pointer-events: none; height: 0; transform: translateY(-50%);`}
+  transition: opacity 0.4s ease, transform 0.4s ease;
+
+  > p {
+    font-size: 16px;
+    font-weight: bold;
+  }
+`;
+
 export const Header = styled.header`
   padding: 30px 30px 30px;
 
@@ -26,6 +53,7 @@ export const InputWrapper = styled.div`
 
   > input,
   textarea {
+    font-size: 14px;
     width: 100%;
     max-width: 680px;
     padding: 5px 10px;
@@ -235,6 +263,7 @@ export const SearchWrapper = styled.div`
   }
 
   > input {
+    font-size: 14px;
     width: 350px;
     padding: 5px 10px 5px 30px;
     border: 2px solid var(--search);

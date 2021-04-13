@@ -35,6 +35,7 @@ export default createGlobalStyle`
     --header-border: #001425;
     --nav-bar: #061F34;
     --warning: #eb0400;
+    --success: #43a047;
   }
   /* Scrollbar on Firefox */
   * {
