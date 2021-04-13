@@ -284,6 +284,7 @@ const CreateMovieList = () => {
                     setParams={setParams}
                     setPageNumber={setPageNumber}
                     setRequestType={setRequestType}
+                    setShowListPreview={setShowListPreview}
                   />
                 </div>
               )}
@@ -293,6 +294,7 @@ const CreateMovieList = () => {
                     setParams={setParams}
                     setPageNumber={setPageNumber}
                     setRequestType={setRequestType}
+                    setShowListPreview={setShowListPreview}
                   />
                 </div>
               )}
@@ -302,6 +304,7 @@ const CreateMovieList = () => {
                     setParams={setParams}
                     setPageNumber={setPageNumber}
                     setRequestType={setRequestType}
+                    setShowListPreview={setShowListPreview}
                   />
                 </div>
               )}

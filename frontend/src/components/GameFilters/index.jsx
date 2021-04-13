@@ -21,7 +21,12 @@ import {
   Option,
 } from './styles';
 
-const GameFilters = ({ setParams, setPageNumber, setRequestType }) => {
+const GameFilters = ({
+  setParams,
+  setPageNumber,
+  setRequestType,
+  setShowListPreview,
+}) => {
   const {
     sortByList,
     sortBy,
@@ -83,19 +88,22 @@ const GameFilters = ({ setParams, setPageNumber, setRequestType }) => {
     setRequestType('game');
     setParams(sanitizeParams());
     setPageNumber(1);
+    setShowListPreview(false);
   };
 
   useEffect(() => {
     setRequestType('game');
     setParams((prevState) => ({ ...prevState, ordering: sortBy.value }));
     setPageNumber(1);
-  }, [sortBy, setParams, setPageNumber, setRequestType]);
+    setShowListPreview(false);
+  }, [sortBy, setParams, setPageNumber, setRequestType, setShowListPreview]);
 
   const handleClearFilters = () => {
     setRequestType('game');
     clearFilters();
     setParams({});
     setPageNumber(1);
+    setShowListPreview(false);
   };
 
   const isPlatformCheck = (providerId) => {

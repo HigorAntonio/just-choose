@@ -21,7 +21,12 @@ import {
   Option,
 } from './styles';
 
-const ShowFilters = ({ setParams, setPageNumber, setRequestType }) => {
+const ShowFilters = ({
+  setParams,
+  setPageNumber,
+  setRequestType,
+  setShowListPreview,
+}) => {
   const {
     sortByList,
     sortBy,
@@ -81,19 +86,22 @@ const ShowFilters = ({ setParams, setPageNumber, setRequestType }) => {
     setRequestType('show');
     setParams(sanitizeParams());
     setPageNumber(1);
+    setShowListPreview(false);
   };
 
   useEffect(() => {
     setRequestType('show');
     setParams((prevState) => ({ ...prevState, sort_by: sortBy.value }));
     setPageNumber(1);
-  }, [sortBy, setParams, setPageNumber, setRequestType]);
+    setShowListPreview(false);
+  }, [sortBy, setParams, setPageNumber, setRequestType, setShowListPreview]);
 
   const handleClearFilters = () => {
     setRequestType('show');
     clearFilters();
     setParams({});
     setPageNumber(1);
+    setShowListPreview(false);
   };
 
   const isProviderCheck = (providerId) => {
