@@ -58,11 +58,28 @@ export const InputWrapper = styled.div`
   display: flex;
   padding: 20px;
 
-  > input,
-  textarea {
+  > .column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 680px;
+
+    > .error {
+      background: var(--warning);
+      padding: 7px 20px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+  }
+
+  > textarea {
     font-size: 14px;
     width: 100%;
     max-width: 680px;
+    max-height: 50px;
+    resize: none;
     padding: 5px 10px;
     border: 2px solid var(--search);
     border-radius: 5px;
@@ -78,11 +95,29 @@ export const InputWrapper = styled.div`
 
     transition: border 0.3s;
   }
+`;
 
-  > textarea {
-    max-height: 50px;
-    resize: none;
+export const TitleInput = styled.input`
+  font-size: 14px;
+  width: 100%;
+  max-width: 680px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background: var(--search);
+  outline: none;
+  ${(props) =>
+    props.validationError
+      ? `border: 2px solid var(--warning);`
+      : `border: 2px solid var(--search);`}
+
+  &:hover {
+    border: 2px solid var(--gray);
   }
+  &:focus {
+    border: 2px solid var(--accent);
+  }
+
+  transition: border 0.3s;
 `;
 
 export const ThumbnailWrapper = styled.div`
@@ -178,6 +213,15 @@ export const Main = styled.main`
 
   & ${InputWrapper} + ${InputWrapper} {
     border-top: 0.1px solid var(--search);
+  }
+
+  > .error {
+    background: var(--warning);
+    padding: 7px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
   }
 `;
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
@@ -34,13 +34,15 @@ const CustomRoute = ({ isPrivate, ...rest }) => {
 };
 
 const Layout = () => {
+  const bodyWrapperRef = useRef();
+
   return (
     <Container>
       <Router>
         <HeaderWrapper>
           <Header />
         </HeaderWrapper>
-        <BodyWrapper>
+        <BodyWrapper ref={bodyWrapperRef}>
           <NavBarWrapper>
             <NavBar />
           </NavBarWrapper>
@@ -51,7 +53,7 @@ const Layout = () => {
                 isPrivate
                 exact
                 path="/list"
-                component={CreateList}
+                component={() => <CreateList wrapperRef={bodyWrapperRef} />}
               />
             </Switch>
           </ContentWrapper>

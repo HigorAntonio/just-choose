@@ -115,7 +115,7 @@ module.exports = {
         errors.push('Conteúdo da lista, valor inválido');
       } else if (content_list.length < 1 || content_list.length > 100) {
         errors.push(
-          'Conteúdo da lista inválido. O número de items deve ficar entre 1 e 100'
+          'Conteúdo da lista inválido. O número de itens deve ficar entre 1 e 100'
         );
       }
       if (errors.length > 0) {

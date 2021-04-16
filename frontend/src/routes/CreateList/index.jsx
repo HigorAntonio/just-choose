@@ -16,6 +16,7 @@ import {
   Main,
   LabelWrapper,
   InputWrapper,
+  TitleInput,
   ThumbnailWrapper,
   ThumbPreview,
   ContentListContainer,
@@ -30,12 +31,12 @@ import {
   CreateButton,
 } from './styles';
 
-const CreateMovieList = () => {
+const CreateMovieList = ({ wrapperRef }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnail, setThumbnail] = useState();
   const [thumbPreview, setThumbPreview] = useState();
-  const [thumbError, setThumbError] = useState(false);
+  const [thumbError, setThumbError] = useState('');
   const [contentType, setContentType] = useState('');
   const [showContent, setShowContent] = useState(false);
   const [requestType, setRequestType] = useState('');
@@ -44,8 +45,11 @@ const CreateMovieList = () => {
   const [contentList, setContentList] = useState([]);
   const [showListPreview, setShowListPreview] = useState(false);
   const [showStatusAlert, setShowStatusAlert] = useState(false);
+  const [statusAlertTimeout, setStatusAlertTimeout] = useState();
   const [creating, setCreating] = useState(false);
   const [errorOnCreate, setErrorOnCreate] = useState(false);
+  const [titleError, setTitleError] = useState('');
+  const [contentError, setContentError] = useState('');
 
   const contentListWrapperRef = useRef();
 
@@ -53,13 +57,8 @@ const CreateMovieList = () => {
 
   useEffect(() => {
     console.log(contentList);
+    setContentError('');
   }, [contentList]);
-
-  useEffect(() => {
-    if (!creating) {
-      setTimeout(() => setShowStatusAlert(false), 4000);
-    }
-  }, [creating]);
 
   useEffect(() => {
     setPageNumber(1);
@@ -78,12 +77,14 @@ const CreateMovieList = () => {
     setDescription('');
     setThumbnail(null);
     setThumbPreview(null);
+    setContentType('');
     setContentList([]);
     setShowListPreview(false);
   };
 
   const handleTitle = (e) => {
     setTitle(e.target.value);
+    setTitleError('');
   };
 
   const handleDescription = (e) => {
@@ -91,9 +92,9 @@ const CreateMovieList = () => {
   };
 
   const handleImage = (e) => {
-    setThumbError(false);
+    setThumbError('');
     if (e.target.files[0].size > 2097152) {
-      setThumbError(true);
+      setThumbError('A imagem não pode ter mais do que 2 MB.');
     } else {
       const reader = new FileReader();
       reader.onload = () => {
@@ -130,30 +131,70 @@ const CreateMovieList = () => {
     setShowListPreview((prevState) => !prevState);
   };
 
+  const validateFields = () => {
+    setTitleError('');
+    setThumbError('');
+    setContentError('');
+    let isValid = true;
+    if (!title) {
+      setTitleError('Por favor, insira um título para a lista');
+      isValid = false;
+    }
+    if (!thumbnail) {
+      setThumbError('Por favor, selecione uma miniatura para a lista');
+      isValid = false;
+    }
+    if (contentList.length < 1) {
+      setContentError('Por favor, selecione o conteúdo da lista');
+      isValid = false;
+    }
+    if (contentList.length > 100) {
+      setContentError(
+        `Desculpe, a lista não pode ter mais que cem itens. Lista atual: ${contentList.length} itens`
+      );
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
   const handleCreateList = async () => {
     setErrorOnCreate(false);
     setShowStatusAlert(true);
     setCreating(true);
-    const data = {
-      title,
-      description,
-      content: contentList,
-    };
+    clearTimeout(statusAlertTimeout);
 
-    const formData = new FormData();
-    formData.append('thumbnail', thumbnail);
-    formData.append('data', JSON.stringify(data));
-    try {
-      await justChooseApi({
-        url: '/contentlists',
-        method: 'POST',
-        data: formData,
-      });
-      clearForm();
-    } catch (error) {
+    const isValid = validateFields();
+    if (isValid) {
+      const data = {
+        title,
+        description,
+        content: contentList,
+      };
+
+      const formData = new FormData();
+      formData.append('thumbnail', thumbnail);
+      formData.append('data', JSON.stringify(data));
+      try {
+        await justChooseApi({
+          url: '/contentlists',
+          method: 'POST',
+          data: formData,
+        });
+        clearForm();
+      } catch (error) {
+        setErrorOnCreate(true);
+      }
+    } else {
       setErrorOnCreate(true);
     }
+
     setCreating(false);
+    const timeout = setTimeout(() => setShowStatusAlert(false), 4000);
+    setStatusAlertTimeout(timeout);
+    // Posiciona o scroll no início da página
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
   };
 
   const getStatusAlert = () => {
@@ -184,13 +225,17 @@ const CreateMovieList = () => {
             <LabelWrapper>
               <label htmlFor="title">Título</label>
             </LabelWrapper>
-            <input
-              type="text"
-              id="title"
-              autoFocus
-              value={title}
-              onChange={handleTitle}
-            />
+            <div className="column">
+              <TitleInput
+                type="text"
+                id="title"
+                autoFocus
+                value={title}
+                onChange={handleTitle}
+                validationError={titleError}
+              />
+              {titleError && <p className="error">{titleError}</p>}
+            </div>
           </InputWrapper>
           <InputWrapper>
             <LabelWrapper>
@@ -225,15 +270,12 @@ const CreateMovieList = () => {
                 A imagem deve estar no formato JPEG, PNG ou GIF e não pode ter
                 mais do que 2 MB.
               </p>
-              {thumbError && (
-                <p className="thumb-error">
-                  A imagem não pode ter mais do que 2 MB.
-                </p>
-              )}
+              {thumbError && <p className="thumb-error">{thumbError}</p>}
             </div>
           </ThumbnailWrapper>
         </div>
         <h3>Conteúdo</h3>
+        {contentError && <p className="error">{contentError}</p>}
         <div className={!contentType ? null : 'content-list'}>
           <ContentListContainer>
             <ContentListHeader>
