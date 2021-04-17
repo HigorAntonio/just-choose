@@ -299,6 +299,46 @@ module.exports = {
         .andWhere({ content_list_id: contentList.id });
       contentList.content_types = contentTypes.map((type) => type.name);
 
+      const content = await knex
+        .select(
+          'movie_id as content_id',
+          'tmdb_id as content_platform_id',
+          'title',
+          'poster_path',
+          knex.raw("'movie' as type")
+        )
+        .from('content_list_movies as clm')
+        .innerJoin('movies as m', 'clm.movie_id', 'm.id')
+        .andWhere({ 'clm.content_list_id': contentListId })
+        .union([
+          knex
+            .select(
+              'show_id as content_id',
+              'tmdb_id as content_platform_id',
+              'name as title',
+              'poster_path',
+              knex.raw("'show' as type")
+            )
+            .from('content_list_shows as cls')
+            .innerJoin('shows as s', 'cls.show_id', 's.id')
+            .andWhere({ 'cls.content_list_id': contentListId }),
+        ])
+        .union([
+          knex
+            .select(
+              'game_id as content_id',
+              'rawg_id as content_platform_id',
+              'name as title',
+              'background_image as poster_path',
+              knex.raw("'game' as type")
+            )
+            .from('content_list_games as clg')
+            .innerJoin('games as g', 'clg.game_id', 'g.id')
+            .andWhere({ 'clg.content_list_id': contentListId }),
+        ])
+        .orderBy('title');
+      contentList.content = content;
+
       return res.json({
         id: contentList.id,
         user_id: contentList.user_id,
@@ -308,10 +348,12 @@ module.exports = {
         description: contentList.description,
         thumbnail: contentList.thumbnail,
         content_types: contentList.content_types,
+        content: contentList.content,
         created_at: contentList.created_at,
         updated_at: contentList.updated_at,
       });
     } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },

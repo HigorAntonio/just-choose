@@ -70,6 +70,8 @@ module.exports = {
       if (!responseData) {
         const { data } = await tmdbApi.get(url, { params });
 
+        await Queue.add('InsertShowsOnDatabase', data);
+
         await setAsync(
           key,
           JSON.stringify(data),
