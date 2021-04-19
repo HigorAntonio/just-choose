@@ -31,7 +31,7 @@ import {
   CreateButton,
 } from './styles';
 
-const CreateMovieList = ({ wrapperRef }) => {
+const CreateList = ({ wrapperRef }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnail, setThumbnail] = useState();
@@ -52,8 +52,15 @@ const CreateMovieList = ({ wrapperRef }) => {
   const [contentError, setContentError] = useState('');
 
   const contentListWrapperRef = useRef();
+  const thumbInputFileRef = useRef();
 
   const contentTypesList = ['Filme', 'Série', 'Jogo'];
+
+  useEffect(() => {
+    // Posiciona o scroll no início da página
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
+  }, [wrapperRef]);
 
   useEffect(() => {
     console.log(contentList);
@@ -77,6 +84,7 @@ const CreateMovieList = ({ wrapperRef }) => {
     setDescription('');
     setThumbnail(null);
     setThumbPreview(null);
+    thumbInputFileRef.current.value = null;
     setContentType('');
     setContentList([]);
     setShowListPreview(false);
@@ -120,6 +128,7 @@ const CreateMovieList = ({ wrapperRef }) => {
         setParams({ search: e.target.value });
       }
       setPageNumber(1);
+      setShowListPreview(false);
     }
   };
 
@@ -264,6 +273,7 @@ const CreateMovieList = ({ wrapperRef }) => {
                   id="thumbnail"
                   accept="image/*"
                   onChange={handleImage}
+                  ref={thumbInputFileRef}
                 />
               </div>
               <p>
@@ -394,4 +404,4 @@ const CreateMovieList = ({ wrapperRef }) => {
   );
 };
 
-export default CreateMovieList;
+export default CreateList;

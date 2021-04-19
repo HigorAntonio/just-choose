@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ImCheckboxUnchecked, ImCheckboxChecked } from 'react-icons/im';
 import { BsImage } from 'react-icons/bs';
 
@@ -9,6 +9,8 @@ const ContentCard = ({ src, title, check, click }) => {
   const handleClick = () => {
     click();
   };
+
+  useEffect(() => !src && setError(true), [src, setError]);
 
   return (
     <Container title={title}>
