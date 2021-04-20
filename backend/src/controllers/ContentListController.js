@@ -13,13 +13,7 @@ const getPlatformId = (contentType) => {
   }
 };
 
-const createContentListOnDB = async (
-  userId,
-  title,
-  description,
-  thumbnail,
-  content_list
-) => {
+const sanitizeListData = async (content_list) => {
   try {
     const contentNames = [
       ...new Set(content_list.map((content) => content.type)),
@@ -47,6 +41,24 @@ const createContentListOnDB = async (
       ).map((content) => content.id);
     }
 
+    return [contentTypes, contentToInsert];
+  } catch (error) {
+    throw error;
+  }
+};
+
+const createContentListOnDB = async (
+  userId,
+  title,
+  description,
+  thumbnail,
+  content_list
+) => {
+  try {
+    const [contentTypes, contentToInsert] = await sanitizeListData(
+      content_list
+    );
+
     await knex.transaction(async (trx) => {
       const [{ id: contentListId }] = await trx('content_lists')
         .insert({ user_id: userId, title, description, thumbnail })
@@ -58,6 +70,64 @@ const createContentListOnDB = async (
           content_type_id: contentType.id,
         }))
       );
+
+      for (const contentType of contentTypes) {
+        await trx(`content_list_${contentType.name}s`).insert(
+          contentToInsert[`content_list_${contentType.name}s`].map(
+            (contentId) => ({
+              content_list_id: contentListId,
+              [`${contentType.name}_id`]: contentId,
+            })
+          )
+        );
+      }
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateContentListOnDB = async (
+  contentListId,
+  title,
+  description,
+  thumbnail,
+  content_list
+) => {
+  try {
+    const [contentTypes, contentToInsert] = await sanitizeListData(
+      content_list
+    );
+
+    await knex.transaction(async (trx) => {
+      await trx('content_lists')
+        .update({ title, description, thumbnail })
+        .where({ id: contentListId });
+
+      const oldContentTypes = await trx
+        .select('ct.name')
+        .from('content_list_types as clt')
+        .where({
+          content_list_id: contentListId,
+        })
+        .innerJoin('content_types as ct', 'clt.content_type_id', 'ct.id');
+
+      await trx('content_list_types')
+        .del()
+        .where({ content_list_id: contentListId });
+
+      await trx('content_list_types').insert(
+        contentTypes.map((contentType) => ({
+          content_list_id: contentListId,
+          content_type_id: contentType.id,
+        }))
+      );
+
+      for (const contentType of oldContentTypes) {
+        await trx(`content_list_${contentType.name}s`)
+          .del()
+          .where({ content_list_id: contentListId });
+      }
 
       for (const contentType of contentTypes) {
         await trx(`content_list_${contentType.name}s`).insert(
@@ -125,8 +195,7 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const { key: fileKey } = req.file;
-      const thumbnail = `${process.env.APP_URL}/files/${fileKey}`;
+      const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
 
       await createContentListOnDB(
         userId,
@@ -353,7 +422,6 @@ module.exports = {
         updated_at: contentList.updated_at,
       });
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },
@@ -408,16 +476,9 @@ module.exports = {
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
-      const {
-        title = contentList.title,
-        description = contentList.description,
-      } = JSON.parse(data);
-
-      const thumbnail = req.file
-        ? `${process.env.APP_URL}/files/${req.file.key}`
-        : contentList.thumbnail;
-
+      const { title, description, content: content_list } = JSON.parse(data);
       const errors = [];
+
       if (!title) {
         errors.push('Título da lista não informado');
       } else if (typeof title !== 'string') {
@@ -426,6 +487,18 @@ module.exports = {
       if (description && typeof description !== 'string') {
         errors.push('Descrição da lista, valor inválido');
       }
+      if (!req.file) {
+        errors.push('Thumbnail da lista não informada');
+      }
+      if (!content_list) {
+        errors.push('Conteúdo da lista não informado');
+      } else if (!Array.isArray(content_list)) {
+        errors.push('Conteúdo da lista, valor inválido');
+      } else if (content_list.length < 1 || content_list.length > 100) {
+        errors.push(
+          'Conteúdo da lista inválido. O número de itens deve ficar entre 1 e 100'
+        );
+      }
       if (errors.length > 0) {
         try {
           await deleteFile(req.file.key);
@@ -433,15 +506,18 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      await knex('content_lists')
-        .update({ title, description, thumbnail })
-        .where({ id: contentListId });
+      await deleteFile(
+        contentList.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
+      );
+      const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
 
-      if (req.file) {
-        await deleteFile(
-          contentList.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
-        );
-      }
+      await updateContentListOnDB(
+        contentListId,
+        title,
+        description,
+        thumbnail,
+        content_list
+      );
 
       return res.sendStatus(200);
     } catch (error) {
