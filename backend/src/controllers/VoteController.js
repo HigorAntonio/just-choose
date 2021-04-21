@@ -46,7 +46,7 @@ module.exports = {
       if (!contentTypes.includes(type)) {
         return res
           .status(400)
-          .json({ erro: 'Tipo de conteúdo não encontrada' });
+          .json({ erro: 'Tipo de conteúdo não encontrado' });
       }
 
       for (const name of contentTypes) {
