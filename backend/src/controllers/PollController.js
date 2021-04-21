@@ -60,6 +60,16 @@ module.exports = {
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
+      if (contentList.user_id !== userId) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
+        return res
+          .status(403)
+          .json({
+            erro: 'A lista de conteúdo informada não pertence ao usuário',
+          });
+      }
 
       const { key: fileKey } = req.file;
       const thumbnail = `${process.env.APP_URL}/files/${fileKey}`;
