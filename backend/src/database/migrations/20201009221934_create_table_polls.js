@@ -13,6 +13,10 @@ exports.up = async (knex) =>
       table.text('title').notNullable();
       table.text('description');
       table.boolean('is_active').notNullable().defaultTo(false);
+      table
+        .enu('sharing_option', ['private', 'public', 'followed_profiles'])
+        .notNullable()
+        .defaultTo('private');
       table.text('thumbnail').notNullable();
 
       table.timestamp('created_at').defaultTo(knex.fn.now());

@@ -6,6 +6,7 @@ const multerConfig = require('./config/multer');
 const authorization = require('./middlewares/authorizationMiddleware');
 const isUserActive = require('./middlewares/isUserActive');
 const LocalAuthController = require('./controllers/LocalAuthController');
+const FollowUsersController = require('./controllers/FollowUsersController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
 const ContentListForkController = require('./controllers/ContentListForkController');
@@ -32,6 +33,20 @@ routes.get(
   '/confirmation',
   authorization,
   LocalAuthController.resendConfirmEmail
+);
+
+// FollowUsersController
+routes.post(
+  '/users/follow',
+  authorization,
+  isUserActive,
+  FollowUsersController.create
+);
+routes.delete(
+  '/users/follow',
+  authorization,
+  isUserActive,
+  FollowUsersController.delete
 );
 
 // ContentListController

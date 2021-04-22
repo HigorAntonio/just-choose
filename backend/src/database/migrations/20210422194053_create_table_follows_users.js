@@ -2,7 +2,7 @@ const { onUpdateTrigger } = require('../triggers');
 
 exports.up = async (knex) =>
   knex.schema
-    .createTable('content_lists', (table) => {
+    .createTable('follows_users', (table) => {
       table.increments('id').primary();
       table
         .integer('user_id')
@@ -10,18 +10,17 @@ exports.up = async (knex) =>
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-      table.text('title').notNullable();
-      table.text('description');
       table
-        .enu('sharing_option', ['private', 'public', 'followed_profiles'])
+        .integer('follows_id')
+        .references('users.id')
         .notNullable()
-        .defaultTo('private');
-      table.text('thumbnail').notNullable();
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
 
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
-    .then(() => knex.raw(onUpdateTrigger('content_lists')));
+    .then(() => knex.raw(onUpdateTrigger('follows_users')));
 
-exports.down = async (knex) => knex.schema.dropTable('content_lists');
+exports.down = async (knex) => knex.schema.dropTable('follows_users');
