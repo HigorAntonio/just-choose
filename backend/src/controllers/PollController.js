@@ -21,7 +21,7 @@ module.exports = {
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
-      const { title, description, content_list_id } = JSON.parse(data);
+      const { title, description, contentListId } = JSON.parse(data);
 
       const errors = [];
 
@@ -36,9 +36,9 @@ module.exports = {
       if (!req.file) {
         errors.push('Thumbnail da lista não informada');
       }
-      if (!content_list_id) {
+      if (!contentListId) {
         errors.push('Lista de conteúdo da votação, id da lista não informado');
-      } else if (isNaN(content_list_id)) {
+      } else if (isNaN(contentListId)) {
         errors.push('Lista de conteúdo da votação, id da lista inválido');
       }
       if (errors.length > 0) {
@@ -49,7 +49,7 @@ module.exports = {
       }
 
       const contentList = await knex('content_lists')
-        .where({ id: content_list_id })
+        .where({ id: contentListId })
         .first();
 
       if (!contentList) {
@@ -64,11 +64,9 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res
-          .status(403)
-          .json({
-            erro: 'A lista de conteúdo informada não pertence ao usuário',
-          });
+        return res.status(403).json({
+          erro: 'A lista de conteúdo informada não pertence ao usuário',
+        });
       }
 
       const { key: fileKey } = req.file;
@@ -81,7 +79,7 @@ module.exports = {
 
         await trx('poll_content_list').insert({
           poll_id: pollId,
-          content_list_id: content_list_id,
+          content_list_id: contentListId,
         });
       });
 

@@ -507,7 +507,7 @@ module.exports = {
       }
 
       await deleteFile(
-        contentList.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
+        contentList.thumbnail.substring(`${process.env.APP_URL}/files/`.length)
       );
       const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
 
@@ -559,7 +559,7 @@ module.exports = {
       await knex('content_lists').del().where({ id: contentListId });
 
       await deleteFile(
-        contentList.thumbnail.substr(`${process.env.APP_URL}/files/`.length)
+        contentList.thumbnail.substring(`${process.env.APP_URL}/files/`.length)
       );
 
       return res.sendStatus(200);

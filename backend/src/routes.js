@@ -8,6 +8,7 @@ const isUserActive = require('./middlewares/isUserActive');
 const LocalAuthController = require('./controllers/LocalAuthController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
+const ContentListForkController = require('./controllers/ContentListForkController');
 const VoteController = require('./controllers/VoteController');
 const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
@@ -55,6 +56,14 @@ routes.delete(
   authorization,
   isUserActive,
   ContentListController.delete
+);
+
+// ContentListForkController
+routes.post(
+  '/contentlists/fork/:id',
+  authorization,
+  isUserActive,
+  ContentListForkController.create
 );
 
 // PollController
