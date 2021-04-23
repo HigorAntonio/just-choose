@@ -34,7 +34,6 @@ const sendEmailConfimation = async (userId, email) => {
       { expiresIn: '15m' }
     );
 
-    // TODO: Enviar email usando a fila
     await Queue.add('ConfirmationMail', { email, emailConfirmationToken });
   } catch (error) {
     throw error;
@@ -68,7 +67,7 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const user = await knex('local_users')
+      const user = await knex('users')
         .where({ name })
         .orWhere({ email })
         .first();
@@ -81,12 +80,13 @@ module.exports = {
 
       const newUser = {};
       await knex.transaction(async (trx) => {
-        const [userId] = await trx('users').insert({ method: 'local' }, 'id');
+        const [userId] = await trx('users').insert(
+          { name, email, method: 'local' },
+          'id'
+        );
         const encryptedPassword = encryptPassword(password);
 
         newUser.user_id = userId;
-        newUser.name = name;
-        newUser.email = email;
         newUser.password = encryptedPassword;
 
         await trx('local_users').insert(newUser);
@@ -128,7 +128,12 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const user = await knex('local_users').where({ email }).first();
+      const user = await knex
+        .select('u.id', 'u.name', 'u.email', 'lu.password')
+        .from('users as u')
+        .where({ email })
+        .innerJoin('local_users as lu', 'u.id', 'lu.user_id')
+        .first();
 
       if (!user)
         return res.status(400).json({ erro: 'Usuário não encontrado' });
@@ -136,14 +141,14 @@ module.exports = {
       if (!bcrypt.compareSync(password, user.password))
         return res.status(400).json({ erro: 'Senha inválida' });
 
-      const accessToken = generateAccessToken({ id: user.user_id });
+      const accessToken = generateAccessToken({ id: user.id });
       const ua = uaParser(req.headers['user-agent']);
       // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
       const refreshToken = jwt.sign(
-        { id: user.user_id, os: ua.os.name, browser: ua.browser.name },
+        { id: user.id, os: ua.os.name, browser: ua.browser.name },
         REFRESH_TOKEN_SECRET
       );
-      await saddAsync(`refreshTokensUser${user.user_id}`, refreshToken);
+      await saddAsync(`refreshTokensUser${user.id}`, refreshToken);
 
       return res.json({ accessToken, refreshToken });
     } catch (error) {
@@ -225,7 +230,12 @@ module.exports = {
         return res.status(400).json({ erro: 'E-mail, valor inválido' });
       }
 
-      const user = await knex('local_users').where({ email }).first();
+      const user = await knex
+        .select('u.id', 'u.name', 'u.email', 'lu.password')
+        .from('users as u')
+        .where({ email })
+        .innerJoin('local_users as lu', 'u.id', 'lu.user_id')
+        .first();
       if (!user) {
         return res.status(400).json({ erro: 'Usuário não encontrado ' });
       }
@@ -269,7 +279,12 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const user = await knex('local_users').where({ email }).first();
+      const user = await knex
+        .select('u.id', 'u.name', 'u.email', 'lu.password')
+        .from('users as u')
+        .where({ email })
+        .innerJoin('local_users as lu', 'u.id', 'lu.user_id')
+        .first();
       if (!user) {
         return res.status(400).json({ erro: 'Usuário não encontrado ' });
       }
@@ -290,7 +305,7 @@ module.exports = {
 
         await knex('local_users')
           .update({ password: encryptedPassword })
-          .where({ id: user.id });
+          .where({ user_id: user.id });
 
         return res.sendStatus(200);
       } catch (error) {
@@ -343,7 +358,12 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const user = await knex('local_users').where({ id: userId }).first();
+      const user = await knex
+        .select('u.id', 'u.name', 'u.email', 'lu.password')
+        .from('users as u')
+        .where({ ['u.id']: userId })
+        .innerJoin('local_users as lu', 'u.id', 'lu.user_id')
+        .first();
       if (!user) {
         return res.status(403).json({ erro: 'Usuário não encontrado' });
       }
@@ -376,14 +396,17 @@ module.exports = {
 
       const decoded = jwt.verify(token, CONFIRM_EMAIL_TOKEN_SECRET);
 
-      const user = await knex('local_users').where({ id: decoded.id }).first();
+      const user = await knex
+        .select('u.id', 'u.name', 'u.email', 'lu.password')
+        .from('users as u')
+        .where({ ['u.id']: decoded.id })
+        .innerJoin('local_users as lu', 'u.id', 'lu.user_id')
+        .first();
       if (!user) {
         return res.status(400).json({ erro: 'Usuário não encontrado' });
       }
 
-      await knex('local_users')
-        .update({ is_active: true })
-        .where({ id: decoded.id });
+      await knex('users').update({ is_active: true }).where({ id: decoded.id });
 
       return res.sendStatus(200);
     } catch (error) {
@@ -401,7 +424,12 @@ module.exports = {
         return res.status(403).json({ erro: 'Usuário inválido' });
       }
 
-      const user = await knex('local_users').where({ id: userId }).first();
+      const user = await knex
+        .select('u.id', 'u.name', 'u.email', 'lu.password')
+        .from('users as u')
+        .where({ ['u.id']: userId })
+        .innerJoin('local_users as lu', 'u.id', 'lu.user_id')
+        .first();
       if (!user) {
         return res.status(403).json({ erro: 'Usuário não encontrado' });
       }

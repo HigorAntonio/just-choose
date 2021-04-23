@@ -246,7 +246,7 @@ module.exports = {
         .select(
           'content_lists.id',
           'content_lists.user_id',
-          'users.method as login_method',
+          'users.name as user_name',
           'content_lists.title',
           'content_lists.description',
           'content_lists.thumbnail',
@@ -269,16 +269,6 @@ module.exports = {
       const [{ count }] = await countObj;
 
       for (const [i, list] of contentLists.entries()) {
-        // Adiciona o username para usuários logados com o método local
-        if (list.login_method === 'local') {
-          const { name: userName } = await knex('local_users')
-            .select('name')
-            .where({ id: list.user_id })
-            .first();
-          contentLists[i].user_name = userName;
-        }
-        // TODO: Adicionar o username para usuário logados com o método Twitch
-
         const contentTypes = await knex
           .select('name')
           .from('content_list_types')
@@ -327,7 +317,7 @@ module.exports = {
         .select(
           'content_lists.id',
           'content_lists.user_id',
-          'users.method as login_method',
+          'users.name as user_name',
           'content_lists.title',
           'content_lists.description',
           'content_lists.thumbnail',
@@ -346,16 +336,6 @@ module.exports = {
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
-
-      // Adiciona o username para usuários logados com o método local
-      if (contentList.login_method === 'local') {
-        const { name: userName } = await knex('local_users')
-          .select('name')
-          .where({ id: contentList.user_id })
-          .first();
-        contentList.user_name = userName;
-      }
-      // TODO: Adicionar o username para usuário logados com o método Twitch
 
       const contentTypes = await knex
         .select('name')

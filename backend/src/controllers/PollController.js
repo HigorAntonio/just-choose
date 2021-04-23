@@ -124,7 +124,7 @@ module.exports = {
         .select(
           'polls.id',
           'polls.user_id',
-          'users.method as login_method',
+          'users.name as user_name',
           'polls.title',
           'polls.description',
           'polls.is_active',
@@ -148,18 +148,6 @@ module.exports = {
 
       const polls = await pollsQuery;
       const [{ count }] = await countObj;
-
-      for (const [i, list] of polls.entries()) {
-        // Adiciona o username para usuários logados com o método local
-        if (list.login_method === 'local') {
-          const { name: userName } = await knex('local_users')
-            .select('name')
-            .where({ id: list.user_id })
-            .first();
-          polls[i].user_name = userName;
-        }
-        // TODO: Adicionar o username para usuário logados com o método Twitch
-      }
 
       const total_pages = Math.ceil(count / page_size);
       return res.json({
@@ -199,7 +187,7 @@ module.exports = {
         .select(
           'polls.id',
           'polls.user_id',
-          'users.method as login_method',
+          'users.name as user_name',
           'polls.title',
           'polls.description',
           'polls.thumbnail',
@@ -222,20 +210,9 @@ module.exports = {
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
 
-      // Adiciona o username para usuários logados com o método local
-      if (poll.login_method === 'local') {
-        const { name: userName } = await knex('local_users')
-          .select('name')
-          .where({ id: poll.user_id })
-          .first();
-        poll.user_name = userName;
-      }
-      // TODO: Adicionar o username para usuário logados com o método Twitch
-
       return res.json({
         id: poll.id,
         user_id: poll.user_id,
-        // login_method: poll.login_method,
         user_name: poll.user_name,
         title: poll.title,
         description: poll.description,
