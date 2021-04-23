@@ -42,6 +42,7 @@ routes.post(
   isUserActive,
   FollowUsersController.create
 );
+routes.get('/profile/follows', authorization, FollowUsersController.index);
 routes.delete(
   '/users/follow',
   authorization,

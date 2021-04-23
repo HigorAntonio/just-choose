@@ -290,7 +290,6 @@ module.exports = {
         items: contentLists.map((list) => ({
           id: list.id,
           user_id: list.user_id,
-          // login_method: list.login_method,
           user_name: list.user_name,
           title: list.title,
           description: list.description,
@@ -391,7 +390,6 @@ module.exports = {
       return res.json({
         id: contentList.id,
         user_id: contentList.user_id,
-        // login_method: contentList.login_method,
         user_name: contentList.user_name,
         title: contentList.title,
         description: contentList.description,
