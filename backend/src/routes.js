@@ -4,7 +4,8 @@ const multer = require('multer');
 const multerConfig = require('./config/multer');
 
 const authorization = require('./middlewares/authorizationMiddleware');
-const isUserActive = require('./middlewares/isUserActive');
+const isUserActive = require('./middlewares/isUserActiveMiddleware');
+const getLoggedUserId = require('./middlewares/getLoggedUserId');
 const LocalAuthController = require('./controllers/LocalAuthController');
 const FollowUsersController = require('./controllers/FollowUsersController');
 const PollController = require('./controllers/PollController');
@@ -58,7 +59,7 @@ routes.post(
   multer(multerConfig).single('thumbnail'),
   ContentListController.create
 );
-routes.get('/contentlists', ContentListController.index);
+routes.get('/contentlists', getLoggedUserId, ContentListController.index);
 routes.get('/contentlists/:id', ContentListController.show);
 routes.put(
   '/contentlists/:id',

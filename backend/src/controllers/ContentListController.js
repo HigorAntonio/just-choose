@@ -216,6 +216,8 @@ module.exports = {
 
   async index(req, res) {
     try {
+      const userId = req.userId;
+
       const { user_id, page = 1, page_size = 30 } = req.query;
 
       const errors = [];
@@ -242,26 +244,77 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const contentListsQuery = knex('content_lists')
-        .select(
-          'content_lists.id',
-          'content_lists.user_id',
-          'users.name as user_name',
-          'content_lists.title',
-          'content_lists.description',
-          'content_lists.thumbnail',
-          'content_lists.created_at',
-          'content_lists.updated_at'
-        )
-        .innerJoin('users', 'user_id', 'users.id')
+      const usersWhoFollowMe = userId
+        ? [
+            { user_id: userId },
+            ...(await knex
+              .select('user_id')
+              .from('follows_users')
+              .where({ follows_id: userId })),
+          ]
+        : [];
+      const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
+
+      // TODO: Obter as listas de conteúdo privadas do usuário logado quando
+      // o mesmo informar o seu id de usuário passando-o através do query param
+      // "user_id"
+      const contentListsQuery = knex
+        .select()
+        .from(function () {
+          this.select(
+            'cl.id',
+            'cl.user_id',
+            'u.name as user_name',
+            'cl.title',
+            'cl.description',
+            'cl.thumbnail',
+            'cl.created_at',
+            'cl.updated_at'
+          )
+            .from('content_lists as cl')
+            .where({ sharing_option: 'public' })
+            .innerJoin('users as u', 'cl.user_id', 'u.id')
+            .union(function () {
+              this.select(
+                'cl.id',
+                'cl.user_id',
+                'u.name as user_name',
+                'cl.title',
+                'cl.description',
+                'cl.thumbnail',
+                'cl.created_at',
+                'cl.updated_at'
+              )
+                .from('content_lists as cl')
+                .where({ sharing_option: 'followed_profiles' })
+                .innerJoin('users as u', 'cl.user_id', 'u.id')
+                .whereIn('u.id', followMeIds);
+            })
+            .as('clsq');
+        })
         .limit(page_size)
         .offset((page - 1) * page_size)
-        .orderBy('content_lists.updated_at', 'desc');
+        .orderBy('updated_at', 'desc');
 
-      const countObj = knex('content_lists').count();
+      const countObj = knex.count().from(function () {
+        this.select()
+          .from(function () {
+            this.select('cl.id', 'cl.user_id')
+              .from('content_lists as cl')
+              .where({ sharing_option: 'public' })
+              .as('public_lists');
+          })
+          .union(function () {
+            this.select('cl.id', 'cl.user_id')
+              .from('content_lists as cl')
+              .where({ sharing_option: 'followed_profiles' })
+              .whereIn('cl.user_id', followMeIds);
+          })
+          .as('count_query');
+      });
 
       if (user_id) {
-        contentListsQuery.where('users.id', user_id);
+        contentListsQuery.where({ user_id });
         countObj.where({ user_id });
       }
 
@@ -300,6 +353,7 @@ module.exports = {
         })),
       });
     } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },
