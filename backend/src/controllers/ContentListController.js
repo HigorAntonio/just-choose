@@ -145,6 +145,171 @@ const updateContentListOnDB = async (
   }
 };
 
+const getContentLists = async (followMeIds, page_size, page) => {
+  try {
+    const contentLists = await knex
+      .select()
+      .from(function () {
+        this.select(
+          'cl.id',
+          'cl.user_id',
+          'u.name as user_name',
+          'cl.title',
+          'cl.description',
+          'cl.sharing_option',
+          'cl.thumbnail',
+          'cl.created_at',
+          'cl.updated_at'
+        )
+          .from('content_lists as cl')
+          .where({ sharing_option: 'public' })
+          .innerJoin('users as u', 'cl.user_id', 'u.id')
+          .union(function () {
+            this.select(
+              'cl.id',
+              'cl.user_id',
+              'u.name as user_name',
+              'cl.title',
+              'cl.description',
+              'cl.sharing_option',
+              'cl.thumbnail',
+              'cl.created_at',
+              'cl.updated_at'
+            )
+              .from('content_lists as cl')
+              .where({ sharing_option: 'followed_profiles' })
+              .innerJoin('users as u', 'cl.user_id', 'u.id')
+              .whereIn('u.id', followMeIds);
+          })
+          .as('clsq');
+      })
+      .limit(page_size)
+      .offset((page - 1) * page_size)
+      .orderBy('updated_at', 'desc');
+
+    const [{ count }] = await knex.count().from(function () {
+      this.select()
+        .from(function () {
+          this.select('cl.id', 'cl.user_id')
+            .from('content_lists as cl')
+            .where({ sharing_option: 'public' })
+            .as('public_lists');
+        })
+        .union(function () {
+          this.select('cl.id', 'cl.user_id')
+            .from('content_lists as cl')
+            .where({ sharing_option: 'followed_profiles' })
+            .whereIn('cl.user_id', followMeIds);
+        })
+        .as('count_query');
+    });
+
+    return { contentLists, count };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getUsersContentLists = async (
+  userId,
+  user_id,
+  followMeIds,
+  page_size,
+  page
+) => {
+  try {
+    const contentLists = await knex
+      .select()
+      .from(function () {
+        this.select(
+          'cl.id',
+          'cl.user_id',
+          'u.name as user_name',
+          'cl.title',
+          'cl.description',
+          'cl.sharing_option',
+          'cl.thumbnail',
+          'cl.created_at',
+          'cl.updated_at'
+        )
+          .from('content_lists as cl')
+          .where({ sharing_option: 'public' })
+          .innerJoin('users as u', 'cl.user_id', 'u.id')
+          .where({ 'u.id': user_id })
+          .union(function () {
+            this.select(
+              'cl.id',
+              'cl.user_id',
+              'u.name as user_name',
+              'cl.title',
+              'cl.description',
+              'cl.sharing_option',
+              'cl.thumbnail',
+              'cl.created_at',
+              'cl.updated_at'
+            )
+              .from('content_lists as cl')
+              .where({ sharing_option: 'followed_profiles' })
+              .innerJoin('users as u', 'cl.user_id', 'u.id')
+              .whereIn('u.id', followMeIds)
+              .andWhere({ 'u.id': user_id });
+          })
+          .union(function () {
+            this.select(
+              'cl.id',
+              'cl.user_id',
+              'u.name as user_name',
+              'cl.title',
+              'cl.description',
+              'cl.sharing_option',
+              'cl.thumbnail',
+              'cl.created_at',
+              'cl.updated_at'
+            )
+              .from('content_lists as cl')
+              .where({ sharing_option: 'private' })
+              .innerJoin('users as u', 'cl.user_id', 'u.id')
+              .where({ 'u.id': userId })
+              .andWhere({ 'u.id': user_id });
+          })
+          .as('clsq');
+      })
+      .limit(page_size)
+      .offset((page - 1) * page_size)
+      .orderBy('updated_at', 'desc');
+
+    const [{ count }] = await knex.count().from(function () {
+      this.select()
+        .from(function () {
+          this.select('cl.id', 'cl.user_id')
+            .from('content_lists as cl')
+            .where({ sharing_option: 'public' })
+            .andWhere({ 'cl.user_id': user_id })
+            .as('public_lists');
+        })
+        .union(function () {
+          this.select('cl.id', 'cl.user_id')
+            .from('content_lists as cl')
+            .where({ sharing_option: 'followed_profiles' })
+            .whereIn('cl.user_id', followMeIds)
+            .andWhere({ 'cl.user_id': user_id });
+        })
+        .union(function () {
+          this.select('cl.id', 'cl.user_id')
+            .from('content_lists as cl')
+            .where({ sharing_option: 'private' })
+            .where('cl.user_id', userId)
+            .andWhere({ 'cl.user_id': user_id });
+        })
+        .as('count_query');
+    });
+
+    return { contentLists, count };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   async create(req, res) {
     try {
@@ -255,71 +420,15 @@ module.exports = {
         : [];
       const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
 
-      // TODO: Obter as listas de conteúdo privadas do usuário logado quando
-      // o mesmo informar o seu id de usuário passando-o através do query param
-      // "user_id"
-      const contentListsQuery = knex
-        .select()
-        .from(function () {
-          this.select(
-            'cl.id',
-            'cl.user_id',
-            'u.name as user_name',
-            'cl.title',
-            'cl.description',
-            'cl.thumbnail',
-            'cl.created_at',
-            'cl.updated_at'
+      const { contentLists, count } = user_id
+        ? await getUsersContentLists(
+            userId,
+            user_id,
+            followMeIds,
+            page_size,
+            page
           )
-            .from('content_lists as cl')
-            .where({ sharing_option: 'public' })
-            .innerJoin('users as u', 'cl.user_id', 'u.id')
-            .union(function () {
-              this.select(
-                'cl.id',
-                'cl.user_id',
-                'u.name as user_name',
-                'cl.title',
-                'cl.description',
-                'cl.thumbnail',
-                'cl.created_at',
-                'cl.updated_at'
-              )
-                .from('content_lists as cl')
-                .where({ sharing_option: 'followed_profiles' })
-                .innerJoin('users as u', 'cl.user_id', 'u.id')
-                .whereIn('u.id', followMeIds);
-            })
-            .as('clsq');
-        })
-        .limit(page_size)
-        .offset((page - 1) * page_size)
-        .orderBy('updated_at', 'desc');
-
-      const countObj = knex.count().from(function () {
-        this.select()
-          .from(function () {
-            this.select('cl.id', 'cl.user_id')
-              .from('content_lists as cl')
-              .where({ sharing_option: 'public' })
-              .as('public_lists');
-          })
-          .union(function () {
-            this.select('cl.id', 'cl.user_id')
-              .from('content_lists as cl')
-              .where({ sharing_option: 'followed_profiles' })
-              .whereIn('cl.user_id', followMeIds);
-          })
-          .as('count_query');
-      });
-
-      if (user_id) {
-        contentListsQuery.where({ user_id });
-        countObj.where({ user_id });
-      }
-
-      const contentLists = await contentListsQuery;
-      const [{ count }] = await countObj;
+        : await getContentLists(followMeIds, page_size, page);
 
       for (const [i, list] of contentLists.entries()) {
         const contentTypes = await knex
@@ -346,6 +455,7 @@ module.exports = {
           user_name: list.user_name,
           title: list.title,
           description: list.description,
+          sharing_option: list.sharing_option,
           thumbnail: list.thumbnail,
           content_types: list.content_types,
           created_at: list.created_at,
