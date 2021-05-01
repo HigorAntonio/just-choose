@@ -60,7 +60,7 @@ routes.post(
   ContentListController.create
 );
 routes.get('/contentlists', getLoggedUserId, ContentListController.index);
-routes.get('/contentlists/:id', ContentListController.show);
+routes.get('/contentlists/:id', getLoggedUserId, ContentListController.show);
 routes.put(
   '/contentlists/:id',
   authorization,

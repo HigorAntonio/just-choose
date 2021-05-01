@@ -1,314 +1,11 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
-
-const getPlatformId = (contentType) => {
-  if (contentType === 'movie') {
-    return 'tmdb_id';
-  }
-  if (contentType === 'show') {
-    return 'tmdb_id';
-  }
-  if (contentType === 'game') {
-    return 'rawg_id';
-  }
-};
-
-const sanitizeListData = async (content_list) => {
-  try {
-    const contentNames = [
-      ...new Set(content_list.map((content) => content.type)),
-    ];
-    const contentTypes = await knex('content_types')
-      .select('id', 'name')
-      .whereIn('name', contentNames);
-
-    const contentToInsert = {};
-    contentNames.forEach(
-      (name) => (contentToInsert[`content_list_${name}s`] = [])
-    );
-    for (const content of content_list) {
-      contentToInsert[`content_list_${content.type}s`].push(content.contentId);
-    }
-
-    // Removendo ids duplicados e ids de conteúdos que não existem no banco de dados
-    for (const type of contentTypes) {
-      let platformId = getPlatformId(type.name);
-      contentToInsert[`content_list_${type.name}s`] = (
-        await knex
-          .select('id')
-          .from(`${type.name}s`)
-          .whereIn(platformId, contentToInsert[`content_list_${type.name}s`])
-      ).map((content) => content.id);
-    }
-
-    return [contentTypes, contentToInsert];
-  } catch (error) {
-    throw error;
-  }
-};
-
-const createContentListOnDB = async (
-  userId,
-  title,
-  description,
-  thumbnail,
-  content_list
-) => {
-  try {
-    const [contentTypes, contentToInsert] = await sanitizeListData(
-      content_list
-    );
-
-    await knex.transaction(async (trx) => {
-      const [{ id: contentListId }] = await trx('content_lists')
-        .insert({ user_id: userId, title, description, thumbnail })
-        .returning(['id']);
-
-      await trx('content_list_types').insert(
-        contentTypes.map((contentType) => ({
-          content_list_id: contentListId,
-          content_type_id: contentType.id,
-        }))
-      );
-
-      for (const contentType of contentTypes) {
-        await trx(`content_list_${contentType.name}s`).insert(
-          contentToInsert[`content_list_${contentType.name}s`].map(
-            (contentId) => ({
-              content_list_id: contentListId,
-              [`${contentType.name}_id`]: contentId,
-            })
-          )
-        );
-      }
-    });
-  } catch (error) {
-    throw error;
-  }
-};
-
-const updateContentListOnDB = async (
-  contentListId,
-  title,
-  description,
-  thumbnail,
-  content_list
-) => {
-  try {
-    const [contentTypes, contentToInsert] = await sanitizeListData(
-      content_list
-    );
-
-    await knex.transaction(async (trx) => {
-      await trx('content_lists')
-        .update({ title, description, thumbnail })
-        .where({ id: contentListId });
-
-      const oldContentTypes = await trx
-        .select('ct.name')
-        .from('content_list_types as clt')
-        .where({
-          content_list_id: contentListId,
-        })
-        .innerJoin('content_types as ct', 'clt.content_type_id', 'ct.id');
-
-      await trx('content_list_types')
-        .del()
-        .where({ content_list_id: contentListId });
-
-      await trx('content_list_types').insert(
-        contentTypes.map((contentType) => ({
-          content_list_id: contentListId,
-          content_type_id: contentType.id,
-        }))
-      );
-
-      for (const contentType of oldContentTypes) {
-        await trx(`content_list_${contentType.name}s`)
-          .del()
-          .where({ content_list_id: contentListId });
-      }
-
-      for (const contentType of contentTypes) {
-        await trx(`content_list_${contentType.name}s`).insert(
-          contentToInsert[`content_list_${contentType.name}s`].map(
-            (contentId) => ({
-              content_list_id: contentListId,
-              [`${contentType.name}_id`]: contentId,
-            })
-          )
-        );
-      }
-    });
-  } catch (error) {
-    throw error;
-  }
-};
-
-const getContentLists = async (followMeIds, page_size, page) => {
-  try {
-    const contentLists = await knex
-      .select()
-      .from(function () {
-        this.select(
-          'cl.id',
-          'cl.user_id',
-          'u.name as user_name',
-          'cl.title',
-          'cl.description',
-          'cl.sharing_option',
-          'cl.thumbnail',
-          'cl.created_at',
-          'cl.updated_at'
-        )
-          .from('content_lists as cl')
-          .where({ sharing_option: 'public' })
-          .innerJoin('users as u', 'cl.user_id', 'u.id')
-          .union(function () {
-            this.select(
-              'cl.id',
-              'cl.user_id',
-              'u.name as user_name',
-              'cl.title',
-              'cl.description',
-              'cl.sharing_option',
-              'cl.thumbnail',
-              'cl.created_at',
-              'cl.updated_at'
-            )
-              .from('content_lists as cl')
-              .where({ sharing_option: 'followed_profiles' })
-              .innerJoin('users as u', 'cl.user_id', 'u.id')
-              .whereIn('u.id', followMeIds);
-          })
-          .as('clsq');
-      })
-      .limit(page_size)
-      .offset((page - 1) * page_size)
-      .orderBy('updated_at', 'desc');
-
-    const [{ count }] = await knex.count().from(function () {
-      this.select()
-        .from(function () {
-          this.select('cl.id', 'cl.user_id')
-            .from('content_lists as cl')
-            .where({ sharing_option: 'public' })
-            .as('public_lists');
-        })
-        .union(function () {
-          this.select('cl.id', 'cl.user_id')
-            .from('content_lists as cl')
-            .where({ sharing_option: 'followed_profiles' })
-            .whereIn('cl.user_id', followMeIds);
-        })
-        .as('count_query');
-    });
-
-    return { contentLists, count };
-  } catch (error) {
-    throw error;
-  }
-};
-
-const getUsersContentLists = async (
-  userId,
-  user_id,
-  followMeIds,
-  page_size,
-  page
-) => {
-  try {
-    const contentLists = await knex
-      .select()
-      .from(function () {
-        this.select(
-          'cl.id',
-          'cl.user_id',
-          'u.name as user_name',
-          'cl.title',
-          'cl.description',
-          'cl.sharing_option',
-          'cl.thumbnail',
-          'cl.created_at',
-          'cl.updated_at'
-        )
-          .from('content_lists as cl')
-          .where({ sharing_option: 'public' })
-          .innerJoin('users as u', 'cl.user_id', 'u.id')
-          .where({ 'u.id': user_id })
-          .union(function () {
-            this.select(
-              'cl.id',
-              'cl.user_id',
-              'u.name as user_name',
-              'cl.title',
-              'cl.description',
-              'cl.sharing_option',
-              'cl.thumbnail',
-              'cl.created_at',
-              'cl.updated_at'
-            )
-              .from('content_lists as cl')
-              .where({ sharing_option: 'followed_profiles' })
-              .innerJoin('users as u', 'cl.user_id', 'u.id')
-              .whereIn('u.id', followMeIds)
-              .andWhere({ 'u.id': user_id });
-          })
-          .union(function () {
-            this.select(
-              'cl.id',
-              'cl.user_id',
-              'u.name as user_name',
-              'cl.title',
-              'cl.description',
-              'cl.sharing_option',
-              'cl.thumbnail',
-              'cl.created_at',
-              'cl.updated_at'
-            )
-              .from('content_lists as cl')
-              .where({ sharing_option: 'private' })
-              .innerJoin('users as u', 'cl.user_id', 'u.id')
-              .where({ 'u.id': userId })
-              .andWhere({ 'u.id': user_id });
-          })
-          .as('clsq');
-      })
-      .limit(page_size)
-      .offset((page - 1) * page_size)
-      .orderBy('updated_at', 'desc');
-
-    const [{ count }] = await knex.count().from(function () {
-      this.select()
-        .from(function () {
-          this.select('cl.id', 'cl.user_id')
-            .from('content_lists as cl')
-            .where({ sharing_option: 'public' })
-            .andWhere({ 'cl.user_id': user_id })
-            .as('public_lists');
-        })
-        .union(function () {
-          this.select('cl.id', 'cl.user_id')
-            .from('content_lists as cl')
-            .where({ sharing_option: 'followed_profiles' })
-            .whereIn('cl.user_id', followMeIds)
-            .andWhere({ 'cl.user_id': user_id });
-        })
-        .union(function () {
-          this.select('cl.id', 'cl.user_id')
-            .from('content_lists as cl')
-            .where({ sharing_option: 'private' })
-            .where('cl.user_id', userId)
-            .andWhere({ 'cl.user_id': user_id });
-        })
-        .as('count_query');
-    });
-
-    return { contentLists, count };
-  } catch (error) {
-    throw error;
-  }
-};
+const createContentListOnDB = require('../utils/contentList/createContentListOnDB');
+const updateContentListOnDB = require('../utils/contentList/updateContentListOnDB');
+const getFollowingUsers = require('../utils/users/getFollowingUsers');
+const isUserFollowing = require('../utils/users/isUserFollowing');
+const getContentLists = require('../utils/contentList/getContentLists');
+const getUsersContentLists = require('../utils/contentList/getUsersContentLists');
 
 module.exports = {
   async create(req, res) {
@@ -330,7 +27,12 @@ module.exports = {
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
-      const { title, description, content: content_list } = JSON.parse(data);
+      const {
+        title,
+        description,
+        sharingOption = 'private',
+        content,
+      } = JSON.parse(data);
       const errors = [];
 
       if (!title) {
@@ -341,14 +43,22 @@ module.exports = {
       if (description && typeof description !== 'string') {
         errors.push('Descrição da lista, valor inválido');
       }
+      if (
+        typeof sharingOption !== 'undefined' &&
+        sharingOption !== 'private' &&
+        sharingOption !== 'public' &&
+        sharingOption !== 'followed_profiles'
+      ) {
+        errors.push('Opção de compartilhamento da lista, valor inválido');
+      }
       if (!req.file) {
         errors.push('Thumbnail da lista não informada');
       }
-      if (!content_list) {
+      if (!content) {
         errors.push('Conteúdo da lista não informado');
-      } else if (!Array.isArray(content_list)) {
+      } else if (!Array.isArray(content)) {
         errors.push('Conteúdo da lista, valor inválido');
-      } else if (content_list.length < 1 || content_list.length > 100) {
+      } else if (content.length < 1 || content.length > 100) {
         errors.push(
           'Conteúdo da lista inválido. O número de itens deve ficar entre 1 e 100'
         );
@@ -366,8 +76,9 @@ module.exports = {
         userId,
         title,
         description,
+        sharingOption,
         thumbnail,
-        content_list
+        content
       );
 
       return res.sendStatus(201);
@@ -409,15 +120,7 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const usersWhoFollowMe = userId
-        ? [
-            { user_id: userId },
-            ...(await knex
-              .select('user_id')
-              .from('follows_users')
-              .where({ follows_id: userId })),
-          ]
-        : [];
+      const usersWhoFollowMe = await getFollowingUsers(userId);
       const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
 
       const { contentLists, count } = user_id
@@ -463,13 +166,14 @@ module.exports = {
         })),
       });
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },
 
   async show(req, res) {
     try {
+      const userId = req.userId;
+
       const contentListId = req.params.id;
 
       if (isNaN(contentListId)) {
@@ -483,6 +187,7 @@ module.exports = {
           'users.name as user_name',
           'content_lists.title',
           'content_lists.description',
+          'content_lists.sharing_option',
           'content_lists.thumbnail',
           'content_lists.created_at',
           'content_lists.updated_at'
@@ -498,6 +203,15 @@ module.exports = {
         return res
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      if (
+        (contentList.sharing_option === 'private' &&
+          contentList.user_id !== userId) ||
+        (contentList.sharing_option === 'followed_profiles' &&
+          !(await isUserFollowing(contentList.user_id, userId)))
+      ) {
+        return res.sendStatus(401);
       }
 
       const contentTypes = await knex
@@ -557,6 +271,7 @@ module.exports = {
         user_name: contentList.user_name,
         title: contentList.title,
         description: contentList.description,
+        sharing_option: contentList.sharing_option,
         thumbnail: contentList.thumbnail,
         content_types: contentList.content_types,
         content: contentList.content,
@@ -618,7 +333,12 @@ module.exports = {
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
-      const { title, description, content: content_list } = JSON.parse(data);
+      const {
+        title = contentList.title,
+        description = contentList.description,
+        sharingOption = contentList.sharing_option,
+        content,
+      } = JSON.parse(data);
       const errors = [];
 
       if (!title) {
@@ -629,14 +349,16 @@ module.exports = {
       if (description && typeof description !== 'string') {
         errors.push('Descrição da lista, valor inválido');
       }
-      if (!req.file) {
-        errors.push('Thumbnail da lista não informada');
+      if (
+        sharingOption !== 'private' &&
+        sharingOption !== 'public' &&
+        sharingOption !== 'followed_profiles'
+      ) {
+        errors.push('Opção de compartilhamento da lista, valor inválido');
       }
-      if (!content_list) {
-        errors.push('Conteúdo da lista não informado');
-      } else if (!Array.isArray(content_list)) {
+      if (content && !Array.isArray(content)) {
         errors.push('Conteúdo da lista, valor inválido');
-      } else if (content_list.length < 1 || content_list.length > 100) {
+      } else if (content && (content.length < 1 || content.length > 100)) {
         errors.push(
           'Conteúdo da lista inválido. O número de itens deve ficar entre 1 e 100'
         );
@@ -648,21 +370,31 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      await deleteFile(
-        contentList.thumbnail.substring(`${process.env.APP_URL}/files/`.length)
-      );
-      const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
+      const deleteOldThumbnail = req.file ? true : false;
+      const thumbnail = req.file
+        ? `${process.env.APP_URL}/files/${req.file.key}`
+        : contentList.thumbnail;
 
       await updateContentListOnDB(
         contentListId,
         title,
         description,
+        sharingOption,
         thumbnail,
-        content_list
+        content
       );
+
+      if (deleteOldThumbnail) {
+        await deleteFile(
+          contentList.thumbnail.substring(
+            `${process.env.APP_URL}/files/`.length
+          )
+        );
+      }
 
       return res.sendStatus(200);
     } catch (error) {
+      console.log(error);
       try {
         await deleteFile(req.file.key);
       } catch (error) {}
