@@ -91,8 +91,8 @@ routes.post(
   multer(multerConfig).single('thumbnail'),
   PollController.create
 );
-routes.get('/polls', PollController.index);
-routes.get('/polls/:id', PollController.show);
+routes.get('/polls', getLoggedUserId, PollController.index);
+routes.get('/polls/:id', getLoggedUserId, PollController.show);
 routes.put(
   '/polls/:id',
   authorization,

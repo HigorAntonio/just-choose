@@ -1,5 +1,8 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
+const getFollowingUsers = require('../utils/users/getFollowingUsers');
+const isUserFollowing = require('../utils/users/isUserFollowing');
+const getPolls = require('../utils/polls/getPolls');
 
 module.exports = {
   async create(req, res) {
@@ -21,7 +24,12 @@ module.exports = {
         return res.status(400).json({ erro: 'Dados da lista não informados' });
       }
 
-      const { title, description, contentListId } = JSON.parse(data);
+      const {
+        title,
+        description,
+        sharingOption = 'private',
+        contentListId,
+      } = JSON.parse(data);
 
       const errors = [];
 
@@ -33,8 +41,16 @@ module.exports = {
       if (description && typeof description !== 'string') {
         errors.push('Descrição da votação, valor inválido');
       }
+      if (
+        typeof sharingOption !== 'undefined' &&
+        sharingOption !== 'private' &&
+        sharingOption !== 'public' &&
+        sharingOption !== 'followed_profiles'
+      ) {
+        errors.push('Opção de compartilhamento da votação, valor inválido');
+      }
       if (!req.file) {
-        errors.push('Thumbnail da lista não informada');
+        errors.push('Thumbnail da votação não informada');
       }
       if (!contentListId) {
         errors.push('Lista de conteúdo da votação, id da lista não informado');
@@ -60,6 +76,9 @@ module.exports = {
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
+      // O usuário só pode criar votações a partir de listas criadas pelo próprio usuário.
+      // O usuário pode fazer um fork de uma lista de outro usuário. A lista fork poderá
+      // ser usada para criar uma votação.
       if (contentList.user_id !== userId) {
         try {
           await deleteFile(req.file.key);
@@ -74,7 +93,13 @@ module.exports = {
 
       await knex.transaction(async (trx) => {
         const [{ id: pollId }] = await trx('polls')
-          .insert({ user_id: userId, title, description, thumbnail })
+          .insert({
+            user_id: userId,
+            title,
+            description,
+            sharing_option: sharingOption,
+            thumbnail,
+          })
           .returning(['id']);
 
         await trx('poll_content_list').insert({
@@ -94,6 +119,8 @@ module.exports = {
 
   async index(req, res) {
     try {
+      const userId = req.userId;
+
       const { user_id, page = 1, page_size = 30 } = req.query;
 
       const errors = [];
@@ -120,34 +147,16 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const pollsQuery = knex('polls')
-        .select(
-          'polls.id',
-          'polls.user_id',
-          'users.name as user_name',
-          'polls.title',
-          'polls.description',
-          'polls.is_active',
-          'polls.thumbnail',
-          'poll_content_list.content_list_id',
-          'polls.created_at',
-          'polls.updated_at'
-        )
-        .innerJoin('users', 'user_id', 'users.id')
-        .innerJoin('poll_content_list', 'poll_id', 'polls.id')
-        .limit(page_size)
-        .offset((page - 1) * page_size)
-        .orderBy('polls.updated_at', 'desc');
+      const usersWhoFollowMe = await getFollowingUsers(userId);
+      const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
 
-      const countObj = knex('polls').count();
-
-      if (user_id) {
-        pollsQuery.where('users.id', user_id);
-        countObj.where({ user_id });
-      }
-
-      const polls = await pollsQuery;
-      const [{ count }] = await countObj;
+      const { polls, count } = await getPolls(
+        userId,
+        user_id,
+        followMeIds,
+        page_size,
+        page
+      );
 
       const total_pages = Math.ceil(count / page_size);
       return res.json({
@@ -158,10 +167,10 @@ module.exports = {
         items: polls.map((poll) => ({
           id: poll.id,
           user_id: poll.user_id,
-          // login_method: poll.login_method,
           user_name: poll.user_name,
           title: poll.title,
           description: poll.description,
+          sharing_option: poll.sharing_option,
           is_active: poll.is_active,
           thumbnail: poll.thumbnail,
           content_list_id: poll.content_list_id,
@@ -177,6 +186,8 @@ module.exports = {
 
   async show(req, res) {
     try {
+      const userId = req.userId;
+
       const pollId = req.params.id;
 
       if (isNaN(pollId)) {
@@ -185,23 +196,24 @@ module.exports = {
 
       const poll = await knex
         .select(
-          'polls.id',
-          'polls.user_id',
-          'users.name as user_name',
-          'polls.title',
-          'polls.description',
-          'polls.thumbnail',
-          'poll_content_list.content_list_id',
-          'polls.is_active',
-          'polls.created_at',
-          'polls.updated_at'
+          'p.id',
+          'p.user_id',
+          'u.name as user_name',
+          'p.title',
+          'p.description',
+          'p.sharing_option',
+          'p.thumbnail',
+          'pcl.content_list_id',
+          'p.is_active',
+          'p.created_at',
+          'p.updated_at'
         )
-        .from('polls')
+        .from('polls as p')
         .where({
-          'polls.id': pollId,
+          'p.id': pollId,
         })
-        .innerJoin('users', 'polls.user_id', 'users.id')
-        .innerJoin('poll_content_list', 'poll_id', 'polls.id')
+        .innerJoin('users as u', 'p.user_id', 'u.id')
+        .innerJoin('poll_content_list as pcl', 'poll_id', 'p.id')
         .first();
 
       if (!poll) {
@@ -210,12 +222,21 @@ module.exports = {
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
 
+      if (
+        (poll.sharing_option === 'private' && poll.user_id !== userId) ||
+        (poll.sharing_option === 'followed_profiles' &&
+          !(await isUserFollowing(poll.user_id, userId)))
+      ) {
+        return res.sendStatus(401);
+      }
+
       return res.json({
         id: poll.id,
         user_id: poll.user_id,
         user_name: poll.user_name,
         title: poll.title,
         description: poll.description,
+        sharing_option: poll.sharing_option,
         is_active: poll.is_active,
         thumbnail: poll.thumbnail,
         content_list_id: poll.content_list_id,
