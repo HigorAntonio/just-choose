@@ -144,6 +144,18 @@ module.exports = {
           )
           .andWhere({ content_list_id: list.id });
         contentLists[i].content_types = contentTypes.map((type) => type.name);
+
+        const [{ count: likes }] = await knex
+          .count()
+          .from('content_list_likes')
+          .where({ content_list_id: list.id });
+        contentLists[i].likes = parseInt(likes);
+
+        const [{ count: forks }] = await knex
+          .count()
+          .from('content_list_forks')
+          .where({ original_list_id: list.id });
+        contentLists[i].forks = parseInt(forks);
       }
 
       const total_pages = Math.ceil(count / page_size);
@@ -160,6 +172,8 @@ module.exports = {
           description: list.description,
           sharing_option: list.sharing_option,
           thumbnail: list.thumbnail,
+          likes: list.likes,
+          forks: list.forks,
           content_types: list.content_types,
           created_at: list.created_at,
           updated_at: list.updated_at,
@@ -225,6 +239,18 @@ module.exports = {
         .andWhere({ content_list_id: contentList.id });
       contentList.content_types = contentTypes.map((type) => type.name);
 
+      const [{ count: likes }] = await knex
+        .count()
+        .from('content_list_likes')
+        .where({ content_list_id: contentList.id });
+      contentList.likes = parseInt(likes);
+
+      const [{ count: forks }] = await knex
+        .count()
+        .from('content_list_forks')
+        .where({ original_list_id: contentList.id });
+      contentList.forks = parseInt(forks);
+
       const content = await knex
         .select(
           'movie_id as content_id',
@@ -273,6 +299,8 @@ module.exports = {
         description: contentList.description,
         sharing_option: contentList.sharing_option,
         thumbnail: contentList.thumbnail,
+        likes: contentList.likes,
+        forks: contentList.forks,
         content_types: contentList.content_types,
         content: contentList.content,
         created_at: contentList.created_at,

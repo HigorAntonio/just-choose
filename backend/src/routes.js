@@ -10,6 +10,7 @@ const LocalAuthController = require('./controllers/LocalAuthController');
 const FollowUsersController = require('./controllers/FollowUsersController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
+const ContentListLikeController = require('./controllers/ContentListLikeController');
 const ContentListForkController = require('./controllers/ContentListForkController');
 const VoteController = require('./controllers/VoteController');
 const PollVoteController = require('./controllers/PollVoteController');
@@ -75,9 +76,23 @@ routes.delete(
   ContentListController.delete
 );
 
+// ContentListLikeController
+routes.post(
+  '/contentlists/:id/like',
+  authorization,
+  isUserActive,
+  ContentListLikeController.create
+);
+routes.delete(
+  '/contentlists/:id/like',
+  authorization,
+  isUserActive,
+  ContentListLikeController.delete
+);
+
 // ContentListForkController
 routes.post(
-  '/contentlists/fork/:id',
+  '/contentlists/:id/fork',
   authorization,
   isUserActive,
   ContentListForkController.create
