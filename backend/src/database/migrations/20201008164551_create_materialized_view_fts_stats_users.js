@@ -6,7 +6,7 @@ FROM
     SELECT to_tsvector('simple_unaccent', u.name)
     FROM users AS u
   $$) AS st,
-  nullif(to_tsquery('portuguese_unaccent',
+  nullif(to_tsquery('simple_unaccent',
     quote_literal(st.word)), '') AS q(query)
 WHERE q.query IS NOT NULL;
 

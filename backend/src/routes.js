@@ -7,6 +7,7 @@ const authorization = require('./middlewares/authorizationMiddleware');
 const isUserActive = require('./middlewares/isUserActiveMiddleware');
 const getLoggedUserId = require('./middlewares/getLoggedUserId');
 const LocalAuthController = require('./controllers/LocalAuthController');
+const UserController = require('./controllers/UserController');
 const FollowUsersController = require('./controllers/FollowUsersController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
@@ -36,6 +37,9 @@ routes.get(
   authorization,
   LocalAuthController.resendConfirmEmail
 );
+
+// UserController
+routes.get('/users', authorization, UserController.index);
 
 // FollowUsersController
 routes.post(
