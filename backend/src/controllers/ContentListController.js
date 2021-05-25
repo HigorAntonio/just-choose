@@ -5,7 +5,7 @@ const updateContentListOnDB = require('../utils/contentList/updateContentListOnD
 const getFollowingUsers = require('../utils/users/getFollowingUsers');
 const isUserFollowing = require('../utils/users/isUserFollowing');
 const getContentLists = require('../utils/contentList/getContentLists');
-const getUsersContentLists = require('../utils/contentList/getUsersContentLists');
+const getListOrderByQuery = require('../utils/contentList/getListOrderByQuery');
 
 module.exports = {
   async create(req, res) {
@@ -94,7 +94,12 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      const { user_id, page = 1, page_size = 30 } = req.query;
+      const {
+        user_id,
+        page = 1,
+        page_size = 30,
+        sort_by = 'updated.desc',
+      } = req.query;
 
       const errors = [];
 
@@ -116,6 +121,13 @@ module.exports = {
       } else if (page_size < 1 || page_size > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
+      if (sort_by) {
+        if (typeof sort_by !== 'string') {
+          errors.push('Parâmetro sort_by, valor inválido');
+        } else if (!getListOrderByQuery(sort_by)) {
+          errors.push('Parâmetro sort_by, valor inválido');
+        }
+      }
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
@@ -123,40 +135,14 @@ module.exports = {
       const usersWhoFollowMe = await getFollowingUsers(userId);
       const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
 
-      const { contentLists, count } = user_id
-        ? await getUsersContentLists(
-            userId,
-            user_id,
-            followMeIds,
-            page_size,
-            page
-          )
-        : await getContentLists(followMeIds, page_size, page);
-
-      for (const [i, list] of contentLists.entries()) {
-        const contentTypes = await knex
-          .select('name')
-          .from('content_list_types')
-          .innerJoin(
-            'content_types',
-            'content_types.id',
-            'content_list_types.content_type_id'
-          )
-          .andWhere({ content_list_id: list.id });
-        contentLists[i].content_types = contentTypes.map((type) => type.name);
-
-        const [{ count: likes }] = await knex
-          .count()
-          .from('content_list_likes')
-          .where({ content_list_id: list.id });
-        contentLists[i].likes = parseInt(likes);
-
-        const [{ count: forks }] = await knex
-          .count()
-          .from('content_list_forks')
-          .where({ original_list_id: list.id });
-        contentLists[i].forks = parseInt(forks);
-      }
+      const { contentLists, count } = await getContentLists(
+        userId,
+        user_id,
+        followMeIds,
+        page_size,
+        page,
+        getListOrderByQuery(sort_by)
+      );
 
       const total_pages = Math.ceil(count / page_size);
       return res.json({
@@ -172,14 +158,15 @@ module.exports = {
           description: list.description,
           sharing_option: list.sharing_option,
           thumbnail: list.thumbnail,
-          likes: list.likes,
-          forks: list.forks,
+          likes: parseInt(list.likes),
+          forks: parseInt(list.forks),
           content_types: list.content_types,
           created_at: list.created_at,
           updated_at: list.updated_at,
         })),
       });
     } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },
