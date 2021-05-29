@@ -23,6 +23,7 @@ exports.up = async (knex) =>
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
+    .then(() => knex.raw('ALTER TABLE polls ADD COLUMN document tsvector;'))
     .then(() => knex.raw(onUpdateTrigger('polls')));
 
 exports.down = async (knex) => knex.schema.dropTable('polls');

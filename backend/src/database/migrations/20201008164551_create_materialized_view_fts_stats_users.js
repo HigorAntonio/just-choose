@@ -1,4 +1,4 @@
-const CREATE_MATERIALIZED_VIEW = `
+const UP = `
 CREATE MATERIALIZED VIEW fts_stats_users AS
 SELECT q.query, st.*
 FROM
@@ -23,7 +23,7 @@ AFTER INSERT OR UPDATE ON users
 EXECUTE PROCEDURE fts_stats_users_update_trigger();
 `;
 
-const DROP_MATERIALIZED_VIEW = `
+const DOWN = `
 DROP TRIGGER fts_stats_users_update ON users;
 
 DROP FUNCTION fts_stats_users_update_trigger();
@@ -31,5 +31,5 @@ DROP FUNCTION fts_stats_users_update_trigger();
 DROP MATERIALIZED VIEW fts_stats_users;
 `;
 
-exports.up = async (knex) => knex.raw(CREATE_MATERIALIZED_VIEW);
-exports.down = async (knex) => knex.raw(DROP_MATERIALIZED_VIEW);
+exports.up = async (knex) => knex.raw(UP);
+exports.down = async (knex) => knex.raw(DOWN);

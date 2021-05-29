@@ -33,11 +33,11 @@ module.exports = {
 
       if (query) {
         usersQuery.where(
-          knex.raw('u.document @@ simple_plainto_tsquery(:query)', { query })
+          knex.raw('u.document @@ users_plainto_tsquery(:query)', { query })
         );
 
         countQuery.where(
-          knex.raw('u.document @@ simple_plainto_tsquery(:query)', { query })
+          knex.raw('u.document @@ users_plainto_tsquery(:query)', { query })
         );
       }
 

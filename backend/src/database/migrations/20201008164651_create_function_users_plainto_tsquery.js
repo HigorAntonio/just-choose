@@ -1,5 +1,5 @@
-const CREATE_FUNCTION = `
-CREATE OR REPLACE FUNCTION public.simple_plainto_tsquery(source text)
+const UP = `
+CREATE OR REPLACE FUNCTION public.users_plainto_tsquery(source text)
 RETURNS tsquery
 LANGUAGE sql
 IMMUTABLE
@@ -24,9 +24,9 @@ AS $function$
 $function$
 `;
 
-const DROP_FUNCTION = `
-DROP FUNCTION public.simple_plainto_tsquery(source text);
+const DOWN = `
+DROP FUNCTION public.users_plainto_tsquery(source text);
 `;
 
-exports.up = async (knex) => knex.raw(CREATE_FUNCTION);
-exports.down = async (knex) => knex.raw(DROP_FUNCTION);
+exports.up = async (knex) => knex.raw(UP);
+exports.down = async (knex) => knex.raw(DOWN);

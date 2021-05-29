@@ -1,10 +1,5 @@
 const { onUpdateTrigger } = require('../triggers');
 
-const addDocumentTsvector = `
-  ALTER TABLE users
-  ADD COLUMN document tsvector;
-`;
-
 exports.up = async (knex) =>
   knex.schema
     .createTable('users', (table) => {
@@ -19,7 +14,7 @@ exports.up = async (knex) =>
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
-    .then(() => knex.raw(onUpdateTrigger('users')))
-    .then(() => knex.raw(addDocumentTsvector));
+    .then(() => knex.raw('ALTER TABLE users ADD COLUMN document tsvector;'))
+    .then(() => knex.raw(onUpdateTrigger('users')));
 
 exports.down = async (knex) => knex.schema.dropTable('users');

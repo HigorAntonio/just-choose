@@ -1,9 +1,9 @@
 const UP = `
-CREATE INDEX users_document_idx ON users USING GIN (document);
+CREATE INDEX polls_document_idx ON polls USING GIN (document);
 `;
 
 const DOWN = `
-DROP INDEX users_document_idx;
+DROP INDEX polls_document_idx;
 `;
 
 exports.up = async (knex) => knex.raw(UP);

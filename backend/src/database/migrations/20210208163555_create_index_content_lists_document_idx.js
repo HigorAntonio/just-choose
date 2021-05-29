@@ -1,9 +1,9 @@
 const UP = `
-CREATE INDEX users_document_idx ON users USING GIN (document);
+CREATE INDEX content_lists_document_idx ON content_lists USING GIN (document);
 `;
 
 const DOWN = `
-DROP INDEX users_document_idx;
+DROP INDEX content_lists_document_idx;
 `;
 
 exports.up = async (knex) => knex.raw(UP);

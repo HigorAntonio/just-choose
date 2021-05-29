@@ -22,6 +22,9 @@ exports.up = async (knex) =>
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
+    .then(() =>
+      knex.raw('ALTER TABLE content_lists ADD COLUMN document tsvector;')
+    )
     .then(() => knex.raw(onUpdateTrigger('content_lists')));
 
 exports.down = async (knex) => knex.schema.dropTable('content_lists');
