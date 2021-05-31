@@ -121,7 +121,7 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      const { user_id, page = 1, page_size = 30 } = req.query;
+      const { user_id, query, page = 1, page_size = 30 } = req.query;
 
       const errors = [];
 
@@ -132,6 +132,9 @@ module.exports = {
         if (!user) {
           errors.push('Usuário não encontrado');
         }
+      }
+      if (query && typeof query !== 'string') {
+        errors.push({ erro: 'O parâmetro query deve ser uma string' });
       }
       if (isNaN(page)) {
         errors.push('O parâmetro page deve ser um número');
@@ -155,7 +158,8 @@ module.exports = {
         user_id,
         followMeIds,
         page_size,
-        page
+        page,
+        query
       );
 
       const total_pages = Math.ceil(count / page_size);
@@ -180,6 +184,7 @@ module.exports = {
         })),
       });
     } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },

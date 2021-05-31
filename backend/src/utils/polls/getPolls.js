@@ -1,6 +1,13 @@
 const knex = require('../../database');
 
-module.exports = async (userId, user_id, followMeIds, page_size, page) => {
+module.exports = async (
+  userId,
+  user_id,
+  followMeIds,
+  page_size,
+  page,
+  query
+) => {
   try {
     const pollsQuery = knex
       .select()
@@ -16,7 +23,8 @@ module.exports = async (userId, user_id, followMeIds, page_size, page) => {
           'p.thumbnail',
           'pcl.content_list_id',
           'p.created_at',
-          'p.updated_at'
+          'p.updated_at',
+          'p.document'
         )
           .from('polls as p')
           .where({ sharing_option: 'public' })
@@ -34,7 +42,8 @@ module.exports = async (userId, user_id, followMeIds, page_size, page) => {
               'p.thumbnail',
               'pcl.content_list_id',
               'p.created_at',
-              'p.updated_at'
+              'p.updated_at',
+              'p.document'
             )
               .from('polls as p')
               .where({ sharing_option: 'followed_profiles' })
@@ -56,7 +65,8 @@ module.exports = async (userId, user_id, followMeIds, page_size, page) => {
               'p.thumbnail',
               'pcl.content_list_id',
               'p.created_at',
-              'p.updated_at'
+              'p.updated_at',
+              'p.document'
             )
               .from('polls as p')
               .where({ sharing_option: 'private' })
@@ -94,6 +104,15 @@ module.exports = async (userId, user_id, followMeIds, page_size, page) => {
     if (user_id) {
       pollsQuery.where({ user_id });
       countObj.where({ user_id });
+    }
+
+    if (query) {
+      pollsQuery.where(
+        knex.raw('document @@ polls_plainto_tsquery(:query)', { query })
+      );
+      countObj.where(
+        knex.raw('document @@ polls_plainto_tsquery(:query)', { query })
+      );
     }
 
     const polls = await pollsQuery;

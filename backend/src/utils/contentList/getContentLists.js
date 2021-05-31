@@ -6,6 +6,7 @@ module.exports = async (
   followMeIds,
   page_size,
   page,
+  query,
   sort_by
 ) => {
   try {
@@ -22,7 +23,8 @@ module.exports = async (
         knex.raw('COALESCE(likes, 0) AS likes'),
         knex.raw('COALESCE(forks, 0) AS forks'),
         'clsq.created_at',
-        'clsq.updated_at'
+        'clsq.updated_at',
+        'clsq.document'
       )
       .from(function () {
         this.select(
@@ -34,7 +36,8 @@ module.exports = async (
           'cl.sharing_option',
           'cl.thumbnail',
           'cl.created_at',
-          'cl.updated_at'
+          'cl.updated_at',
+          'cl.document'
         )
           .from('content_lists as cl')
           .where({ sharing_option: 'public' })
@@ -49,7 +52,8 @@ module.exports = async (
               'cl.sharing_option',
               'cl.thumbnail',
               'cl.created_at',
-              'cl.updated_at'
+              'cl.updated_at',
+              'cl.document'
             )
               .from('content_lists as cl')
               .where({ sharing_option: 'followed_profiles' })
@@ -68,7 +72,8 @@ module.exports = async (
               'cl.sharing_option',
               'cl.thumbnail',
               'cl.created_at',
-              'cl.updated_at'
+              'cl.updated_at',
+              'cl.document'
             )
               .from('content_lists as cl')
               .where({ sharing_option: 'private' })
@@ -115,13 +120,13 @@ module.exports = async (
     const countObj = knex.count().from(function () {
       this.select()
         .from(function () {
-          this.select('cl.id', 'cl.user_id')
+          this.select('cl.id', 'cl.user_id', 'cl.document')
             .from('content_lists as cl')
             .where({ sharing_option: 'public' })
             .as('public_lists');
         })
         .union(function () {
-          this.select('cl.id', 'cl.user_id')
+          this.select('cl.id', 'cl.user_id', 'cl.document')
             .from('content_lists as cl')
             .where({ sharing_option: 'followed_profiles' })
             .whereIn('cl.user_id', followMeIds);
@@ -129,7 +134,7 @@ module.exports = async (
         .as('count_query');
       if (userId && user_id) {
         this.union(function () {
-          this.select('cl.id', 'cl.user_id')
+          this.select('cl.id', 'cl.user_id', 'cl.document')
             .from('content_lists as cl')
             .where({ sharing_option: 'private' })
             .where('cl.user_id', userId);
@@ -140,6 +145,15 @@ module.exports = async (
     if (user_id) {
       contentListsQuery.where({ user_id });
       countObj.where({ user_id });
+    }
+
+    if (query) {
+      contentListsQuery.where(
+        knex.raw('document @@ content_lists_plainto_tsquery(:query)', { query })
+      );
+      countObj.where(
+        knex.raw('document @@ content_lists_plainto_tsquery(:query)', { query })
+      );
     }
 
     const contentLists = await contentListsQuery;

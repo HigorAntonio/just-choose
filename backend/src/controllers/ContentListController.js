@@ -97,6 +97,7 @@ module.exports = {
 
       const {
         user_id,
+        query,
         page = 1,
         page_size = 30,
         sort_by = 'updated.desc',
@@ -111,6 +112,9 @@ module.exports = {
         if (!user) {
           errors.push('Usuário não encontrado');
         }
+      }
+      if (query && typeof query !== 'string') {
+        errors.push({ erro: 'O parâmetro query deve ser uma string' });
       }
       if (isNaN(page)) {
         errors.push('O parâmetro page deve ser um número');
@@ -142,6 +146,7 @@ module.exports = {
         followMeIds,
         page_size,
         page,
+        query,
         getListOrderByQuery(sort_by)
       );
 
@@ -167,6 +172,7 @@ module.exports = {
         })),
       });
     } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },
