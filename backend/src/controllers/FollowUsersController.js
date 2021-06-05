@@ -4,9 +4,6 @@ module.exports = {
   async create(req, res) {
     try {
       const userId = req.userId;
-      if (!userId) {
-        return res.sendStatus(401);
-      }
 
       const { followsId } = req.body;
       if (!followsId) {
@@ -52,9 +49,6 @@ module.exports = {
   async index(req, res) {
     try {
       const userId = req.userId;
-      if (!userId) {
-        return res.sendStatus(401);
-      }
 
       const { page = 1, page_size = 30 } = req.query;
 
@@ -116,9 +110,6 @@ module.exports = {
   async delete(req, res) {
     try {
       const userId = req.userId;
-      if (!userId) {
-        return res.sendStatus(401);
-      }
 
       const { followsId } = req.body;
       if (!followsId) {

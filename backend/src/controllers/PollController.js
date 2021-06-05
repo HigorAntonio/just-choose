@@ -9,13 +9,6 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) {
-        try {
-          await deleteFile(req.file.key);
-        } catch (error) {}
-        return res.sendStatus(401);
-      }
-
       const { data } = req.body;
       if (!data) {
         try {
@@ -195,7 +188,7 @@ module.exports = {
       const pollId = req.params.id;
 
       if (isNaN(pollId)) {
-        return res.sendStatus(404);
+        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex
@@ -231,7 +224,7 @@ module.exports = {
         (poll.sharing_option === 'followed_profiles' &&
           !(await isUserFollowing(poll.user_id, userId)))
       ) {
-        return res.sendStatus(401);
+        return res.sendStatus(403);
       }
 
       return res.json({
@@ -257,20 +250,13 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) {
-        try {
-          await deleteFile(req.file.key);
-        } catch (error) {}
-        return res.sendStatus(401);
-      }
-
       const pollId = req.params.id;
 
       if (isNaN(pollId)) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.sendStatus(404);
+        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex('polls')
@@ -353,12 +339,10 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) return res.sendStatus(401);
-
       const pollId = req.params.id;
 
       if (isNaN(pollId)) {
-        return res.sendStatus(404);
+        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex('polls')

@@ -5,7 +5,7 @@ module.exports = {
     try {
       const pollId = req.params.id;
       if (isNaN(pollId)) {
-        return res.sendStatus(404);
+        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex

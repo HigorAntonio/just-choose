@@ -13,13 +13,6 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) {
-        try {
-          await deleteFile(req.file.key);
-        } catch (error) {}
-        return res.sendStatus(401);
-      }
-
       const { data } = req.body;
       if (!data) {
         try {
@@ -183,7 +176,9 @@ module.exports = {
       const contentListId = req.params.id;
 
       if (isNaN(contentListId)) {
-        return res.sendStatus(404);
+        return res
+          .status(400)
+          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const contentList = await getContentList(contentListId);
@@ -200,7 +195,7 @@ module.exports = {
         (contentList.sharing_option === 'followed_profiles' &&
           !(await isUserFollowing(contentList.user_id, userId)))
       ) {
-        return res.sendStatus(401);
+        return res.sendStatus(403);
       }
 
       return res.json({
@@ -227,20 +222,15 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) {
-        try {
-          await deleteFile(req.file.key);
-        } catch (error) {}
-        return res.sendStatus(401);
-      }
-
       const contentListId = req.params.id;
 
       if (isNaN(contentListId)) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.sendStatus(404);
+        return res
+          .status(400)
+          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const contentList = await knex('content_lists')
@@ -345,12 +335,12 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) return res.sendStatus(401);
-
       const contentListId = req.params.id;
 
       if (isNaN(contentListId)) {
-        return res.sendStatus(404);
+        return res
+          .status(400)
+          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const contentList = await knex('content_lists')

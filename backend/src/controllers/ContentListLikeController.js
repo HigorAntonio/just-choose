@@ -4,9 +4,6 @@ module.exports = {
   async create(req, res) {
     try {
       const userId = req.userId;
-      if (!userId) {
-        return res.sendStatus(401);
-      }
 
       const contentListId = req.params.id;
       if (!contentListId) {
@@ -55,9 +52,6 @@ module.exports = {
   async delete(req, res) {
     try {
       const userId = req.userId;
-      if (!userId) {
-        return res.sendStatus(401);
-      }
 
       const contentListId = req.params.id;
       if (!contentListId) {

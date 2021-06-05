@@ -7,9 +7,6 @@ module.exports = {
     let thumbnail;
     try {
       const userId = req.userId;
-      if (!userId) {
-        return res.sendStatus(401);
-      }
 
       const originalListId = req.params.id;
       if (!originalListId) {

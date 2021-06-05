@@ -5,10 +5,6 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      if (!userId) {
-        return res.sendStatus(401);
-      }
-
       const { contentId, type } = req.body;
       const pollId = req.params.id;
 
@@ -89,13 +85,10 @@ module.exports = {
   async delete(req, res) {
     try {
       const userId = req.userId;
-      if (!userId) {
-        return res.sendStatus(401);
-      }
 
       const pollId = req.params.id;
       if (isNaN(pollId)) {
-        return res.sendStatus(404);
+        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex('polls').where({ id: pollId }).first();
