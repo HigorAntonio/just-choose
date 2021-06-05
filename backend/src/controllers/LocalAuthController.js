@@ -8,6 +8,7 @@ const Queue = require('../lib/Queue');
 const { redisClient } = require('../server');
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const ACCESS_TOKEN_EXPIRATION_TIME = process.env.ACCESS_TOKEN_EXPIRATION_TIME;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 const CONFIRM_EMAIL_TOKEN_SECRET = process.env.CONFIRM_EMAIL_TOKEN_SECRET;
 const FORGOT_PASSWORD_TOKEN_SECRET = process.env.FORGOT_PASSWORD_TOKEN_SECRET;
@@ -23,7 +24,9 @@ const encryptPassword = (password) => {
 };
 
 const generateAccessToken = (params) => {
-  return jwt.sign(params, ACCESS_TOKEN_SECRET, { expiresIn: '24h' });
+  return jwt.sign(params, ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
+  });
 };
 
 const sendEmailConfimation = async (userId, email) => {
