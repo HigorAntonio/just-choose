@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Container } from './styles';
 
-const Home = () => {
+const Home = ({ wrapperRef }) => {
+  useEffect(() => {
+    // Posiciona o scroll no início da página
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
+  }, [wrapperRef]);
+
   return (
     <Container>
       <h1>Home</h1>

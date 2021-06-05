@@ -184,7 +184,6 @@ module.exports = {
         })),
       });
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },
@@ -250,7 +249,6 @@ module.exports = {
         updated_at: poll.updated_at,
       });
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },

@@ -172,7 +172,6 @@ module.exports = {
         })),
       });
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },

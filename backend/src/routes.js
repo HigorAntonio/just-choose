@@ -39,7 +39,7 @@ routes.get(
 );
 
 // UserController
-routes.get('/users', authorization, UserController.index);
+routes.get('/users', getLoggedUserId, UserController.index);
 
 // FollowUsersController
 routes.post(

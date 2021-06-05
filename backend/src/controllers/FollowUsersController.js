@@ -105,8 +105,6 @@ module.exports = {
           user_id: user.id,
           user_name: user.name,
           profile_image_url: user.profile_image_url,
-          created_at: user.created_at,
-          updated_at: user.updated_at,
         })),
       });
     } catch (error) {

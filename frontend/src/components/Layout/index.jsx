@@ -48,7 +48,11 @@ const Layout = () => {
           </NavBarWrapper>
           <ContentWrapper>
             <Switch>
-              <CustomRoute exact path="/" component={Home} />
+              <CustomRoute
+                exact
+                path="/"
+                component={() => <Home wrapperRef={bodyWrapperRef} />}
+              />
               <CustomRoute
                 isPrivate
                 exact

@@ -4,7 +4,7 @@ exports.up = async (knex) =>
   knex.schema
     .createTable('users', (table) => {
       table.increments('id').primary();
-      table.text('name').unique().notNullable();
+      table.text('name').unique().notNullable(); //TODO: O nome de usúario deve ter entre 4 e 25 caracteres
       table.text('email').unique().notNullable();
       table.text('profile_image_url');
       table.enu('method', ['local', 'twitch']).notNullable();

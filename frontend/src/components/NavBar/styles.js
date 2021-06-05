@@ -16,6 +16,73 @@ export const TopSide = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+
+  padding-right: 10px;
+  overflow-y: hidden;
+
+  &:hover {
+    overflow-y: auto;
+  }
+
+  /* Scrollbar on Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--search) var(--nav-bar);
+
+  &::-webkit-scrollbar-track {
+    background: var(--nav-bar);
+  }
+`;
+
+export const Navigation = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px 0;
+  border-bottom: 1px solid var(--search);
+
+  > a {
+    text-decoration: none;
+  }
+`;
+
+export const Following = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px 0;
+`;
+
+export const NavOption = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  height: 42px;
+
+  padding: 5px 10px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+  }
+
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  > div span {
+    font-size: 15px;
+    font-weight: 500;
+
+    margin-left: 10px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 export const Header = styled.div`
@@ -61,17 +128,16 @@ export const ProfileData = styled.div`
   display: flex;
   align-items: center;
 
+  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 
   > span {
     font-size: 15px;
     font-weight: 500;
-
-    margin-left: 10px;
-
     overflow: hidden;
     text-overflow: ellipsis;
+
+    margin-left: 10px;
   }
 `;
 
@@ -105,4 +171,10 @@ export const SearchUserInput = styled.input`
   transition: border 0.3s;
 
   background: var(--search);
+`;
+
+export const NoResults = styled.span`
+  padding: 10px;
+  font-size: 15px;
+  color: var(--gray);
 `;
