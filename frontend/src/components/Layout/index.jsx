@@ -12,6 +12,7 @@ import Header from '../Header';
 import NavBar from '../NavBar';
 import Home from '../../routes/Home';
 import CreateList from '../../routes/CreateList';
+import ShowList from '../../routes/ShowList';
 
 import {
   Container,
@@ -58,6 +59,12 @@ const Layout = () => {
                 exact
                 path="/list"
                 component={() => <CreateList wrapperRef={bodyWrapperRef} />}
+              />
+              <CustomRoute
+                isPrivate
+                exact
+                path="/list/:id"
+                component={() => <ShowList />}
               />
             </Switch>
           </ContentWrapper>
