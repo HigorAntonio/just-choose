@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import jwt_decode from 'jwt-decode';
 
 import justChooseApi from '../../apis/justChooseApi';
 
 const useAuth = () => {
   const [authenticated, setAuthenticated] = useState(false);
+  const [userId, setUserId] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,6 +15,8 @@ const useAuth = () => {
       justChooseApi.defaults.headers.Authorization = `Bearer ${JSON.parse(
         accessToken
       )}`;
+      const decoded = jwt_decode(accessToken);
+      setUserId(decoded.id);
       setAuthenticated(true);
     }
 
@@ -29,6 +33,8 @@ const useAuth = () => {
       localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
 
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
+      const decoded = jwt_decode(accessToken);
+      setUserId(decoded.id);
       setAuthenticated(true);
     } catch (error) {
       throw error;
@@ -45,6 +51,8 @@ const useAuth = () => {
       localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
 
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
+      const decoded = jwt_decode(accessToken);
+      setUserId(decoded.id);
       setAuthenticated(true);
     } catch (error) {
       throw error;
@@ -57,6 +65,7 @@ const useAuth = () => {
       const body = { refreshToken: JSON.parse(refreshToken) };
       await justChooseApi.delete('/logout', { data: body });
 
+      setUserId(null);
       setAuthenticated(false);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -69,6 +78,7 @@ const useAuth = () => {
 
   return {
     loading,
+    userId,
     authenticated,
     handleRegistration,
     handleLogin,

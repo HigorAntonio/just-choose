@@ -7,6 +7,7 @@ export const AuthContext = createContext();
 export const AuthContextProvider = (props) => {
   const {
     loading,
+    userId,
     authenticated,
     handleRegistration,
     handleLogin,
@@ -17,6 +18,7 @@ export const AuthContextProvider = (props) => {
     <AuthContext.Provider
       value={{
         loading,
+        userId,
         authenticated,
         handleRegistration,
         handleLogin,

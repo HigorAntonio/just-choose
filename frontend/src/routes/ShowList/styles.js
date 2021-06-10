@@ -44,8 +44,33 @@ export const HeaderButton = styled.div`
     background: var(--accent);
     cursor: pointer;
   }
+`;
 
-  transition: background 0.2s ease;
+export const HeaderDeleteButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  padding: 10px;
+  background: var(--search);
+
+  > svg {
+    fill: #eb0400;
+  }
+
+  > span {
+    margin-left: 10px;
+    font-size: 25px;
+  }
+
+  &:hover {
+    background: var(--warning);
+    cursor: pointer;
+
+    > svg {
+      fill: #fff;
+    }
+  }
 `;
 
 export const ListInfo = styled.div`

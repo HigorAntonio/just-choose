@@ -44,7 +44,7 @@ module.exports = {
         originalList.thumbnail.substring(`${process.env.APP_URL}/files/`.length)
       )}`;
 
-      await knex.transaction(async (trx) => {
+      const forkedListId = await knex.transaction(async (trx) => {
         const [{ id: contentListId }] = await trx('content_lists')
           .insert({
             user_id: userId,
@@ -79,9 +79,11 @@ module.exports = {
           original_list_id: originalList.id,
           forked_list_id: contentListId,
         });
+
+        return contentListId;
       });
 
-      return res.sendStatus(201);
+      return res.status(201).json({ forked_list_id: forkedListId });
     } catch (error) {
       try {
         await deleteFile(thumbnail);

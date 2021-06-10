@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import { FaHeart } from 'react-icons/fa';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaVoteYea } from 'react-icons/fa';
 import { BiGitRepoForked } from 'react-icons/bi';
+import { MdSettings } from 'react-icons/md';
+import { FaTrash } from 'react-icons/fa';
+
+import { AuthContext } from '../../context/AuthContext';
 
 import justChooseApi from '../../apis/justChooseApi';
 import ContentCardSimple from '../../components/ContentCardSimple';
@@ -15,6 +19,7 @@ import {
   HeaderRow,
   HeaderButtons,
   HeaderButton,
+  HeaderDeleteButton,
   ListInfo,
   Description,
   Filters,
@@ -103,7 +108,11 @@ const getFilteredContent = (content, contentTypes, typeFilter) => {
 };
 
 const ShowList = () => {
-  const { id } = useParams();
+  const { id: listId } = useParams();
+  const history = useHistory();
+
+  const { userId } = useContext(AuthContext);
+
   const [loading, setLoading] = useState(true);
   const [contentList, setContentList] = useState({});
   const [createdAt, setCreatedAt] = useState();
@@ -113,24 +122,35 @@ const ShowList = () => {
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [liked, setLiked] = useState();
 
+  const clearState = () => {
+    setContentList({});
+    setCreatedAt(null);
+    setContent([]);
+    setContentTypes([]);
+    setTypeFilter('all');
+    setShowTypeOptions(false);
+    setLiked(null);
+  };
+
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const { data } = await justChooseApi.get(`/contentlists/${id}`);
+        clearState();
+        const { data } = await justChooseApi.get(`/contentlists/${listId}`);
         setContentList(data);
         setCreatedAt(new Date(data.created_at));
         setContentTypes(['all', ...data.content_types]);
         const {
           data: { like },
-        } = await justChooseApi.get(`/contentlists/${id}/like`);
+        } = await justChooseApi.get(`/contentlists/${listId}/like`);
         setLiked(like);
         setLoading(false);
       } catch (error) {
         setLoading(false);
       }
     })();
-  }, [id]);
+  }, [listId]);
 
   useEffect(() => {
     JSON.stringify(contentList) !== '{}' &&
@@ -150,14 +170,14 @@ const ShowList = () => {
   const handleLike = async () => {
     try {
       if (!liked) {
-        await justChooseApi.post(`/contentlists/${id}/like`);
+        await justChooseApi.post(`/contentlists/${listId}/like`);
         setContentList((prevState) => ({
           ...prevState,
           likes: prevState.likes + 1,
         }));
       }
       if (liked) {
-        await justChooseApi.delete(`/contentlists/${id}/like`);
+        await justChooseApi.delete(`/contentlists/${listId}/like`);
         setContentList((prevState) => ({
           ...prevState,
           likes: prevState.likes - 1,
@@ -167,13 +187,22 @@ const ShowList = () => {
     } catch (error) {}
   };
 
+  const handleFork = async () => {
+    try {
+      const { data } = await justChooseApi.post(
+        `/contentlists/${listId}/fork/`
+      );
+      history.push(`/list/${data.forked_list_id}`);
+    } catch (error) {}
+  };
+
   return (
     <Container>
       <Header>
         <HeaderRow>
           <h1>{contentList.title}</h1>
-          <HeaderButtons title="Like">
-            <HeaderButton onClick={handleLike}>
+          <HeaderButtons>
+            <HeaderButton title="Like" onClick={handleLike}>
               {!liked && (
                 <FaRegHeart
                   size={'25px'}
@@ -186,7 +215,10 @@ const ShowList = () => {
               )}
               <span>{contentList.likes}</span>
             </HeaderButton>
-            <HeaderButton title="Criar uma cópia da lista para sua conta">
+            <HeaderButton
+              title="Criar uma cópia da lista para sua conta"
+              onClick={handleFork}
+            >
               <BiGitRepoForked
                 size={'25px'}
                 color="#fff"
@@ -194,9 +226,31 @@ const ShowList = () => {
               />
               <span>{contentList.forks}</span>
             </HeaderButton>
-            <HeaderButton title="Criar uma votação a partir da lista">
-              <FaVoteYea size={'25px'} color="#fff" style={{ flexShrink: 0 }} />
-            </HeaderButton>
+            {userId === contentList.user_id && (
+              <>
+                <HeaderButton title="Criar uma votação a partir da lista">
+                  <FaVoteYea
+                    size={'25px'}
+                    color="#fff"
+                    style={{ flexShrink: 0, margin: '0 5px' }}
+                  />
+                </HeaderButton>
+                <HeaderButton title="Editar lista">
+                  <MdSettings
+                    size={'25px'}
+                    color="#fff"
+                    style={{ flexShrink: 0, margin: '0 5px' }}
+                  />
+                </HeaderButton>
+                <HeaderDeleteButton title="Excluir lista">
+                  <FaTrash
+                    size={'25px'}
+                    color="#fff"
+                    style={{ flexShrink: 0, margin: '0 5px' }}
+                  />
+                </HeaderDeleteButton>
+              </>
+            )}
           </HeaderButtons>
         </HeaderRow>
         <ListInfo>
