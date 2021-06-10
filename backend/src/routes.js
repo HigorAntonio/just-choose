@@ -87,6 +87,12 @@ routes.post(
   isUserActive,
   ContentListLikeController.create
 );
+routes.get(
+  '/contentlists/:id/like',
+  authorization,
+  isUserActive,
+  ContentListLikeController.show
+);
 routes.delete(
   '/contentlists/:id/like',
   authorization,

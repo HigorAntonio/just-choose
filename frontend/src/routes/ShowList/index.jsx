@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { FaHeart } from 'react-icons/fa';
+import { FaRegHeart } from 'react-icons/fa';
+import { FaVoteYea } from 'react-icons/fa';
+import { BiGitRepoForked } from 'react-icons/bi';
 
 import justChooseApi from '../../apis/justChooseApi';
 import ContentCardSimple from '../../components/ContentCardSimple';
+import SingleOptionSelect from '../../components/SingleOptionSelect';
 
 import {
   Container,
   Header,
+  HeaderRow,
+  HeaderButtons,
+  HeaderButton,
   ListInfo,
   Description,
+  Filters,
+  TypeOptions,
+  Option,
   Main,
   ContentListContainer,
 } from './styles';
@@ -57,13 +68,50 @@ const getContentBaseUrl = (type) => {
   }
 };
 
+const getTypeOption = (type) => {
+  switch (type) {
+    case 'all':
+      return 'Todos';
+    case 'movie':
+      return 'Filmes';
+    case 'show':
+      return 'Séries';
+    case 'game':
+      return 'Jogos';
+    default:
+      return '';
+  }
+};
+
+const getFilteredContent = (content, contentTypes, typeFilter) => {
+  if (typeFilter === 'all') {
+    let filteredContent = [];
+    contentTypes.map(
+      (t) => (filteredContent = [...filteredContent, ...content[`${t}s`]])
+    );
+    return filteredContent;
+  }
+  if (typeFilter === 'movie') {
+    return content.movies;
+  }
+  if (typeFilter === 'show') {
+    return content.shows;
+  }
+  if (typeFilter === 'game') {
+    return content.games;
+  }
+};
+
 const ShowList = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [contentList, setContentList] = useState({});
   const [createdAt, setCreatedAt] = useState();
-  const [contentTypes, setContentTypes] = useState([]);
   const [content, setContent] = useState([]);
+  const [contentTypes, setContentTypes] = useState([]);
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [showTypeOptions, setShowTypeOptions] = useState(false);
+  const [liked, setLiked] = useState();
 
   useEffect(() => {
     (async () => {
@@ -72,10 +120,11 @@ const ShowList = () => {
         const { data } = await justChooseApi.get(`/contentlists/${id}`);
         setContentList(data);
         setCreatedAt(new Date(data.created_at));
-        setContentTypes(data.content_types);
-        data.content_types.map((t) =>
-          setContent((prevState) => [...prevState, ...data.content[`${t}s`]])
-        );
+        setContentTypes(['all', ...data.content_types]);
+        const {
+          data: { like },
+        } = await justChooseApi.get(`/contentlists/${id}/like`);
+        setLiked(like);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -83,14 +132,73 @@ const ShowList = () => {
     })();
   }, [id]);
 
+  useEffect(() => {
+    JSON.stringify(contentList) !== '{}' &&
+      setContent(
+        getFilteredContent(
+          contentList.content,
+          contentList.content_types,
+          typeFilter
+        )
+      );
+  }, [contentList, typeFilter]);
+
   // useEffect(() => console.debug('loading:', loading), [loading]);
   // useEffect(() => console.debug('contentList:', contentList), [contentList]);
   // useEffect(() => console.debug('content:', content), [content]);
 
+  const handleLike = async () => {
+    try {
+      if (!liked) {
+        await justChooseApi.post(`/contentlists/${id}/like`);
+        setContentList((prevState) => ({
+          ...prevState,
+          likes: prevState.likes + 1,
+        }));
+      }
+      if (liked) {
+        await justChooseApi.delete(`/contentlists/${id}/like`);
+        setContentList((prevState) => ({
+          ...prevState,
+          likes: prevState.likes - 1,
+        }));
+      }
+      setLiked((prevState) => !prevState);
+    } catch (error) {}
+  };
+
   return (
     <Container>
       <Header>
-        <h1>{contentList.title}</h1>
+        <HeaderRow>
+          <h1>{contentList.title}</h1>
+          <HeaderButtons title="Like">
+            <HeaderButton onClick={handleLike}>
+              {!liked && (
+                <FaRegHeart
+                  size={'25px'}
+                  color="#fff"
+                  style={{ flexShrink: 0 }}
+                />
+              )}
+              {liked && (
+                <FaHeart size={'25px'} color="#fff" style={{ flexShrink: 0 }} />
+              )}
+              <span>{contentList.likes}</span>
+            </HeaderButton>
+            <HeaderButton title="Criar uma cópia da lista para sua conta">
+              <BiGitRepoForked
+                size={'25px'}
+                color="#fff"
+                style={{ flexShrink: 0 }}
+              />
+              <span>{contentList.forks}</span>
+            </HeaderButton>
+            <HeaderButton title="Criar uma votação a partir da lista">
+              <FaVoteYea size={'25px'} color="#fff" style={{ flexShrink: 0 }} />
+            </HeaderButton>
+          </HeaderButtons>
+        </HeaderRow>
         <ListInfo>
           Criada em{' '}
           <span className="created-at">
@@ -111,6 +219,34 @@ const ShowList = () => {
           ad obcaecati quod explicabo deleniti nostrum, voluptatibus illo saepe.
           Est, hic? */}
         </Description>
+        <Filters>
+          {contentTypes.length > 2 && (
+            <>
+              <label>Tipo</label>
+              <SingleOptionSelect
+                label={!typeFilter ? 'Todos' : getTypeOption(typeFilter)}
+                dropDownAlign="center"
+                show={showTypeOptions}
+                setShow={setShowTypeOptions}
+                width="85px"
+              >
+                <TypeOptions>
+                  {contentTypes.map((t, i) => (
+                    <Option
+                      key={`typeFilter${i}`}
+                      onClick={() => {
+                        typeFilter !== t && setTypeFilter(t);
+                        setShowTypeOptions(false);
+                      }}
+                    >
+                      {getTypeOption(t)}
+                    </Option>
+                  ))}
+                </TypeOptions>
+              </SingleOptionSelect>
+            </>
+          )}
+        </Filters>
       </Header>
       <Main>
         {contentList.content && (
