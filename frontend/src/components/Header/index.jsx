@@ -3,7 +3,8 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { BiLogOut } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 
-import SignModal from '../SignModal';
+import Modal from '../Modal';
+import Sign from '../SignModal';
 
 import { AuthContext } from '../../context/AuthContext';
 
@@ -122,12 +123,13 @@ function Header() {
         </NavMenu>
       </NavMenuWrapper>
 
-      <SignModal
-        show={showSignModal}
-        setShow={setShowSignModal}
-        navOption={navOption}
-        setNavOption={setNavOption}
-      />
+      <Modal show={showSignModal} setShow={setShowSignModal}>
+        <Sign
+          setShow={setShowSignModal}
+          navOption={navOption}
+          setNavOption={setNavOption}
+        />
+      </Modal>
     </Container>
   );
 }

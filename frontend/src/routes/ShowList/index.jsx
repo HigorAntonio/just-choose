@@ -12,6 +12,8 @@ import { AuthContext } from '../../context/AuthContext';
 import justChooseApi from '../../apis/justChooseApi';
 import ContentCardSimple from '../../components/ContentCardSimple';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
+import Modal from '../../components/Modal';
+import DeleteListDialog from '../../components/DeleteListDialog';
 
 import {
   Container,
@@ -121,6 +123,8 @@ const ShowList = () => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [liked, setLiked] = useState();
+  const [showSignModal, setShowSignModal] = useState(false);
+  const [navOption, setNavOption] = useState('');
 
   const clearState = () => {
     setContentList({});
@@ -242,13 +246,22 @@ const ShowList = () => {
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderButton>
-                <HeaderDeleteButton title="Excluir lista">
+                <HeaderDeleteButton
+                  title="Excluir lista"
+                  onClick={() => setShowSignModal(true)}
+                >
                   <FaTrash
                     size={'25px'}
                     color="#fff"
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderDeleteButton>
+                <Modal show={showSignModal} setShow={setShowSignModal}>
+                  <DeleteListDialog
+                    createdBy={contentList.user_name}
+                    listTitle={contentList.title}
+                  />
+                </Modal>
               </>
             )}
           </HeaderButtons>
