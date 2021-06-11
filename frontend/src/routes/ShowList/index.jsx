@@ -8,8 +8,10 @@ import { MdSettings } from 'react-icons/md';
 import { FaTrash } from 'react-icons/fa';
 
 import { AuthContext } from '../../context/AuthContext';
+import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../apis/justChooseApi';
+import NotFound from '../../components/NotFound';
 import ContentCardSimple from '../../components/ContentCardSimple';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
@@ -114,8 +116,16 @@ const ShowList = () => {
   const history = useHistory();
 
   const { userId } = useContext(AuthContext);
+  const {
+    setMessage,
+    setSeverity,
+    setShow: setShowAlert,
+    duration: alertTimeout,
+    setDuration: setAlertTimeout,
+  } = useContext(AlertContext);
 
   const [loading, setLoading] = useState(true);
+  const [loadingError, setLoadingError] = useState(false);
   const [contentList, setContentList] = useState({});
   const [createdAt, setCreatedAt] = useState();
   const [content, setContent] = useState([]);
@@ -123,8 +133,7 @@ const ShowList = () => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [liked, setLiked] = useState();
-  const [showSignModal, setShowSignModal] = useState(false);
-  const [navOption, setNavOption] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const clearState = () => {
     setContentList({});
@@ -152,12 +161,15 @@ const ShowList = () => {
         setLoading(false);
       } catch (error) {
         setLoading(false);
+        if (error.response && error.response.status === 400) {
+          setLoadingError(true);
+        }
       }
     })();
   }, [listId]);
 
   useEffect(() => {
-    JSON.stringify(contentList) !== '{}' &&
+    if (JSON.stringify(contentList) !== '{}') {
       setContent(
         getFilteredContent(
           contentList.content,
@@ -165,11 +177,8 @@ const ShowList = () => {
           typeFilter
         )
       );
+    }
   }, [contentList, typeFilter]);
-
-  // useEffect(() => console.debug('loading:', loading), [loading]);
-  // useEffect(() => console.debug('contentList:', contentList), [contentList]);
-  // useEffect(() => console.debug('content:', content), [content]);
 
   const handleLike = async () => {
     try {
@@ -193,20 +202,64 @@ const ShowList = () => {
 
   const handleFork = async () => {
     try {
+      setLoading(true);
+      clearTimeout(alertTimeout);
+      setMessage('Por favor aguarde. Criando lista...');
+      setSeverity('info');
+      setShowAlert(true);
       const { data } = await justChooseApi.post(
         `/contentlists/${listId}/fork/`
       );
+      setLoading(false);
+      setMessage('Lista criada com sucesso.');
+      setSeverity('success');
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       history.push(`/list/${data.forked_list_id}`);
-    } catch (error) {}
+    } catch (error) {
+      setLoading(false);
+      setMessage('Não foi possível criar a lista. Por favor tente novamente.');
+      setSeverity('error');
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+    }
   };
 
+  const handleDelete = async () => {
+    try {
+      setShowDeleteDialog(false);
+      clearTimeout(alertTimeout);
+      setMessage('Por favor aguarde. Excluindo lista...');
+      setSeverity('info');
+      setShowAlert(true);
+      await justChooseApi.delete(`/contentlists/${listId}`);
+      setMessage('Lista excluída com sucesso.');
+      setSeverity('success');
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+      history.push('/');
+    } catch (error) {
+      setMessage(
+        'Não foi possível excluir a lista. Por favor tente novamente.'
+      );
+      setSeverity('error');
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+    }
+  };
+
+  if (loading) {
+    return null;
+  }
+  if (loadingError) {
+    return <NotFound />;
+  }
   return (
     <Container>
       <Header>
         <HeaderRow>
           <h1>{contentList.title}</h1>
           <HeaderButtons>
-            <HeaderButton title="Like" onClick={handleLike}>
+            <HeaderButton
+              title={liked ? 'Não gostei' : 'Gostei'}
+              onClick={handleLike}
+            >
               {!liked && (
                 <FaRegHeart
                   size={'25px'}
@@ -248,7 +301,7 @@ const ShowList = () => {
                 </HeaderButton>
                 <HeaderDeleteButton
                   title="Excluir lista"
-                  onClick={() => setShowSignModal(true)}
+                  onClick={() => setShowDeleteDialog(true)}
                 >
                   <FaTrash
                     size={'25px'}
@@ -256,10 +309,11 @@ const ShowList = () => {
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderDeleteButton>
-                <Modal show={showSignModal} setShow={setShowSignModal}>
+                <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
                   <DeleteListDialog
                     createdBy={contentList.user_name}
                     listTitle={contentList.title}
+                    handleDelete={handleDelete}
                   />
                 </Modal>
               </>
@@ -277,15 +331,7 @@ const ShowList = () => {
           </span>{' '}
           por <span className="created-by">{contentList.user_name}</span>
         </ListInfo>
-        <Description>
-          {contentList.description}
-          {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt quas
-          numquam ea vel vero quod illo ipsa dolore doloremque quidem!
-          Repudiandae quo sed minus praesentium autem soluta non enim iure
-          dolores in impedit natus expedita dolorem incidunt aspernatur delectus
-          ad obcaecati quod explicabo deleniti nostrum, voluptatibus illo saepe.
-          Est, hic? */}
-        </Description>
+        <Description>{contentList.description}</Description>
         <Filters>
           {contentTypes.length > 2 && (
             <>

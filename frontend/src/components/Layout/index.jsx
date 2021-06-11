@@ -8,11 +8,13 @@ import {
 
 import { AuthContext } from '../../context/AuthContext';
 
+import Alert from '../Alert';
 import Header from '../Header';
 import NavBar from '../NavBar';
 import Home from '../../routes/Home';
 import CreateList from '../../routes/CreateList';
 import ShowList from '../../routes/ShowList';
+import NotFound from '../../components/NotFound';
 
 import {
   Container,
@@ -48,6 +50,7 @@ const Layout = () => {
             <NavBar />
           </NavBarWrapper>
           <ContentWrapper>
+            <Alert />
             <Switch>
               <CustomRoute
                 exact
@@ -66,6 +69,7 @@ const Layout = () => {
                 path="/list/:id"
                 component={() => <ShowList />}
               />
+              <Route component={NotFound} />
             </Switch>
           </ContentWrapper>
         </BodyWrapper>

@@ -167,11 +167,13 @@ module.exports = async (contentListId) => {
     )
     .first();
 
-  Object.keys(contentList.content).map((type) => {
-    if (!contentList.content[type].length) {
-      delete contentList.content[type];
-    }
-  });
+  if (contentList) {
+    Object.keys(contentList.content).map((type) => {
+      if (!contentList.content[type].length) {
+        delete contentList.content[type];
+      }
+    });
+  }
 
   return contentList;
 };

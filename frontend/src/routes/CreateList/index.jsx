@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { GoSearch } from 'react-icons/go';
+
+import { AlertContext } from '../../context/AlertContext';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
@@ -11,7 +13,6 @@ import justChooseApi from '../../apis/justChooseApi';
 
 import {
   Container,
-  StatusAlert,
   Header,
   Main,
   LabelWrapper,
@@ -32,6 +33,14 @@ import {
 } from './styles';
 
 const CreateList = ({ wrapperRef }) => {
+  const {
+    setMessage,
+    setSeverity,
+    setShow: setShowAlert,
+    duration: alertTimeout,
+    setDuration: setAlertTimeout,
+  } = useContext(AlertContext);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnail, setThumbnail] = useState();
@@ -44,8 +53,6 @@ const CreateList = ({ wrapperRef }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [contentList, setContentList] = useState([]);
   const [showListPreview, setShowListPreview] = useState(false);
-  const [showStatusAlert, setShowStatusAlert] = useState(false);
-  const [statusAlertTimeout, setStatusAlertTimeout] = useState();
   const [creating, setCreating] = useState(false);
   const [errorOnCreate, setErrorOnCreate] = useState(false);
   const [titleError, setTitleError] = useState('');
@@ -78,6 +85,19 @@ const CreateList = ({ wrapperRef }) => {
       setRequestType('game');
     }
   }, [contentType]);
+
+  useEffect(() => {
+    if (creating) {
+      setSeverity('info');
+      setMessage('Por favor aguarde. Criando lista...');
+    } else if (errorOnCreate) {
+      setSeverity('error');
+      setMessage('Não foi possível criar a lista. Por favor tente novamente.');
+    } else {
+      setSeverity('success');
+      setMessage('Lista criada com sucesso.');
+    }
+  }, [creating, errorOnCreate, setMessage, setSeverity]);
 
   const clearForm = () => {
     setTitle('');
@@ -169,9 +189,9 @@ const CreateList = ({ wrapperRef }) => {
 
   const handleCreateList = async () => {
     setErrorOnCreate(false);
-    setShowStatusAlert(true);
+    setShowAlert(true);
     setCreating(true);
-    clearTimeout(statusAlertTimeout);
+    clearTimeout(alertTimeout);
 
     const isValid = validateFields();
     if (isValid) {
@@ -199,31 +219,14 @@ const CreateList = ({ wrapperRef }) => {
     }
 
     setCreating(false);
-    const timeout = setTimeout(() => setShowStatusAlert(false), 4000);
-    setStatusAlertTimeout(timeout);
+    setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
   };
 
-  const getStatusAlert = () => {
-    return creating ? 'creating' : errorOnCreate ? 'error' : 'success';
-  };
-
-  const getStatusAlertMessage = () => {
-    const status = getStatusAlert();
-    return status === 'creating'
-      ? 'Por favor aguarde. Criando lista...'
-      : status === 'error'
-      ? 'Não foi possível criar a lista. Por favor tente novamente.'
-      : 'Lista criada com sucesso.';
-  };
-
   return (
     <Container>
-      <StatusAlert status={getStatusAlert()} show={showStatusAlert}>
-        <p>{getStatusAlertMessage()}</p>
-      </StatusAlert>
       <Header>
         <h1>Nova Lista</h1>
       </Header>
