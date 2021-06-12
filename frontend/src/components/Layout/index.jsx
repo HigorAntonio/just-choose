@@ -27,7 +27,7 @@ import {
 const CustomRoute = ({ isPrivate, ...rest }) => {
   const { loading, authenticated } = useContext(AuthContext);
 
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) return null;
 
   if (isPrivate && !authenticated) {
     return <Redirect to="/" />;

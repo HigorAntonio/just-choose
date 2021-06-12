@@ -12,10 +12,12 @@ import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
+import AccessDenied from '../../components/AccessDenied';
 import ContentCardSimple from '../../components/ContentCardSimple';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import DeleteListDialog from '../../components/DeleteListDialog';
+import ShowListSkeleton from '../../components/Skeleton/ShowListSkeleton';
 
 import {
   Container,
@@ -126,6 +128,7 @@ const ShowList = () => {
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
+  const [denyAccess, setDenyAccess] = useState(false);
   const [contentList, setContentList] = useState({});
   const [createdAt, setCreatedAt] = useState();
   const [content, setContent] = useState([]);
@@ -136,6 +139,8 @@ const ShowList = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const clearState = () => {
+    setLoadingError(false);
+    setDenyAccess(false);
     setContentList({});
     setCreatedAt(null);
     setContent([]);
@@ -143,6 +148,7 @@ const ShowList = () => {
     setTypeFilter('all');
     setShowTypeOptions(false);
     setLiked(null);
+    setShowDeleteDialog(false);
   };
 
   useEffect(() => {
@@ -163,6 +169,9 @@ const ShowList = () => {
         setLoading(false);
         if (error.response && error.response.status === 400) {
           setLoadingError(true);
+        }
+        if (error.response && error.response.status === 403) {
+          setDenyAccess(true);
         }
       }
     })();
@@ -245,10 +254,13 @@ const ShowList = () => {
   };
 
   if (loading) {
-    return null;
+    return <ShowListSkeleton />;
   }
   if (loadingError) {
     return <NotFound />;
+  }
+  if (denyAccess) {
+    return <AccessDenied />;
   }
   return (
     <Container>
