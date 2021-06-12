@@ -246,8 +246,8 @@ export const ContentListHeader = styled.div`
   }
 `;
 
-export const ContentTypes = styled.div`
-  width: 150px;
+export const Options = styled.div`
+  ${(props) => props.width && `width: ${props.width};`};
   display: flex;
   flex-direction: column;
 
@@ -265,6 +265,15 @@ export const Option = styled.div`
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     cursor: pointer;
+  }
+`;
+
+export const SharingOption = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  > div + div {
+    font-size: 13px;
   }
 `;
 

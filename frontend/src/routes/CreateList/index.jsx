@@ -22,8 +22,9 @@ import {
   ThumbPreview,
   ContentListContainer,
   ContentListHeader,
-  ContentTypes,
+  Options,
   Option,
+  SharingOption,
   SearchWrapper,
   ContentListWrapper,
   CreationOptions,
@@ -31,6 +32,19 @@ import {
   PreviewButton,
   CreateButton,
 } from './styles';
+
+const getSharingOption = (type) => {
+  switch (type) {
+    case 'private':
+      return 'Privada';
+    case 'public':
+      return 'Pública';
+    case 'followed_profiles':
+      return 'Perfis seguidos';
+    default:
+      return '';
+  }
+};
 
 const CreateList = ({ wrapperRef }) => {
   const {
@@ -43,6 +57,9 @@ const CreateList = ({ wrapperRef }) => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [sharingOption, setSharingOption] = useState('');
+  const [showSharingOption, setShowSharingOption] = useState(false);
+  const [sharingOptionError, setSharingOptionError] = useState(false);
   const [thumbnail, setThumbnail] = useState();
   const [thumbPreview, setThumbPreview] = useState();
   const [thumbError, setThumbError] = useState('');
@@ -102,6 +119,7 @@ const CreateList = ({ wrapperRef }) => {
   const clearForm = () => {
     setTitle('');
     setDescription('');
+    setSharingOption('');
     setThumbnail(null);
     setThumbPreview(null);
     thumbInputFileRef.current.value = null;
@@ -162,12 +180,18 @@ const CreateList = ({ wrapperRef }) => {
 
   const validateFields = () => {
     setTitleError('');
+    setSharingOptionError('');
     setThumbError('');
     setContentError('');
     let isValid = true;
     if (!title) {
       setTitleError('Por favor, insira um título para a lista');
       isValid = false;
+    }
+    if (!sharingOption) {
+      setSharingOptionError(
+        'Por favor, selecione uma opção de compartilhamento para a lista'
+      );
     }
     if (!thumbnail) {
       setThumbError('Por favor, selecione uma miniatura para a lista');
@@ -198,6 +222,7 @@ const CreateList = ({ wrapperRef }) => {
       const data = {
         title,
         description,
+        sharingOption,
         content: contentList,
       };
 
@@ -261,6 +286,63 @@ const CreateList = ({ wrapperRef }) => {
               onChange={handleDescription}
             ></textarea>
           </InputWrapper>
+          <InputWrapper>
+            <LabelWrapper>
+              <label htmlFor="sharing-option">Opção de compartilhamento</label>
+            </LabelWrapper>
+            <div className="column">
+              <SingleOptionSelect
+                label={
+                  !sharingOption
+                    ? 'Selecionar'
+                    : getSharingOption(sharingOption)
+                }
+                dropDownAlign="left"
+                show={showSharingOption}
+                setShow={setShowSharingOption}
+                width="150px"
+              >
+                <Options>
+                  <Option
+                    onClick={() => {
+                      setSharingOption('public');
+                      setShowSharingOption(false);
+                    }}
+                  >
+                    <SharingOption>
+                      <div>Pública</div>
+                      <div>Todos podem pesquisar e ver</div>
+                    </SharingOption>
+                  </Option>
+                  <Option
+                    onClick={() => {
+                      setSharingOption('followed_profiles');
+                      setShowSharingOption(false);
+                    }}
+                  >
+                    <SharingOption>
+                      <div>Perfis seguidos</div>
+                      <div>Apenas perfis seguidos podem pesquisar e ver</div>
+                    </SharingOption>
+                  </Option>
+                  <Option
+                    onClick={() => {
+                      setSharingOption('private');
+                      setShowSharingOption(false);
+                    }}
+                  >
+                    <SharingOption>
+                      <div>Privada</div>
+                      <div>Só você pode ver</div>
+                    </SharingOption>
+                  </Option>
+                </Options>
+              </SingleOptionSelect>
+              {sharingOptionError && (
+                <p className="error">{sharingOptionError}</p>
+              )}
+            </div>
+          </InputWrapper>
         </div>
         <h3>Miniatura</h3>
         <div>
@@ -302,7 +384,7 @@ const CreateList = ({ wrapperRef }) => {
                     setShow={setShowContent}
                     width="75px"
                   >
-                    <ContentTypes>
+                    <Options width={'120px'}>
                       {contentTypesList.map((ct, i) => (
                         <Option
                           key={`contentTypesList${i}`}
@@ -314,7 +396,7 @@ const CreateList = ({ wrapperRef }) => {
                           {ct}
                         </Option>
                       ))}
-                    </ContentTypes>
+                    </Options>
                   </SingleOptionSelect>
                 </div>
                 {contentType && (
