@@ -14,6 +14,7 @@ import NavBar from '../NavBar';
 import Home from '../../routes/Home';
 import CreateList from '../../routes/CreateList';
 import ShowList from '../../routes/ShowList';
+import UpdateList from '../../routes/UpdateList';
 import NotFound from '../../components/NotFound';
 
 import {
@@ -67,7 +68,13 @@ const Layout = () => {
                 isPrivate
                 exact
                 path="/list/:id"
-                component={() => <ShowList />}
+                component={() => <ShowList wrapperRef={bodyWrapperRef} />}
+              />
+              <CustomRoute
+                isPrivate
+                exact
+                path="/list/:id/update"
+                component={() => <UpdateList wrapperRef={bodyWrapperRef} />}
               />
               <Route component={NotFound} />
             </Switch>

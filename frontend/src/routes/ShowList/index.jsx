@@ -113,7 +113,7 @@ const getFilteredContent = (content, contentTypes, typeFilter) => {
   }
 };
 
-const ShowList = () => {
+const ShowList = ({ wrapperRef }) => {
   const { id: listId } = useParams();
   const history = useHistory();
 
@@ -137,6 +137,12 @@ const ShowList = () => {
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [liked, setLiked] = useState();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  useEffect(() => {
+    // Posiciona o scroll no início da página
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
+  }, [wrapperRef]);
 
   const clearState = () => {
     setLoadingError(false);
@@ -209,11 +215,15 @@ const ShowList = () => {
     } catch (error) {}
   };
 
+  const handleUpdate = () => {
+    history.push(`/list/${listId}/update`);
+  };
+
   const handleFork = async () => {
     try {
       setLoading(true);
       clearTimeout(alertTimeout);
-      setMessage('Por favor aguarde. Criando lista...');
+      setMessage('Por favor, aguarde. Criando lista...');
       setSeverity('info');
       setShowAlert(true);
       const { data } = await justChooseApi.post(
@@ -226,7 +236,7 @@ const ShowList = () => {
       history.push(`/list/${data.forked_list_id}`);
     } catch (error) {
       setLoading(false);
-      setMessage('Não foi possível criar a lista. Por favor tente novamente.');
+      setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
       setSeverity('error');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     }
@@ -304,7 +314,7 @@ const ShowList = () => {
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderButton>
-                <HeaderButton title="Editar lista">
+                <HeaderButton title="Editar lista" onClick={handleUpdate}>
                   <MdSettings
                     size={'25px'}
                     color="#fff"

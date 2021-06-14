@@ -11,6 +11,7 @@ export const Container = styled.div`
   transform: translateY(-50%);
   font-size: 16px;
   font-weight: bold;
+  z-index: 1000;
   ${(props) =>
     props.severity === 'info'
       ? `background: var(--accent);`

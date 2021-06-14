@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import { GoSearch } from 'react-icons/go';
 
 import { AlertContext } from '../../context/AlertContext';
@@ -10,6 +11,8 @@ import GameFilters from '../../components/GameFilters';
 import ContentList from '../../components/ContentList';
 import ContentListPreview from '../../components/ContentListPreview';
 import justChooseApi from '../../apis/justChooseApi';
+import NotFound from '../../components/NotFound';
+import AccessDenied from '../../components/AccessDenied';
 
 import {
   Container,
@@ -46,7 +49,10 @@ const getSharingOption = (type) => {
   }
 };
 
-const CreateList = ({ wrapperRef }) => {
+const UpdateList = ({ wrapperRef }) => {
+  const { id: listId } = useParams();
+  const history = useHistory();
+
   const {
     setMessage,
     setSeverity,
@@ -55,6 +61,8 @@ const CreateList = ({ wrapperRef }) => {
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
 
+  const [loadingError, setLoadingError] = useState(false);
+  const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [sharingOption, setSharingOption] = useState('');
@@ -69,9 +77,9 @@ const CreateList = ({ wrapperRef }) => {
   const [params, setParams] = useState({});
   const [pageNumber, setPageNumber] = useState(1);
   const [contentList, setContentList] = useState([]);
-  const [showListPreview, setShowListPreview] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [errorOnCreate, setErrorOnCreate] = useState(false);
+  const [showListPreview, setShowListPreview] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [errorOnUpdate, setErrorOnUpdate] = useState(false);
   const [titleError, setTitleError] = useState('');
   const [contentError, setContentError] = useState('');
 
@@ -84,10 +92,48 @@ const CreateList = ({ wrapperRef }) => {
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
+    contentListWrapperRef.current.scrollTop = 0;
+    contentListWrapperRef.current.scrollLeft = 0;
   }, [wrapperRef]);
 
   useEffect(() => {
-    console.log(contentList);
+    (async () => {
+      try {
+        clearForm();
+        const { data } = await justChooseApi.get(`/contentlists/${listId}`);
+        setTitle(data.title);
+        setDescription(data.description);
+        setSharingOption(data.sharing_option);
+        setThumbPreview(data.thumbnail);
+        let content = [];
+        Object.keys(data.content).map(
+          (key) =>
+            (content = [
+              ...content,
+              ...data.content[key].map((c) => ({
+                contentId: c.content_platform_id,
+                poster:
+                  c.type === 'game'
+                    ? c.poster_path
+                    : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`,
+                title: c.title,
+                type: c.type,
+              })),
+            ])
+        );
+        setContentList(content);
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          setLoadingError(true);
+        }
+        if (error.response && error.response.status === 403) {
+          setDenyAccess(true);
+        }
+      }
+    })();
+  }, [listId]);
+
+  useEffect(() => {
     setContentError('');
   }, [contentList]);
 
@@ -104,17 +150,19 @@ const CreateList = ({ wrapperRef }) => {
   }, [contentType]);
 
   useEffect(() => {
-    if (creating) {
+    if (updating) {
       setSeverity('info');
-      setMessage('Por favor, aguarde. Criando lista...');
-    } else if (errorOnCreate) {
+      setMessage('Por favor, aguarde. Atualizando lista...');
+    } else if (errorOnUpdate) {
       setSeverity('error');
-      setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
+      setMessage(
+        'Não foi possível atualizar a lista. Por favor, tente novamente.'
+      );
     } else {
       setSeverity('success');
-      setMessage('Lista criada com sucesso.');
+      setMessage('Lista atualizada com sucesso.');
     }
-  }, [creating, errorOnCreate, setMessage, setSeverity]);
+  }, [updating, errorOnUpdate, setMessage, setSeverity]);
 
   const clearForm = () => {
     setTitle('');
@@ -125,7 +173,7 @@ const CreateList = ({ wrapperRef }) => {
     thumbInputFileRef.current.value = null;
     setContentType('');
     setContentList([]);
-    setShowListPreview(false);
+    setShowListPreview(true);
   };
 
   const handleTitle = (e) => {
@@ -193,10 +241,6 @@ const CreateList = ({ wrapperRef }) => {
         'Por favor, selecione uma opção de compartilhamento para a lista'
       );
     }
-    if (!thumbnail) {
-      setThumbError('Por favor, selecione uma miniatura para a lista');
-      isValid = false;
-    }
     if (contentList.length < 1) {
       setContentError('Por favor, selecione o conteúdo da lista');
       isValid = false;
@@ -211,10 +255,10 @@ const CreateList = ({ wrapperRef }) => {
     return isValid;
   };
 
-  const handleCreateList = async () => {
-    setErrorOnCreate(false);
+  const handleUpdateList = async () => {
+    setErrorOnUpdate(false);
     setShowAlert(true);
-    setCreating(true);
+    setUpdating(true);
     clearTimeout(alertTimeout);
 
     const isValid = validateFields();
@@ -227,33 +271,38 @@ const CreateList = ({ wrapperRef }) => {
       };
 
       const formData = new FormData();
-      formData.append('thumbnail', thumbnail);
+      if (thumbnail) {
+        formData.append('thumbnail', thumbnail);
+      }
       formData.append('data', JSON.stringify(data));
       try {
         await justChooseApi({
-          url: '/contentlists',
-          method: 'POST',
+          url: `/contentlists/${listId}`,
+          method: 'PUT',
           data: formData,
         });
-        clearForm();
       } catch (error) {
-        setErrorOnCreate(true);
+        setErrorOnUpdate(true);
       }
     } else {
-      setErrorOnCreate(true);
+      setErrorOnUpdate(true);
     }
 
-    setCreating(false);
+    setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
+    history.push(`/list/${listId}`);
   };
 
+  if (loadingError) {
+    return <NotFound />;
+  }
+  if (denyAccess) {
+    return <AccessDenied />;
+  }
   return (
     <Container>
       <Header>
-        <h1>Nova Lista</h1>
+        <h1>Editar Lista</h1>
       </Header>
       <Main>
         <h3>Principal</h3>
@@ -371,7 +420,7 @@ const CreateList = ({ wrapperRef }) => {
         </div>
         <h3>Conteúdo</h3>
         {contentError && <p className="error">{contentError}</p>}
-        <div className={!contentType ? null : 'content-list'}>
+        <div className="content-list">
           <ContentListContainer>
             <ContentListHeader>
               <div className="row">
@@ -446,47 +495,47 @@ const CreateList = ({ wrapperRef }) => {
                 </div>
               )}
             </ContentListHeader>
-            {contentType && (
-              <ContentListWrapper ref={contentListWrapperRef}>
-                {!showListPreview && (
-                  <ContentList
-                    requestType={requestType}
-                    contentType={contentType}
-                    params={params}
-                    pageNumber={pageNumber}
-                    setPageNumber={setPageNumber}
-                    contentList={contentList}
-                    setContentList={setContentList}
-                    wrapperRef={contentListWrapperRef}
-                  />
-                )}
-                {showListPreview && (
-                  <ContentListPreview
-                    contentType={contentType}
-                    contentList={contentList}
-                    setContentList={setContentList}
-                  />
-                )}
-              </ContentListWrapper>
-            )}
+
+            <ContentListWrapper ref={contentListWrapperRef}>
+              {!showListPreview && (
+                <ContentList
+                  requestType={requestType}
+                  contentType={contentType}
+                  params={params}
+                  pageNumber={pageNumber}
+                  setPageNumber={setPageNumber}
+                  contentList={contentList}
+                  setContentList={setContentList}
+                  wrapperRef={contentListWrapperRef}
+                />
+              )}
+              {showListPreview && (
+                <ContentListPreview
+                  contentType={contentType}
+                  contentList={contentList}
+                  setContentList={setContentList}
+                />
+              )}
+            </ContentListWrapper>
           </ContentListContainer>
-          {contentType && (
-            <CreationOptions>
-              <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
-              <div>
+
+          <CreationOptions>
+            <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
+            <div>
+              {contentType && (
                 <PreviewButton onClick={handlePreviewList}>
                   {showListPreview ? 'Todos os conteúdos' : 'Minha lista'}
                 </PreviewButton>
-                <CreateButton onClick={handleCreateList} disabled={creating}>
-                  Criar Lista
-                </CreateButton>
-              </div>
-            </CreationOptions>
-          )}
+              )}
+              <CreateButton onClick={handleUpdateList} disabled={updating}>
+                Aplicar alterações
+              </CreateButton>
+            </div>
+          </CreationOptions>
         </div>
       </Main>
     </Container>
   );
 };
 
-export default CreateList;
+export default UpdateList;
