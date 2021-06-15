@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { GoSearch } from 'react-icons/go';
+import { useParams, useHistory } from 'react-router-dom';
+import { ThemeProvider } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 
+import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
 
+import NotFound from '../../components/NotFound';
+import AccessDenied from '../../components/AccessDenied';
+import theme from '../../styles/materialUITheme';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
-import MovieFilters from '../../components/MovieFilters';
-import ShowFilters from '../../components/ShowFilters';
-import GameFilters from '../../components/GameFilters';
-import ContentList from '../../components/ContentList';
-import ContentListPreview from '../../components/ContentListPreview';
+import ContentCardSimple from '../../components/ContentCardSimple';
 import justChooseApi from '../../apis/justChooseApi';
 
 import {
@@ -21,16 +23,13 @@ import {
   ThumbnailWrapper,
   ThumbPreview,
   ContentListContainer,
-  ContentListHeader,
   Options,
   Option,
   SharingOption,
-  SearchWrapper,
   ContentListWrapper,
   CreationOptions,
-  ClearButton,
-  PreviewButton,
   CreateButton,
+  ContentList,
 } from './styles';
 
 const getSharingOption = (type) => {
@@ -46,7 +45,24 @@ const getSharingOption = (type) => {
   }
 };
 
-const CreateList = ({ wrapperRef }) => {
+const getContentBaseUrl = (type) => {
+  switch (type) {
+    case 'movie':
+      return process.env.REACT_APP_TMDB_MOVIE_URL;
+    case 'show':
+      return process.env.REACT_APP_TMDB_SHOW_URL;
+    case 'game':
+      return process.env.REACT_APP_RAWG_GAME_URL;
+    default:
+      return '';
+  }
+};
+
+const CreatePoll = ({ wrapperRef }) => {
+  const { id: listId } = useParams();
+  const history = useHistory();
+
+  const { userId } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -55,6 +71,8 @@ const CreateList = ({ wrapperRef }) => {
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
 
+  const [loadingError, setLoadingError] = useState(false);
+  const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [sharingOption, setSharingOption] = useState('');
@@ -63,56 +81,59 @@ const CreateList = ({ wrapperRef }) => {
   const [thumbnail, setThumbnail] = useState();
   const [thumbPreview, setThumbPreview] = useState();
   const [thumbError, setThumbError] = useState('');
-  const [contentType, setContentType] = useState('');
-  const [showContent, setShowContent] = useState(false);
-  const [requestType, setRequestType] = useState('');
-  const [params, setParams] = useState({});
-  const [pageNumber, setPageNumber] = useState(1);
   const [contentList, setContentList] = useState([]);
-  const [showListPreview, setShowListPreview] = useState(false);
   const [creating, setCreating] = useState(false);
   const [errorOnCreate, setErrorOnCreate] = useState(false);
   const [titleError, setTitleError] = useState('');
-  const [contentError, setContentError] = useState('');
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
-
-  const contentTypesList = ['Filme', 'Série', 'Jogo'];
 
   useEffect(() => {
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
+    contentListWrapperRef.current.scrollTop = 0;
+    contentListWrapperRef.current.scrollLeft = 0;
   }, [wrapperRef]);
 
   useEffect(() => {
-    console.log(contentList);
-    setContentError('');
-  }, [contentList]);
-
-  useEffect(() => {
-    setPageNumber(1);
-    setParams({});
-    if (contentType === 'Filme') {
-      setRequestType('movie');
-    } else if (contentType === 'Série') {
-      setRequestType('show');
-    } else if (contentType === 'Jogo') {
-      setRequestType('game');
-    }
-  }, [contentType]);
+    (async () => {
+      try {
+        clearForm();
+        const { data } = await justChooseApi.get(`/contentlists/${listId}`);
+        if (userId !== data.user_id) {
+          setDenyAccess(true);
+          return;
+        }
+        let content = [];
+        Object.keys(data.content).map(
+          (key) => (content = [...content, ...data.content[key]])
+        );
+        setContentList(content);
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          setLoadingError(true);
+        }
+        if (error.response && error.response.status === 403) {
+          setDenyAccess(true);
+        }
+      }
+    })();
+  }, [listId, userId]);
 
   useEffect(() => {
     if (creating) {
       setSeverity('info');
-      setMessage('Por favor, aguarde. Criando lista...');
+      setMessage('Por favor, aguarde. Criando votação...');
     } else if (errorOnCreate) {
       setSeverity('error');
-      setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
+      setMessage(
+        'Não foi possível criar a votação. Por favor, tente novamente.'
+      );
     } else {
       setSeverity('success');
-      setMessage('Lista criada com sucesso.');
+      setMessage('Votação criada com sucesso.');
     }
   }, [creating, errorOnCreate, setMessage, setSeverity]);
 
@@ -123,9 +144,7 @@ const CreateList = ({ wrapperRef }) => {
     setThumbnail(null);
     setThumbPreview(null);
     thumbInputFileRef.current.value = null;
-    setContentType('');
     setContentList([]);
-    setShowListPreview(false);
   };
 
   const handleTitle = (e) => {
@@ -153,65 +172,29 @@ const CreateList = ({ wrapperRef }) => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && e.target.value) {
-      if (contentType === 'Filme') {
-        setRequestType('movie-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Série') {
-        setRequestType('show-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Jogo') {
-        setRequestType('game');
-        setParams({ search: e.target.value });
-      }
-      setPageNumber(1);
-      setShowListPreview(false);
-    }
-  };
-
-  const handleClearList = () => {
-    setContentList([]);
-  };
-
-  const handlePreviewList = () => {
-    setShowListPreview((prevState) => !prevState);
-  };
-
   const validateFields = () => {
     setTitleError('');
     setSharingOptionError('');
     setThumbError('');
-    setContentError('');
     let isValid = true;
     if (!title) {
-      setTitleError('Por favor, insira um título para a lista');
+      setTitleError('Por favor, insira um título para a votação');
       isValid = false;
     }
     if (!sharingOption) {
       setSharingOptionError(
-        'Por favor, selecione uma opção de compartilhamento para a lista'
+        'Por favor, selecione uma opção de compartilhamento para a votação'
       );
     }
     if (!thumbnail) {
-      setThumbError('Por favor, selecione uma miniatura para a lista');
-      isValid = false;
-    }
-    if (contentList.length < 1) {
-      setContentError('Por favor, selecione o conteúdo da lista');
-      isValid = false;
-    }
-    if (contentList.length > 100) {
-      setContentError(
-        `Desculpe, a lista não pode ter mais que cem itens. Lista atual: ${contentList.length} itens`
-      );
+      setThumbError('Por favor, selecione uma miniatura para a votação');
       isValid = false;
     }
 
     return isValid;
   };
 
-  const handleCreateList = async () => {
+  const handleCreatePoll = async () => {
     setErrorOnCreate(false);
     setShowAlert(true);
     setCreating(true);
@@ -223,7 +206,7 @@ const CreateList = ({ wrapperRef }) => {
         title,
         description,
         sharingOption,
-        content: contentList,
+        contentListId: listId,
       };
 
       const formData = new FormData();
@@ -231,11 +214,10 @@ const CreateList = ({ wrapperRef }) => {
       formData.append('data', JSON.stringify(data));
       try {
         await justChooseApi({
-          url: '/contentlists',
+          url: '/polls',
           method: 'POST',
           data: formData,
         });
-        clearForm();
       } catch (error) {
         setErrorOnCreate(true);
       }
@@ -250,10 +232,16 @@ const CreateList = ({ wrapperRef }) => {
     wrapperRef.current.scrollLeft = 0;
   };
 
+  if (loadingError) {
+    return <NotFound />;
+  }
+  if (denyAccess) {
+    return <AccessDenied />;
+  }
   return (
     <Container>
       <Header>
-        <h1>Nova Lista</h1>
+        <h1>Nova Votação</h1>
       </Header>
       <Main>
         <h3>Principal</h3>
@@ -373,123 +361,53 @@ const CreateList = ({ wrapperRef }) => {
           </ThumbnailWrapper>
         </div>
         <h3>Conteúdo</h3>
-        {contentError && <p className="error">{contentError}</p>}
-        <div className={!contentType ? null : 'content-list'}>
+        <div className="content-list">
           <ContentListContainer>
-            <ContentListHeader>
-              <div className="row">
-                <div>
-                  <label>Tipo de conteúdo</label>
-                  <SingleOptionSelect
-                    label={!contentType ? 'Selecionar' : contentType}
-                    dropDownAlign="center"
-                    show={showContent}
-                    setShow={setShowContent}
-                    width="75px"
-                  >
-                    <Options width={'120px'}>
-                      {contentTypesList.map((ct, i) => (
-                        <Option
-                          key={`contentTypesList${i}`}
-                          onClick={() => {
-                            setContentType(ct);
-                            setShowContent(false);
-                          }}
-                        >
-                          {ct}
-                        </Option>
-                      ))}
-                    </Options>
-                  </SingleOptionSelect>
-                </div>
-                {contentType && (
-                  <SearchWrapper>
-                    <GoSearch
-                      size={15}
-                      color="#efeff1"
-                      style={{ flexShrink: 0 }}
-                    />
-                    <input
-                      type="search"
-                      id="search"
-                      placeholder="Buscar"
-                      onKeyPress={handleKeyPress}
-                    />
-                  </SearchWrapper>
-                )}
-              </div>
-              {contentType === 'Filme' && (
-                <div className="row">
-                  <MovieFilters
-                    setParams={setParams}
-                    setPageNumber={setPageNumber}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Série' && (
-                <div className="row">
-                  <ShowFilters
-                    setParams={setParams}
-                    setPageNumber={setPageNumber}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Jogo' && (
-                <div className="row">
-                  <GameFilters
-                    setParams={setParams}
-                    setPageNumber={setPageNumber}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-            </ContentListHeader>
-            {contentType && (
-              <ContentListWrapper ref={contentListWrapperRef}>
-                {!showListPreview && (
-                  <ContentList
-                    requestType={requestType}
-                    contentType={contentType}
-                    params={params}
-                    pageNumber={pageNumber}
-                    setPageNumber={setPageNumber}
-                    contentList={contentList}
-                    setContentList={setContentList}
-                    wrapperRef={contentListWrapperRef}
-                  />
-                )}
-                {showListPreview && (
-                  <ContentListPreview
-                    contentType={contentType}
-                    contentList={contentList}
-                    setContentList={setContentList}
-                  />
-                )}
-              </ContentListWrapper>
-            )}
+            <ContentListWrapper ref={contentListWrapperRef}>
+              <ContentList>
+                {contentList.length > 0 &&
+                  contentList.map((c, i) => {
+                    const src =
+                      c.type === 'game'
+                        ? c.poster_path
+                        : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
+                    const href = `${getContentBaseUrl(c.type)}/${
+                      c.content_platform_id
+                    }`;
+                    return (
+                      <div key={c.type + c.content_id} className="cardWrapper">
+                        <a href={href} target="blank">
+                          <ContentCardSimple src={src} title={c.title} />
+                        </a>
+                      </div>
+                    );
+                  })}
+                {contentList.length <= 0 &&
+                  [...Array(30).keys()].map((c) => (
+                    <div key={c} className="cardWrapper">
+                      <ThemeProvider theme={theme}>
+                        <Skeleton
+                          variant="rect"
+                          width={'100%'}
+                          height={'100%'}
+                        />
+                      </ThemeProvider>
+                    </div>
+                  ))}
+              </ContentList>
+            </ContentListWrapper>
           </ContentListContainer>
-          {contentType && (
-            <CreationOptions>
-              <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
-              <div>
-                <PreviewButton onClick={handlePreviewList}>
-                  {showListPreview ? 'Todos os conteúdos' : 'Minha lista'}
-                </PreviewButton>
-                <CreateButton onClick={handleCreateList} disabled={creating}>
-                  Criar Lista
-                </CreateButton>
-              </div>
-            </CreationOptions>
-          )}
+          <CreationOptions>
+            <div>
+              <CreateButton onClick={handleCreatePoll} disabled={creating}>
+                Criar Votação
+              </CreateButton>
+            </div>
+          </CreationOptions>
         </div>
       </Main>
     </Container>
   );
 };
 
-export default CreateList;
+export default CreatePoll;

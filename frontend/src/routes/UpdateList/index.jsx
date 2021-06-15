@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { GoSearch } from 'react-icons/go';
 
+import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
@@ -53,6 +54,7 @@ const UpdateList = ({ wrapperRef }) => {
   const { id: listId } = useParams();
   const history = useHistory();
 
+  const { userId } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -101,6 +103,10 @@ const UpdateList = ({ wrapperRef }) => {
       try {
         clearForm();
         const { data } = await justChooseApi.get(`/contentlists/${listId}`);
+        if (userId !== data.user_id) {
+          setDenyAccess(true);
+          return;
+        }
         setTitle(data.title);
         setDescription(data.description);
         setSharingOption(data.sharing_option);
@@ -131,7 +137,7 @@ const UpdateList = ({ wrapperRef }) => {
         }
       }
     })();
-  }, [listId]);
+  }, [listId, userId]);
 
   useEffect(() => {
     setContentError('');

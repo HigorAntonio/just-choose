@@ -215,10 +215,6 @@ const ShowList = ({ wrapperRef }) => {
     } catch (error) {}
   };
 
-  const handleUpdate = () => {
-    history.push(`/list/${listId}/update`);
-  };
-
   const handleFork = async () => {
     try {
       setLoading(true);
@@ -240,6 +236,14 @@ const ShowList = ({ wrapperRef }) => {
       setSeverity('error');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     }
+  };
+
+  const handlePoll = () => {
+    history.push(`/list/${listId}/poll`);
+  };
+
+  const handleUpdate = () => {
+    history.push(`/list/${listId}/update`);
   };
 
   const handleDelete = async () => {
@@ -307,7 +311,10 @@ const ShowList = ({ wrapperRef }) => {
             </HeaderButton>
             {userId === contentList.user_id && (
               <>
-                <HeaderButton title="Criar uma votação a partir da lista">
+                <HeaderButton
+                  title="Criar uma votação a partir da lista"
+                  onClick={handlePoll}
+                >
                   <FaVoteYea
                     size={'25px'}
                     color="#fff"
