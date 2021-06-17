@@ -82,6 +82,56 @@ module.exports = {
     }
   },
 
+  async show(req, res) {
+    try {
+      const userId = req.userId;
+
+      const pollId = req.params.id;
+      if (isNaN(pollId)) {
+        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
+      }
+
+      const poll = await knex('polls').where({ id: pollId }).first();
+      if (!poll) {
+        return res.status(400).json({ erro: 'Votação não encontrada' });
+      }
+      if (!poll.is_active) {
+        return res.status(403).json({ erro: 'Votação desativada' });
+      }
+
+      const contentTypes = (
+        await knex.select('name').from('content_types')
+      ).map((type) => type.name);
+
+      let vote;
+      for (const name of contentTypes) {
+        platform = name === 'game' ? 'rawg' : 'tmdb';
+        vote = await knex
+          .select(
+            'v.id',
+            'v.user_id',
+            `v.${name}_id as content_id`,
+            `c.${platform}_id as content_platform_id`,
+            knex.raw(`'${name}' as type`),
+            'v.poll_id',
+            'v.created_at',
+            'v.updated_at'
+          )
+          .from(`${name}_votes as v`)
+          .innerJoin(`${name}s as c`, 'c.id', `v.${name}_id`)
+          .where({ 'v.user_id': userId, 'v.poll_id': pollId })
+          .first();
+        if (vote) {
+          break;
+        }
+      }
+
+      return res.json(vote);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
   async delete(req, res) {
     try {
       const userId = req.userId;

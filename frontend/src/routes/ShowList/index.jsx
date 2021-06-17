@@ -250,7 +250,7 @@ const ShowList = ({ wrapperRef }) => {
     try {
       setShowDeleteDialog(false);
       clearTimeout(alertTimeout);
-      setMessage('Por favor aguarde. Excluindo lista...');
+      setMessage('Por favor, aguarde. Excluindo lista...');
       setSeverity('info');
       setShowAlert(true);
       await justChooseApi.delete(`/contentlists/${listId}`);
@@ -260,7 +260,7 @@ const ShowList = ({ wrapperRef }) => {
       history.push('/');
     } catch (error) {
       setMessage(
-        'Não foi possível excluir a lista. Por favor tente novamente.'
+        'Não foi possível excluir a lista. Por favor, tente novamente.'
       );
       setSeverity('error');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));

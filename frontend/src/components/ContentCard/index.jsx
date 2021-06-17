@@ -6,8 +6,8 @@ import { Container, Poster } from './styles';
 
 const ContentCard = ({ src, title, check, click }) => {
   const [error, setError] = useState(false);
-  const handleClick = () => {
-    click();
+  const handleClick = (e) => {
+    click(e);
   };
 
   useEffect(() => !src && setError(true), [src, setError]);

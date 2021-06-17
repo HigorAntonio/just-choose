@@ -138,7 +138,8 @@ module.exports = {
               'gv.game_id'
             );
         })
-        .orderBy('votes', 'desc');
+        .orderBy('votes', 'desc')
+        .orderBy('title', 'asc');
 
       const [{ total_votes }] = await knex
         .sum('count as total_votes')
