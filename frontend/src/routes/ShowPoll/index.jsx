@@ -245,7 +245,7 @@ const ShowPoll = ({ wrapperRef }) => {
       setSeverity('info');
       setShowAlert(true);
       const formData = new FormData();
-      formData.append('data', JSON.stringify({ is_active: !poll.is_active }));
+      formData.append('data', JSON.stringify({ isActive: !poll.is_active }));
       await justChooseApi({
         url: `/polls/${pollId}`,
         method: 'PUT',
@@ -276,11 +276,11 @@ const ShowPoll = ({ wrapperRef }) => {
   };
 
   const handleList = () => {
-    history.push(`/list/${poll.content_list_id}`);
+    history.push(`/lists/${poll.content_list_id}`);
   };
 
   const handleUpdate = () => {
-    // history.push(`/list/${pollId}/update`);
+    history.push(`/polls/${pollId}/update`);
   };
 
   const handleDelete = async () => {

@@ -17,6 +17,7 @@ import ShowList from '../../routes/ShowList';
 import UpdateList from '../../routes/UpdateList';
 import CreatePoll from '../../routes/CreatePoll';
 import ShowPoll from '../../routes/ShowPoll';
+import UpdatePoll from '../../routes/UpdatePoll';
 import NotFound from '../../components/NotFound';
 
 import {
@@ -69,26 +70,32 @@ const Layout = () => {
               <CustomRoute
                 isPrivate
                 exact
-                path="/list/:id"
+                path="/lists/:id"
                 component={() => <ShowList wrapperRef={bodyWrapperRef} />}
               />
               <CustomRoute
                 isPrivate
                 exact
-                path="/list/:id/update"
+                path="/lists/:id/update"
                 component={() => <UpdateList wrapperRef={bodyWrapperRef} />}
               />
               <CustomRoute
                 isPrivate
                 exact
-                path="/list/:id/poll"
+                path="/lists/:id/poll"
                 component={() => <CreatePoll wrapperRef={bodyWrapperRef} />}
               />
               <CustomRoute
                 isPrivate
                 exact
-                path="/poll/:id"
+                path="/polls/:id"
                 component={() => <ShowPoll wrapperRef={bodyWrapperRef} />}
+              />
+              <CustomRoute
+                isPrivate
+                exact
+                path="/polls/:id/update"
+                component={() => <UpdatePoll wrapperRef={bodyWrapperRef} />}
               />
               <Route component={NotFound} />
             </Switch>

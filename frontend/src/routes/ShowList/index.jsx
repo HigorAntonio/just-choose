@@ -229,7 +229,7 @@ const ShowList = ({ wrapperRef }) => {
       setMessage('Lista criada com sucesso.');
       setSeverity('success');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-      history.push(`/list/${data.forked_list_id}`);
+      history.push(`/lists/${data.forked_list_id}`);
     } catch (error) {
       setLoading(false);
       setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
@@ -239,11 +239,11 @@ const ShowList = ({ wrapperRef }) => {
   };
 
   const handlePoll = () => {
-    history.push(`/list/${listId}/poll`);
+    history.push(`/lists/${listId}/poll`);
   };
 
   const handleUpdate = () => {
-    history.push(`/list/${listId}/update`);
+    history.push(`/lists/${listId}/update`);
   };
 
   const handleDelete = async () => {

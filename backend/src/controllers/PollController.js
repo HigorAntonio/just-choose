@@ -290,7 +290,8 @@ module.exports = {
       const {
         title = poll.title,
         description = poll.description,
-        is_active = poll.is_active,
+        sharingOption = poll.sharing_option,
+        isActive = poll.is_active,
       } = JSON.parse(data);
 
       const thumbnail = req.file
@@ -306,7 +307,14 @@ module.exports = {
       if (description && typeof description !== 'string') {
         errors.push('Descrição da votação, valor inválido');
       }
-      if (is_active && typeof is_active !== 'boolean') {
+      if (
+        sharingOption !== 'private' &&
+        sharingOption !== 'public' &&
+        sharingOption !== 'followed_profiles'
+      ) {
+        errors.push('Opção de compartilhamento da votação, valor inválido');
+      }
+      if (isActive && typeof isActive !== 'boolean') {
         errors.push('Votação ativa, valor inválido');
       }
       if (errors.length > 0) {
@@ -317,7 +325,13 @@ module.exports = {
       }
 
       await knex('polls')
-        .update({ title, description, thumbnail, is_active })
+        .update({
+          title,
+          description,
+          thumbnail,
+          sharing_option: sharingOption,
+          is_active: isActive,
+        })
         .where({ id: pollId });
 
       if (req.file) {
@@ -328,6 +342,7 @@ module.exports = {
 
       return res.sendStatus(200);
     } catch (error) {
+      console.log(error);
       try {
         await deleteFile(req.file.key);
       } catch (error) {}

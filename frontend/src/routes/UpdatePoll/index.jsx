@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { GoSearch } from 'react-icons/go';
+import { ThemeProvider } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
 
-import SingleOptionSelect from '../../components/SingleOptionSelect';
-import MovieFilters from '../../components/MovieFilters';
-import ShowFilters from '../../components/ShowFilters';
-import GameFilters from '../../components/GameFilters';
-import ContentList from '../../components/ContentList';
-import ContentListPreview from '../../components/ContentListPreview';
-import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
 import AccessDenied from '../../components/AccessDenied';
+import theme from '../../styles/materialUITheme';
+import SingleOptionSelect from '../../components/SingleOptionSelect';
+import ContentCardSimple from '../../components/ContentCardSimple';
+import justChooseApi from '../../apis/justChooseApi';
 
 import {
   Container,
@@ -25,16 +23,13 @@ import {
   ThumbnailWrapper,
   ThumbPreview,
   ContentListContainer,
-  ContentListHeader,
   Options,
   Option,
   SharingOption,
-  SearchWrapper,
   ContentListWrapper,
   CreationOptions,
-  ClearButton,
-  PreviewButton,
   CreateButton,
+  ContentList,
 } from './styles';
 
 const getSharingOption = (type) => {
@@ -50,8 +45,21 @@ const getSharingOption = (type) => {
   }
 };
 
-const UpdateList = ({ wrapperRef }) => {
-  const { id: listId } = useParams();
+const getContentBaseUrl = (type) => {
+  switch (type) {
+    case 'movie':
+      return process.env.REACT_APP_TMDB_MOVIE_URL;
+    case 'show':
+      return process.env.REACT_APP_TMDB_SHOW_URL;
+    case 'game':
+      return process.env.REACT_APP_RAWG_GAME_URL;
+    default:
+      return '';
+  }
+};
+
+const UpdatePoll = ({ wrapperRef }) => {
+  const { id: pollId } = useParams();
   const history = useHistory();
 
   const { userId } = useContext(AuthContext);
@@ -66,6 +74,7 @@ const UpdateList = ({ wrapperRef }) => {
   const [loadingError, setLoadingError] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState('');
   const [description, setDescription] = useState('');
   const [sharingOption, setSharingOption] = useState('');
   const [showSharingOption, setShowSharingOption] = useState(false);
@@ -73,22 +82,13 @@ const UpdateList = ({ wrapperRef }) => {
   const [thumbnail, setThumbnail] = useState();
   const [thumbPreview, setThumbPreview] = useState();
   const [thumbError, setThumbError] = useState('');
-  const [contentType, setContentType] = useState('');
-  const [showContent, setShowContent] = useState(false);
-  const [requestType, setRequestType] = useState('');
-  const [params, setParams] = useState({});
-  const [pageNumber, setPageNumber] = useState(1);
+  const [contentListId, setContentListId] = useState('');
   const [contentList, setContentList] = useState([]);
-  const [showListPreview, setShowListPreview] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [errorOnUpdate, setErrorOnUpdate] = useState(false);
-  const [titleError, setTitleError] = useState('');
-  const [contentError, setContentError] = useState('');
+  const [errorOnCreate, setErrorOnCreate] = useState(false);
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
-
-  const contentTypesList = ['Filme', 'Série', 'Jogo'];
 
   useEffect(() => {
     // Posiciona o scroll no início da página
@@ -102,7 +102,7 @@ const UpdateList = ({ wrapperRef }) => {
     (async () => {
       try {
         clearForm();
-        const { data } = await justChooseApi.get(`/contentlists/${listId}`);
+        const { data } = await justChooseApi.get(`/polls/${pollId}`);
         if (userId !== data.user_id) {
           setDenyAccess(true);
           return;
@@ -111,23 +111,7 @@ const UpdateList = ({ wrapperRef }) => {
         setDescription(data.description);
         setSharingOption(data.sharing_option);
         setThumbPreview(data.thumbnail);
-        let content = [];
-        Object.keys(data.content).map(
-          (key) =>
-            (content = [
-              ...content,
-              ...data.content[key].map((c) => ({
-                contentId: c.content_platform_id,
-                poster:
-                  c.type === 'game'
-                    ? c.poster_path
-                    : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`,
-                title: c.title,
-                type: c.type,
-              })),
-            ])
-        );
-        setContentList(content);
+        setContentListId(data.content_list_id);
       } catch (error) {
         if (error.response && error.response.status === 400) {
           setLoadingError(true);
@@ -137,38 +121,50 @@ const UpdateList = ({ wrapperRef }) => {
         }
       }
     })();
-  }, [listId, userId]);
+  }, [pollId, userId]);
 
   useEffect(() => {
-    setContentError('');
-  }, [contentList]);
-
-  useEffect(() => {
-    setPageNumber(1);
-    setParams({});
-    if (contentType === 'Filme') {
-      setRequestType('movie');
-    } else if (contentType === 'Série') {
-      setRequestType('show');
-    } else if (contentType === 'Jogo') {
-      setRequestType('game');
-    }
-  }, [contentType]);
+    (async () => {
+      if (contentListId) {
+        try {
+          const { data } = await justChooseApi.get(
+            `/contentlists/${contentListId}`
+          );
+          if (userId !== data.user_id) {
+            setDenyAccess(true);
+            return;
+          }
+          let content = [];
+          Object.keys(data.content).map(
+            (key) => (content = [...content, ...data.content[key]])
+          );
+          setContentList(content);
+        } catch (error) {
+          if (error.response && error.response.status === 400) {
+            setLoadingError(true);
+          }
+          if (error.response && error.response.status === 403) {
+            setDenyAccess(true);
+          }
+        }
+      }
+    })();
+  }, [contentListId, userId]);
 
   useEffect(() => {
     if (updating) {
       setSeverity('info');
-      setMessage('Por favor, aguarde. Atualizando lista...');
-    } else if (errorOnUpdate) {
+      setMessage('Por favor, aguarde. Atualizando votação...');
+    } else if (errorOnCreate) {
       setSeverity('error');
       setMessage(
-        'Não foi possível atualizar a lista. Por favor, tente novamente.'
+        'Não foi possível atualizar a votação. Por favor, tente novamente.'
       );
     } else {
       setSeverity('success');
-      setMessage('Lista atualizada com sucesso.');
+      setMessage('Votação atualizada com sucesso.');
     }
-  }, [updating, errorOnUpdate, setMessage, setSeverity]);
+  }, [updating, errorOnCreate, setMessage, setSeverity]);
 
   const clearForm = () => {
     setTitle('');
@@ -176,10 +172,9 @@ const UpdateList = ({ wrapperRef }) => {
     setSharingOption('');
     setThumbnail(null);
     setThumbPreview(null);
+    setContentListId('');
     thumbInputFileRef.current.value = null;
-    setContentType('');
     setContentList([]);
-    setShowListPreview(true);
   };
 
   const handleTitle = (e) => {
@@ -207,62 +202,26 @@ const UpdateList = ({ wrapperRef }) => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && e.target.value) {
-      if (contentType === 'Filme') {
-        setRequestType('movie-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Série') {
-        setRequestType('show-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Jogo') {
-        setRequestType('game');
-        setParams({ search: e.target.value });
-      }
-      setPageNumber(1);
-      setShowListPreview(false);
-    }
-  };
-
-  const handleClearList = () => {
-    setContentList([]);
-  };
-
-  const handlePreviewList = () => {
-    setShowListPreview((prevState) => !prevState);
-  };
-
   const validateFields = () => {
     setTitleError('');
     setSharingOptionError('');
     setThumbError('');
-    setContentError('');
     let isValid = true;
     if (!title) {
-      setTitleError('Por favor, insira um título para a lista');
+      setTitleError('Por favor, insira um título para a votação');
       isValid = false;
     }
     if (!sharingOption) {
       setSharingOptionError(
-        'Por favor, selecione uma opção de compartilhamento para a lista'
+        'Por favor, selecione uma opção de compartilhamento para a votação'
       );
-    }
-    if (contentList.length < 1) {
-      setContentError('Por favor, selecione o conteúdo da lista');
-      isValid = false;
-    }
-    if (contentList.length > 100) {
-      setContentError(
-        `Desculpe, a lista não pode ter mais que cem itens. Lista atual: ${contentList.length} itens`
-      );
-      isValid = false;
     }
 
     return isValid;
   };
 
-  const handleUpdateList = async () => {
-    setErrorOnUpdate(false);
+  const handleUpdatePoll = async () => {
+    setErrorOnCreate(false);
     setShowAlert(true);
     setUpdating(true);
     clearTimeout(alertTimeout);
@@ -273,7 +232,6 @@ const UpdateList = ({ wrapperRef }) => {
         title,
         description,
         sharingOption,
-        content: contentList,
       };
 
       const formData = new FormData();
@@ -283,20 +241,20 @@ const UpdateList = ({ wrapperRef }) => {
       formData.append('data', JSON.stringify(data));
       try {
         await justChooseApi({
-          url: `/contentlists/${listId}`,
+          url: `/polls/${pollId}`,
           method: 'PUT',
           data: formData,
         });
       } catch (error) {
-        setErrorOnUpdate(true);
+        setErrorOnCreate(true);
       }
     } else {
-      setErrorOnUpdate(true);
+      setErrorOnCreate(true);
     }
 
     setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    history.push(`/lists/${listId}`);
+    history.push(`/polls/${pollId}`);
   };
 
   if (loadingError) {
@@ -308,7 +266,7 @@ const UpdateList = ({ wrapperRef }) => {
   return (
     <Container>
       <Header>
-        <h1>Editar Lista</h1>
+        <h1>Editar Votação</h1>
       </Header>
       <Main>
         <h3>Principal</h3>
@@ -361,6 +319,7 @@ const UpdateList = ({ wrapperRef }) => {
                   <Option
                     onClick={() => {
                       setSharingOption('public');
+                      setSharingOptionError(false);
                       setShowSharingOption(false);
                     }}
                   >
@@ -372,6 +331,7 @@ const UpdateList = ({ wrapperRef }) => {
                   <Option
                     onClick={() => {
                       setSharingOption('followed_profiles');
+                      setSharingOptionError(false);
                       setShowSharingOption(false);
                     }}
                   >
@@ -383,6 +343,7 @@ const UpdateList = ({ wrapperRef }) => {
                   <Option
                     onClick={() => {
                       setSharingOption('private');
+                      setSharingOptionError(false);
                       setShowSharingOption(false);
                     }}
                   >
@@ -425,115 +386,45 @@ const UpdateList = ({ wrapperRef }) => {
           </ThumbnailWrapper>
         </div>
         <h3>Conteúdo</h3>
-        {contentError && <p className="error">{contentError}</p>}
         <div className="content-list">
           <ContentListContainer>
-            <ContentListHeader>
-              <div className="row">
-                <div>
-                  <label>Tipo de conteúdo</label>
-                  <SingleOptionSelect
-                    label={!contentType ? 'Selecionar' : contentType}
-                    dropDownAlign="center"
-                    show={showContent}
-                    setShow={setShowContent}
-                    width="75px"
-                  >
-                    <Options width={'120px'}>
-                      {contentTypesList.map((ct, i) => (
-                        <Option
-                          key={`contentTypesList${i}`}
-                          onClick={() => {
-                            setContentType(ct);
-                            setShowContent(false);
-                          }}
-                        >
-                          {ct}
-                        </Option>
-                      ))}
-                    </Options>
-                  </SingleOptionSelect>
-                </div>
-                {contentType && (
-                  <SearchWrapper>
-                    <GoSearch
-                      size={15}
-                      color="#efeff1"
-                      style={{ flexShrink: 0 }}
-                    />
-                    <input
-                      type="search"
-                      id="search"
-                      placeholder="Buscar"
-                      onKeyPress={handleKeyPress}
-                    />
-                  </SearchWrapper>
-                )}
-              </div>
-              {contentType === 'Filme' && (
-                <div className="row">
-                  <MovieFilters
-                    setParams={setParams}
-                    setPageNumber={setPageNumber}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Série' && (
-                <div className="row">
-                  <ShowFilters
-                    setParams={setParams}
-                    setPageNumber={setPageNumber}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Jogo' && (
-                <div className="row">
-                  <GameFilters
-                    setParams={setParams}
-                    setPageNumber={setPageNumber}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-            </ContentListHeader>
-
             <ContentListWrapper ref={contentListWrapperRef}>
-              {!showListPreview && (
-                <ContentList
-                  requestType={requestType}
-                  contentType={contentType}
-                  params={params}
-                  pageNumber={pageNumber}
-                  setPageNumber={setPageNumber}
-                  contentList={contentList}
-                  setContentList={setContentList}
-                  wrapperRef={contentListWrapperRef}
-                />
-              )}
-              {showListPreview && (
-                <ContentListPreview
-                  contentType={contentType}
-                  contentList={contentList}
-                  setContentList={setContentList}
-                />
-              )}
+              <ContentList>
+                {contentList.length > 0 &&
+                  contentList.map((c, i) => {
+                    const src =
+                      c.type === 'game'
+                        ? c.poster_path
+                        : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
+                    const href = `${getContentBaseUrl(c.type)}/${
+                      c.content_platform_id
+                    }`;
+                    return (
+                      <div key={c.type + c.content_id} className="cardWrapper">
+                        <a href={href} target="blank">
+                          <ContentCardSimple src={src} title={c.title} />
+                        </a>
+                      </div>
+                    );
+                  })}
+                {contentList.length <= 0 &&
+                  [...Array(30).keys()].map((c) => (
+                    <div key={c} className="cardWrapper">
+                      <ThemeProvider theme={theme}>
+                        <Skeleton
+                          variant="rect"
+                          width={'100%'}
+                          height={'100%'}
+                        />
+                      </ThemeProvider>
+                    </div>
+                  ))}
+              </ContentList>
             </ContentListWrapper>
           </ContentListContainer>
-
           <CreationOptions>
-            <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
             <div>
-              {contentType && (
-                <PreviewButton onClick={handlePreviewList}>
-                  {showListPreview ? 'Todos os conteúdos' : 'Minha lista'}
-                </PreviewButton>
-              )}
-              <CreateButton onClick={handleUpdateList} disabled={updating}>
+              <CreateButton onClick={handleUpdatePoll} disabled={updating}>
                 Aplicar alterações
               </CreateButton>
             </div>
@@ -544,4 +435,4 @@ const UpdateList = ({ wrapperRef }) => {
   );
 };
 
-export default UpdateList;
+export default UpdatePoll;
