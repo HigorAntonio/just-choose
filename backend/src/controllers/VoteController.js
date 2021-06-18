@@ -1,4 +1,5 @@
 const knex = require('../database');
+const isUserFollowing = require('../utils/users/isUserFollowing');
 
 module.exports = {
   async create(req, res) {
@@ -31,6 +32,13 @@ module.exports = {
       const poll = await knex('polls').where({ id: pollId }).first();
       if (!poll) {
         return res.status(400).json({ erro: 'Votação não encontrada' });
+      }
+      if (
+        (poll.sharing_option === 'private' && poll.user_id !== userId) ||
+        (poll.sharing_option === 'followed_profiles' &&
+          !(await isUserFollowing(poll.user_id, userId)))
+      ) {
+        return res.sendStatus(403);
       }
       if (!poll.is_active) {
         return res.status(403).json({ erro: 'Votação desativada' });
@@ -94,9 +102,6 @@ module.exports = {
       const poll = await knex('polls').where({ id: pollId }).first();
       if (!poll) {
         return res.status(400).json({ erro: 'Votação não encontrada' });
-      }
-      if (!poll.is_active) {
-        return res.status(403).json({ erro: 'Votação desativada' });
       }
 
       const contentTypes = (

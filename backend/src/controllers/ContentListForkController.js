@@ -1,6 +1,7 @@
 const knex = require('../database');
 const copyFile = require('../utils/copyFile');
 const deleteFile = require('../utils/deleteFile');
+const isUserFollowing = require('../utils/users/isUserFollowing');
 
 module.exports = {
   async create(req, res) {
@@ -30,6 +31,15 @@ module.exports = {
         return res
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      if (
+        (originalList.sharing_option === 'private' &&
+          originalList.user_id !== userId) ||
+        (originalList.sharing_option === 'followed_profiles' &&
+          !(await isUserFollowing(originalList.user_id, userId)))
+      ) {
+        return res.sendStatus(403);
       }
 
       const originalListContentTypes = await knex

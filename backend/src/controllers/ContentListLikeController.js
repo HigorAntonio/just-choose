@@ -1,4 +1,5 @@
 const knex = require('../database');
+const isUserFollowing = require('../utils/users/isUserFollowing');
 
 module.exports = {
   async create(req, res) {
@@ -27,6 +28,15 @@ module.exports = {
         return res
           .status(400)
           .json({ erro: 'Lista de conteúdo não encontrada' });
+      }
+
+      if (
+        (contentList.sharing_option === 'private' &&
+          contentList.user_id !== userId) ||
+        (contentList.sharing_option === 'followed_profiles' &&
+          !(await isUserFollowing(contentList.user_id, userId)))
+      ) {
+        return res.sendStatus(403);
       }
 
       const like = await knex
