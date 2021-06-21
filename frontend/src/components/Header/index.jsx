@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { BiLogOut } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
@@ -21,8 +22,6 @@ import {
   NavMenu,
   NewListButton,
   NewListIcon,
-  NewPollButton,
-  NewPollIcon,
   Tooltip,
   SignIn,
   SignUp,
@@ -33,10 +32,12 @@ import {
 } from './styles';
 
 function Header() {
+  const history = useHistory();
   const { authenticated, handleLogout } = useContext(AuthContext);
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
+  const [search, setSearch] = useState('');
 
   const handleSignIn = () => {
     setShowSignModal(true);
@@ -54,6 +55,20 @@ function Header() {
     } catch (error) {}
   };
 
+  const searchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleSearch = () => {
+    history.push(`/search?query=${search}`);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && e.target.value) {
+      handleSearch();
+    }
+  };
+
   return (
     <Container>
       <LogoWrapper>
@@ -64,8 +79,14 @@ function Header() {
 
       <SearchWrapper>
         <SearchBar>
-          <SearchInput type="search" placeholder="Buscar" />
-          <SearchButton disabled>
+          <SearchInput
+            type="search"
+            placeholder="Buscar"
+            value={search}
+            onChange={searchChange}
+            onKeyPress={handleKeyPress}
+          />
+          <SearchButton disabled={!search} onClick={handleSearch}>
             <SearchIcon />
           </SearchButton>
         </SearchBar>
@@ -74,20 +95,12 @@ function Header() {
       <NavMenuWrapper>
         <NavMenu>
           {authenticated && (
-            <>
-              <Link to="/list">
-                <NewListButton>
-                  <NewListIcon />
-                  <Tooltip width="80px">Nova Lista</Tooltip>
-                </NewListButton>
-              </Link>
-              <Link to="">
-                <NewPollButton>
-                  <NewPollIcon />
-                  <Tooltip width="100px">Nova Votação</Tooltip>
-                </NewPollButton>
-              </Link>
-            </>
+            <Link to="/list">
+              <NewListButton>
+                <NewListIcon />
+                <Tooltip width="80px">Nova Lista</Tooltip>
+              </NewListButton>
+            </Link>
           )}
           {!authenticated && (
             <>

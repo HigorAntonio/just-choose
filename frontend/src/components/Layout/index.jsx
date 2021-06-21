@@ -17,6 +17,7 @@ import ShowList from '../../routes/ShowList';
 import UpdateList from '../../routes/UpdateList';
 import CreatePoll from '../../routes/CreatePoll';
 import ShowPoll from '../../routes/ShowPoll';
+import Search from '../../routes/Search';
 import UpdatePoll from '../../routes/UpdatePoll';
 import NotFound from '../../components/NotFound';
 
@@ -60,6 +61,11 @@ const Layout = () => {
                 exact
                 path="/"
                 component={() => <Home wrapperRef={bodyWrapperRef} />}
+              />
+              <CustomRoute
+                exact
+                path="/search"
+                component={() => <Search wrapperRef={bodyWrapperRef} />}
               />
               <CustomRoute
                 isPrivate
