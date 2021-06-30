@@ -1,8 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import { ThemeContext } from 'styled-components';
 import { BiLogOut } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
+import { HiDocumentAdd } from 'react-icons/hi';
+import { FiSearch } from 'react-icons/fi';
 
 import Modal from '../Modal';
 import Sign from '../SignModal';
@@ -18,10 +21,9 @@ import {
   SearchBar,
   SearchInput,
   SearchButton,
-  SearchIcon,
   NavMenu,
   NewListButton,
-  NewListIcon,
+  // NewListIcon,
   Tooltip,
   SignIn,
   SignUp,
@@ -33,6 +35,9 @@ import {
 
 function Header() {
   const history = useHistory();
+
+  const { title: theme } = useContext(ThemeContext);
+
   const { authenticated, handleLogout } = useContext(AuthContext);
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
@@ -73,7 +78,7 @@ function Header() {
     <Container>
       <LogoWrapper>
         <Link to="/">
-          <Logo />
+          <Logo theme={theme} />
         </Link>
       </LogoWrapper>
 
@@ -87,7 +92,7 @@ function Header() {
             onKeyPress={handleKeyPress}
           />
           <SearchButton disabled={!search} onClick={handleSearch}>
-            <SearchIcon />
+            <FiSearch size={25} style={{ flexShrink: 0 }} />
           </SearchButton>
         </SearchBar>
       </SearchWrapper>
@@ -97,7 +102,8 @@ function Header() {
           {authenticated && (
             <Link to="/list">
               <NewListButton>
-                <NewListIcon />
+                {/* <NewListIcon /> */}
+                <HiDocumentAdd size={25} style={{ flexShrink: 0 }} />
                 <Tooltip width="80px">Nova Lista</Tooltip>
               </NewListButton>
             </Link>
@@ -122,11 +128,7 @@ function Header() {
               {authenticated && (
                 <DropDownOption onClick={handleUserExit}>
                   <div className="align-left">
-                    <BiLogOut
-                      size={20}
-                      color="#fff"
-                      style={{ flexShrink: 0 }}
-                    />{' '}
+                    <BiLogOut size={20} style={{ flexShrink: 0 }} />{' '}
                   </div>
                   <div className="align-right">Sair</div>
                 </DropDownOption>

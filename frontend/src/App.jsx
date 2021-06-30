@@ -1,3 +1,6 @@
+import { ThemeProvider } from 'styled-components';
+
+import light from './styles/themes/light';
 import Layout from './components/Layout';
 import GlobalStyles from './styles/GlobalStyles';
 
@@ -6,12 +9,14 @@ import { AlertContextProvider } from './context/AlertContext';
 
 function App() {
   return (
-    <AuthContextProvider>
-      <AlertContextProvider>
-        <Layout />
-        <GlobalStyles />
-      </AlertContextProvider>
-    </AuthContextProvider>
+    <ThemeProvider theme={light}>
+      <AuthContextProvider>
+        <AlertContextProvider>
+          <Layout />
+          <GlobalStyles />
+        </AlertContextProvider>
+      </AuthContextProvider>
+    </ThemeProvider>
   );
 }
 

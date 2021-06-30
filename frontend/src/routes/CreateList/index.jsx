@@ -404,11 +404,7 @@ const CreateList = ({ wrapperRef }) => {
                 </div>
                 {contentType && (
                   <SearchWrapper>
-                    <GoSearch
-                      size={15}
-                      color="#efeff1"
-                      style={{ flexShrink: 0 }}
-                    />
+                    <GoSearch size={15} style={{ flexShrink: 0 }} />
                     <input
                       type="search"
                       id="search"

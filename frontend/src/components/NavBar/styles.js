@@ -9,7 +9,7 @@ export const Container = styled.div`
   width: 240px;
   height: 100%;
 
-  background: var(--nav-bar);
+  background: var(--background-500);
 `;
 
 export const TopSide = styled.div`
@@ -26,10 +26,10 @@ export const TopSide = styled.div`
 
   /* Scrollbar on Firefox */
   scrollbar-width: thin;
-  scrollbar-color: var(--search) var(--nav-bar);
+  scrollbar-color: var(--dark-gray) var(--background-500);
 
   &::-webkit-scrollbar-track {
-    background: var(--nav-bar);
+    background: var(--background-500);
   }
 `;
 
@@ -39,7 +39,7 @@ export const Navigation = styled.div`
   flex-direction: column;
 
   padding: 10px 0;
-  border-bottom: 1px solid var(--search);
+  border-bottom: 1px solid var(--background-900);
 
   > a {
     text-decoration: none;
@@ -62,7 +62,7 @@ export const NavOption = styled.div`
   padding: 5px 10px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--background-600);
     cursor: pointer;
   }
 
@@ -111,7 +111,7 @@ export const Profile = styled.div`
   padding: 5px 10px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--background-600);
     cursor: pointer;
   }
 `;
@@ -145,18 +145,28 @@ export const BottomSide = styled.div`
   width: 100%;
   padding: 10px;
 
-  border-top: 1px solid var(--search);
+  border-top: 1px solid var(--background-700);
 `;
 
-export const SearchUser = styled.div``;
+export const SearchUser = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+
+  > svg {
+    position: absolute;
+    left: 8.5px;
+  }
+`;
 
 export const SearchUserInput = styled.input`
   width: 100%;
   height: 30px;
 
-  border: 2px solid var(--search);
+  border: 2px solid var(--background-700);
   border-radius: 3px;
-  padding: 5px 10px;
+  padding: 5px 10px 5px 30px;
 
   outline: 0;
 
@@ -165,16 +175,16 @@ export const SearchUserInput = styled.input`
   }
 
   &:focus {
-    border: 2px solid var(--accent);
+    border: 2px solid var(--primary-400);
   }
 
   transition: border 0.3s;
 
-  background: var(--search);
+  background: var(--background-700);
 `;
 
 export const NoResults = styled.span`
   padding: 10px;
   font-size: 15px;
-  color: var(--gray);
+  color: var(--dark-gray);
 `;

@@ -1,12 +1,16 @@
 import styled, { css } from 'styled-components';
 
-import JustChooseLogo from '../../assets/JustChooseLogo.png';
+import JustChooseLogoLight from '../../assets/JustChooseLogoLight.svg';
+import JustChooseLogoDark from '../../assets/JustChooseLogoDark.svg';
 
 export const Logo = styled.img.attrs((props) => ({
-  src: props.src || JustChooseLogo,
+  src:
+    props.src ||
+    (props.theme === 'light' ? JustChooseLogoLight : JustChooseLogoDark),
   alt: props.alt || 'JustChose Logo',
 }))`
   height: 35px;
+  margin-left: 10px;
 
   &:hover {
     cursor: pointer;
@@ -17,7 +21,7 @@ export const Container = styled.div`
   width: 420px;
   max-width: 90vw;
   max-height: 90%;
-  background: var(--primary);
+  background: var(--background-100);
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -29,7 +33,8 @@ export const Container = styled.div`
 export const ModalHeader = styled.div``;
 
 const NavActiveCSS = css`
-  border-bottom: 2px solid var(--accent);
+  color: var(--primary-400);
+  border-bottom: 2px solid var(--primary-400);
 `;
 
 export const Nav = styled.div`
@@ -37,7 +42,7 @@ export const Nav = styled.div`
   display: flex;
   align-self: flex-start;
   margin-top: 10px;
-  border-bottom: 1px solid var(--search);
+  border-bottom: 1px solid var(--background-500);
 `;
 
 export const SignIn = styled.button`
@@ -87,17 +92,17 @@ export const Label = styled.label`
 
 export const Input = styled.input`
   width: 100%;
-  background: var(--search);
+  background: var(--background-500);
   padding: 5px 10px;
-  border: 2px solid var(--search);
+  border: 2px solid var(--background-500);
   border-radius: 5px;
   outline: none;
 
   &:hover {
-    border: 2px solid var(--gray);
+    border: 2px solid var(--background-900);
   }
   &:focus {
-    border: 2px solid var(--accent);
+    border: 2px solid var(--primary-400);
   }
 
   transition: border 0.3s;
@@ -108,19 +113,20 @@ export const SignFormButton = styled.button`
   width: 100%;
   padding: 7px;
   border-radius: 5px;
-  background: var(--accent);
+  color: var(--white);
+  background: var(--primary-400);
   outline: none;
   font-weight: bold;
 
   &:hover {
     cursor: pointer;
-    background: #0f6ba8d9;
+    background: var(--primary-500);
   }
 
   &:disabled {
     cursor: not-allowed;
-    background: rgba(256, 256, 256, 0.08);
-    color: #888;
+    background: var(--background-300);
+    color: var(--dark-gray);
   }
 `;
 
@@ -131,11 +137,11 @@ export const SignUpForm = styled.form``;
 export const FormErrors = styled.div`
   margin: 25px 0;
   padding: 10px;
-  border: 2px solid var(--warning);
   border-radius: 5px;
-  background: #ffffff1a;
+  background: var(--error);
 
   > p {
+    color: var(--white);
     text-align: center;
     font-weight: bold;
   }

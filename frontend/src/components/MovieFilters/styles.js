@@ -12,12 +12,12 @@ export const OrderByOptions = styled.div`
 
 export const Option = styled.div`
   width: 100%;
-  background: var(--search);
+  background: var(--background-400);
   padding: 10px;
   border-radius: 5px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;
@@ -65,7 +65,7 @@ export const RangeWrapper = styled.div`
   > div {
     display: flex;
     align-items: center;
-    background: var(--search);
+    background: var(--background-400);
     padding: 0 10px;
     border-radius: 5px;
 
@@ -92,7 +92,6 @@ const buttonCss = css`
   align-items: center;
   font-weight: bold;
   font-size: 14px;
-  color: var(--white);
   height: 31px;
   padding: 10px;
   border-radius: 5px;
@@ -102,20 +101,21 @@ const buttonCss = css`
 
 export const SearchButton = styled.button`
   ${buttonCss}
-  background: var(--accent);
+  color: var(--white);
+  background: var(--primary-400);
 
   &:hover {
-    background: #0f6ba8d9;
+    background: var(--primary-500);
     cursor: pointer;
   }
 `;
 
 export const ClearButton = styled.button`
   ${buttonCss}
-  background: var(--search-button);
+  background: var(--background-400);
 
   &:hover {
-    background: var(--search);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;

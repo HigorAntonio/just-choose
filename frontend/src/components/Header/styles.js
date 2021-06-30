@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
-import JustChooseLogo from '../../assets/JustChooseLogo.png';
-import SearchImage from '../../assets/SearchIcon.png';
+import JustChooseLogoLight from '../../assets/JustChooseLogoLight.svg';
+import JustChooseLogoDark from '../../assets/JustChooseLogoDark.svg';
 import NewList from '../../assets/NewList.png';
 import NewPoll from '../../assets/NewPoll.png';
 
@@ -11,9 +11,10 @@ export const Container = styled.div`
 
   height: 59px;
 
-  border-bottom: 3px solid var(--header-border);
+  background: var(--background-100);
 
-  background: var(--primary);
+  -webkit-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
 `;
 
 export const LogoWrapper = styled.div`
@@ -38,7 +39,9 @@ export const NavMenuWrapper = styled.div`
 `;
 
 export const Logo = styled.img.attrs((props) => ({
-  src: props.src || JustChooseLogo,
+  src:
+    props.src ||
+    (props.theme === 'light' ? JustChooseLogoLight : JustChooseLogoDark),
   alt: props.alt || 'JustChose Logo',
 }))`
   height: 35px;
@@ -64,12 +67,12 @@ export const SearchInput = styled.input`
   font-size: 14px;
   padding: 5px 10px;
   border-radius: 5px 0 0 5px;
-  border: 2px solid var(--search);
-  background: var(--search);
+  border: 2px solid var(--background-400);
+  background: var(--background-400);
   text-overflow: ellipsis;
 
   &::placeholder {
-    color: var(--white);
+    color: var(--text);
   }
 
   outline: 0;
@@ -79,7 +82,7 @@ export const SearchInput = styled.input`
   }
 
   &:focus {
-    border: 2px solid var(--accent);
+    border: 2px solid var(--primary-400);
   }
 
   transition: border 0.3s;
@@ -96,23 +99,16 @@ export const SearchButton = styled.button`
 
   margin-left: 1px;
 
-  background: var(--search-button);
+  background: var(--background-300);
 
   &:hover {
-    background: var(--search);
+    background: var(--background-500);
   }
 
   &:disabled {
-    background: var(--search-button);
+    background: var(--background-300);
     cursor: not-allowed;
   }
-`;
-
-export const SearchIcon = styled.img.attrs((props) => ({
-  src: props.src || SearchImage,
-  alt: props.alt || 'Buscar',
-}))`
-  width: 60%;
 `;
 
 export const NavMenu = styled.div`
@@ -139,7 +135,7 @@ const navButtonCss = css`
   outline: none;
 
   &:hover {
-    background: var(--search);
+    background: var(--background-500);
     cursor: pointer;
   }
   position: relative;
@@ -176,8 +172,8 @@ export const Tooltip = styled.span`
   opacity: 0;
   pointer-events: none;
   width: ${(props) => props.width || '120px'};
-  background-color: var(--white);
-  color: var(--black);
+  background-color: var(--tooltip);
+  color: var(--tooltip-text);
   text-align: center;
   border-radius: 6px;
   padding: 5px;
@@ -201,7 +197,7 @@ export const Tooltip = styled.span`
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent var(--white) transparent;
+    border-color: transparent transparent var(--tooltip) transparent;
   }
 
   ${NewListButton}:hover &,
@@ -216,7 +212,7 @@ const signButton = css`
   display: flex;
   align-items: center;
   font-weight: bold;
-  color: var(--white);
+  color: var(--text);
   height: 35px;
   padding: 10px;
   border-radius: 5px;
@@ -226,19 +222,20 @@ const signButton = css`
 
 export const SignIn = styled.button`
   ${signButton}
-  background: rgba(255, 255, 255, .2);
+  background: var(--background-300);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;
 
 export const SignUp = styled.button`
   ${signButton}
-  background: var(--accent);
+  color: var(--white);
+  background: var(--primary-400);
   &:hover {
-    background: #0f6ba8d9;
+    background: var(--primary-500);
     cursor: pointer;
   }
 `;
@@ -262,7 +259,7 @@ export const Profile = styled.div`
 
 export const ProfileDropDown = styled.div`
   width: 280px;
-  background: var(--primary);
+  background: var(--background-100);
   padding: 10px;
   border-radius: 5px;
   position: absolute;
@@ -298,7 +295,7 @@ export const DropDownOption = styled.div`
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;

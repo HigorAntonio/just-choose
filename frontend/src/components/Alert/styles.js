@@ -9,6 +9,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   transform: translateY(-50%);
+  color: var(--white);
   font-size: 16px;
   font-weight: bold;
   z-index: 1000;
@@ -16,7 +17,7 @@ export const Container = styled.div`
     props.severity === 'info'
       ? `background: var(--accent);`
       : props.severity === 'error'
-      ? `background: var(--warning);`
+      ? `background: var(--error);`
       : `background: var(--success);`}
   ${(props) =>
     props.show

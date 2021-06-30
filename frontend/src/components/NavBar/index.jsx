@@ -8,6 +8,7 @@ import React, {
 import { AiFillHome } from 'react-icons/ai';
 import { AiFillFire } from 'react-icons/ai';
 import { BsFillPeopleFill } from 'react-icons/bs';
+import { GoSearch } from 'react-icons/go';
 import { Link } from 'react-router-dom';
 
 import { AuthContext } from '../../context/AuthContext';
@@ -122,24 +123,20 @@ const NavBar = () => {
         <Navigation>
           <Link to="/">
             <NavOption title="Início">
-              <AiFillHome size={30} color="#fff" style={{ flexShrink: 0 }} />
+              <AiFillHome size={30} style={{ flexShrink: 0 }} />
               <div>
                 <span>Início</span>
               </div>
             </NavOption>
           </Link>
           <NavOption title="Populares">
-            <AiFillFire size={30} color="#fff" style={{ flexShrink: 0 }} />
+            <AiFillFire size={30} style={{ flexShrink: 0 }} />
             <div>
               <span>Populares</span>
             </div>
           </NavOption>
           <NavOption title="Seguindo">
-            <BsFillPeopleFill
-              size={30}
-              color="#fff"
-              style={{ flexShrink: 0 }}
-            />
+            <BsFillPeopleFill size={30} style={{ flexShrink: 0 }} />
             <div>
               <span>Seguindo</span>
             </div>
@@ -213,6 +210,7 @@ const NavBar = () => {
       {authenticated && (
         <BottomSide>
           <SearchUser>
+            <GoSearch size={15} style={{ flexShrink: 0 }} />
             <SearchUserInput
               type="text"
               placeholder="Adicionar amigos"

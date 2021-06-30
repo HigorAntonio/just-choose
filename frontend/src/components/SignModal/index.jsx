@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { ThemeContext } from 'styled-components';
 
 import InputToggleVisibility from '../InputToggleVisibility';
 
@@ -22,7 +23,9 @@ import {
 } from './styles';
 
 const SignModal = ({ setShow, navOption, setNavOption }) => {
+  const { title: theme } = useContext(ThemeContext);
   const { handleRegistration, handleLogin } = useContext(AuthContext);
+
   const [signUpName, setSignUpName] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
@@ -99,7 +102,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
   return (
     <Container>
       <ModalHeader>
-        <Logo />
+        <Logo theme={theme} />
       </ModalHeader>
       <Nav>
         <SignIn

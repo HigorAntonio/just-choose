@@ -6,7 +6,7 @@ export const Container = styled.div`
   > button {
     font-size: 16px;
     padding: 6px 30px 6px 10px;
-    background: var(--search);
+    background: var(--background-400);
     border-radius: 5px;
     position: relative;
     outline: none;
@@ -19,7 +19,7 @@ export const Container = styled.div`
     }
 
     &:hover {
-      background: rgba(255, 255, 255, 0.25);
+      background: var(--background-500);
       cursor: pointer;
     }
 
@@ -33,8 +33,8 @@ export const Container = styled.div`
 export const FilterDropDown = styled.div`
   display: flex;
   flex-direction: column;
-  background: var(--nav-bar);
-  border: 0.1px solid var(--search);
+  background: var(--background-100);
+  border: 0.1px solid var(--background-600);
   border-radius: 5px;
   padding: 10px;
   position: absolute;

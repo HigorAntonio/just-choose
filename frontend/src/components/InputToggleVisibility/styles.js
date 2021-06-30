@@ -1,8 +1,5 @@
 import styled from 'styled-components';
 
-import visible from '../../assets/visibleIcon.png';
-import invisible from '../../assets/invisibleIcon.png';
-
 export const Container = styled.div`
   width: 100%;
 `;
@@ -10,17 +7,17 @@ export const Container = styled.div`
 export const Input = styled.div`
   > input {
     width: 100%;
-    background: var(--search);
+    background: var(--background-500);
     padding: 5px 37px 5px 10px;
-    border: 2px solid var(--search);
+    border: 2px solid var(--background-500);
     border-radius: 5px;
     outline: none;
 
     &:hover {
-      border: 2px solid var(--gray);
+      border: 2px solid var(--background-900);
     }
     &:focus {
-      border: 2px solid var(--accent);
+      border: 2px solid var(--primary-400);
     }
 
     transition: border 0.3s;
@@ -36,20 +33,6 @@ export const Input = styled.div`
   }
 `;
 
-export const VisibleIcon = styled.img.attrs((props) => ({
-  src: props.src || visible,
-  alt: props.alt || 'Mostrar senha',
-}))`
-  height: 16px;
-`;
-
-export const InvisibleIcon = styled.img.attrs((props) => ({
-  src: props.src || invisible,
-  alt: props.alt || 'Esconder senha',
-}))`
-  height: 16px;
-`;
-
 export const ToggleVisibility = styled.span`
   width: 22px;
   height: 22px;
@@ -59,7 +42,7 @@ export const ToggleVisibility = styled.span`
   border-radius: 2px;
 
   &:hover {
-    background: #ffffff33;
+    background: var(--background-500);
     cursor: pointer;
   }
 `;

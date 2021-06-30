@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
+import { MdVisibility } from 'react-icons/md';
+import { MdVisibilityOff } from 'react-icons/md';
 
-import {
-  Container,
-  Input,
-  VisibleIcon,
-  InvisibleIcon,
-  ToggleVisibility,
-} from './styles';
+import { Container, Input, ToggleVisibility } from './styles';
 
 const InputToggleVisibility = (props) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +24,15 @@ const InputToggleVisibility = (props) => {
             onClick={handleTogglePassword}
             onMouseDown={(e) => e.preventDefault()}
           >
-            {showPassword ? <InvisibleIcon /> : <VisibleIcon />}
+            {showPassword ? (
+              <MdVisibilityOff
+                size={16}
+                color="#fff"
+                style={{ flexShrink: 0 }}
+              />
+            ) : (
+              <MdVisibility size={16} color="#fff" style={{ flexShrink: 0 }} />
+            )}
           </ToggleVisibility>
         </label>
         <input {...props} type={inputType} />

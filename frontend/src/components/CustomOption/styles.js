@@ -6,11 +6,11 @@ export const Container = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background: var(--search);
+  background: var(--background-400);
   border-radius: 5px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;
