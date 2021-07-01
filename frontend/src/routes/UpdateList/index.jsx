@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import { ThemeContext } from 'styled-components';
+import { ThemeProvider } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 import { GoSearch } from 'react-icons/go';
 
 import { AuthContext } from '../../context/AuthContext';
@@ -14,6 +17,9 @@ import ContentListPreview from '../../components/ContentListPreview';
 import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
 import AccessDenied from '../../components/AccessDenied';
+
+import mUILightTheme from '../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
 import {
   Container,
@@ -31,6 +37,7 @@ import {
   SharingOption,
   SearchWrapper,
   ContentListWrapper,
+  ContentListSkeleton,
   CreationOptions,
   ClearButton,
   PreviewButton,
@@ -62,7 +69,9 @@ const UpdateList = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
+  const { title: theme } = useContext(ThemeContext);
 
+  const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
@@ -101,6 +110,7 @@ const UpdateList = ({ wrapperRef }) => {
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
         clearForm();
         const { data } = await justChooseApi.get(`/contentlists/${listId}`);
         if (userId !== data.user_id) {
@@ -128,11 +138,14 @@ const UpdateList = ({ wrapperRef }) => {
             ])
         );
         setContentList(content);
+        setLoading(false);
       } catch (error) {
         if (error.response && error.response.status === 400) {
+          setLoading(false);
           setLoadingError(true);
         }
         if (error.response && error.response.status === 403) {
+          setLoading(false);
           setDenyAccess(true);
         }
       }
@@ -456,11 +469,7 @@ const UpdateList = ({ wrapperRef }) => {
                 </div>
                 {contentType && (
                   <SearchWrapper>
-                    <GoSearch
-                      size={15}
-                      color="#efeff1"
-                      style={{ flexShrink: 0 }}
-                    />
+                    <GoSearch size={15} style={{ flexShrink: 0 }} />
                     <input
                       type="search"
                       id="search"
@@ -503,7 +512,7 @@ const UpdateList = ({ wrapperRef }) => {
             </ContentListHeader>
 
             <ContentListWrapper ref={contentListWrapperRef}>
-              {!showListPreview && (
+              {!loading && !showListPreview && (
                 <ContentList
                   requestType={requestType}
                   contentType={contentType}
@@ -515,12 +524,29 @@ const UpdateList = ({ wrapperRef }) => {
                   wrapperRef={contentListWrapperRef}
                 />
               )}
-              {showListPreview && (
+              {!loading && showListPreview && (
                 <ContentListPreview
                   contentType={contentType}
                   contentList={contentList}
                   setContentList={setContentList}
                 />
+              )}
+              {loading && (
+                <ContentListSkeleton>
+                  {[...Array(30).keys()].map((c) => (
+                    <div key={c} className="cardWrapper">
+                      <ThemeProvider
+                        theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
+                      >
+                        <Skeleton
+                          variant="rect"
+                          width={'100%'}
+                          height={'100%'}
+                        />
+                      </ThemeProvider>
+                    </div>
+                  ))}
+                </ContentListSkeleton>
               )}
             </ContentListWrapper>
           </ContentListContainer>

@@ -4,7 +4,7 @@ export const Container = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.11);
+  background: var(--background-500);
   display: flex;
   align-items: center;
   justify-content: center;

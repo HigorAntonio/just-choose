@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
@@ -8,10 +9,12 @@ import { AlertContext } from '../../context/AlertContext';
 
 import NotFound from '../../components/NotFound';
 import AccessDenied from '../../components/AccessDenied';
-import theme from '../../styles/materialUITheme';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import ContentCardSimple from '../../components/ContentCardSimple';
 import justChooseApi from '../../apis/justChooseApi';
+
+import mUILightTheme from '../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
 import {
   Container,
@@ -70,6 +73,7 @@ const CreatePoll = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
+  const { title: theme } = useContext(ThemeContext);
 
   const [loadingError, setLoadingError] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
@@ -385,7 +389,9 @@ const CreatePoll = ({ wrapperRef }) => {
                 {contentList.length <= 0 &&
                   [...Array(30).keys()].map((c) => (
                     <div key={c} className="cardWrapper">
-                      <ThemeProvider theme={theme}>
+                      <ThemeProvider
+                        theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
+                      >
                         <Skeleton
                           variant="rect"
                           width={'100%'}

@@ -17,7 +17,7 @@ export const HeaderRow = styled.div`
 
 export const ListInfo = styled.div`
   font-size: 16px;
-  color: #999;
+  color: var(--dark-gray);
   margin: 30px 0;
 `;
 

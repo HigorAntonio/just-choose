@@ -6,13 +6,18 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.div`
-  background: var(--primary);
+  background: var(--background-100);
   font-size: 10px;
   padding: 20px;
+  position: relative;
+  z-index: 5000;
+
+  -webkit-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
 `;
 
 export const Main = styled.div`
-  background: var(--secondary);
+  background: var(--background-100);
   padding: 20px;
 
   > div + div {
@@ -21,9 +26,9 @@ export const Main = styled.div`
 
   > input {
     width: 100%;
-    background: var(--search);
+    background: var(--background-400);
     padding: 5px 10px;
-    border: 2px solid var(--search);
+    border: 2px solid var(--background-400);
     border-radius: 5px;
     outline: none;
     margin-top: 20px;
@@ -32,7 +37,7 @@ export const Main = styled.div`
       border: 2px solid var(--gray);
     }
     &:focus {
-      border: 2px solid var(--warning);
+      border: 2px solid var(--error);
     }
 
     transition: border 0.3s;
@@ -43,20 +48,21 @@ export const Main = styled.div`
     width: 100%;
     padding: 7px;
     border-radius: 5px;
-    background: var(--search-button);
+    background: var(--background-400);
     outline: none;
     font-weight: bold;
     font-size: 16px;
 
     &:hover {
       cursor: pointer;
-      background: var(--warning);
+      color: var(--white);
+      background: var(--error);
     }
 
     &:disabled {
       cursor: not-allowed;
-      background: rgba(256, 256, 256, 0.08);
-      color: #888;
+      background: var(--background-300);
+      color: var(--dark-gray);
     }
   }
 `;

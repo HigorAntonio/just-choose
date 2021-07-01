@@ -17,6 +17,7 @@ export const Container = styled.div`
       position: absolute;
       top: 7px;
       right: 10px;
+      flex-shrink: 0;
     }
 
     &:hover {

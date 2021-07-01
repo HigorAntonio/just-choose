@@ -1,5 +1,7 @@
 import { createMuiTheme } from '@material-ui/core';
 
+import dark from '../themes/dark';
+
 const theme = createMuiTheme({});
 
 theme.props = {
@@ -18,11 +20,11 @@ theme.props = {
 theme.overrides = {
   MuiTypography: {
     root: {
-      color: '#efeff1',
+      color: dark.colors.text,
       fontWeight: 'bold',
     },
     colorInherit: {
-      color: '#efeff1',
+      color: dark.colors.text,
     },
   },
   MuiFormControl: {
@@ -33,20 +35,20 @@ theme.overrides = {
   },
   MuiInput: {
     root: {
-      border: '2px solid #35495B',
+      border: `2px solid ${dark.colors['background-400']}`,
       borderRadius: '5px',
-      background: '#35495B',
+      background: `${dark.colors['background-400']}`,
       transition: 'border 0.3s',
       '&:hover': {
-        border: '2px solid #C4C4C4',
+        border: `2px solid ${dark.colors.gray}`,
       },
       '&$focused': {
-        border: '2px solid #0F6BA8',
+        border: `2px solid ${dark.colors['primary-400']}`,
       },
     },
     input: {
       padding: '5px 0 5px 5px',
-      color: '#efeff1',
+      color: dark.colors.text,
     },
   },
   MuiIconButton: {
@@ -60,30 +62,30 @@ theme.overrides = {
   },
   MuiSvgIcon: {
     root: {
-      fill: '#efeff1',
+      fill: dark.colors.text,
     },
   },
   MuiPaper: {
     root: {
-      backgroundColor: '#35495B',
+      backgroundColor: `${dark.colors['background-100']}`,
     },
   },
   MuiPickersCalendarHeader: {
     iconButton: {
-      backgroundColor: '#35495B',
+      backgroundColor: `${dark.colors['background-100']}`,
       '&:hover': {
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
       },
     },
     dayLabel: {
-      color: '#C4C4C4',
+      color: dark.colors['dark-gray'],
     },
   },
   MuiPickersDay: {
     daySelected: {
-      backgroundColor: '#0F6BA8',
+      backgroundColor: `${dark.colors['primary-400']}`,
       '&:hover': {
-        backgroundColor: '#0f6ba8d9',
+        backgroundColor: `${dark.colors['primary-500']}`,
       },
     },
   },
@@ -92,21 +94,21 @@ theme.overrides = {
       width: '250px',
     },
     rail: {
-      color: '#0F6BA8',
+      color: `${dark.colors['primary-400']}`,
     },
     track: {
-      color: '#0F6BA8',
+      color: `${dark.colors['primary-400']}`,
     },
     thumb: {
-      color: '#0F6BA8',
+      color: `${dark.colors['primary-400']}`,
     },
   },
   MuiTooltip: {
     tooltip: {
-      backgroundColor: '#0F6BA8',
+      backgroundColor: `${dark.colors['primary-400']}`,
     },
     arrow: {
-      color: '#0F6BA8',
+      color: `${dark.colors['primary-400']}`,
     },
   },
   MuiSkeleton: {

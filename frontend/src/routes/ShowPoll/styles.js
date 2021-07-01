@@ -33,7 +33,7 @@ export const HeaderButton = styled.div`
   justify-content: center;
   border-radius: 5px;
   padding: 10px;
-  background: var(--search);
+  background: var(--background-600);
 
   > span {
     margin-left: 10px;
@@ -41,8 +41,16 @@ export const HeaderButton = styled.div`
   }
 
   &:hover {
-    background: var(--accent);
+    background: var(--tooltip);
     cursor: pointer;
+
+    > span {
+      color: var(--tooltip-text);
+    }
+
+    > svg {
+      fill: var(--tooltip-text);
+    }
   }
 `;
 
@@ -52,10 +60,10 @@ export const HeaderDeleteButton = styled.div`
   justify-content: center;
   border-radius: 5px;
   padding: 10px;
-  background: var(--search);
+  background: var(--background-600);
 
   > svg {
-    fill: #eb0400;
+    fill: var(--error);
   }
 
   > span {
@@ -64,18 +72,18 @@ export const HeaderDeleteButton = styled.div`
   }
 
   &:hover {
-    background: var(--warning);
+    background: var(--error);
     cursor: pointer;
 
     > svg {
-      fill: #fff;
+      fill: var(--white);
     }
   }
 `;
 
 export const ListInfo = styled.div`
   font-size: 16px;
-  color: #999;
+  color: var(--dark-gray);
   margin: 30px 0;
 `;
 
@@ -108,12 +116,12 @@ export const TypeOptions = styled.div`
 
 export const Option = styled.div`
   width: 100%;
-  background: var(--search);
+  background: var(--background-400);
   padding: 10px;
   border-radius: 5px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;
@@ -152,8 +160,8 @@ export const ResultContainer = styled.div`
   flex-direction: column;
   width: 90%;
   max-width: 900px;
-  background: var(--nav-bar);
-  border: 0.1px solid var(--search);
+  background: var(--background-100);
+  border: 0.1px solid var(--background-600);
   border-radius: 5px;
 `;
 
@@ -162,7 +170,7 @@ export const ResultHeader = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 20px;
-  border-bottom: 0.1px solid var(--search);
+  border-bottom: 0.1px solid var(--background-600);
 
   > div h2 {
     font-size: 20px;
@@ -203,7 +211,7 @@ export const ResultBody = styled.div`
     }
 
     &:hover > div {
-      background: rgba(255, 255, 255, 0.25);
+      background: var(--background-600);
     }
   }
 
@@ -212,7 +220,7 @@ export const ResultBody = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--search);
+    background: var(--background-500);
     border-radius: 5px 0 0 5px;
     font-weight: bold;
     font-size: 40px;
@@ -221,7 +229,7 @@ export const ResultBody = styled.div`
   .bodyTitle {
     width: 65%;
     display: flex;
-    background: var(--search);
+    background: var(--background-500);
     margin: 0 15px;
 
     > span {
@@ -236,7 +244,7 @@ export const ResultBody = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--search);
+    background: var(--background-500);
     border-radius: 0 5px 5px 0;
     font-weight: bold;
     font-size: 40px;

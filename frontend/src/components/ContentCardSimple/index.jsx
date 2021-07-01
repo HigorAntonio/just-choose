@@ -11,7 +11,7 @@ const ContentCardSimple = ({ src, title }) => {
   return (
     <Container title={title}>
       <Poster src={src} alt="" onError={() => setError(true)} error={error} />
-      {error && <BsImage size={'50%'} color="#fff" style={{ flexShrink: 0 }} />}
+      {error && <BsImage size={'50%'} style={{ flexShrink: 0 }} />}
     </Container>
   );
 };

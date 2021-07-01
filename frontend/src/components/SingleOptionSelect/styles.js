@@ -6,7 +6,8 @@ export const Container = styled.div`
   > button {
     font-size: 16px;
     padding: 6px 30px 6px 10px;
-    background: var(--background-400);
+    background: ${(props) =>
+      props.background ? props.background : `var(--background-400)`};
     border-radius: 5px;
     position: relative;
     outline: none;
@@ -16,10 +17,12 @@ export const Container = styled.div`
       position: absolute;
       top: 7px;
       right: 10px;
+      flex-shrink: 0;
     }
 
     &:hover {
-      background: var(--background-500);
+      background: ${(props) =>
+        props.hover ? props.hover : `var(--background-500)`};
       cursor: pointer;
     }
 

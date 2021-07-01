@@ -33,7 +33,7 @@ export const HeaderButton = styled.div`
   justify-content: center;
   border-radius: 5px;
   padding: 10px;
-  background: var(--search);
+  background: var(--background-600);
 
   > span {
     margin-left: 10px;
@@ -41,8 +41,16 @@ export const HeaderButton = styled.div`
   }
 
   &:hover {
-    background: var(--accent);
+    background: var(--tooltip);
     cursor: pointer;
+
+    > span {
+      color: var(--tooltip-text);
+    }
+
+    > svg {
+      fill: var(--tooltip-text);
+    }
   }
 `;
 
@@ -52,10 +60,10 @@ export const HeaderDeleteButton = styled.div`
   justify-content: center;
   border-radius: 5px;
   padding: 10px;
-  background: var(--search);
+  background: var(--background-600);
 
   > svg {
-    fill: #eb0400;
+    fill: var(--error);
   }
 
   > span {
@@ -64,18 +72,18 @@ export const HeaderDeleteButton = styled.div`
   }
 
   &:hover {
-    background: var(--warning);
+    background: var(--error);
     cursor: pointer;
 
     > svg {
-      fill: #fff;
+      fill: var(--white);
     }
   }
 `;
 
 export const ListInfo = styled.div`
   font-size: 16px;
-  color: #999;
+  color: var(--dark-gray);
   margin: 30px 0;
 `;
 
@@ -108,12 +116,12 @@ export const TypeOptions = styled.div`
 
 export const Option = styled.div`
   width: 100%;
-  background: var(--search);
+  background: var(--background-400);
   padding: 10px;
   border-radius: 5px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;

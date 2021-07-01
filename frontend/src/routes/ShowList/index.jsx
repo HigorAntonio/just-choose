@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import { ThemeContext } from 'styled-components';
 import { FaHeart } from 'react-icons/fa';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaVoteYea } from 'react-icons/fa';
@@ -125,6 +126,7 @@ const ShowList = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
+  const { colors } = useContext(ThemeContext);
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -286,27 +288,15 @@ const ShowList = ({ wrapperRef }) => {
               title={liked ? 'Não gostei' : 'Gostei'}
               onClick={handleLike}
             >
-              {!liked && (
-                <FaRegHeart
-                  size={'25px'}
-                  color="#fff"
-                  style={{ flexShrink: 0 }}
-                />
-              )}
-              {liked && (
-                <FaHeart size={'25px'} color="#fff" style={{ flexShrink: 0 }} />
-              )}
+              {!liked && <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />}
+              {liked && <FaHeart size={'25px'} style={{ flexShrink: 0 }} />}
               <span>{contentList.likes}</span>
             </HeaderButton>
             <HeaderButton
               title="Criar uma cópia da lista para sua conta"
               onClick={handleFork}
             >
-              <BiGitRepoForked
-                size={'25px'}
-                color="#fff"
-                style={{ flexShrink: 0 }}
-              />
+              <BiGitRepoForked size={'25px'} style={{ flexShrink: 0 }} />
               <span>{contentList.forks}</span>
             </HeaderButton>
             {userId === contentList.user_id && (
@@ -317,14 +307,12 @@ const ShowList = ({ wrapperRef }) => {
                 >
                   <FaVoteYea
                     size={'25px'}
-                    color="#fff"
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderButton>
                 <HeaderButton title="Editar lista" onClick={handleUpdate}>
                   <MdSettings
                     size={'25px'}
-                    color="#fff"
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderButton>
@@ -334,7 +322,6 @@ const ShowList = ({ wrapperRef }) => {
                 >
                   <FaTrash
                     size={'25px'}
-                    color="#fff"
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderDeleteButton>
@@ -371,6 +358,8 @@ const ShowList = ({ wrapperRef }) => {
                 show={showTypeOptions}
                 setShow={setShowTypeOptions}
                 width="85px"
+                background={colors['background-600']}
+                hover={colors['background-700']}
               >
                 <TypeOptions>
                   {contentTypes.map((t, i) => (

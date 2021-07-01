@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import theme from '../../styles/materialUITheme';
+import mUILightTheme from '../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
-const ValueLabelComponent = (props) => {
-  const { children, open, value } = props;
-
+const ValueLabelComponent = ({ children, open, value }) => {
   return (
     <Tooltip open={open} enterTouchDelay={0} placement="top" title={value}>
       {children}
@@ -16,12 +16,14 @@ const ValueLabelComponent = (props) => {
 };
 
 const RangeSlider = ({ min, max, step, value, setValue }) => {
+  const { title: theme } = useContext(ThemeContext);
+
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}>
       <Slider
         value={value}
         onChange={handleChange}

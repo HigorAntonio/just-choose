@@ -9,7 +9,7 @@ export const Container = styled.div`
   width: 240px;
   height: 100%;
 
-  background: var(--background-500);
+  background: var(--background-510);
 `;
 
 export const TopSide = styled.div`
@@ -39,7 +39,7 @@ export const Navigation = styled.div`
   flex-direction: column;
 
   padding: 10px 0;
-  border-bottom: 1px solid var(--background-900);
+  border-bottom: 1px solid var(--background-700);
 
   > a {
     text-decoration: none;

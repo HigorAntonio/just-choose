@@ -22,8 +22,8 @@ export const FiltersLeft = styled.div`
     padding: 5px 0;
 
     &.active {
-      /* color: var(--accent); */
-      border-bottom: 2px solid var(--accent);
+      color: var(--primary-400);
+      border-bottom: 2px solid var(--primary-400);
     }
 
     &:hover {
@@ -59,12 +59,12 @@ export const SortOptions = styled.div`
 
 export const Option = styled.div`
   width: 100%;
-  background: var(--search);
+  background: var(--background-400);
   padding: 10px;
   border-radius: 5px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;

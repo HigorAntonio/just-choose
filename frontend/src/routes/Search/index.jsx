@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
+import { ThemeContext } from 'styled-components';
 import queryString from 'query-string';
 
 import useSearchRequest from '../../hooks/useSearchRequest';
@@ -46,6 +47,8 @@ const Search = ({ wrapperRef }) => {
   const { search } = useLocation();
   const { query } = queryString.parse(search);
   const history = useHistory();
+
+  const { colors } = useContext(ThemeContext);
 
   const [listParams, setListParams] = useState({});
   const [listPageNumber, setListPageNumber] = useState(1);
@@ -120,6 +123,8 @@ const Search = ({ wrapperRef }) => {
             show={showSortOptions}
             setShow={setShowSortOptions}
             width="155px"
+            background={colors['background-600']}
+            hover={colors['background-700']}
           >
             <SortOptions>
               <Option onClick={() => handleSortOption('updated.desc')}>

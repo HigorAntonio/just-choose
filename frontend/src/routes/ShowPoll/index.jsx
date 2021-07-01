@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import { ThemeContext } from 'styled-components';
 import { IoMdListBox } from 'react-icons/io';
 import { FaPlay } from 'react-icons/fa';
 import { FaStop } from 'react-icons/fa';
@@ -137,6 +138,7 @@ const ShowPoll = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
+  const { colors } = useContext(ThemeContext);
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -424,6 +426,8 @@ const ShowPoll = ({ wrapperRef }) => {
                   show={showTypeOptions}
                   setShow={setShowTypeOptions}
                   width="85px"
+                  background={colors['background-600']}
+                  hover={colors['background-700']}
                 >
                   <TypeOptions>
                     {contentTypes.map((t, i) => (

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import ptBrLocale from 'date-fns/locale/pt-BR';
@@ -7,11 +8,14 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 
-import theme from '../../styles/materialUITheme';
+import mUILightTheme from '../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
 const DataPicker = ({ value, setValue }) => {
+  const { title: theme } = useContext(ThemeContext);
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}>
       <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBrLocale}>
         <KeyboardDatePicker
           disableToolbar

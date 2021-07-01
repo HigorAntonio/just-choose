@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useContext } from 'react';
+import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import ContentCard from '../ContentCard';
 import useContentRequest from '../../hooks/useContentRequest';
-import theme from '../../styles/materialUITheme';
+import mUILightTheme from '../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
 import { Container } from './styles';
 
@@ -18,6 +20,8 @@ const ContentList = ({
   setContentList,
   wrapperRef,
 }) => {
+  const { title: theme } = useContext(ThemeContext);
+
   useEffect(() => {
     setPageNumber(1);
   }, [setPageNumber]);
@@ -136,7 +140,9 @@ const ContentList = ({
       {loading &&
         [...new Array(30).keys()].map((_, i) => (
           <div key={i} className="skeleton">
-            <ThemeProvider theme={theme}>
+            <ThemeProvider
+              theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
+            >
               <Skeleton
                 variant="rect"
                 width={'100%'}

@@ -21,23 +21,15 @@ export default createGlobalStyle`
     font-family: 'Roboto', sans-serif;
   }
   html {
-    background: var(--background-400);
+    background: var(--background-410);
   }
   :root {
-    --primary: lightgray;
-    --secondary: #001425;
-    --accent: ${(props) => props.theme.colors.primary};
-    --search: #35495B;
-    --search-button: #213D55;
-    --header-border: #001425;
-    --nav-bar: #061F34;
-
-    --white: #ffffff;
-    --black: #000000;
-    --gray: #C4C4C4;
-    --dark-gray: #888888;
-    --error: #eb0400;
-    --success: #43a047;
+    --white: ${(props) => props.theme.colors.white};
+    --black: ${(props) => props.theme.colors.black};
+    --gray: ${(props) => props.theme.colors.gray};
+    --dark-gray: ${(props) => props.theme.colors['dark-gray']};
+    --error: ${(props) => props.theme.colors.error};
+    --success: ${(props) => props.theme.colors.success};
 
     --primary-400: ${(props) => props.theme.colors['primary-400']};
     --primary-500: ${(props) => props.theme.colors['primary-500']};
@@ -45,7 +37,9 @@ export default createGlobalStyle`
     --background-100: ${(props) => props.theme.colors['background-100']};
     --background-300: ${(props) => props.theme.colors['background-300']};
     --background-400: ${(props) => props.theme.colors['background-400']};
+    --background-410: ${(props) => props.theme.colors['background-410']};
     --background-500: ${(props) => props.theme.colors['background-500']};
+    --background-510: ${(props) => props.theme.colors['background-510']};
     --background-600: ${(props) => props.theme.colors['background-600']};
     --background-700: ${(props) => props.theme.colors['background-700']};
     --background-900: ${(props) => props.theme.colors['background-900']};

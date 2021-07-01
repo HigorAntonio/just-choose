@@ -31,7 +31,7 @@ export const InputWrapper = styled.div`
     max-width: 680px;
 
     > .error {
-      background: var(--warning);
+      background: var(--error);
       padding: 7px 20px;
       border-radius: 5px;
       font-size: 14px;
@@ -47,16 +47,16 @@ export const InputWrapper = styled.div`
     max-height: 50px;
     resize: none;
     padding: 5px 10px;
-    border: 2px solid var(--search);
+    border: 2px solid var(--background-400);
     border-radius: 5px;
-    background: var(--search);
+    background: var(--background-400);
     outline: none;
 
     &:hover {
       border: 2px solid var(--gray);
     }
     &:focus {
-      border: 2px solid var(--accent);
+      border: 2px solid var(--primary-400);
     }
 
     transition: border 0.3s;
@@ -69,18 +69,18 @@ export const TitleInput = styled.input`
   max-width: 680px;
   padding: 5px 10px;
   border-radius: 5px;
-  background: var(--search);
+  background: var(--background-400);
   outline: none;
   ${(props) =>
     props.validationError
-      ? `border: 2px solid var(--warning);`
-      : `border: 2px solid var(--search);`}
+      ? `border: 2px solid var(--error);`
+      : `border: 2px solid var(--background-400);`}
 
   &:hover {
     border: 2px solid var(--gray);
   }
   &:focus {
-    border: 2px solid var(--accent);
+    border: 2px solid var(--primary-400);
   }
 
   transition: border 0.3s;
@@ -107,11 +107,11 @@ export const ThumbnailWrapper = styled.div`
       > label {
         ${labelCss}
         padding: 7px 20px;
-        background: var(--search);
+        background: var(--background-400);
         border-radius: 5px;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.25);
+          background: var(--background-500);
           cursor: pointer;
         }
       }
@@ -123,7 +123,7 @@ export const ThumbnailWrapper = styled.div`
     }
 
     > p.thumb-error {
-      background: var(--warning);
+      background: var(--error);
       padding: 7px 20px;
       border-radius: 5px;
       font-size: 14px;
@@ -134,7 +134,7 @@ export const ThumbnailWrapper = styled.div`
 
 export const ThumbPreview = styled.div`
   width: 170px;
-  background: var(--search-button);
+  background: var(--background-400);
   display: flex;
   margin-right: 20px;
 
@@ -166,8 +166,8 @@ export const Main = styled.main`
     flex-direction: column;
     width: 90%;
     max-width: 900px;
-    background: var(--nav-bar);
-    border: 0.1px solid var(--search);
+    background: var(--background-100);
+    border: 0.1px solid var(--background-600);
     border-radius: 5px;
     margin-bottom: 40px;
   }
@@ -178,11 +178,11 @@ export const Main = styled.main`
   }
 
   & ${InputWrapper} + ${InputWrapper} {
-    border-top: 0.1px solid var(--search);
+    border-top: 0.1px solid var(--background-600);
   }
 
   > .error {
-    background: var(--warning);
+    background: var(--error);
     padding: 7px 20px;
     border-radius: 5px;
     font-size: 14px;
@@ -218,12 +218,12 @@ export const Options = styled.div`
 
 export const Option = styled.div`
   width: 100%;
-  background: var(--search);
+  background: var(--background-400);
   padding: 10px;
   border-radius: 5px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--background-500);
     cursor: pointer;
   }
 `;
@@ -240,14 +240,13 @@ export const SharingOption = styled.div`
 export const ContentListWrapper = styled.div`
   max-height: 550px;
   overflow-y: auto;
-  border-top: 0.1px solid var(--search);
 `;
 
 export const CreationOptions = styled.div`
   display: flex;
   justify-content: flex-end;
   padding: 20px;
-  border-top: 0.1px solid var(--search);
+  border-top: 0.1px solid var(--background-600);
 
   > div {
     display: flex;
@@ -276,10 +275,11 @@ const buttonCss = css`
 
 export const CreateButton = styled.button`
   ${buttonCss}
-  background: var(--accent);
+  color: var(--white);
+  background: var(--primary-400);
 
   &:hover {
-    background: #0f6ba8d9;
+    background: var(--primary-500);
   }
 `;
 

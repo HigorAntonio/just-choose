@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
-import theme from '../../../styles/materialUITheme';
+import mUILightTheme from '../../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../../styles/materialUIThemes/dark';
 
 import {
   Container,
@@ -15,8 +17,10 @@ import {
 } from './styles';
 
 const ShowListSkeleton = () => {
+  const { title: theme } = useContext(ThemeContext);
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}>
       <Container>
         <Header>
           <HeaderRow>
