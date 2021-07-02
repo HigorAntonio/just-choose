@@ -5,7 +5,9 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
 
+import { ThemeContext } from '../../context/ThemeContext';
 import { AuthContext } from '../../context/AuthContext';
 
 import Alert from '../Alert';
@@ -20,6 +22,7 @@ import ShowPoll from '../../routes/ShowPoll';
 import Search from '../../routes/Search';
 import UpdatePoll from '../../routes/UpdatePoll';
 import NotFound from '../../components/NotFound';
+import GlobalStyles from '../../styles/GlobalStyles';
 
 import {
   Container,
@@ -42,73 +45,78 @@ const CustomRoute = ({ isPrivate, ...rest }) => {
 };
 
 const Layout = () => {
+  const { theme } = useContext(ThemeContext);
+
   const bodyWrapperRef = useRef();
 
   return (
-    <Container>
-      <Router>
-        <HeaderWrapper>
-          <Header />
-        </HeaderWrapper>
-        <BodyWrapper ref={bodyWrapperRef}>
-          <NavBarWrapper>
-            <NavBar />
-          </NavBarWrapper>
-          <ContentWrapper>
-            <Alert />
-            <Switch>
-              <CustomRoute
-                exact
-                path="/"
-                component={() => <Home wrapperRef={bodyWrapperRef} />}
-              />
-              <CustomRoute
-                exact
-                path="/search"
-                component={() => <Search wrapperRef={bodyWrapperRef} />}
-              />
-              <CustomRoute
-                isPrivate
-                exact
-                path="/list"
-                component={() => <CreateList wrapperRef={bodyWrapperRef} />}
-              />
-              <CustomRoute
-                isPrivate
-                exact
-                path="/lists/:id"
-                component={() => <ShowList wrapperRef={bodyWrapperRef} />}
-              />
-              <CustomRoute
-                isPrivate
-                exact
-                path="/lists/:id/update"
-                component={() => <UpdateList wrapperRef={bodyWrapperRef} />}
-              />
-              <CustomRoute
-                isPrivate
-                exact
-                path="/lists/:id/poll"
-                component={() => <CreatePoll wrapperRef={bodyWrapperRef} />}
-              />
-              <CustomRoute
-                isPrivate
-                exact
-                path="/polls/:id"
-                component={() => <ShowPoll wrapperRef={bodyWrapperRef} />}
-              />
-              <CustomRoute
-                isPrivate
-                exact
-                path="/polls/:id/update"
-                component={() => <UpdatePoll wrapperRef={bodyWrapperRef} />}
-              />
-              <Route component={NotFound} />
-            </Switch>
-          </ContentWrapper>
-        </BodyWrapper>
-      </Router>
-    </Container>
+    <ThemeProvider theme={theme}>
+      <Container>
+        <Router>
+          <HeaderWrapper>
+            <Header />
+          </HeaderWrapper>
+          <BodyWrapper ref={bodyWrapperRef}>
+            <NavBarWrapper>
+              <NavBar />
+            </NavBarWrapper>
+            <ContentWrapper>
+              <Alert />
+              <Switch>
+                <CustomRoute
+                  exact
+                  path="/"
+                  component={() => <Home wrapperRef={bodyWrapperRef} />}
+                />
+                <CustomRoute
+                  exact
+                  path="/search"
+                  component={() => <Search wrapperRef={bodyWrapperRef} />}
+                />
+                <CustomRoute
+                  isPrivate
+                  exact
+                  path="/list"
+                  component={() => <CreateList wrapperRef={bodyWrapperRef} />}
+                />
+                <CustomRoute
+                  isPrivate
+                  exact
+                  path="/lists/:id"
+                  component={() => <ShowList wrapperRef={bodyWrapperRef} />}
+                />
+                <CustomRoute
+                  isPrivate
+                  exact
+                  path="/lists/:id/update"
+                  component={() => <UpdateList wrapperRef={bodyWrapperRef} />}
+                />
+                <CustomRoute
+                  isPrivate
+                  exact
+                  path="/lists/:id/poll"
+                  component={() => <CreatePoll wrapperRef={bodyWrapperRef} />}
+                />
+                <CustomRoute
+                  isPrivate
+                  exact
+                  path="/polls/:id"
+                  component={() => <ShowPoll wrapperRef={bodyWrapperRef} />}
+                />
+                <CustomRoute
+                  isPrivate
+                  exact
+                  path="/polls/:id/update"
+                  component={() => <UpdatePoll wrapperRef={bodyWrapperRef} />}
+                />
+                <Route component={NotFound} />
+              </Switch>
+            </ContentWrapper>
+          </BodyWrapper>
+        </Router>
+      </Container>
+      <GlobalStyles />
+    </ThemeProvider>
   );
 };
 

@@ -37,7 +37,7 @@ theme.overrides = {
     root: {
       border: `2px solid ${dark.colors['background-400']}`,
       borderRadius: '5px',
-      background: `${dark.colors['background-400']}`,
+      background: dark.colors['background-400'],
       transition: 'border 0.3s',
       '&:hover': {
         border: `2px solid ${dark.colors.gray}`,
@@ -67,12 +67,12 @@ theme.overrides = {
   },
   MuiPaper: {
     root: {
-      backgroundColor: `${dark.colors['background-100']}`,
+      backgroundColor: dark.colors['background-100'],
     },
   },
   MuiPickersCalendarHeader: {
     iconButton: {
-      backgroundColor: `${dark.colors['background-100']}`,
+      backgroundColor: dark.colors['background-100'],
       '&:hover': {
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
       },
@@ -83,9 +83,9 @@ theme.overrides = {
   },
   MuiPickersDay: {
     daySelected: {
-      backgroundColor: `${dark.colors['primary-400']}`,
+      backgroundColor: dark.colors['primary-400'],
       '&:hover': {
-        backgroundColor: `${dark.colors['primary-500']}`,
+        backgroundColor: dark.colors['primary-500'],
       },
     },
   },
@@ -94,21 +94,21 @@ theme.overrides = {
       width: '250px',
     },
     rail: {
-      color: `${dark.colors['primary-400']}`,
+      color: dark.colors['primary-400'],
     },
     track: {
-      color: `${dark.colors['primary-400']}`,
+      color: dark.colors['primary-400'],
     },
     thumb: {
-      color: `${dark.colors['primary-400']}`,
+      color: dark.colors['primary-400'],
     },
   },
   MuiTooltip: {
     tooltip: {
-      backgroundColor: `${dark.colors['primary-400']}`,
+      backgroundColor: dark.colors['primary-400'],
     },
     arrow: {
-      color: `${dark.colors['primary-400']}`,
+      color: dark.colors['primary-400'],
     },
   },
   MuiSkeleton: {

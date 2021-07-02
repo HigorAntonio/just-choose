@@ -1,16 +1,19 @@
 import React, { useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import { ClickAwayListener } from '@material-ui/core';
 import { ThemeContext } from 'styled-components';
 import { BiLogOut } from 'react-icons/bi';
+import { HiOutlineMoon } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { HiDocumentAdd } from 'react-icons/hi';
 import { FiSearch } from 'react-icons/fi';
 
 import Modal from '../Modal';
 import Sign from '../SignModal';
+import Switch from '../Switch';
 
 import { AuthContext } from '../../context/AuthContext';
+import { ThemeContext as AppThemeContext } from '../../context/ThemeContext';
 
 import {
   Container,
@@ -36,9 +39,10 @@ import {
 function Header() {
   const history = useHistory();
 
-  const { title: theme } = useContext(ThemeContext);
+  const { title: theme, colors } = useContext(ThemeContext);
+  const { theme: appTheme, toggleTheme } = useContext(AppThemeContext);
 
-  const { authenticated, handleLogout } = useContext(AuthContext);
+  const { loading, authenticated, handleLogout } = useContext(AuthContext);
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
@@ -57,6 +61,7 @@ function Header() {
   const handleUserExit = async () => {
     try {
       await handleLogout();
+      setShowProfileDropDown(false);
     } catch (error) {}
   };
 
@@ -99,7 +104,7 @@ function Header() {
 
       <NavMenuWrapper>
         <NavMenu>
-          {authenticated && (
+          {!loading && authenticated && (
             <Link to="/list">
               <NewListButton>
                 {/* <NewListIcon /> */}
@@ -108,7 +113,7 @@ function Header() {
               </NewListButton>
             </Link>
           )}
-          {!authenticated && (
+          {!loading && !authenticated && (
             <>
               <SignIn onClick={handleSignIn}>Entrar</SignIn>
               <SignUp onClick={handleSignUp}>Cadastrar-se</SignUp>
@@ -118,22 +123,49 @@ function Header() {
             <ClickAwayListener
               onClickAway={() => setShowProfileDropDown(false)}
             >
-              <Profile
-                onClick={() =>
-                  setShowProfileDropDown((prevState) => !prevState)
-                }
-              />
+              <div>
+                <Profile
+                  onClick={() =>
+                    setShowProfileDropDown((prevState) => !prevState)
+                  }
+                />
+                <ProfileDropDown show={showProfileDropDown}>
+                  <DropDownOption>
+                    <div className="align-left">
+                      <HiOutlineMoon size={20} style={{ flexShrink: 0 }} />{' '}
+                    </div>
+                    <div className="align-right switch">
+                      <label htmlFor="theme-switch">Tema escuro</label>
+                      <Switch
+                        id="theme-switch"
+                        checked={appTheme.title === 'dark'}
+                        onChange={toggleTheme}
+                        uncheckedIcon={false}
+                        onBorder={`2px solid ${colors['primary-400']}`}
+                        offBorder={`2px solid ${colors.text}`}
+                        borderWidth={2}
+                        width={35}
+                        height={20}
+                        handleDiameter={12}
+                        onColor={colors['background-100']}
+                        offColor={colors['background-100']}
+                        onHandleColor={colors['primary-400']}
+                        offHandleColor={colors.text}
+                        checkedColor={colors['primary-400']}
+                      />
+                    </div>
+                  </DropDownOption>
+                  {authenticated && (
+                    <DropDownOption className="hover" onClick={handleUserExit}>
+                      <div className="align-left">
+                        <BiLogOut size={20} style={{ flexShrink: 0 }} />{' '}
+                      </div>
+                      <div className="align-right">Sair</div>
+                    </DropDownOption>
+                  )}
+                </ProfileDropDown>
+              </div>
             </ClickAwayListener>
-            <ProfileDropDown show={showProfileDropDown}>
-              {authenticated && (
-                <DropDownOption onClick={handleUserExit}>
-                  <div className="align-left">
-                    <BiLogOut size={20} style={{ flexShrink: 0 }} />{' '}
-                  </div>
-                  <div className="align-right">Sair</div>
-                </DropDownOption>
-              )}
-            </ProfileDropDown>
           </ProfileWrapper>
         </NavMenu>
       </NavMenuWrapper>

@@ -22,8 +22,15 @@ export const HeaderRow = styled.div`
 export const HeaderButtons = styled.div`
   display: flex;
 
-  > div + div {
+  > div + div,
+  a + div,
+  div + a,
+  a + a {
     margin-left: 10px;
+  }
+
+  > a {
+    display: flex;
   }
 `;
 

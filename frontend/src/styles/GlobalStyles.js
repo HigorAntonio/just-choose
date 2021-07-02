@@ -69,4 +69,16 @@ export default createGlobalStyle`
     /* border-radius: 20px; */
     border: 3px solid var(--background-400);
   }
+
+  /* Text selection color */
+  ::-moz-selection { /* Code for Firefox */
+    color: var(--white);
+    background: var(--primary-400);
+  }
+
+  /* Text selection color */
+  ::selection { /* Code for Chrome, Edge, and Safari */
+    color: var(--white);
+    background: var(--primary-400);
+  }
 `;

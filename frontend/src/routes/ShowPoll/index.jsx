@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
+import { useParams, useHistory, Link } from 'react-router-dom';
 import { ThemeContext } from 'styled-components';
 import { IoMdListBox } from 'react-icons/io';
 import { FaPlay } from 'react-icons/fa';
@@ -174,54 +174,47 @@ const ShowPoll = ({ wrapperRef }) => {
     setShowDeleteDialog(false);
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        clearState();
-        const { data } = await justChooseApi.get(`/polls/${pollId}`);
-        setPoll(data);
-        setCreatedAt(new Date(data.created_at));
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        if (error.response && error.response.status === 400) {
-          setLoadingError(true);
-        }
-        if (error.response && error.response.status === 403) {
-          setDenyAccess(true);
+  const getPageData = useCallback(async () => {
+    try {
+      setLoading(true);
+      clearState();
+      const { data } = await justChooseApi.get(`/polls/${pollId}`);
+      setPoll(data);
+      setCreatedAt(new Date(data.created_at));
+      if (JSON.stringify(data) !== '{}' && data.is_active) {
+        const { data: list } = await justChooseApi.get(
+          `/contentlists/${data.content_list_id}`
+        );
+        setContentList(list);
+        setContentTypes(['all', ...list.content_types]);
+        const { data: vote } = await justChooseApi.get(
+          `/polls/${data.id}/votes`
+        );
+        if (vote) {
+          setVote(vote);
         }
       }
-    })();
+      if (JSON.stringify(data) !== '{}' && !data.is_active) {
+        const { data: result } = await justChooseApi.get(
+          `/polls/${data.id}/result`
+        );
+        setContent(result.items);
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      if (error.response && error.response.status === 400) {
+        setLoadingError(true);
+      }
+      if (error.response && error.response.status === 403) {
+        setDenyAccess(true);
+      }
+    }
   }, [pollId]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        if (JSON.stringify(poll) !== '{}' && poll.is_active) {
-          const { data } = await justChooseApi.get(
-            `/contentlists/${poll.content_list_id}`
-          );
-          setContentList(data);
-          setContentTypes(['all', ...data.content_types]);
-          const { data: vote } = await justChooseApi.get(
-            `/polls/${poll.id}/votes`
-          );
-          if (vote) {
-            setVote(vote);
-          }
-        }
-        if (JSON.stringify(poll) !== '{}' && !poll.is_active) {
-          const { data } = await justChooseApi.get(`/polls/${poll.id}/result`);
-          setContent(data.items);
-        }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
-    })();
-  }, [poll]);
+    (async () => await getPageData())();
+  }, [getPageData]);
 
   useEffect(() => {
     if (JSON.stringify(contentList) !== '{}' && poll.is_active) {
@@ -257,6 +250,7 @@ const ShowPoll = ({ wrapperRef }) => {
         ...prevState,
         is_active: !prevState.is_active,
       }));
+      await getPageData();
       setLoading(false);
       setMessage(
         poll.is_active
@@ -275,14 +269,6 @@ const ShowPoll = ({ wrapperRef }) => {
       setSeverity('error');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     }
-  };
-
-  const handleList = () => {
-    history.push(`/lists/${poll.content_list_id}`);
-  };
-
-  const handleUpdate = () => {
-    history.push(`/polls/${pollId}/update`);
   };
 
   const handleDelete = async () => {
@@ -344,16 +330,14 @@ const ShowPoll = ({ wrapperRef }) => {
         <HeaderRow>
           <h1>{poll.title}</h1>
           <HeaderButtons>
-            <HeaderButton
-              title="Visualizar lista de conteúdo"
-              onClick={handleList}
-            >
-              <IoMdListBox
-                size={'25px'}
-                color="#fff"
-                style={{ flexShrink: 0, margin: '0 5px' }}
-              />
-            </HeaderButton>
+            <Link to={`/lists/${poll.content_list_id}`}>
+              <HeaderButton title="Visualizar lista de conteúdo">
+                <IoMdListBox
+                  size={'25px'}
+                  style={{ flexShrink: 0, margin: '0 5px' }}
+                />
+              </HeaderButton>
+            </Link>
             {userId === poll.user_id && (
               <>
                 <HeaderButton
@@ -363,32 +347,30 @@ const ShowPoll = ({ wrapperRef }) => {
                   {!poll.is_active && (
                     <FaPlay
                       size={'25px'}
-                      color="#fff"
                       style={{ flexShrink: 0, margin: '0 5px' }}
                     />
                   )}
                   {poll.is_active && (
                     <FaStop
                       size={'25px'}
-                      color="#fff"
                       style={{ flexShrink: 0, margin: '0 5px' }}
                     />
                   )}
                 </HeaderButton>
-                <HeaderButton title="Editar votação" onClick={handleUpdate}>
-                  <MdSettings
-                    size={'25px'}
-                    color="#fff"
-                    style={{ flexShrink: 0, margin: '0 5px' }}
-                  />
-                </HeaderButton>
+                <Link to={`/polls/${pollId}/update`}>
+                  <HeaderButton title="Editar votação">
+                    <MdSettings
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
+                    />
+                  </HeaderButton>
+                </Link>
                 <HeaderDeleteButton
                   title="Excluir votação"
                   onClick={() => setShowDeleteDialog(true)}
                 >
                   <FaTrash
                     size={'25px'}
-                    color="#fff"
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderDeleteButton>
@@ -449,46 +431,44 @@ const ShowPoll = ({ wrapperRef }) => {
         )}
       </Header>
       <Main>
-        {poll.is_active && contentList.content && (
+        {poll.is_active && content.length > 0 && (
           <ContentListContainer>
-            {content.length > 0 &&
-              content.map((c) => {
-                const src =
-                  c.type === 'game'
-                    ? c.poster_path
-                    : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
-                const href = `${getContentBaseUrl(c.type)}/${
-                  c.content_platform_id
-                }`;
-                return (
-                  <div
-                    key={c.type + c.content_id}
-                    className="cardWrapper"
-                    onClick={() => {
-                      window.open(href);
-                    }}
-                  >
-                    <ContentCard
-                      src={src}
-                      title={c.title}
-                      check={
-                        vote.content_id === c.content_id && vote.type === c.type
-                      }
-                      click={(e) => handleVote(e, c)}
-                    />
-                  </div>
-                );
-              })}
+            {content.map((c) => {
+              const src =
+                c.type === 'game'
+                  ? c.poster_path
+                  : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
+              const href = `${getContentBaseUrl(c.type)}/${
+                c.content_platform_id
+              }`;
+              return (
+                <div
+                  key={c.type + c.content_id}
+                  className="cardWrapper"
+                  onClick={() => {
+                    window.open(href);
+                  }}
+                >
+                  <ContentCard
+                    src={src}
+                    title={c.title}
+                    check={
+                      vote.content_id === c.content_id && vote.type === c.type
+                    }
+                    click={(e) => handleVote(e, c)}
+                  />
+                </div>
+              );
+            })}
           </ContentListContainer>
         )}
-        {!poll.is_active && (
+        {!poll.is_active && content.length > 0 && (
           <ResultContainer>
             <ResultHeader>
               <div className="headerPosition">
                 <h2>
                   <FaHashtag
                     size={'20px'}
-                    color="#fff"
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </h2>
@@ -501,40 +481,39 @@ const ShowPoll = ({ wrapperRef }) => {
               </div>
             </ResultHeader>
             <ResultBody>
-              {content.length > 0 &&
-                content.map((c, i) => {
-                  const src =
-                    c.type === 'game'
-                      ? c.poster_path
-                      : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
-                  const href = `${getContentBaseUrl(c.type)}/${
-                    c.content_platform_id
-                  }`;
-                  const votes = `${formatVotes(c.votes)}`.replace('.', ',');
-                  return (
-                    <div
-                      className="row"
-                      key={c.type + c.content_id}
-                      onClick={() => {
-                        window.open(href);
-                      }}
-                    >
-                      <div className="bodyPosition">{i + 1}</div>
-                      <div className="bodyTitle">
-                        <div className="posterWrapper">
-                          <ContentCardSimple src={src} title={c.title} />
-                        </div>
-                        <span>{c.title}</span>
+              {content.map((c, i) => {
+                const src =
+                  c.type === 'game'
+                    ? c.poster_path
+                    : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
+                const href = `${getContentBaseUrl(c.type)}/${
+                  c.content_platform_id
+                }`;
+                const votes = `${formatVotes(c.votes)}`.replace('.', ',');
+                return (
+                  <div
+                    className="row"
+                    key={c.type + c.content_id}
+                    onClick={() => {
+                      window.open(href);
+                    }}
+                  >
+                    <div className="bodyPosition">{i + 1}</div>
+                    <div className="bodyTitle">
+                      <div className="posterWrapper">
+                        <ContentCardSimple src={src} title={c.title} />
                       </div>
-                      <div
-                        className="bodyVotes"
-                        title={c.votes !== votes ? c.votes : ''}
-                      >
-                        {votes}
-                      </div>
+                      <span>{c.title}</span>
                     </div>
-                  );
-                })}
+                    <div
+                      className="bodyVotes"
+                      title={c.votes !== votes ? c.votes : ''}
+                    >
+                      {votes}
+                    </div>
+                  </div>
+                );
+              })}
             </ResultBody>
           </ResultContainer>
         )}

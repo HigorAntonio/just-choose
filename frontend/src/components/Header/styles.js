@@ -272,6 +272,11 @@ export const ProfileDropDown = styled.div`
       ? 'opacity: 1; pointer-events: all; transform: translateY(100%);'
       : 'opacity: 0; pointer-events: none; transform: translateY(90%);'}
   transition: opacity 0.4s ease, transform 0.4s ease;
+
+  .hover:hover {
+    background: var(--background-500);
+    cursor: pointer;
+  }
 `;
 
 export const DropDownOption = styled.div`
@@ -281,21 +286,25 @@ export const DropDownOption = styled.div`
   padding: 5px;
   border-radius: 2.5px;
 
-  > .align-left {
+  .align-left {
     flex: 0;
     display: flex;
     align-items: center;
     margin-right: 5px;
   }
 
-  > .align-right {
+  .align-right {
     flex: 1;
     display: flex;
     align-items: center;
   }
 
-  &:hover {
-    background: var(--background-500);
-    cursor: pointer;
+  .switch {
+    display: flex;
+    justify-content: space-between;
+
+    > label {
+      cursor: pointer;
+    }
   }
 `;

@@ -1,23 +1,18 @@
-import { ThemeProvider } from 'styled-components';
-
-import light from './styles/themes/light';
-import dark from './styles/themes/dark';
 import Layout from './components/Layout';
-import GlobalStyles from './styles/GlobalStyles';
 
 import { AuthContextProvider } from './context/AuthContext';
+import { ThemeContextProvider } from './context/ThemeContext';
 import { AlertContextProvider } from './context/AlertContext';
 
 function App() {
   return (
-    <ThemeProvider theme={dark}>
+    <ThemeContextProvider>
       <AuthContextProvider>
         <AlertContextProvider>
           <Layout />
-          <GlobalStyles />
         </AlertContextProvider>
       </AuthContextProvider>
-    </ThemeProvider>
+    </ThemeContextProvider>
   );
 }
 

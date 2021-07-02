@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, Link } from 'react-router-dom';
 import { ThemeContext } from 'styled-components';
 import { FaHeart } from 'react-icons/fa';
 import { FaRegHeart } from 'react-icons/fa';
@@ -240,14 +240,6 @@ const ShowList = ({ wrapperRef }) => {
     }
   };
 
-  const handlePoll = () => {
-    history.push(`/lists/${listId}/poll`);
-  };
-
-  const handleUpdate = () => {
-    history.push(`/lists/${listId}/update`);
-  };
-
   const handleDelete = async () => {
     try {
       setShowDeleteDialog(false);
@@ -301,21 +293,22 @@ const ShowList = ({ wrapperRef }) => {
             </HeaderButton>
             {userId === contentList.user_id && (
               <>
-                <HeaderButton
-                  title="Criar uma votação a partir da lista"
-                  onClick={handlePoll}
-                >
-                  <FaVoteYea
-                    size={'25px'}
-                    style={{ flexShrink: 0, margin: '0 5px' }}
-                  />
-                </HeaderButton>
-                <HeaderButton title="Editar lista" onClick={handleUpdate}>
-                  <MdSettings
-                    size={'25px'}
-                    style={{ flexShrink: 0, margin: '0 5px' }}
-                  />
-                </HeaderButton>
+                <Link to={`/lists/${listId}/poll`}>
+                  <HeaderButton title="Criar uma votação a partir da lista">
+                    <FaVoteYea
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
+                    />
+                  </HeaderButton>
+                </Link>
+                <Link to={`/lists/${listId}/update`}>
+                  <HeaderButton title="Editar lista">
+                    <MdSettings
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
+                    />
+                  </HeaderButton>
+                </Link>
                 <HeaderDeleteButton
                   title="Excluir lista"
                   onClick={() => setShowDeleteDialog(true)}
