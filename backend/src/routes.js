@@ -201,8 +201,4 @@ routes.get('/games/genres', authorization, isUserActive, GameController.genres);
 // ConfigurationController
 routes.get('/configuration/tmdb', authorization, ConfigurationController.tmdb);
 
-routes.get('/', authorization, (req, res) => {
-  res.json({ home: true });
-});
-
 module.exports = routes;

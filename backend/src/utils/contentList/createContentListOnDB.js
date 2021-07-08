@@ -12,7 +12,7 @@ module.exports = async (
   try {
     const [contentTypes, contentToInsert] = await sanitizeListData(content);
 
-    await knex.transaction(async (trx) => {
+    const contentListId = await knex.transaction(async (trx) => {
       const [{ id: contentListId }] = await trx('content_lists')
         .insert({
           user_id: userId,
@@ -40,7 +40,11 @@ module.exports = async (
           )
         );
       }
+
+      return contentListId;
     });
+
+    return contentListId;
   } catch (error) {
     throw error;
   }

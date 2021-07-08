@@ -66,7 +66,7 @@ module.exports = {
 
       const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
 
-      await createContentListOnDB(
+      const contentListId = await createContentListOnDB(
         userId,
         title,
         description,
@@ -75,7 +75,7 @@ module.exports = {
         content
       );
 
-      return res.sendStatus(201);
+      return res.status(201).json({ id: contentListId });
     } catch (error) {
       try {
         await deleteFile(req.file.key);

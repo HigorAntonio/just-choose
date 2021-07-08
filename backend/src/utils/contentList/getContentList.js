@@ -79,7 +79,7 @@ module.exports = async (contentListId) => {
               'movie_id as content_id',
               'tmdb_id as content_platform_id',
               'title',
-              'poster_path',
+              knex.raw(`COALESCE(poster_path, '') AS poster_path`),
               knex.raw(`'movie' AS type`)
             )
             .from('content_list_movies as clm')
@@ -115,7 +115,7 @@ module.exports = async (contentListId) => {
               'show_id as content_id',
               'tmdb_id as content_platform_id',
               'name as title',
-              'poster_path',
+              knex.raw(`COALESCE(poster_path, '') AS poster_path`),
               knex.raw(`'show' AS type`)
             )
             .from('content_list_shows as cls')
@@ -151,7 +151,7 @@ module.exports = async (contentListId) => {
               'game_id as content_id',
               'rawg_id as content_platform_id',
               'name as title',
-              'background_image as poster_path',
+              knex.raw(`COALESCE(background_image, '') AS poster_path`),
               knex.raw(`'game' AS type`)
             )
             .from('content_list_games as clg')

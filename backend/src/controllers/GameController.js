@@ -29,6 +29,8 @@ module.exports = {
       const responseData = await getAsync(key);
       if (!responseData) {
         const { data } = await rawgApi.get(url, { params });
+        data.next = !!data.next; // As urls (strings) em next e previous contém
+        data.previous = !!data.previous; // a RAWG_API_KEY e não devem ser usadas
 
         await Queue.add('InsertGamesOnDatabase', data);
 
@@ -111,7 +113,6 @@ module.exports = {
 
       return res.json(JSON.parse(responseData));
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },

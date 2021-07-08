@@ -84,7 +84,7 @@ module.exports = {
       const { key: fileKey } = req.file;
       const thumbnail = `${process.env.APP_URL}/files/${fileKey}`;
 
-      await knex.transaction(async (trx) => {
+      const pollId = await knex.transaction(async (trx) => {
         const [{ id: pollId }] = await trx('polls')
           .insert({
             user_id: userId,
@@ -99,9 +99,11 @@ module.exports = {
           poll_id: pollId,
           content_list_id: contentListId,
         });
+
+        return pollId;
       });
 
-      return res.sendStatus(201);
+      return res.status(201).json({ id: pollId });
     } catch (error) {
       try {
         await deleteFile(req.file.key);
