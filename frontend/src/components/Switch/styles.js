@@ -4,11 +4,11 @@ export const Container = styled.div`
   ${(props) => props.width && `width: ${props.width};`};
   ${(props) => props.height && `height: ${props.height};`};
   ${(props) => {
-    if (props.checked && props.onBorder) {
-      return `border: ${props.onBorder};`;
+    if (props.checked && props.border) {
+      return `border: ${props.border};`;
     }
-    if (!props.checked && props.offBorder) {
-      return `border: ${props.offBorder};`;
+    if (!props.checked && props.offborder) {
+      return `border: ${props.offborder};`;
     }
   }};
   ${(props) =>
@@ -21,11 +21,11 @@ export const Container = styled.div`
 
   > div div div svg path {
     ${(props) => {
-      if (props.checked && props.checkedColor) {
-        return `fill: ${props.checkedColor};`;
+      if (props.checked && props.checkedcolor) {
+        return `fill: ${props.checkedcolor};`;
       }
-      if (!props.checked && props.uncheckedColor) {
-        return `fill: ${props.uncheckedColor};`;
+      if (!props.checked && props.uncheckedcolor) {
+        return `fill: ${props.uncheckedcolor};`;
       }
     }};
   }

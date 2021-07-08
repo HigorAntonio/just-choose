@@ -51,7 +51,7 @@ export default createGlobalStyle`
   }
   /* Scrollbar on Firefox */
   * {
-    scrollbar-width: thin;
+    scrollbar-width: auto;
     scrollbar-color: var(--dark-gray) var(--background-400);
   }
 

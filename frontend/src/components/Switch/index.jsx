@@ -9,16 +9,16 @@ const Switch = (props) => {
       checked={props.checked}
       width={props.width}
       height={props.height}
-      offBorder={props.offBorder}
-      onBorder={props.onBorder}
+      offborder={props.offborder}
+      border={props.border}
       borderRadius={props.borderRadius}
-      checkedColor={props.checkedColor}
-      uncheckedColor={props.uncheckedColor}
+      checkedcolor={props.checkedcolor}
+      uncheckedcolor={props.uncheckedcolor}
     >
       <ReactSwitch
         {...props}
-        width={props.width - 2 * props.borderWidth}
-        height={props.height - 2 * props.borderWidth}
+        width={props.width - 2 * props.borderwidth}
+        height={props.height - 2 * props.borderwidth}
       />
     </Container>
   );

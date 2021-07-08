@@ -14,7 +14,7 @@ import { AlertContext } from '../../context/AlertContext';
 import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
 import AccessDenied from '../../components/AccessDenied';
-import ContentCard from '../../components/ContentCard';
+import ContentGrid from '../../components/ContentGrid';
 import ContentCardSimple from '../../components/ContentCardSimple';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
@@ -34,7 +34,6 @@ import {
   TypeOptions,
   Option,
   Main,
-  ContentListContainer,
   ResultContainer,
   ResultHeader,
   ResultBody,
@@ -294,7 +293,8 @@ const ShowPoll = ({ wrapperRef }) => {
 
   const handleVote = async (e, content) => {
     try {
-      e.stopPropagation();
+      e.preventDefault();
+      // e.stopPropagation();
       if (vote && JSON.stringify(vote) !== '{}') {
         await justChooseApi.delete(`/polls/${pollId}/votes`);
       }
@@ -432,35 +432,14 @@ const ShowPoll = ({ wrapperRef }) => {
       </Header>
       <Main>
         {poll.is_active && content.length > 0 && (
-          <ContentListContainer>
-            {content.map((c) => {
-              const src =
-                c.type === 'game'
-                  ? c.poster_path
-                  : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
-              const href = `${getContentBaseUrl(c.type)}/${
-                c.content_platform_id
-              }`;
-              return (
-                <div
-                  key={c.type + c.content_id}
-                  className="cardWrapper"
-                  onClick={() => {
-                    window.open(href);
-                  }}
-                >
-                  <ContentCard
-                    src={src}
-                    title={c.title}
-                    check={
-                      vote.content_id === c.content_id && vote.type === c.type
-                    }
-                    click={(e) => handleVote(e, c)}
-                  />
-                </div>
-              );
-            })}
-          </ContentListContainer>
+          <ContentGrid
+            content={content}
+            checkbox
+            checkboxcheck={(c) =>
+              vote.content_id === c.content_id && vote.type === c.type
+            }
+            checkboxclick={handleVote}
+          />
         )}
         {!poll.is_active && content.length > 0 && (
           <ResultContainer>

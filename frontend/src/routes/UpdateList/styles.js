@@ -314,8 +314,16 @@ export const SearchWrapper = styled.div`
 
 export const ContentListWrapper = styled.div`
   max-height: 550px;
-  overflow-y: auto;
+  overflow-y: scroll;
   border-top: 0.1px solid var(--background-600);
+
+  /* Scrollbar on Firefox */
+  scrollbar-color: var(--dark-gray) var(--background-100);
+
+  /* Scrollbar on Chrome, Edge, and Safari */
+  &::-webkit-scrollbar-track {
+    background: var(--background-100);
+  }
 `;
 
 export const ContentListSkeleton = styled.div`

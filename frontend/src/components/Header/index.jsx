@@ -141,9 +141,9 @@ function Header() {
                         checked={appTheme.title === 'dark'}
                         onChange={toggleTheme}
                         uncheckedIcon={false}
-                        onBorder={`2px solid ${colors['primary-400']}`}
-                        offBorder={`2px solid ${colors.text}`}
-                        borderWidth={2}
+                        border={`2px solid ${colors['primary-400']}`}
+                        offborder={`2px solid ${colors.text}`}
+                        borderwidth={2}
                         width={35}
                         height={20}
                         handleDiameter={12}
@@ -151,7 +151,7 @@ function Header() {
                         offColor={colors['background-100']}
                         onHandleColor={colors['primary-400']}
                         offHandleColor={colors.text}
-                        checkedColor={colors['primary-400']}
+                        checkedcolor={colors['primary-400']}
                       />
                     </div>
                   </DropDownOption>

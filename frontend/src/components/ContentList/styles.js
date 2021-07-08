@@ -31,3 +31,8 @@ export const Container = styled.div`
     padding-bottom: calc(271 / 181 * 100%);
   }
 `;
+
+export const Message = styled.span`
+  grid-column-start: 1;
+  grid-column-end: -1;
+`;

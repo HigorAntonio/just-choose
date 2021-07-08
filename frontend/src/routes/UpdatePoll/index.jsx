@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { ThemeContext } from 'styled-components';
-import { ThemeProvider } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
 
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
@@ -10,11 +7,8 @@ import { AlertContext } from '../../context/AlertContext';
 import NotFound from '../../components/NotFound';
 import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
-import ContentCardSimple from '../../components/ContentCardSimple';
+import ContentGrid from '../../components/ContentGrid';
 import justChooseApi from '../../apis/justChooseApi';
-
-import mUILightTheme from '../../styles/materialUIThemes/light';
-import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
 import {
   Container,
@@ -32,7 +26,6 @@ import {
   ContentListWrapper,
   CreationOptions,
   CreateButton,
-  ContentList,
 } from './styles';
 
 const getSharingOption = (type) => {
@@ -43,19 +36,6 @@ const getSharingOption = (type) => {
       return 'Pública';
     case 'followed_profiles':
       return 'Perfis seguidos';
-    default:
-      return '';
-  }
-};
-
-const getContentBaseUrl = (type) => {
-  switch (type) {
-    case 'movie':
-      return process.env.REACT_APP_TMDB_MOVIE_URL;
-    case 'show':
-      return process.env.REACT_APP_TMDB_SHOW_URL;
-    case 'game':
-      return process.env.REACT_APP_RAWG_GAME_URL;
     default:
       return '';
   }
@@ -73,7 +53,6 @@ const UpdatePoll = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { title: theme } = useContext(ThemeContext);
 
   const [loadingError, setLoadingError] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
@@ -393,39 +372,7 @@ const UpdatePoll = ({ wrapperRef }) => {
         <div className="content-list">
           <ContentListContainer>
             <ContentListWrapper ref={contentListWrapperRef}>
-              <ContentList>
-                {contentList.length > 0 &&
-                  contentList.map((c, i) => {
-                    const src =
-                      c.type === 'game'
-                        ? c.poster_path
-                        : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
-                    const href = `${getContentBaseUrl(c.type)}/${
-                      c.content_platform_id
-                    }`;
-                    return (
-                      <div key={c.type + c.content_id} className="cardWrapper">
-                        <a href={href} target="blank">
-                          <ContentCardSimple src={src} title={c.title} />
-                        </a>
-                      </div>
-                    );
-                  })}
-                {contentList.length <= 0 &&
-                  [...Array(30).keys()].map((c) => (
-                    <div key={c} className="cardWrapper">
-                      <ThemeProvider
-                        theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
-                      >
-                        <Skeleton
-                          variant="rect"
-                          width={'100%'}
-                          height={'100%'}
-                        />
-                      </ThemeProvider>
-                    </div>
-                  ))}
-              </ContentList>
+              <ContentGrid content={contentList} />
             </ContentListWrapper>
           </ContentListContainer>
           <CreationOptions>

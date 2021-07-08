@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import { GoSearch } from 'react-icons/go';
 
 import { AlertContext } from '../../context/AlertContext';
@@ -8,7 +9,6 @@ import MovieFilters from '../../components/MovieFilters';
 import ShowFilters from '../../components/ShowFilters';
 import GameFilters from '../../components/GameFilters';
 import ContentList from '../../components/ContentList';
-import ContentListPreview from '../../components/ContentListPreview';
 import justChooseApi from '../../apis/justChooseApi';
 
 import {
@@ -55,6 +55,8 @@ const CreateList = ({ wrapperRef }) => {
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
 
+  const history = useHistory();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [sharingOption, setSharingOption] = useState('');
@@ -87,7 +89,6 @@ const CreateList = ({ wrapperRef }) => {
   }, [wrapperRef]);
 
   useEffect(() => {
-    console.log(contentList);
     setContentError('');
   }, [contentList]);
 
@@ -115,18 +116,6 @@ const CreateList = ({ wrapperRef }) => {
       setMessage('Lista criada com sucesso.');
     }
   }, [creating, errorOnCreate, setMessage, setSeverity]);
-
-  const clearForm = () => {
-    setTitle('');
-    setDescription('');
-    setSharingOption('');
-    setThumbnail(null);
-    setThumbPreview(null);
-    thumbInputFileRef.current.value = null;
-    setContentType('');
-    setContentList([]);
-    setShowListPreview(false);
-  };
 
   const handleTitle = (e) => {
     setTitle(e.target.value);
@@ -176,6 +165,8 @@ const CreateList = ({ wrapperRef }) => {
 
   const handlePreviewList = () => {
     setShowListPreview((prevState) => !prevState);
+    contentListWrapperRef.current.scrollTop = 0;
+    contentListWrapperRef.current.scrollLeft = 0;
   };
 
   const validateFields = () => {
@@ -217,6 +208,7 @@ const CreateList = ({ wrapperRef }) => {
     setCreating(true);
     clearTimeout(alertTimeout);
 
+    let listId;
     const isValid = validateFields();
     if (isValid) {
       const data = {
@@ -230,12 +222,12 @@ const CreateList = ({ wrapperRef }) => {
       formData.append('thumbnail', thumbnail);
       formData.append('data', JSON.stringify(data));
       try {
-        await justChooseApi({
+        const { data } = await justChooseApi({
           url: '/contentlists',
           method: 'POST',
           data: formData,
         });
-        clearForm();
+        listId = data.id;
       } catch (error) {
         setErrorOnCreate(true);
       }
@@ -245,6 +237,9 @@ const CreateList = ({ wrapperRef }) => {
 
     setCreating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+    if (listId) {
+      return history.push(`/lists/${listId}`);
+    }
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
@@ -447,25 +442,17 @@ const CreateList = ({ wrapperRef }) => {
             </ContentListHeader>
             {contentType && (
               <ContentListWrapper ref={contentListWrapperRef}>
-                {!showListPreview && (
-                  <ContentList
-                    requestType={requestType}
-                    contentType={contentType}
-                    params={params}
-                    pageNumber={pageNumber}
-                    setPageNumber={setPageNumber}
-                    contentList={contentList}
-                    setContentList={setContentList}
-                    wrapperRef={contentListWrapperRef}
-                  />
-                )}
-                {showListPreview && (
-                  <ContentListPreview
-                    contentType={contentType}
-                    contentList={contentList}
-                    setContentList={setContentList}
-                  />
-                )}
+                <ContentList
+                  requestType={requestType}
+                  contentType={contentType}
+                  params={params}
+                  pageNumber={pageNumber}
+                  setPageNumber={setPageNumber}
+                  contentList={contentList}
+                  setContentList={setContentList}
+                  showPreview={showListPreview}
+                  wrapperRef={contentListWrapperRef}
+                />
               </ContentListWrapper>
             )}
           </ContentListContainer>

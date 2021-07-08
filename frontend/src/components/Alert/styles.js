@@ -15,7 +15,7 @@ export const Container = styled.div`
   z-index: 1000;
   ${(props) =>
     props.severity === 'info'
-      ? `background: var(--accent);`
+      ? `background: var(--primary-400);`
       : props.severity === 'error'
       ? `background: var(--error);`
       : `background: var(--success);`}

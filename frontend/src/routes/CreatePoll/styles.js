@@ -239,7 +239,16 @@ export const SharingOption = styled.div`
 
 export const ContentListWrapper = styled.div`
   max-height: 550px;
+  padding: 20px;
   overflow-y: auto;
+
+  /* Scrollbar on Firefox */
+  scrollbar-color: var(--dark-gray) var(--background-100);
+
+  /* Scrollbar on Chrome, Edge, and Safari */
+  &::-webkit-scrollbar-track {
+    background: var(--background-100);
+  }
 `;
 
 export const CreationOptions = styled.div`
@@ -279,25 +288,5 @@ export const CreateButton = styled.button`
 
   &:hover {
     background: var(--primary-500);
-  }
-`;
-
-export const ContentList = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  grid-template-rows: 1fr;
-  grid-gap: 15px;
-  padding: 20px;
-
-  .cardWrapper {
-    display: flex;
-  }
-
-  .cardWrapper:before {
-    content: '';
-    display: block;
-    height: 0;
-    width: 0;
-    padding-bottom: calc(271 / 181 * 100%);
   }
 `;

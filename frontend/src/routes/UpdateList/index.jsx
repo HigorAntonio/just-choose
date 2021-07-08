@@ -13,7 +13,6 @@ import MovieFilters from '../../components/MovieFilters';
 import ShowFilters from '../../components/ShowFilters';
 import GameFilters from '../../components/GameFilters';
 import ContentList from '../../components/ContentList';
-import ContentListPreview from '../../components/ContentListPreview';
 import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
 import AccessDenied from '../../components/AccessDenied';
@@ -243,6 +242,8 @@ const UpdateList = ({ wrapperRef }) => {
 
   const handlePreviewList = () => {
     setShowListPreview((prevState) => !prevState);
+    contentListWrapperRef.current.scrollTop = 0;
+    contentListWrapperRef.current.scrollLeft = 0;
   };
 
   const validateFields = () => {
@@ -512,7 +513,7 @@ const UpdateList = ({ wrapperRef }) => {
             </ContentListHeader>
 
             <ContentListWrapper ref={contentListWrapperRef}>
-              {!loading && !showListPreview && (
+              {!loading && (
                 <ContentList
                   requestType={requestType}
                   contentType={contentType}
@@ -521,14 +522,8 @@ const UpdateList = ({ wrapperRef }) => {
                   setPageNumber={setPageNumber}
                   contentList={contentList}
                   setContentList={setContentList}
+                  showPreview={showListPreview}
                   wrapperRef={contentListWrapperRef}
-                />
-              )}
-              {!loading && showListPreview && (
-                <ContentListPreview
-                  contentType={contentType}
-                  contentList={contentList}
-                  setContentList={setContentList}
                 />
               )}
               {loading && (

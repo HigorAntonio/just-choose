@@ -14,7 +14,7 @@ import { AlertContext } from '../../context/AlertContext';
 import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
 import AccessDenied from '../../components/AccessDenied';
-import ContentCardSimple from '../../components/ContentCardSimple';
+import ContentGrid from '../../components/ContentGrid';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import DeleteListDialog from '../../components/DeleteListDialog';
@@ -33,7 +33,6 @@ import {
   TypeOptions,
   Option,
   Main,
-  ContentListContainer,
 } from './styles';
 
 const getMonth = (month) => {
@@ -64,19 +63,6 @@ const getMonth = (month) => {
       return 'dezembro';
     default:
       return '-';
-  }
-};
-
-const getContentBaseUrl = (type) => {
-  switch (type) {
-    case 'movie':
-      return process.env.REACT_APP_TMDB_MOVIE_URL;
-    case 'show':
-      return process.env.REACT_APP_TMDB_SHOW_URL;
-    case 'game':
-      return process.env.REACT_APP_RAWG_GAME_URL;
-    default:
-      return '';
   }
 };
 
@@ -372,29 +358,7 @@ const ShowList = ({ wrapperRef }) => {
           )}
         </Filters>
       </Header>
-      <Main>
-        {contentList.content && (
-          <ContentListContainer>
-            {content.length > 0 &&
-              content.map((c, i) => {
-                const src =
-                  c.type === 'game'
-                    ? c.poster_path
-                    : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
-                const href = `${getContentBaseUrl(c.type)}/${
-                  c.content_platform_id
-                }`;
-                return (
-                  <div key={c.type + c.content_id} className="cardWrapper">
-                    <a href={href} target="blank">
-                      <ContentCardSimple src={src} title={c.title} />
-                    </a>
-                  </div>
-                );
-              })}
-          </ContentListContainer>
-        )}
-      </Main>
+      <Main>{content && <ContentGrid content={content} />}</Main>
     </Container>
   );
 };

@@ -25,11 +25,12 @@ export const TopSide = styled.div`
   }
 
   /* Scrollbar on Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: var(--dark-gray) var(--background-500);
+  scrollbar-width: auto;
+  scrollbar-color: var(--dark-gray) var(--background-510);
 
+  /* Scrollbar on Chrome, Edge, and Safari */
   &::-webkit-scrollbar-track {
-    background: var(--background-500);
+    background: var(--background-510);
   }
 `;
 

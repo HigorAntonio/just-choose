@@ -8,7 +8,7 @@ import useContentRequest from '../../hooks/useContentRequest';
 import mUILightTheme from '../../styles/materialUIThemes/light';
 import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
-import { Container } from './styles';
+import { Container, Message } from './styles';
 
 const ContentList = ({
   requestType,
@@ -16,8 +16,9 @@ const ContentList = ({
   params,
   pageNumber,
   setPageNumber,
-  contentList,
+  contentList = {},
   setContentList,
+  showPreview,
   wrapperRef,
 }) => {
   const { title: theme } = useContext(ThemeContext);
@@ -44,11 +45,11 @@ const ContentList = ({
     }
   };
 
-  const { content, hasMore, loading } = useContentRequest(
-    getUrl(),
-    params,
-    pageNumber
-  );
+  const {
+    content = {},
+    hasMore,
+    loading,
+  } = useContentRequest(getUrl(), params, pageNumber);
 
   // Quando a lista de conteudo muda move o scroll da contentList pro início
   useEffect(() => {
@@ -107,7 +108,8 @@ const ContentList = ({
 
   return (
     <Container>
-      {content.length > 0 &&
+      {!showPreview &&
+        content.length > 0 &&
         content.map((c, i) => {
           const src =
             contentType === 'Jogo'
@@ -137,6 +139,23 @@ const ContentList = ({
             </div>
           );
         })}
+      {showPreview &&
+        contentList.length > 0 &&
+        contentList.map((c) => {
+          return (
+            <div key={c.contentId} className="cardWrapper">
+              <ContentCard
+                src={c.poster}
+                title={c.title}
+                click={() => addToContentList(c.contentId, c.poster, c.title)}
+                check={isInContentList(c.contentId)}
+              />
+            </div>
+          );
+        })}
+      {showPreview && !contentList.length && (
+        <Message>Você não adicionou itens à lista</Message>
+      )}
       {loading &&
         [...new Array(30).keys()].map((_, i) => (
           <div key={i} className="skeleton">

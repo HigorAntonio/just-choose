@@ -138,22 +138,3 @@ export const Main = styled.main`
   flex-direction: column;
   padding: 0 30px 30px 30px;
 `;
-
-export const ContentListContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  grid-template-rows: 1fr;
-  grid-gap: 15px;
-
-  .cardWrapper {
-    display: flex;
-  }
-
-  .cardWrapper:before {
-    content: '';
-    display: block;
-    height: 0;
-    width: 0;
-    padding-bottom: calc(271 / 181 * 100%);
-  }
-`;
