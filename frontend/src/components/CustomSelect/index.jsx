@@ -5,18 +5,18 @@ import { FaChevronDown } from 'react-icons/fa';
 
 import { Container, FilterDropDown } from './styles';
 
-const CustomSelect = (props) => {
+const CustomSelect = ({ label, dropDownAlign, children }) => {
   const [show, setShow] = useState(false);
 
   return (
     <ClickAwayListener onClickAway={() => setShow(false)}>
       <Container>
         <button onClick={() => setShow((prevState) => !prevState)}>
-          {props.label}
+          {label}
           {show ? <FaChevronUp /> : <FaChevronDown />}
         </button>
-        <FilterDropDown align={props.dropDownAlign} show={show}>
-          {props.children}
+        <FilterDropDown align={dropDownAlign} show={show}>
+          {children}
         </FilterDropDown>
       </Container>
     </ClickAwayListener>

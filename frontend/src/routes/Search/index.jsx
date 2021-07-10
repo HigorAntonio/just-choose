@@ -69,14 +69,14 @@ const Search = ({ wrapperRef }) => {
 
   const {
     content: contentLists,
-    hasMore: listHasMore,
-    loading: listLoading,
+    // hasMore: listHasMore,
+    // loading: listLoading,
   } = useSearchRequest('/contentlists', listParams, listPageNumber);
 
   const {
     content: polls,
-    hasMore: pollsHasMore,
-    loading: pollsLoading,
+    // hasMore: pollsHasMore,
+    // loading: pollsLoading,
   } = useSearchRequest('/polls', pollParams, pollPageNumber);
 
   useEffect(() => {

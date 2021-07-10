@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, memo } from 'react';
 import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
@@ -34,4 +34,4 @@ const DataPicker = ({ value, setValue }) => {
   );
 };
 
-export default DataPicker;
+export default memo(DataPicker);

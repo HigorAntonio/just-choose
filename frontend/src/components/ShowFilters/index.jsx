@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 
 import SingleOptionSelect from '../SingleOptionSelect';
 import CustomSelect from '../CustomSelect';
@@ -227,4 +227,4 @@ const ShowFilters = ({
   );
 };
 
-export default ShowFilters;
+export default memo(ShowFilters);

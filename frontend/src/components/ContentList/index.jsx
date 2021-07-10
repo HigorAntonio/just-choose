@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useContext } from 'react';
+import React, { useEffect, useRef, useCallback, useContext, memo } from 'react';
 import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -175,4 +175,4 @@ const ContentList = ({
   );
 };
 
-export default ContentList;
+export default memo(ContentList);

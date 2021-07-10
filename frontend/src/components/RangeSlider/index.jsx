@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, memo } from 'react';
 import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
@@ -37,4 +37,4 @@ const RangeSlider = ({ min, max, step, value, setValue }) => {
   );
 };
 
-export default RangeSlider;
+export default memo(RangeSlider);
