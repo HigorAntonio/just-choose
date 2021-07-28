@@ -7,7 +7,7 @@ import dark from '../styles/themes/dark';
 
 export const ThemeContext = createContext();
 
-export const ThemeContextProvider = (props) => {
+export const ThemeContextProvider = ({ children }) => {
   const [theme, setTheme] = usePersistedState('theme', light);
 
   const toggleTheme = () => {
@@ -21,7 +21,7 @@ export const ThemeContextProvider = (props) => {
         toggleTheme,
       }}
     >
-      {props.children}
+      {children}
     </ThemeContext.Provider>
   );
 };

@@ -27,6 +27,14 @@ export const Platforms = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 10px;
   padding: 10px;
+  overflow-y: scroll;
+
+  &::after {
+    content: '';
+    display: block;
+    height: 0.1px;
+    background: red;
+  }
 `;
 
 export const Genres = styled.div`

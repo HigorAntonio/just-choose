@@ -1,12 +1,14 @@
 import styled from 'styled-components';
 
+import breakpoints from '../../styles/breakpoints';
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
 
-  width: 240px;
+  width: 100%;
   height: 100%;
 
   background: var(--background-510);
@@ -84,6 +86,16 @@ export const NavOption = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  @media (max-width: ${breakpoints.size1}) {
+    > div {
+      display: none;
+    }
+
+    &:hover {
+      background: transparent;
+    }
+  }
 `;
 
 export const Header = styled.div`
@@ -95,6 +107,10 @@ export const Header = styled.div`
   > h5 {
     font-size: 15px;
     font-weight: 500;
+  }
+
+  @media (max-width: ${breakpoints.size1}) {
+    display: none;
   }
 `;
 
@@ -114,6 +130,12 @@ export const Profile = styled.div`
   &:hover {
     background: var(--background-600);
     cursor: pointer;
+  }
+
+  @media (max-width: ${breakpoints.size1}) {
+    &:hover {
+      background: transparent;
+    }
   }
 `;
 
@@ -139,6 +161,10 @@ export const ProfileData = styled.div`
     text-overflow: ellipsis;
 
     margin-left: 10px;
+  }
+
+  @media (max-width: ${breakpoints.size1}) {
+    display: none;
   }
 `;
 

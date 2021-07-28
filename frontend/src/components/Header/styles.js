@@ -9,7 +9,8 @@ export const Container = styled.div`
   display: flex;
   justify-content: space-between;
 
-  height: 59px;
+  /* height: 59px; */
+  padding: 0.5em;
 
   background: var(--background-100);
 
@@ -25,7 +26,7 @@ export const LogoWrapper = styled.div`
 `;
 
 export const SearchWrapper = styled.div`
-  flex: 1;
+  flex: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,8 +45,8 @@ export const Logo = styled.img.attrs((props) => ({
     (props.theme === 'light' ? JustChooseLogoLight : JustChooseLogoDark),
   alt: props.alt || 'JustChose Logo',
 }))`
-  height: 35px;
-  margin-left: 10px;
+  height: 3.5rem;
+  margin-left: 0.5rem;
 
   &:hover {
     cursor: pointer;
@@ -54,17 +55,18 @@ export const Logo = styled.img.attrs((props) => ({
 
 export const SearchBar = styled.div`
   display: flex;
-  width: min(399px, 100%);
+  width: 100%;
+  max-width: 39rem;
 
-  max-height: 36px;
+  /* max-height: 36px; */
 
   margin: 0 20px;
 `;
 
 export const SearchInput = styled.input`
   width: 90%;
-  height: 36px;
-  font-size: 14px;
+  height: 3.6rem;
+  font-size: 1.4rem;
   padding: 5px 10px;
   border-radius: 5px 0 0 5px;
   border: 2px solid var(--background-400);
@@ -90,8 +92,8 @@ export const SearchInput = styled.input`
 
 export const SearchButton = styled.button`
   width: 10%;
-  height: 36px;
-  min-width: 30px;
+  height: 3.6rem;
+  min-width: 3rem;
 
   padding: 5px;
 
@@ -115,10 +117,10 @@ export const NavMenu = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-right: 10px;
+  margin-right: 1rem;
 
   > button {
-    margin-right: 10px;
+    margin-right: 1rem;
   }
 `;
 
@@ -127,8 +129,8 @@ const navButtonCss = css`
   justify-content: center;
   align-items: center;
 
-  width: 35px;
-  height: 35px;
+  width: 3.5rem;
+  height: 3.5rem;
 
   border-radius: 5px;
 
@@ -143,29 +145,29 @@ const navButtonCss = css`
 
 export const NewListButton = styled.button`
   ${navButtonCss}
-  margin-right: 10px;
+  margin-right: 1rem;
 `;
 
 export const NewListIcon = styled.img.attrs((props) => ({
   src: props.src || NewList,
   alt: props.alt || 'Nova Lista',
 }))`
-  height: 25px;
+  height: 2.5rem;
 
-  margin-top: 2px;
+  margin-top: 0.2rem;
 `;
 
 export const NewPollButton = styled.button`
   ${navButtonCss}
-  width: 40px;
-  margin-right: 10px;
+  width: 4rem;
+  margin-right: 1rem;
 `;
 
 export const NewPollIcon = styled.img.attrs((props) => ({
   src: props.src || NewPoll,
   alt: props.alt || 'Nova Votação',
 }))`
-  height: 27px;
+  height: 2.7rem;
 `;
 
 export const Tooltip = styled.span`
@@ -213,8 +215,8 @@ const signButton = css`
   align-items: center;
   font-weight: bold;
   color: var(--text);
-  height: 35px;
-  padding: 10px;
+  height: 3.5rem;
+  padding: 1rem;
   border-radius: 5px;
   white-space: nowrap;
   outline: none;
@@ -245,8 +247,8 @@ export const ProfileWrapper = styled.div`
 `;
 
 export const Profile = styled.div`
-  width: 35px;
-  height: 35px;
+  width: 3.5rem;
+  height: 3.5rem;
 
   border-radius: 50%;
 
@@ -258,9 +260,9 @@ export const Profile = styled.div`
 `;
 
 export const ProfileDropDown = styled.div`
-  width: 280px;
+  width: 28rem;
   background: var(--background-100);
-  padding: 10px;
+  padding: 1rem;
   border-radius: 5px;
   position: absolute;
   bottom: -5px;

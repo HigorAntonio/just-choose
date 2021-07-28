@@ -2,7 +2,7 @@ import React, { useState, createContext } from 'react';
 
 export const AlertContext = createContext();
 
-export const AlertContextProvider = (props) => {
+export const AlertContextProvider = ({ children }) => {
   const [severity, setSeverity] = useState('info');
   const [message, setMessage] = useState('');
   const [show, setShow] = useState(false);
@@ -21,7 +21,7 @@ export const AlertContextProvider = (props) => {
         setDuration,
       }}
     >
-      {props.children}
+      {children}
     </AlertContext.Provider>
   );
 };

@@ -4,7 +4,7 @@ import useAuth from '../hooks/useAuth';
 
 export const AuthContext = createContext();
 
-export const AuthContextProvider = (props) => {
+export const AuthContextProvider = ({ children }) => {
   const {
     loading,
     userId,
@@ -25,7 +25,7 @@ export const AuthContextProvider = (props) => {
         handleLogout,
       }}
     >
-      {props.children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -2,15 +2,18 @@ import Layout from './components/Layout';
 
 import { AuthContextProvider } from './context/AuthContext';
 import { ThemeContextProvider } from './context/ThemeContext';
+import { ViewportContextProvider } from './context/ViewportContext';
 import { AlertContextProvider } from './context/AlertContext';
 
 function App() {
   return (
     <ThemeContextProvider>
       <AuthContextProvider>
-        <AlertContextProvider>
-          <Layout />
-        </AlertContextProvider>
+        <ViewportContextProvider>
+          <AlertContextProvider>
+            <Layout />
+          </AlertContextProvider>
+        </ViewportContextProvider>
       </AuthContextProvider>
     </ThemeContextProvider>
   );

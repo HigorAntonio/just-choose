@@ -21,7 +21,11 @@ export default createGlobalStyle`
     font-family: 'Roboto', sans-serif;
   }
   html {
+    font-size: 62.5%;
     background: var(--background-410);
+  }
+  body {
+    font-size: 1.6rem;
   }
   :root {
     --white: ${(props) => props.theme.colors.white};

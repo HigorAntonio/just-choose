@@ -12,7 +12,9 @@ import { GoSearch } from 'react-icons/go';
 import { Link } from 'react-router-dom';
 
 import { AuthContext } from '../../context/AuthContext';
+import { ViewportContext } from '../../context/ViewportContext';
 import useUserRequest from '../../hooks/useUserRequest';
+import breakpoints from '../../styles/breakpoints';
 
 import {
   Container,
@@ -38,7 +40,10 @@ const NavBar = () => {
   const [usersPageNumber, setUsersPageNumber] = useState(1);
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+
   const { authenticated } = useContext(AuthContext);
+  const { width } = useContext(ViewportContext);
+
   const wrapperRef = useRef();
 
   useEffect(() => {
@@ -66,6 +71,12 @@ const NavBar = () => {
       setShowSearch(false);
     }
   }, [search]);
+
+  useEffect(() => {
+    if (width <= breakpoints.getInt(breakpoints.size1)) {
+      setShowSearch(false);
+    }
+  }, [width]);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && e.target.value) {
@@ -151,19 +162,23 @@ const NavBar = () => {
               {following.map((p, i) => {
                 if (following.length === i + 1) {
                   return (
-                    <Profile ref={lastFollowRef} key={p.user_id}>
+                    <Profile
+                      ref={lastFollowRef}
+                      key={p.user_id}
+                      title={p.user_name}
+                    >
                       <ProfileImage></ProfileImage>
                       <ProfileData>
-                        <span title={p.user_name}>{p.user_name}</span>
+                        <span>{p.user_name}</span>
                       </ProfileData>
                     </Profile>
                   );
                 }
                 return (
-                  <Profile key={p.user_id}>
+                  <Profile key={p.user_id} title={p.user_name}>
                     <ProfileImage></ProfileImage>
                     <ProfileData>
-                      <span title={p.user_name}>{p.user_name}</span>
+                      <span>{p.user_name}</span>
                     </ProfileData>
                   </Profile>
                 );
@@ -180,19 +195,19 @@ const NavBar = () => {
               {users.map((p, i) => {
                 if (users.length === i + 1) {
                   return (
-                    <Profile ref={lastUserRef} key={p.id}>
+                    <Profile ref={lastUserRef} key={p.id} title={p.name}>
                       <ProfileImage></ProfileImage>
                       <ProfileData>
-                        <span title={p.name}>{p.name}</span>
+                        <span>{p.name}</span>
                       </ProfileData>
                     </Profile>
                   );
                 }
                 return (
-                  <Profile key={p.id}>
+                  <Profile key={p.id} title={p.name}>
                     <ProfileImage></ProfileImage>
                     <ProfileData>
-                      <span title={p.name}>{p.name}</span>
+                      <span>{p.name}</span>
                     </ProfileData>
                   </Profile>
                 );
@@ -207,7 +222,7 @@ const NavBar = () => {
           </Following>
         )}
       </TopSide>
-      {authenticated && (
+      {authenticated && width >= breakpoints.getInt(breakpoints.size1) && (
         <BottomSide>
           <SearchUser>
             <GoSearch size={15} style={{ flexShrink: 0 }} />

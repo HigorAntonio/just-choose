@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import breakpoints from '../../styles/breakpoints';
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -16,20 +18,25 @@ export const HeaderWrapper = styled.div`
 
 export const BodyWrapper = styled.div`
   display: flex;
+  width: 100%;
   height: 100%;
   overflow-y: auto;
 `;
 
 export const NavBarWrapper = styled.div`
-  width: 240px;
+  width: 25.5rem;
   height: 100%;
   position: sticky;
   top: 0;
+
+  @media (max-width: ${breakpoints.size1}) {
+    width: 5.5rem;
+  }
 `;
 
 export const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  flex: 1;
   height: 100%;
 `;
