@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ClickAwayListener } from '@material-ui/core';
 import { ThemeContext } from 'styled-components';
@@ -46,7 +46,13 @@ function Header() {
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
+  const [showSearchDropDown, setShowSearchDropDown] = useState(false);
   const [search, setSearch] = useState('');
+
+  useEffect(
+    () => console.debug('showSearch:', showSearchDropDown),
+    [showSearchDropDown]
+  );
 
   const handleSignIn = () => {
     setShowSignModal(true);
@@ -100,6 +106,35 @@ function Header() {
             <FiSearch size={25} style={{ flexShrink: 0 }} />
           </SearchButton>
         </SearchBar>
+        <ClickAwayListener
+          onClickAway={() => {
+            setShowSearchDropDown(false);
+          }}
+        >
+          <div>
+            <SearchButton
+              className="squared no-background search-button-small-screen"
+              onClick={() => setShowSearchDropDown((prevState) => !prevState)}
+            >
+              <FiSearch size={25} style={{ flexShrink: 0 }} />
+            </SearchButton>
+            <SearchBar
+              className="searchbar-small-screen"
+              show={showSearchDropDown}
+            >
+              <SearchInput
+                type="search"
+                placeholder="Buscar"
+                value={search}
+                onChange={searchChange}
+                onKeyPress={handleKeyPress}
+              />
+              <SearchButton disabled={!search} onClick={handleSearch}>
+                <FiSearch size={25} style={{ flexShrink: 0 }} />
+              </SearchButton>
+            </SearchBar>
+          </div>
+        </ClickAwayListener>
       </SearchWrapper>
 
       <NavMenuWrapper>

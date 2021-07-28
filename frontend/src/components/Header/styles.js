@@ -4,6 +4,7 @@ import JustChooseLogoLight from '../../assets/JustChooseLogoLight.svg';
 import JustChooseLogoDark from '../../assets/JustChooseLogoDark.svg';
 import NewList from '../../assets/NewList.png';
 import NewPoll from '../../assets/NewPoll.png';
+import breakpoints from '../../styles/breakpoints';
 
 export const Container = styled.div`
   display: flex;
@@ -26,10 +27,19 @@ export const LogoWrapper = styled.div`
 `;
 
 export const SearchWrapper = styled.div`
-  flex: 2;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (max-width: ${breakpoints.size2}) {
+    flex: 2;
+  }
+
+  @media (max-width: ${breakpoints.size3}) {
+    justify-content: flex-end;
+    position: relative;
+  }
 `;
 
 export const NavMenuWrapper = styled.div`
@@ -37,6 +47,10 @@ export const NavMenuWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  @media (max-width: ${breakpoints.size3}) {
+    flex: 0;
+  }
 `;
 
 export const Logo = styled.img.attrs((props) => ({
@@ -47,6 +61,7 @@ export const Logo = styled.img.attrs((props) => ({
 }))`
   height: 3.5rem;
   margin-left: 0.5rem;
+  margin-right: 1em;
 
   &:hover {
     cursor: pointer;
@@ -57,10 +72,38 @@ export const SearchBar = styled.div`
   display: flex;
   width: 100%;
   max-width: 39rem;
-
-  /* max-height: 36px; */
-
   margin: 0 20px;
+
+  &.searchbar-small-screen {
+    display: none;
+  }
+
+  @media (max-width: ${breakpoints.size3}) {
+    display: none;
+
+    &.searchbar-small-screen {
+      ${(props) => (props.show ? 'display: flex;' : 'display: none;')}
+      background: var(--background-100);
+      padding: 5px;
+      min-width: 39rem;
+      margin: 0;
+      border-radius: 5px;
+      position: absolute;
+      top: 4.5rem;
+      right: 0;
+      transform: translateX(20%);
+
+      -webkit-box-shadow: 0px 2px 10px 1px rgba(0, 0, 0, 0.25);
+      box-shadow: 0px 2px 10px 1px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  @media (max-width: ${breakpoints.size4}) {
+    &.searchbar-small-screen {
+      min-width: 85vw;
+      transform: translateX(26%);
+    }
+  }
 `;
 
 export const SearchInput = styled.input`
@@ -94,14 +137,19 @@ export const SearchButton = styled.button`
   width: 10%;
   height: 3.6rem;
   min-width: 3rem;
-
   padding: 5px;
-
   border-radius: 0 5px 5px 0;
-
   margin-left: 1px;
-
   background: var(--background-300);
+
+  &.squared {
+    width: 3.6rem;
+    border-radius: 5px;
+  }
+
+  &.no-background {
+    background: transparent;
+  }
 
   &:hover {
     background: var(--background-500);
@@ -110,6 +158,16 @@ export const SearchButton = styled.button`
   &:disabled {
     background: var(--background-300);
     cursor: not-allowed;
+  }
+
+  &.search-button-small-screen {
+    display: none;
+  }
+
+  @media (max-width: ${breakpoints.size3}) {
+    &.search-button-small-screen {
+      display: initial;
+    }
   }
 `;
 
@@ -145,7 +203,7 @@ const navButtonCss = css`
 
 export const NewListButton = styled.button`
   ${navButtonCss}
-  margin-right: 1rem;
+  margin: 0 1rem;
 `;
 
 export const NewListIcon = styled.img.attrs((props) => ({
@@ -268,6 +326,9 @@ export const ProfileDropDown = styled.div`
   bottom: -5px;
   right: 0;
   transform: translateY(100%);
+
+  -webkit-box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
 
   ${(props) =>
     props.show

@@ -26,6 +26,8 @@ export default createGlobalStyle`
   }
   body {
     font-size: 1.6rem;
+
+    overflow: hidden;
   }
   :root {
     --white: ${(props) => props.theme.colors.white};
