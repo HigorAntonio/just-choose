@@ -349,7 +349,7 @@ const UpdatePoll = ({ wrapperRef }) => {
             <div className="column">
               <ThumbPreview src={thumbPreview} />
             </div>
-            <div className="column">
+            <div className="column button-wrapper">
               <div className="file-input">
                 <label htmlFor="thumbnail">Selecione uma imagem</label>
                 <input

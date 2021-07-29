@@ -1,5 +1,7 @@
 import styled, { css } from 'styled-components';
 
+import breakpoints from '../../styles/breakpoints';
+
 const labelCss = css`
   flex-shrink: 0;
   font-size: 14px;
@@ -31,6 +33,7 @@ export const InputWrapper = styled.div`
     max-width: 680px;
 
     > .error {
+      color: var(--white);
       background: var(--error);
       padding: 7px 20px;
       border-radius: 5px;
@@ -61,6 +64,15 @@ export const InputWrapper = styled.div`
 
     transition: border 0.3s;
   }
+
+  @media (max-width: ${breakpoints.size7}) {
+    flex-direction: column;
+
+    > .column,
+    textarea {
+      max-width: 100%;
+    }
+  }
 `;
 
 export const TitleInput = styled.input`
@@ -84,6 +96,10 @@ export const TitleInput = styled.input`
   }
 
   transition: border 0.3s;
+
+  @media (max-width: ${breakpoints.size7}) {
+    max-width: 100%;
+  }
 `;
 
 export const ThumbnailWrapper = styled.div`
@@ -123,12 +139,23 @@ export const ThumbnailWrapper = styled.div`
     }
 
     > p.thumb-error {
+      width: 100%;
+      color: var(--white);
       background: var(--error);
       padding: 7px 20px;
       border-radius: 5px;
       font-size: 14px;
       font-weight: bold;
     }
+  }
+
+  > div.button-wrapper {
+    flex: 1;
+  }
+
+  @media (max-width: ${breakpoints.size8}) {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -150,6 +177,11 @@ export const ThumbPreview = styled.div`
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 50% 50%;
+
+  @media (max-width: ${breakpoints.size8}) {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
 `;
 
 export const Main = styled.main`
@@ -170,6 +202,10 @@ export const Main = styled.main`
     border: 0.1px solid var(--background-600);
     border-radius: 5px;
     margin-bottom: 40px;
+
+    @media (max-width: ${breakpoints.size6}) {
+      width: 100%;
+    }
   }
 
   > .content-list {
@@ -182,6 +218,7 @@ export const Main = styled.main`
   }
 
   > .error {
+    color: var(--white);
     background: var(--error);
     padding: 7px 20px;
     border-radius: 5px;
@@ -198,6 +235,10 @@ export const LabelWrapper = styled.div`
   > label {
     font-size: 14px;
     font-weight: bold;
+  }
+
+  @media (max-width: ${breakpoints.size7}) {
+    margin-bottom: 15px;
   }
 `;
 

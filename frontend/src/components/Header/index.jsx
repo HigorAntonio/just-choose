@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ClickAwayListener } from '@material-ui/core';
 import { ThemeContext } from 'styled-components';
@@ -48,11 +48,6 @@ function Header() {
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const [showSearchDropDown, setShowSearchDropDown] = useState(false);
   const [search, setSearch] = useState('');
-
-  useEffect(
-    () => console.debug('showSearch:', showSearchDropDown),
-    [showSearchDropDown]
-  );
 
   const handleSignIn = () => {
     setShowSignModal(true);
