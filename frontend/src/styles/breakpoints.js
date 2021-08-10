@@ -1,12 +1,9 @@
 module.exports = {
-  size1: '1200px',
-  size2: '1290px',
-  size3: '768px',
-  size4: '475px',
-  size5: '500px',
-  size6: '1130px',
-  size7: '1027px',
-  size8: '640px',
+  size1: '1200px', //usando na sidebar
+  size2: '1886px', //usando no filtro de conteudo
+  size3: '775px', //usando no filtro de conteudo
+  size4: '1670px', //usando no filtro de conteudo
+  size5: '1490px', //usando no filtro de conteudo
 
   getInt: (size) => {
     return parseInt(size.slice(0, -2));

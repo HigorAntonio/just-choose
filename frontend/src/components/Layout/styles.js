@@ -33,7 +33,7 @@ export const NavBarWrapper = styled.div`
     width: 5.5rem;
   }
 
-  @media (max-width: ${breakpoints.size5}) {
+  @media (max-width: 500px) {
     display: none;
   }
 `;

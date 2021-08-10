@@ -4,7 +4,6 @@ import JustChooseLogoLight from '../../assets/JustChooseLogoLight.svg';
 import JustChooseLogoDark from '../../assets/JustChooseLogoDark.svg';
 import NewList from '../../assets/NewList.png';
 import NewPoll from '../../assets/NewPoll.png';
-import breakpoints from '../../styles/breakpoints';
 
 export const Container = styled.div`
   display: flex;
@@ -32,11 +31,11 @@ export const SearchWrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  @media (max-width: ${breakpoints.size2}) {
+  @media (max-width: 1290px) {
     flex: 2;
   }
 
-  @media (max-width: ${breakpoints.size3}) {
+  @media (max-width: 768px) {
     justify-content: flex-end;
     position: relative;
   }
@@ -48,7 +47,7 @@ export const NavMenuWrapper = styled.div`
   align-items: center;
   justify-content: flex-end;
 
-  @media (max-width: ${breakpoints.size3}) {
+  @media (max-width: 768px) {
     flex: 0;
   }
 `;
@@ -78,7 +77,7 @@ export const SearchBar = styled.div`
     display: none;
   }
 
-  @media (max-width: ${breakpoints.size3}) {
+  @media (max-width: 768px) {
     display: none;
 
     &.searchbar-small-screen {
@@ -98,7 +97,7 @@ export const SearchBar = styled.div`
     }
   }
 
-  @media (max-width: ${breakpoints.size4}) {
+  @media (max-width: 475px) {
     &.searchbar-small-screen {
       min-width: 85vw;
       transform: translateX(26%);
@@ -164,7 +163,7 @@ export const SearchButton = styled.button`
     display: none;
   }
 
-  @media (max-width: ${breakpoints.size3}) {
+  @media (max-width: 768px) {
     &.search-button-small-screen {
       display: initial;
     }

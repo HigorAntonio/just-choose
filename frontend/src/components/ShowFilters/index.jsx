@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useContext, memo } from 'react';
 
 import SingleOptionSelect from '../SingleOptionSelect';
 import CustomSelect from '../CustomSelect';
@@ -7,9 +7,17 @@ import CustomOption from '../CustomOption';
 import DataPicker from '../DataPicker';
 import RangeSlider from '../RangeSlider';
 
+import { ViewportContext } from '../../context/ViewportContext';
 import useShowFilters from '../../hooks/useShowFilters';
+import breakpoints from '../../styles/breakpoints';
 
 import {
+  Container,
+  FilterWrapper,
+  FilterGrid,
+  ButtonsWrapper,
+  LabelWrapper,
+  Label,
   Providers,
   Genres,
   ReleaseDate,
@@ -49,6 +57,7 @@ const ShowFilters = ({
   } = useShowFilters();
 
   const [showSortOptions, setShowSortOptions] = useState(false);
+  const { width } = useContext(ViewportContext);
 
   const handleSelectProvider = (id) => {
     if (selectedProviders.includes(id)) {
@@ -113,9 +122,11 @@ const ShowFilters = ({
   };
 
   return (
-    <>
-      <div>
-        <label>Ordenar por</label>
+    <Container>
+      <FilterWrapper>
+        <LabelWrapper>
+          <Label>Ordenar por</Label>
+        </LabelWrapper>
         <SingleOptionSelect
           label={!sortBy.key ? 'Selecionar' : sortBy.key}
           dropDownAlign="center"
@@ -137,93 +148,107 @@ const ShowFilters = ({
             ))}
           </OrderByOptions>
         </SingleOptionSelect>
-      </div>
-      <div>
-        <label>Filtrar por</label>
-        <CustomSelect label="Provedor" dropDownAlign="center">
-          <Providers>
-            {providers &&
-              providers.map((p) => (
-                <ContentProvider
-                  key={p.id}
-                  click={() => handleSelectProvider(p.id)}
-                  check={isProviderCheck(p.id)}
-                >
-                  {p.name}
-                </ContentProvider>
-              ))}
-          </Providers>
-        </CustomSelect>
-        <CustomSelect label="Gênero" dropDownAlign="center">
-          <Genres>
-            {genres &&
-              genres.map((g) => (
-                <CustomOption
-                  key={g.id}
-                  click={() => handleSelectGenre(g.id)}
-                  check={isGenreCheck(g.id)}
-                >
-                  {g.name}
-                </CustomOption>
-              ))}
-          </Genres>
-        </CustomSelect>
-        <CustomSelect label="Data de lançamento" dropDownAlign="center">
-          <ReleaseDate>
-            <div>
-              <span>de</span>
-              <DataPickerWrapper>
-                <DataPicker value={airDateGte} setValue={setAirDateGte} />
-              </DataPickerWrapper>
-            </div>
-            <div>
-              <span>até</span>
-              <DataPickerWrapper>
-                <DataPicker value={airDateLte} setValue={setAirDateLte} />
-              </DataPickerWrapper>
-            </div>
-          </ReleaseDate>
-        </CustomSelect>
-        <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
-          <RangeWrapper>
-            <div>
-              <span className="label-left">0</span>
-              <RangeSlider
-                min={0}
-                max={10}
-                step={1}
-                value={voteAverage}
-                setValue={setVoteAverage}
-              />
-              <span className="label-right">10</span>
-            </div>
-          </RangeWrapper>
-        </CustomSelect>
-        <CustomSelect label="Duração" dropDownAlign="center">
-          <RangeWrapper title="Duração em minutos">
-            <div>
-              <span className="label-left" title="0 minutos">
-                0
-              </span>
-              <RangeSlider
-                min={0}
-                max={400}
-                step={5}
-                value={runtime}
-                setValue={setRuntime}
-              />
-              <span className="label-right" title="400 minutos">
-                400
-              </span>
-            </div>
-          </RangeWrapper>
-        </CustomSelect>
-        <div>
+      </FilterWrapper>
+      <FilterWrapper className="space-beetween">
+        <FilterWrapper className="filter-grid-wrapper">
+          <LabelWrapper>
+            <Label>Filtrar por</Label>
+          </LabelWrapper>
+          <FilterGrid>
+            <CustomSelect
+              label="Provedor"
+              dropDownAlign={
+                width <= breakpoints.getInt(breakpoints.size4) &&
+                width > breakpoints.getInt(breakpoints.size3)
+                  ? 'left'
+                  : 'center'
+              }
+            >
+              <Providers>
+                {providers &&
+                  providers.map((p) => (
+                    <ContentProvider
+                      key={p.id}
+                      click={() => handleSelectProvider(p.id)}
+                      check={isProviderCheck(p.id)}
+                    >
+                      {p.name}
+                    </ContentProvider>
+                  ))}
+              </Providers>
+            </CustomSelect>
+            <CustomSelect label="Gênero" dropDownAlign="center">
+              <Genres>
+                {genres &&
+                  genres.map((g) => (
+                    <CustomOption
+                      key={g.id}
+                      click={() => handleSelectGenre(g.id)}
+                      check={isGenreCheck(g.id)}
+                    >
+                      {g.name}
+                    </CustomOption>
+                  ))}
+              </Genres>
+            </CustomSelect>
+            <CustomSelect label="Data de lançamento" dropDownAlign="center">
+              <ReleaseDate>
+                <div>
+                  <span>de</span>
+                  <DataPickerWrapper>
+                    <DataPicker value={airDateGte} setValue={setAirDateGte} />
+                  </DataPickerWrapper>
+                </div>
+                <div>
+                  <span>até</span>
+                  <DataPickerWrapper>
+                    <DataPicker value={airDateLte} setValue={setAirDateLte} />
+                  </DataPickerWrapper>
+                </div>
+              </ReleaseDate>
+            </CustomSelect>
+            <CustomSelect label="Pontuação do usuário" dropDownAlign="center">
+              <RangeWrapper>
+                <div>
+                  <span className="label-left">0</span>
+                  <RangeSlider
+                    min={0}
+                    max={10}
+                    step={1}
+                    value={voteAverage}
+                    setValue={setVoteAverage}
+                  />
+                  <span className="label-right">10</span>
+                </div>
+              </RangeWrapper>
+            </CustomSelect>
+            <CustomSelect label="Duração" dropDownAlign="center">
+              <RangeWrapper title="Duração em minutos">
+                <div>
+                  <span className="label-left" title="0 minutos">
+                    0
+                  </span>
+                  <RangeSlider
+                    min={0}
+                    max={400}
+                    step={5}
+                    value={runtime}
+                    setValue={setRuntime}
+                  />
+                  <span className="label-right" title="400 minutos">
+                    400
+                  </span>
+                </div>
+              </RangeWrapper>
+            </CustomSelect>
+          </FilterGrid>
+        </FilterWrapper>
+        <ButtonsWrapper>
           <ClearButton onClick={handleClearFilters}>Reinicializar</ClearButton>
           <SearchButton onClick={handleSearch}>Filtrar</SearchButton>
-        </div>
-      </div>
-    </>
+        </ButtonsWrapper>
+      </FilterWrapper>
+    </Container>
   );
 };
 
