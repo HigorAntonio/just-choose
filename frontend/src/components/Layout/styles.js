@@ -13,7 +13,7 @@ export const HeaderWrapper = styled.div`
   flex-shrink: 0;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 2000;
 `;
 
 export const BodyWrapper = styled.div`
@@ -43,4 +43,5 @@ export const ContentWrapper = styled.div`
   flex-direction: column;
   flex: 1;
   height: 100%;
+  overflow-y: auto;
 `;
