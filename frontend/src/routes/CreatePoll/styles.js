@@ -1,7 +1,5 @@
 import styled, { css } from 'styled-components';
 
-import breakpoints from '../../styles/breakpoints';
-
 const labelCss = css`
   flex-shrink: 0;
   font-size: 14px;
@@ -65,7 +63,7 @@ export const InputWrapper = styled.div`
     transition: border 0.3s;
   }
 
-  @media (max-width: ${breakpoints.size7}) {
+  @media (max-width: 1027px) {
     flex-direction: column;
 
     > .column,
@@ -97,7 +95,7 @@ export const TitleInput = styled.input`
 
   transition: border 0.3s;
 
-  @media (max-width: ${breakpoints.size7}) {
+  @media (max-width: 1027px) {
     max-width: 100%;
   }
 `;
@@ -153,7 +151,7 @@ export const ThumbnailWrapper = styled.div`
     flex: 1;
   }
 
-  @media (max-width: ${breakpoints.size8}) {
+  @media (max-width: 640px) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -178,7 +176,7 @@ export const ThumbPreview = styled.div`
   background-size: cover;
   background-position: 50% 50%;
 
-  @media (max-width: ${breakpoints.size8}) {
+  @media (max-width: 640px) {
     margin-right: 0;
     margin-bottom: 20px;
   }
@@ -203,14 +201,14 @@ export const Main = styled.main`
     border-radius: 5px;
     margin-bottom: 40px;
 
-    @media (max-width: ${breakpoints.size6}) {
+    @media (max-width: 1130px) {
       width: 100%;
     }
   }
 
   > .content-list {
     width: 100%;
-    max-width: 100%;
+    min-width: 100%;
   }
 
   & ${InputWrapper} + ${InputWrapper} {
@@ -226,6 +224,10 @@ export const Main = styled.main`
     font-weight: bold;
     margin-bottom: 5px;
   }
+
+  @media (max-width: 500px) {
+    padding: 0 20px;
+  }
 `;
 
 export const LabelWrapper = styled.div`
@@ -237,7 +239,7 @@ export const LabelWrapper = styled.div`
     font-weight: bold;
   }
 
-  @media (max-width: ${breakpoints.size7}) {
+  @media (max-width: 1027px) {
     margin-bottom: 15px;
   }
 `;
@@ -302,6 +304,14 @@ export const CreationOptions = styled.div`
     display: flex;
     > button + button {
       margin-left: 15px;
+    }
+  }
+
+  @media (max-width: 415px) {
+    flex-direction: column;
+
+    > div + div {
+      margin-top: 15px;
     }
   }
 `;

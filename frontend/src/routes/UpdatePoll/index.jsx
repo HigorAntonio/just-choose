@@ -209,6 +209,7 @@ const UpdatePoll = ({ wrapperRef }) => {
     setUpdating(true);
     clearTimeout(alertTimeout);
 
+    let successfulyUpdated = true;
     const isValid = validateFields();
     if (isValid) {
       const data = {
@@ -230,14 +231,21 @@ const UpdatePoll = ({ wrapperRef }) => {
         });
       } catch (error) {
         setErrorOnCreate(true);
+        successfulyUpdated = false;
       }
     } else {
       setErrorOnCreate(true);
+      successfulyUpdated = false;
     }
 
     setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    history.push(`/polls/${pollId}`);
+    if (successfulyUpdated) {
+      history.push(`/polls/${pollId}`);
+    }
+    // Posiciona o scroll no início da página
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
   };
 
   if (loadingError) {

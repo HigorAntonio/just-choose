@@ -372,8 +372,8 @@ const CreateList = ({ wrapperRef }) => {
         <div className={!contentType ? null : 'content-list'}>
           <ContentListContainer>
             <ContentListHeader>
-              <div className="row">
-                <div>
+              <div className="wrapper">
+                <div className="wrapper content-type-wrapper">
                   <label>Tipo de conteúdo</label>
                   <SingleOptionSelect
                     label={!contentType ? 'Selecionar' : contentType}
@@ -410,7 +410,7 @@ const CreateList = ({ wrapperRef }) => {
                 )}
               </div>
               {contentType === 'Filme' && (
-                <div className="row">
+                <div className="wrapper">
                   <MovieFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
@@ -420,7 +420,7 @@ const CreateList = ({ wrapperRef }) => {
                 </div>
               )}
               {contentType === 'Série' && (
-                <div className="row">
+                <div className="wrapper">
                   <ShowFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
@@ -430,7 +430,7 @@ const CreateList = ({ wrapperRef }) => {
                 </div>
               )}
               {contentType === 'Jogo' && (
-                <div className="row">
+                <div className="wrapper">
                   <GameFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
@@ -458,7 +458,11 @@ const CreateList = ({ wrapperRef }) => {
           </ContentListContainer>
           {contentType && (
             <CreationOptions>
-              <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
+              <div>
+                <ClearButton onClick={handleClearList}>
+                  Limpar lista
+                </ClearButton>
+              </div>
               <div>
                 <PreviewButton onClick={handlePreviewList}>
                   {showListPreview ? 'Todos os conteúdos' : 'Minha lista'}

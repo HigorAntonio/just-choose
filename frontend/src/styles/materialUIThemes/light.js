@@ -22,6 +22,20 @@ theme.overrides = {
     root: {
       color: light.colors.text,
       fontWeight: 'bold',
+      fontSize: '1.4rem',
+      fontFamily: `'Roboto', sans-serif`,
+    },
+    body1: {
+      fontSize: '1.6rem',
+      fontFamily: `'Roboto', sans-serif`,
+    },
+    body2: {
+      fontSize: '1.4rem',
+      fontFamily: `'Roboto', sans-serif`,
+    },
+    caption: {
+      fontSize: '1.3rem',
+      fontFamily: `'Roboto', sans-serif`,
     },
     colorInherit: {
       color: light.colors.text,
@@ -49,6 +63,8 @@ theme.overrides = {
     input: {
       padding: '5px 0 5px 5px',
       color: light.colors.text,
+      fontSize: '1.4rem',
+      fontFamily: `'Roboto', sans-serif`,
     },
   },
   MuiIconButton: {
@@ -63,6 +79,8 @@ theme.overrides = {
   MuiSvgIcon: {
     root: {
       fill: light.colors.text,
+      width: '25px',
+      height: '25px',
     },
   },
   MuiPaper: {
@@ -106,6 +124,8 @@ theme.overrides = {
   MuiTooltip: {
     tooltip: {
       backgroundColor: `${light.colors['primary-400']}`,
+      fontSize: '1.4rem',
+      fontFamily: `'Roboto', sans-serif`,
     },
     arrow: {
       color: `${light.colors['primary-400']}`,

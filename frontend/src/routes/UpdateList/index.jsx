@@ -281,6 +281,7 @@ const UpdateList = ({ wrapperRef }) => {
     setUpdating(true);
     clearTimeout(alertTimeout);
 
+    let successfulyUpdated = true;
     const isValid = validateFields();
     if (isValid) {
       const data = {
@@ -303,14 +304,21 @@ const UpdateList = ({ wrapperRef }) => {
         });
       } catch (error) {
         setErrorOnUpdate(true);
+        successfulyUpdated = false;
       }
     } else {
       setErrorOnUpdate(true);
+      successfulyUpdated = false;
     }
 
     setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    history.push(`/lists/${listId}`);
+    if (successfulyUpdated) {
+      history.push(`/lists/${listId}`);
+    }
+    // Posiciona o scroll no início da página
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
   };
 
   if (loadingError) {
@@ -443,8 +451,8 @@ const UpdateList = ({ wrapperRef }) => {
         <div className="content-list">
           <ContentListContainer>
             <ContentListHeader>
-              <div className="row">
-                <div>
+              <div className="wrapper">
+                <div className="wrapper content-type-wrapper">
                   <label>Tipo de conteúdo</label>
                   <SingleOptionSelect
                     label={!contentType ? 'Selecionar' : contentType}
@@ -481,7 +489,7 @@ const UpdateList = ({ wrapperRef }) => {
                 )}
               </div>
               {contentType === 'Filme' && (
-                <div className="row">
+                <div className="wrapper">
                   <MovieFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
@@ -491,7 +499,7 @@ const UpdateList = ({ wrapperRef }) => {
                 </div>
               )}
               {contentType === 'Série' && (
-                <div className="row">
+                <div className="wrapper">
                   <ShowFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
@@ -501,7 +509,7 @@ const UpdateList = ({ wrapperRef }) => {
                 </div>
               )}
               {contentType === 'Jogo' && (
-                <div className="row">
+                <div className="wrapper">
                   <GameFilters
                     setParams={setParams}
                     setPageNumber={setPageNumber}
@@ -547,7 +555,9 @@ const UpdateList = ({ wrapperRef }) => {
           </ContentListContainer>
 
           <CreationOptions>
-            <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
+            <div>
+              <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
+            </div>
             <div>
               {contentType && (
                 <PreviewButton onClick={handlePreviewList}>
