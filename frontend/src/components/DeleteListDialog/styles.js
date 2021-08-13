@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   width: 500px;
-  max-width: 90vw;
+  max-width: calc(95vw - 40px);
 `;
 
 export const Header = styled.div`
@@ -10,6 +10,7 @@ export const Header = styled.div`
   font-size: 10px;
   padding: 20px;
   position: relative;
+  border-radius: 5px 5px 0 0;
   z-index: 5000;
 
   -webkit-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
@@ -19,6 +20,7 @@ export const Header = styled.div`
 export const Main = styled.div`
   background: var(--background-100);
   padding: 20px;
+  border-radius: 0 0 5px 5px;
 
   > div + div {
     margin-top: 20px;

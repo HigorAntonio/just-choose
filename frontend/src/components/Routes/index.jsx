@@ -45,7 +45,6 @@ const Routes = ({ wrapperRef }) => {
         component={() => <CreateList wrapperRef={wrapperRef} />}
       />
       <CustomRoute
-        isPrivate
         exact
         path="/lists/:id"
         component={() => <ShowList wrapperRef={wrapperRef} />}
@@ -63,7 +62,6 @@ const Routes = ({ wrapperRef }) => {
         component={() => <CreatePoll wrapperRef={wrapperRef} />}
       />
       <CustomRoute
-        isPrivate
         exact
         path="/polls/:id"
         component={() => <ShowPoll wrapperRef={wrapperRef} />}

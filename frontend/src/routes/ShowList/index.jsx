@@ -24,6 +24,7 @@ import {
   Container,
   Header,
   HeaderRow,
+  TitleWrapper,
   HeaderButtons,
   HeaderButton,
   HeaderDeleteButton,
@@ -104,7 +105,7 @@ const ShowList = ({ wrapperRef }) => {
   const { id: listId } = useParams();
   const history = useHistory();
 
-  const { userId } = useContext(AuthContext);
+  const { userId, authenticated } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -154,10 +155,12 @@ const ShowList = ({ wrapperRef }) => {
         setContentList(data);
         setCreatedAt(new Date(data.created_at));
         setContentTypes(['all', ...data.content_types]);
-        const {
-          data: { like },
-        } = await justChooseApi.get(`/contentlists/${listId}/like`);
-        setLiked(like);
+        if (authenticated) {
+          const {
+            data: { like },
+          } = await justChooseApi.get(`/contentlists/${listId}/like`);
+          setLiked(like);
+        }
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -169,7 +172,7 @@ const ShowList = ({ wrapperRef }) => {
         }
       }
     })();
-  }, [listId]);
+  }, [listId, authenticated]);
 
   useEffect(() => {
     if (JSON.stringify(contentList) !== '{}') {
@@ -184,6 +187,9 @@ const ShowList = ({ wrapperRef }) => {
   }, [contentList, typeFilter]);
 
   const handleLike = async () => {
+    if (!authenticated) {
+      return;
+    }
     try {
       if (!liked) {
         await justChooseApi.post(`/contentlists/${listId}/like`);
@@ -204,6 +210,9 @@ const ShowList = ({ wrapperRef }) => {
   };
 
   const handleFork = async () => {
+    if (!authenticated) {
+      return;
+    }
     try {
       setLoading(true);
       clearTimeout(alertTimeout);
@@ -227,6 +236,9 @@ const ShowList = ({ wrapperRef }) => {
   };
 
   const handleDelete = async () => {
+    if (!authenticated) {
+      return;
+    }
     try {
       setShowDeleteDialog(false);
       clearTimeout(alertTimeout);
@@ -260,25 +272,37 @@ const ShowList = ({ wrapperRef }) => {
     <Container>
       <Header>
         <HeaderRow>
-          <h1>{contentList.title}</h1>
+          <TitleWrapper>
+            <h1 title={contentList.title}>{contentList.title}</h1>
+          </TitleWrapper>
           <HeaderButtons>
-            <HeaderButton
-              title={liked ? 'Não gostei' : 'Gostei'}
-              onClick={handleLike}
-            >
-              {!liked && <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />}
-              {liked && <FaHeart size={'25px'} style={{ flexShrink: 0 }} />}
-              <span>{contentList.likes}</span>
-            </HeaderButton>
-            <HeaderButton
-              title="Criar uma cópia da lista para sua conta"
-              onClick={handleFork}
-            >
-              <BiGitRepoForked size={'25px'} style={{ flexShrink: 0 }} />
-              <span>{contentList.forks}</span>
-            </HeaderButton>
+            <div>
+              <HeaderButton
+                title={
+                  authenticated ? (liked ? 'Não gostei' : 'Gostei') : 'Likes'
+                }
+                onClick={handleLike}
+              >
+                {!liked && (
+                  <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />
+                )}
+                {liked && <FaHeart size={'25px'} style={{ flexShrink: 0 }} />}
+                <span>{contentList.likes}</span>
+              </HeaderButton>
+              <HeaderButton
+                title={
+                  authenticated
+                    ? 'Criar uma cópia da lista para sua conta'
+                    : 'Forks'
+                }
+                onClick={handleFork}
+              >
+                <BiGitRepoForked size={'25px'} style={{ flexShrink: 0 }} />
+                <span>{contentList.forks}</span>
+              </HeaderButton>
+            </div>
             {userId === contentList.user_id && (
-              <>
+              <div>
                 <Link to={`/lists/${listId}/poll`}>
                   <HeaderButton title="Criar uma votação a partir da lista">
                     <FaVoteYea
@@ -304,27 +328,24 @@ const ShowList = ({ wrapperRef }) => {
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
                 </HeaderDeleteButton>
-                <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
-                  <DeleteListDialog
-                    createdBy={contentList.user_name}
-                    listTitle={contentList.title}
-                    handleDelete={handleDelete}
-                  />
-                </Modal>
-              </>
+              </div>
             )}
           </HeaderButtons>
         </HeaderRow>
         <ListInfo>
-          Criada em{' '}
-          <span className="created-at">
-            {createdAt
-              ? `${createdAt.getDate()}  de ${getMonth(
-                  createdAt.getMonth()
-                )} de ${createdAt.getFullYear()}`
-              : '-'}
-          </span>{' '}
-          por <span className="created-by">{contentList.user_name}</span>
+          <span>
+            Criada em{' '}
+            <span className="created-at">
+              {createdAt
+                ? `${createdAt.getDate()}  de ${getMonth(
+                    createdAt.getMonth()
+                  )} de ${createdAt.getFullYear()}`
+                : '-'}
+            </span>{' '}
+          </span>
+          <span>
+            por <span className="created-by">{contentList.user_name}</span>
+          </span>
         </ListInfo>
         <Description>{contentList.description}</Description>
         <Filters>
@@ -359,6 +380,13 @@ const ShowList = ({ wrapperRef }) => {
         </Filters>
       </Header>
       <Main>{content && <ContentGrid content={content} />}</Main>
+      <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
+        <DeleteListDialog
+          createdBy={contentList.user_name}
+          listTitle={contentList.title}
+          handleDelete={handleDelete}
+        />
+      </Modal>
     </Container>
   );
 };

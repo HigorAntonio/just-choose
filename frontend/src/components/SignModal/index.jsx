@@ -43,8 +43,8 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
         email: signUpEmail,
         password: signUpPassword,
       });
-      setShow(false);
       clearForm();
+      setShow(false);
     } catch (error) {
       if (error.response) {
         const errors = error.response.data.erros
@@ -61,8 +61,8 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
     try {
       e.preventDefault();
       await handleLogin({ email: signInEmail, password: signInPassword });
-      setShow(false);
       clearForm();
+      setShow(false);
     } catch (error) {
       if (error.response) {
         const errors = error.response.data.erros

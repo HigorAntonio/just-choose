@@ -10,12 +10,19 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 3000;
 `;
 
 export const ModalWrapper = styled.div`
-  /* width: min(420px, 90%);
-  max-height: 90%; */
+  /* width: min(420px, 90%); */
+  max-height: 100%;
+  padding: 20px 0 20px 0;
+
+  &::after {
+    content: '';
+    display: block;
+    height: 20px;
+  }
 `;
 
 export const ModalContent = styled.div`
@@ -25,7 +32,8 @@ export const ModalContent = styled.div`
   flex-direction: column;
   align-items: center;
   position: relative;
-  z-index: 500;
+  transform: translateX(-10px);
+  z-index: 4000;
 `;
 
 export const CloseModal = styled.button`

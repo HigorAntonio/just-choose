@@ -6,7 +6,11 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.header`
-  padding: 30px 30px 30px;
+  padding: 30px;
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+  }
 `;
 
 export const HeaderRow = styled.div`
@@ -14,27 +18,90 @@ export const HeaderRow = styled.div`
   align-items: flex-start;
   justify-content: space-between;
 
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+`;
+
+export const TitleWrapper = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+
   > h1 {
     font-size: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 30px;
+
+    @media (max-width: 1440px) {
+      font-size: 54px;
+    }
+
+    @media (max-width: 1024px) {
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 46px;
+    }
+
+    @media (max-width: 580px) {
+      font-size: 36px;
+    }
+
+    @media (max-width: 320px) {
+      font-size: 30px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    white-space: initial;
+    overflow: initial;
   }
 `;
 
 export const HeaderButtons = styled.div`
   display: flex;
 
-  > div + div,
-  a + div,
-  div + a,
-  a + a {
+  > div {
+    display: flex;
+
+    > div + div,
+    a + div,
+    div + a,
+    a + a {
+      margin-left: 10px;
+    }
+  }
+
+  > div + div {
     margin-left: 10px;
   }
 
   > a {
     display: flex;
   }
+
+  @media (max-width: 375px) {
+    flex-direction: column;
+
+    > div {
+      > div {
+        flex: 1;
+      }
+    }
+
+    > div + div {
+      margin-left: 0;
+      margin-top: 10px;
+    }
+  }
 `;
 
 export const HeaderButton = styled.div`
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,12 +157,29 @@ export const HeaderDeleteButton = styled.div`
 
 export const ListInfo = styled.div`
   font-size: 16px;
-  color: var(--dark-gray);
   margin: 30px 0;
+  display: flex;
+
+  > span {
+    color: var(--dark-gray);
+  }
+
+  > span + span {
+    margin-left: 5px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    > span + span {
+      margin-left: 0;
+    }
+  }
 `;
 
 export const Description = styled.div`
-  max-width: 40%;
+  width: 100%;
+  max-width: 650px;
   font-size: 16px;
 `;
 
@@ -137,4 +221,8 @@ export const Main = styled.main`
   display: flex;
   flex-direction: column;
   padding: 0 30px 30px 30px;
+
+  @media (max-width: 768px) {
+    padding: 0 15px 20px 15px;
+  }
 `;

@@ -6,7 +6,11 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.header`
-  padding: 30px 30px 30px;
+  padding: 30px;
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+  }
 `;
 
 export const HeaderRow = styled.div`
@@ -14,26 +18,90 @@ export const HeaderRow = styled.div`
   align-items: flex-start;
   justify-content: space-between;
 
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+`;
+
+export const TitleWrapper = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+
   > h1 {
     font-size: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 30px;
+
+    @media (max-width: 1440px) {
+      font-size: 54px;
+    }
+
+    @media (max-width: 1024px) {
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 46px;
+    }
+
+    @media (max-width: 580px) {
+      font-size: 36px;
+    }
+
+    @media (max-width: 320px) {
+      font-size: 30px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    white-space: initial;
+    overflow: initial;
   }
 `;
 
 export const HeaderButtons = styled.div`
   display: flex;
 
-  > div + div,
-  a + div,
-  div + a {
+  > div {
+    display: flex;
+
+    > div + div,
+    a + div,
+    div + a,
+    a + a {
+      margin-left: 10px;
+    }
+  }
+
+  > div + div {
     margin-left: 10px;
   }
 
   > a {
     display: flex;
   }
+
+  @media (max-width: 375px) {
+    flex-direction: column;
+
+    > div {
+      > div {
+        flex: 1;
+      }
+    }
+
+    > div + div {
+      margin-left: 0;
+      margin-top: 10px;
+    }
+  }
 `;
 
 export const HeaderButton = styled.div`
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,12 +157,29 @@ export const HeaderDeleteButton = styled.div`
 
 export const ListInfo = styled.div`
   font-size: 16px;
-  color: var(--dark-gray);
   margin: 30px 0;
+  display: flex;
+
+  > span {
+    color: var(--dark-gray);
+  }
+
+  > span + span {
+    margin-left: 5px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    > span + span {
+      margin-left: 0;
+    }
+  }
 `;
 
 export const Description = styled.div`
-  max-width: 40%;
+  width: 100%;
+  max-width: 650px;
   font-size: 16px;
 `;
 
@@ -136,12 +221,16 @@ export const Main = styled.main`
   display: flex;
   flex-direction: column;
   padding: 0 30px 30px 30px;
+
+  @media (max-width: 768px) {
+    padding: 0 15px 20px 15px;
+  }
 `;
 
 export const ResultContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 90%;
+  width: 100%;
   max-width: 900px;
   background: var(--background-100);
   border: 0.1px solid var(--background-600);
@@ -156,11 +245,12 @@ export const ResultHeader = styled.div`
   border-bottom: 0.1px solid var(--background-600);
 
   > div h2 {
-    font-size: 20px;
+    font-size: 2rem;
   }
 
   .headerPosition {
     width: 15%;
+    min-width: 40px;
     text-align: center;
   }
 
@@ -171,7 +261,12 @@ export const ResultHeader = styled.div`
 
   .headerVotes {
     width: 20%;
+    min-width: 40px;
     text-align: center;
+  }
+
+  @media (max-width: 500px) {
+    padding: 10px;
   }
 `;
 
@@ -181,12 +276,20 @@ export const ResultBody = styled.div`
   flex-direction: column;
   padding: 20px;
 
+  @media (max-width: 500px) {
+    padding: 10px;
+  }
+
   .row {
     display: flex;
     justify-content: space-between;
 
     & + .row {
       margin-top: 15px;
+
+      @media (max-width: 500px) {
+        margin-top: 5px;
+      }
     }
 
     &:hover {
@@ -200,6 +303,7 @@ export const ResultBody = styled.div`
 
   .bodyPosition {
     width: 15%;
+    min-width: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -214,16 +318,35 @@ export const ResultBody = styled.div`
     display: flex;
     background: var(--background-500);
     margin: 0 15px;
+    overflow: hidden;
 
-    > span {
+    > .titleWrapper {
       display: flex;
       align-items: center;
       padding: 15px;
+      overflow: hidden;
+
+      > .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* number of lines to show */
+        -webkit-box-orient: vertical;
+
+        @media (max-width: 640px) {
+          -webkit-line-clamp: 2; /* number of lines to show */
+        }
+      }
+    }
+
+    @media (max-width: 500px) {
+      margin: 0 5px;
     }
   }
 
   .bodyVotes {
     width: 20%;
+    min-width: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -233,12 +356,32 @@ export const ResultBody = styled.div`
     font-size: 40px;
   }
 
+  .bodyPosition,
+  .bodyVotes {
+    @media (max-width: 768px) {
+      font-size: 28px;
+    }
+
+    @media (max-width: 580px) {
+      font-size: 20px;
+    }
+
+    @media (max-width: 320px) {
+      font-size: 16px;
+    }
+  }
+
   .posterWrapper {
+    flex-shrink: 0;
     display: flex;
     width: 70px;
 
     &:hover {
       cursor: pointer;
+    }
+
+    @media (max-width: 640px) {
+      width: 40px;
     }
   }
 

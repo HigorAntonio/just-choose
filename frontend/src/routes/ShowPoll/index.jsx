@@ -25,6 +25,7 @@ import {
   Container,
   Header,
   HeaderRow,
+  TitleWrapper,
   HeaderButtons,
   HeaderButton,
   HeaderDeleteButton,
@@ -129,7 +130,7 @@ const ShowPoll = ({ wrapperRef }) => {
   const { id: pollId } = useParams();
   const history = useHistory();
 
-  const { userId } = useContext(AuthContext);
+  const { userId, authenticated } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -186,11 +187,13 @@ const ShowPoll = ({ wrapperRef }) => {
         );
         setContentList(list);
         setContentTypes(['all', ...list.content_types]);
-        const { data: vote } = await justChooseApi.get(
-          `/polls/${data.id}/votes`
-        );
-        if (vote) {
-          setVote(vote);
+        if (authenticated) {
+          const { data: vote } = await justChooseApi.get(
+            `/polls/${data.id}/votes`
+          );
+          if (vote) {
+            setVote(vote);
+          }
         }
       }
       if (JSON.stringify(data) !== '{}' && !data.is_active) {
@@ -209,7 +212,7 @@ const ShowPoll = ({ wrapperRef }) => {
         setDenyAccess(true);
       }
     }
-  }, [pollId]);
+  }, [pollId, authenticated]);
 
   useEffect(() => {
     (async () => await getPageData())();
@@ -228,6 +231,9 @@ const ShowPoll = ({ wrapperRef }) => {
   }, [contentList, typeFilter, poll]);
 
   const handleActive = async () => {
+    if (!authenticated) {
+      return;
+    }
     try {
       setLoading(true);
       clearTimeout(alertTimeout);
@@ -271,6 +277,9 @@ const ShowPoll = ({ wrapperRef }) => {
   };
 
   const handleDelete = async () => {
+    if (!authenticated) {
+      return;
+    }
     try {
       setShowDeleteDialog(false);
       clearTimeout(alertTimeout);
@@ -292,6 +301,9 @@ const ShowPoll = ({ wrapperRef }) => {
   };
 
   const handleVote = async (e, content) => {
+    if (!authenticated) {
+      return;
+    }
     try {
       e.preventDefault();
       // e.stopPropagation();
@@ -328,73 +340,74 @@ const ShowPoll = ({ wrapperRef }) => {
     <Container>
       <Header>
         <HeaderRow>
-          <h1>{poll.title}</h1>
+          <TitleWrapper>
+            <h1 title={poll.title}>{poll.title}</h1>
+          </TitleWrapper>
           <HeaderButtons>
-            <Link to={`/lists/${poll.content_list_id}`}>
-              <HeaderButton title="Visualizar lista de conteúdo">
-                <IoMdListBox
-                  size={'25px'}
-                  style={{ flexShrink: 0, margin: '0 5px' }}
-                />
-              </HeaderButton>
-            </Link>
-            {userId === poll.user_id && (
-              <>
-                <HeaderButton
-                  title={poll.is_active ? 'Fechar votação' : 'Abrir votação'}
-                  onClick={handleActive}
-                >
-                  {!poll.is_active && (
-                    <FaPlay
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
-                    />
-                  )}
-                  {poll.is_active && (
-                    <FaStop
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
-                    />
-                  )}
-                </HeaderButton>
-                <Link to={`/polls/${pollId}/update`}>
-                  <HeaderButton title="Editar votação">
-                    <MdSettings
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
-                    />
-                  </HeaderButton>
-                </Link>
-                <HeaderDeleteButton
-                  title="Excluir votação"
-                  onClick={() => setShowDeleteDialog(true)}
-                >
-                  <FaTrash
+            <div>
+              <Link to={`/lists/${poll.content_list_id}`}>
+                <HeaderButton title="Visualizar lista de conteúdo">
+                  <IoMdListBox
                     size={'25px'}
                     style={{ flexShrink: 0, margin: '0 5px' }}
                   />
-                </HeaderDeleteButton>
-                <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
-                  <DeletePollDialog
-                    createdBy={poll.user_name}
-                    pollTitle={poll.title}
-                    handleDelete={handleDelete}
-                  />
-                </Modal>
-              </>
-            )}
+                </HeaderButton>
+              </Link>
+              {userId === poll.user_id && (
+                <>
+                  <HeaderButton
+                    title={poll.is_active ? 'Fechar votação' : 'Abrir votação'}
+                    onClick={handleActive}
+                  >
+                    {!poll.is_active && (
+                      <FaPlay
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
+                      />
+                    )}
+                    {poll.is_active && (
+                      <FaStop
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
+                      />
+                    )}
+                  </HeaderButton>
+                  <Link to={`/polls/${pollId}/update`}>
+                    <HeaderButton title="Editar votação">
+                      <MdSettings
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
+                      />
+                    </HeaderButton>
+                  </Link>
+                  <HeaderDeleteButton
+                    title="Excluir votação"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    <FaTrash
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
+                    />
+                  </HeaderDeleteButton>
+                </>
+              )}
+            </div>
           </HeaderButtons>
         </HeaderRow>
         <ListInfo>
-          Criada em{' '}
-          <span className="created-at">
-            {createdAt
-              ? `${createdAt.getDate()}  de ${getMonth(
-                  createdAt.getMonth()
-                )} de ${createdAt.getFullYear()}`
-              : '-'}
-          </span>{' '}
-          por <span className="created-by">{poll.user_name}</span>
+          <span>
+            Criada em{' '}
+            <span className="created-at">
+              {createdAt
+                ? `${createdAt.getDate()}  de ${getMonth(
+                    createdAt.getMonth()
+                  )} de ${createdAt.getFullYear()}`
+                : '-'}
+            </span>{' '}
+          </span>
+          <span>
+            por <span className="created-by">{poll.user_name}</span>
+          </span>
         </ListInfo>
         <Description>{poll.description}</Description>
         {poll.is_active && (
@@ -482,7 +495,9 @@ const ShowPoll = ({ wrapperRef }) => {
                       <div className="posterWrapper">
                         <ContentCardSimple src={src} title={c.title} />
                       </div>
-                      <span>{c.title}</span>
+                      <div className="titleWrapper">
+                        <div className="titleText">{c.title}</div>
+                      </div>
                     </div>
                     <div
                       className="bodyVotes"
@@ -497,6 +512,13 @@ const ShowPoll = ({ wrapperRef }) => {
           </ResultContainer>
         )}
       </Main>
+      <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
+        <DeletePollDialog
+          createdBy={poll.user_name}
+          pollTitle={poll.title}
+          handleDelete={handleDelete}
+        />
+      </Modal>
     </Container>
   );
 };

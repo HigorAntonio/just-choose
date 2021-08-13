@@ -13,10 +13,14 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.header`
-  padding: 30px 30px 30px;
+  padding: 30px;
 
   > h1 {
     font-size: 36px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
   }
 `;
 
@@ -185,7 +189,7 @@ export const ThumbPreview = styled.div`
 export const Main = styled.main`
   display: flex;
   flex-direction: column;
-  padding: 0 30px;
+  padding: 0 30px 30px 30px;
 
   > h3 {
     margin-bottom: 20px;
@@ -199,11 +203,14 @@ export const Main = styled.main`
     background: var(--background-100);
     border: 0.1px solid var(--background-600);
     border-radius: 5px;
-    margin-bottom: 40px;
 
     @media (max-width: 1130px) {
       width: 100%;
     }
+  }
+
+  > div + div {
+    margin-top: 40px;
   }
 
   > .content-list {
@@ -225,8 +232,8 @@ export const Main = styled.main`
     margin-bottom: 5px;
   }
 
-  @media (max-width: 500px) {
-    padding: 0 20px;
+  @media (max-width: 768px) {
+    padding: 0 15px 20px 15px;
   }
 `;
 
