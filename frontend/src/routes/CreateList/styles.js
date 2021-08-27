@@ -209,7 +209,7 @@ export const Main = styled.main`
     }
   }
 
-  > div + div {
+  > div + h3 {
     margin-top: 40px;
   }
 
