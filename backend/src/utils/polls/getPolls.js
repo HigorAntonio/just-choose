@@ -6,7 +6,8 @@ module.exports = async (
   followMeIds,
   page_size,
   page,
-  query
+  query,
+  sort_by
 ) => {
   try {
     const pollsQuery = knex
@@ -78,7 +79,7 @@ module.exports = async (
       })
       .limit(page_size)
       .offset((page - 1) * page_size)
-      .orderBy('updated_at', 'desc');
+      .orderByRaw(sort_by);
 
     const countObj = knex.count().from(function () {
       this.select()

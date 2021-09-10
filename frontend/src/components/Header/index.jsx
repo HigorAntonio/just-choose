@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import { ClickAwayListener } from '@material-ui/core';
 import { ThemeContext } from 'styled-components';
 import { BiLogOut } from 'react-icons/bi';
@@ -7,6 +7,7 @@ import { HiOutlineMoon } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import { HiDocumentAdd } from 'react-icons/hi';
 import { FiSearch } from 'react-icons/fi';
+import queryString from 'query-string';
 
 import Modal from '../Modal';
 import Sign from '../SignModal';
@@ -38,6 +39,8 @@ import {
 
 function Header() {
   const history = useHistory();
+  const { search: searchQuery } = useLocation();
+  const { query } = queryString.parse(searchQuery);
 
   const { title: theme, colors } = useContext(ThemeContext);
   const { theme: appTheme, toggleTheme } = useContext(AppThemeContext);
@@ -48,6 +51,12 @@ function Header() {
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const [showSearchDropDown, setShowSearchDropDown] = useState(false);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (query) {
+      setSearch(query);
+    }
+  }, [query]);
 
   const handleSignIn = () => {
     setShowSignModal(true);

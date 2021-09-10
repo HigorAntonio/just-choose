@@ -2,6 +2,7 @@ const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
 const getFollowingUsers = require('../utils/users/getFollowingUsers');
 const isUserFollowing = require('../utils/users/isUserFollowing');
+const getPollOrderByQuery = require('../utils/polls/getPollOrderByQuery');
 const getPolls = require('../utils/polls/getPolls');
 
 module.exports = {
@@ -116,7 +117,13 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      const { user_id, query, page = 1, page_size = 30 } = req.query;
+      const {
+        user_id,
+        query,
+        page = 1,
+        page_size = 30,
+        sort_by = 'updated.desc',
+      } = req.query;
 
       const errors = [];
 
@@ -141,6 +148,13 @@ module.exports = {
       } else if (page_size < 1 || page_size > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
+      if (sort_by) {
+        if (typeof sort_by !== 'string') {
+          errors.push('Parâmetro sort_by, valor inválido');
+        } else if (!getPollOrderByQuery(sort_by)) {
+          errors.push('Parâmetro sort_by, valor inválido');
+        }
+      }
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
@@ -154,7 +168,8 @@ module.exports = {
         followMeIds,
         page_size,
         page,
-        query
+        query,
+        getPollOrderByQuery(sort_by)
       );
 
       const total_pages = Math.ceil(count / page_size);

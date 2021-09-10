@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="342.5" height="279.39" version="1.1" viewBox="0 0 90.619 73.923" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <filter id="filter1062" x="-7.676e-6" y="-9.7509e-6" width="1" height="1" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="0.0005386602"/>
+  </filter>
+  <linearGradient id="linearGradient2463" x1="183.99" x2="123.89" y1="134.37" y2="33.493" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#003380" offset="0"/>
+   <stop stop-color="#59f" offset="1"/>
+  </linearGradient>
+  <linearGradient id="linearGradient2479" x1="-52.32" x2="193.34" y1="-61.21" y2="139.93" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#59f" offset="0"/>
+   <stop stop-color="#003380" offset="1"/>
+  </linearGradient>
+ </defs>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g transform="translate(-4.6168 -67.296)">
+  <path transform="matrix(.40228 0 0 .40228 4.6169 67.295)" d="m159.71 61.346c14.303-7.4431 6.9238-21.212 6.9238-21.212-29.336-42.614-74.267-40.1-74.267-40.1-126.04 5.6021-119.97 182.41-0.81631 183.71 0 0 40.548 2.0566 70.499-33.943 0 0 15.834-17.764-3.0445-27.381-19.463-6.3493-22.327 35.126-67.16 34.014-92.158-1.0666-80.986-130.82-1.6304-128.64 53.054 2.9269 44.28 38.707 69.495 33.556z" fill="url(#linearGradient2479)" filter="url(#filter1062)"/>
+  <path transform="matrix(.40228 0 0 .40228 4.6169 67.295)" d="m201.59 5.0834-97.12 97.12s-8.3851 8.4012-16.504 0c0 0-3.4968-4.1599-2.3093-13.292 3.799-17.472-7.661-21.17-7.661-21.17-12.514-3.4405-18.641 11.426-18.641 11.426-10.379 30.947 14.696 48.135 14.696 48.135s24.37 20.391 57.947-13.52l89.171-89.12s9.1978-8.7954 0-19.521c-9.7327-9.7327-19.578-0.057071-19.578-0.057071z" fill="url(#linearGradient2463)" filter="url(#filter1062)"/>
+ </g>
+</svg>

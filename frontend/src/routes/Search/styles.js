@@ -9,7 +9,19 @@ export const Filters = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 30px;
+  padding: 30px 0;
+  width: 90%;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  @media (max-width: 680px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    > div + div {
+      margin-top: 20px;
+    }
+  }
 `;
 
 export const FiltersLeft = styled.div`
@@ -69,13 +81,14 @@ export const Option = styled.div`
   }
 `;
 
-export const Main = styled.div`
-  padding: 0 30px 30px 30px;
-`;
+export const Main = styled.div``;
 
 export const SearchItems = styled.div`
   width: 90%;
-  max-width: 900px;
+  max-width: 1280px;
+  margin: 0 auto;
+  border-top: 1px solid var(--background-700);
+  padding: 20px 0 0 0;
 
   > div + div {
     margin-top: 15px;
