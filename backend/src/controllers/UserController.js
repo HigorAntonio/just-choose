@@ -1,4 +1,5 @@
 const knex = require('../database');
+const deleteFile = require('../utils/deleteFile');
 
 module.exports = {
   async index(req, res) {
@@ -54,7 +55,125 @@ module.exports = {
         items: users,
       });
     } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async show(req, res) {
+    try {
+      const userId = req.userId;
+
+      const profileId = parseInt(req.params.id);
+
+      if (isNaN(profileId)) {
+        return res
+          .status(400)
+          .json({ erro: 'Id do perfil de usuário, valor inválido' });
+      }
+
+      const profile = await knex
+        .select(
+          'id',
+          'name',
+          'email',
+          'profile_image_url',
+          'method',
+          'is_active'
+        )
+        .from('users as u')
+        .where({ 'u.id': profileId })
+        .first();
+
+      if (!profile) {
+        return res
+          .status(400)
+          .json({ erro: 'Perfil de usuário não encontrado' });
+      }
+
+      if (userId !== profileId) {
+        delete profile.email;
+        delete profile.method;
+        delete profile.is_active;
+      }
+
+      return res.json(profile);
+    } catch (error) {
       console.log(error);
+      return res.sendStatus(500);
+    }
+  },
+
+  async update(req, res) {
+    try {
+      const userId = req.userId;
+
+      if (isNaN(userId)) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
+        return res.status(400).json({ erro: 'Id do usuário, valor inválido' });
+      }
+
+      const user = await knex
+        .select()
+        .from('users as u')
+        .where({ id: userId })
+        .first();
+
+      if (!user) {
+        return res.status(400).json({ erro: 'Usuário não encontrado' });
+      }
+
+      const { data } = req.body;
+      if (!data) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
+        return res
+          .status(400)
+          .json({ erro: 'Dados do usuário não informados' });
+      }
+
+      const { name = user.name } = JSON.parse(data);
+      const errors = [];
+
+      if (!name) {
+        errors.push('Nome do usuário não informado');
+      } else if (typeof name !== 'string') {
+        errors.push('Nome do usuário, valor inválido');
+      }
+      if (errors.length > 0) {
+        try {
+          await deleteFile(req.file.key);
+        } catch (error) {}
+        return res.status(400).json({ erros: errors });
+      }
+
+      const deleteOldProfileImage = req.file ? true : false;
+      const profileImageUrl = req.file
+        ? `${process.env.APP_URL}/files/${req.file.key}`
+        : user.profile_image_url;
+
+      await knex('users')
+        .update({ name, profile_image_url: profileImageUrl })
+        .where({ id: userId });
+
+      if (deleteOldProfileImage) {
+        if (user.profile_image_url) {
+          await deleteFile(
+            user.profile_image_url.substring(
+              `${process.env.APP_URL}/files/`.length
+            )
+          );
+        }
+      }
+
+      return res.sendStatus(200);
+    } catch (error) {
+      console.log(error);
+      try {
+        await deleteFile(req.file.key);
+      } catch (error) {}
       return res.sendStatus(500);
     }
   },

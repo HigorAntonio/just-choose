@@ -1,10 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory, Link } from 'react-router-dom';
 import { ClickAwayListener } from '@material-ui/core';
 import { ThemeContext } from 'styled-components';
-import { BiLogOut } from 'react-icons/bi';
+import { BiCog, BiLogOut } from 'react-icons/bi';
 import { HiOutlineMoon } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
 import { HiDocumentAdd } from 'react-icons/hi';
 import { FiSearch } from 'react-icons/fi';
 import queryString from 'query-string';
@@ -194,6 +193,19 @@ function Header() {
                       />
                     </div>
                   </DropDownOption>
+                  {authenticated && (
+                    <Link
+                      to={`/settings`}
+                      onClick={() => setShowProfileDropDown(false)}
+                    >
+                      <DropDownOption className="hover">
+                        <div className="align-left">
+                          <BiCog size={20} style={{ flexShrink: 0 }} />{' '}
+                        </div>
+                        <div className="align-right">Configurações</div>
+                      </DropDownOption>
+                    </Link>
+                  )}
                   {authenticated && (
                     <DropDownOption className="hover" onClick={handleUserExit}>
                       <div className="align-left">

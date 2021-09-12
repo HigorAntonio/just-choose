@@ -40,6 +40,13 @@ routes.get(
 
 // UserController
 routes.get('/users', getLoggedUserId, UserController.index);
+routes.get('/users/:id', getLoggedUserId, UserController.show);
+routes.put(
+  '/users',
+  authorization,
+  multer(multerConfig).single('profile_image'),
+  UserController.update
+);
 
 // FollowUsersController
 routes.post(

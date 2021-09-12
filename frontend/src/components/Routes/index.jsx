@@ -11,6 +11,7 @@ import CreatePoll from '../../routes/CreatePoll';
 import ShowPoll from '../../routes/ShowPoll';
 import Search from '../../routes/Search';
 import UpdatePoll from '../../routes/UpdatePoll';
+import Settings from '../../routes/Settings';
 import NotFound from '../../components/NotFound';
 
 const CustomRoute = ({ isPrivate, ...rest }) => {
@@ -71,6 +72,12 @@ const Routes = ({ wrapperRef }) => {
         exact
         path="/polls/:id/update"
         component={() => <UpdatePoll wrapperRef={wrapperRef} />}
+      />
+      <CustomRoute
+        isPrivate
+        exact
+        path="/settings"
+        component={() => <Settings wrapperRef={wrapperRef} />}
       />
       <Route component={NotFound} />
     </Switch>

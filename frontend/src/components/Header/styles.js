@@ -339,6 +339,10 @@ export const ProfileDropDown = styled.div`
     background: var(--background-500);
     cursor: pointer;
   }
+
+  > a {
+    text-decoration: none;
+  }
 `;
 
 export const DropDownOption = styled.div`
