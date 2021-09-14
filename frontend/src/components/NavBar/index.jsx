@@ -167,7 +167,7 @@ const NavBar = () => {
                       key={p.user_id}
                       title={p.user_name}
                     >
-                      <ProfileImage></ProfileImage>
+                      <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
                         <span>{p.user_name}</span>
                       </ProfileData>
@@ -176,7 +176,7 @@ const NavBar = () => {
                 }
                 return (
                   <Profile key={p.user_id} title={p.user_name}>
-                    <ProfileImage></ProfileImage>
+                    <ProfileImage src={p.profile_image_url} />
                     <ProfileData>
                       <span>{p.user_name}</span>
                     </ProfileData>
@@ -196,7 +196,7 @@ const NavBar = () => {
                 if (users.length === i + 1) {
                   return (
                     <Profile ref={lastUserRef} key={p.id} title={p.name}>
-                      <ProfileImage></ProfileImage>
+                      <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
                         <span>{p.name}</span>
                       </ProfileData>
@@ -205,7 +205,7 @@ const NavBar = () => {
                 }
                 return (
                   <Profile key={p.id} title={p.name}>
-                    <ProfileImage></ProfileImage>
+                    <ProfileImage src={p.profile_image_url} />
                     <ProfileData>
                       <span>{p.name}</span>
                     </ProfileData>

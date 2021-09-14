@@ -309,7 +309,11 @@ export const Profile = styled.div`
 
   border-radius: 50%;
 
-  background: var(--gray);
+  background-image: url('${(props) => props.src}');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-color: var(--background-600);
 
   &:hover {
     cursor: pointer;

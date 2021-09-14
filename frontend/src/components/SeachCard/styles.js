@@ -18,10 +18,11 @@ export const Thumbnail = styled.div`
     padding-bottom: calc(9 / 16 * 100%);
   }
 
-  background-image: url(${(props) => props.src});
+  background-image: url('${(props) => props.src}');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 50% 50%;
+  background-color: var(--background-600);
 `;
 
 export const TextWrapper = styled.div`

@@ -143,7 +143,11 @@ export const ProfileImage = styled.div`
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--gray);
+  background-image: url('${(props) => props.src}');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-color: var(--background-700);
   flex-shrink: 0;
 `;
 

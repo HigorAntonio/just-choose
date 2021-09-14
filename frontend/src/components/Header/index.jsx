@@ -14,6 +14,7 @@ import Switch from '../Switch';
 
 import { AuthContext } from '../../context/AuthContext';
 import { ThemeContext as AppThemeContext } from '../../context/ThemeContext';
+import justChooseApi from '../../apis/justChooseApi';
 
 import {
   Container,
@@ -44,12 +45,27 @@ function Header() {
   const { title: theme, colors } = useContext(ThemeContext);
   const { theme: appTheme, toggleTheme } = useContext(AppThemeContext);
 
-  const { loading, authenticated, handleLogout } = useContext(AuthContext);
+  const { loading, authenticated, handleLogout, userId } =
+    useContext(AuthContext);
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const [showSearchDropDown, setShowSearchDropDown] = useState(false);
   const [search, setSearch] = useState('');
+  const [userProfile, setUserProfile] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (userId) {
+          const { data } = await justChooseApi.get(`/users/${userId}`);
+          setUserProfile(data);
+        }
+      } catch (error) {
+        console.error('Falha ao obter dados do perfil do usuário');
+      }
+    })();
+  }, [userId]);
 
   useEffect(() => {
     if (query) {
@@ -163,11 +179,25 @@ function Header() {
             >
               <div>
                 <Profile
+                  src={userProfile.profile_image_url}
                   onClick={() =>
                     setShowProfileDropDown((prevState) => !prevState)
                   }
                 />
                 <ProfileDropDown show={showProfileDropDown}>
+                  {authenticated && (
+                    <Link
+                      to={`/settings`}
+                      onClick={() => setShowProfileDropDown(false)}
+                    >
+                      <DropDownOption className="hover">
+                        <div className="align-left">
+                          <BiCog size={20} style={{ flexShrink: 0 }} />{' '}
+                        </div>
+                        <div className="align-right">Configurações</div>
+                      </DropDownOption>
+                    </Link>
+                  )}
                   <DropDownOption>
                     <div className="align-left">
                       <HiOutlineMoon size={20} style={{ flexShrink: 0 }} />{' '}
@@ -193,19 +223,6 @@ function Header() {
                       />
                     </div>
                   </DropDownOption>
-                  {authenticated && (
-                    <Link
-                      to={`/settings`}
-                      onClick={() => setShowProfileDropDown(false)}
-                    >
-                      <DropDownOption className="hover">
-                        <div className="align-left">
-                          <BiCog size={20} style={{ flexShrink: 0 }} />{' '}
-                        </div>
-                        <div className="align-right">Configurações</div>
-                      </DropDownOption>
-                    </Link>
-                  )}
                   {authenticated && (
                     <DropDownOption className="hover" onClick={handleUserExit}>
                       <div className="align-left">
