@@ -198,7 +198,6 @@ const SettingsProfile = ({ wrapperRef }) => {
               spellCheck={false}
               type="text"
               id="name"
-              autoFocus
               value={userName}
               onChange={handleUserName}
               validationError={userNameError}

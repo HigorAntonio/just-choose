@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import SettingsProfile from '../../components/SettingsProfile';
+import SettingsSecurity from '../../components/SettingsSecurity';
 
 import { Container, Header, Navigation, Main } from './styles';
 
@@ -41,9 +42,7 @@ const Settings = ({ wrapperRef }) => {
       <Main>
         {navOption === 'profile' && <SettingsProfile wrapperRef={wrapperRef} />}
         {navOption === 'security' && (
-          <>
-            <h3>Segurança</h3>
-          </>
+          <SettingsSecurity wrapperRef={wrapperRef} />
         )}
       </Main>
     </Container>
