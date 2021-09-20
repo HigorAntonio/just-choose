@@ -1,44 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import {
-  Container,
-  Header,
-  Navigation,
-  Main,
-  LayoutBox,
-  ThumbnailWrapper,
-  ThumbPreview,
-} from './styles';
+import SettingsProfile from '../../components/SettingsProfile';
+
+import { Container, Header, Navigation, Main } from './styles';
 
 const Settings = ({ wrapperRef }) => {
   const [navOption, setNavOption] = useState('profile');
-  const [profileImage, setProfileImage] = useState();
-  const [profileImagePreview, setProfileImagePreview] = useState();
-  const [profileImageError, setProfileImageError] = useState('');
-
-  const profileImageInputFileRef = useRef();
 
   useEffect(() => {
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
   }, [wrapperRef]);
-
-  const handleProfileImage = (e) => {
-    setProfileImageError('');
-    if (e.target.files[0].size > 2097152) {
-      setProfileImageError('A imagem não pode ter mais do que 2 MB.');
-    } else {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.readyState === 2) {
-          setProfileImagePreview(reader.result);
-        }
-      };
-      reader.readAsDataURL(e.target.files[0]);
-      setProfileImage(e.target.files[0]);
-    }
-  };
 
   return (
     <Container>
@@ -66,37 +39,7 @@ const Settings = ({ wrapperRef }) => {
         </div>
       </Navigation>
       <Main>
-        {navOption === 'profile' && (
-          <>
-            <h3>Imagem de perfil</h3>
-            <LayoutBox>
-              <ThumbnailWrapper>
-                <div className="column">
-                  <ThumbPreview src={profileImagePreview} className="rounded" />
-                </div>
-                <div className="column button-wrapper">
-                  <div className="file-input">
-                    <label htmlFor="thumbnail">Selecione uma imagem</label>
-                    <input
-                      type="file"
-                      id="thumbnail"
-                      accept="image/*"
-                      onChange={handleProfileImage}
-                      ref={profileImageInputFileRef}
-                    />
-                  </div>
-                  <p>
-                    A imagem deve estar no formato JPEG, PNG ou GIF e não pode
-                    ter mais do que 2 MB.
-                  </p>
-                  {profileImageError && (
-                    <p className="thumb-error">{profileImageError}</p>
-                  )}
-                </div>
-              </ThumbnailWrapper>
-            </LayoutBox>
-          </>
-        )}
+        {navOption === 'profile' && <SettingsProfile wrapperRef={wrapperRef} />}
         {navOption === 'security' && (
           <>
             <h3>Segurança</h3>

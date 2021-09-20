@@ -175,7 +175,7 @@ export const ThumbPreview = styled.div`
     padding-bottom: calc(9 / 16 * 100%);
   }
 
-  background-image: url(${(props) => props.src});
+  background-image: url('${(props) => props.src}');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 50% 50%;

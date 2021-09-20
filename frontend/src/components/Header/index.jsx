@@ -13,8 +13,8 @@ import Sign from '../SignModal';
 import Switch from '../Switch';
 
 import { AuthContext } from '../../context/AuthContext';
+import { ProfileContext } from '../../context/ProfileContext';
 import { ThemeContext as AppThemeContext } from '../../context/ThemeContext';
-import justChooseApi from '../../apis/justChooseApi';
 
 import {
   Container,
@@ -34,6 +34,10 @@ import {
   ProfileWrapper,
   Profile,
   ProfileDropDown,
+  ProfileOption,
+  ProfileImage,
+  ProfileData,
+  DropDownSeparator,
   DropDownOption,
 } from './styles';
 
@@ -44,28 +48,14 @@ function Header() {
 
   const { title: theme, colors } = useContext(ThemeContext);
   const { theme: appTheme, toggleTheme } = useContext(AppThemeContext);
+  const { loading, authenticated, handleLogout } = useContext(AuthContext);
+  const { userProfile, setUserProfile } = useContext(ProfileContext);
 
-  const { loading, authenticated, handleLogout, userId } =
-    useContext(AuthContext);
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const [showSearchDropDown, setShowSearchDropDown] = useState(false);
   const [search, setSearch] = useState('');
-  const [userProfile, setUserProfile] = useState({});
-
-  useEffect(() => {
-    (async () => {
-      try {
-        if (userId) {
-          const { data } = await justChooseApi.get(`/users/${userId}`);
-          setUserProfile(data);
-        }
-      } catch (error) {
-        console.error('Falha ao obter dados do perfil do usuário');
-      }
-    })();
-  }, [userId]);
 
   useEffect(() => {
     if (query) {
@@ -86,6 +76,7 @@ function Header() {
   const handleUserExit = async () => {
     try {
       await handleLogout();
+      setUserProfile({});
       setShowProfileDropDown(false);
     } catch (error) {}
   };
@@ -185,6 +176,18 @@ function Header() {
                   }
                 />
                 <ProfileDropDown show={showProfileDropDown}>
+                  <ProfileOption>
+                    <Link
+                      to={`/settings`}
+                      onClick={() => setShowProfileDropDown(false)}
+                    >
+                      <ProfileImage src={userProfile.profile_image_url} />
+                    </Link>
+                    <ProfileData>
+                      <span>{userProfile.name}</span>
+                    </ProfileData>
+                  </ProfileOption>
+                  <DropDownSeparator />
                   {authenticated && (
                     <Link
                       to={`/settings`}
@@ -223,6 +226,7 @@ function Header() {
                       />
                     </div>
                   </DropDownOption>
+                  <DropDownSeparator />
                   {authenticated && (
                     <DropDownOption className="hover" onClick={handleUserExit}>
                       <div className="align-left">

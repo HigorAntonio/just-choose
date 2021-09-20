@@ -23,6 +23,13 @@ export const Thumbnail = styled.div`
   background-size: cover;
   background-position: 50% 50%;
   background-color: var(--background-600);
+
+  ${(props) =>
+    props.roundedThumbnail &&
+    `border-radius: 50%;
+    width: 136px;
+    height: 136px;
+  `};
 `;
 
 export const TextWrapper = styled.div`

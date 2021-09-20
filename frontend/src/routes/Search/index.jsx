@@ -376,7 +376,11 @@ const Search = ({ wrapperRef }) => {
                       alert(`${profile.name}`);
                     }}
                   >
-                    <SearchCard title={profile.name} />
+                    <SearchCard
+                      title={profile.name}
+                      thumbnail={profile.profile_image_url}
+                      roundedThumbnail
+                    />
                   </SearchItem>
                 );
               }
@@ -387,7 +391,11 @@ const Search = ({ wrapperRef }) => {
                     alert(`${profile.name}`);
                   }}
                 >
-                  <SearchCard title={profile.name} />
+                  <SearchCard
+                    title={profile.name}
+                    thumbnail={profile.profile_image_url}
+                    roundedThumbnail
+                  />
                 </SearchItem>
               );
             })}

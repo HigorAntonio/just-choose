@@ -68,7 +68,7 @@ const UpdatePoll = ({ wrapperRef }) => {
   const [contentListId, setContentListId] = useState('');
   const [contentList, setContentList] = useState([]);
   const [updating, setUpdating] = useState(false);
-  const [errorOnCreate, setErrorOnCreate] = useState(false);
+  const [errorOnUpdate, setErrorOnUpdate] = useState(false);
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
@@ -138,7 +138,7 @@ const UpdatePoll = ({ wrapperRef }) => {
     if (updating) {
       setSeverity('info');
       setMessage('Por favor, aguarde. Atualizando votação...');
-    } else if (errorOnCreate) {
+    } else if (errorOnUpdate) {
       setSeverity('error');
       setMessage(
         'Não foi possível atualizar a votação. Por favor, tente novamente.'
@@ -147,7 +147,7 @@ const UpdatePoll = ({ wrapperRef }) => {
       setSeverity('success');
       setMessage('Votação atualizada com sucesso.');
     }
-  }, [updating, errorOnCreate, setMessage, setSeverity]);
+  }, [updating, errorOnUpdate, setMessage, setSeverity]);
 
   const clearForm = () => {
     setTitle('');
@@ -204,7 +204,7 @@ const UpdatePoll = ({ wrapperRef }) => {
   };
 
   const handleUpdatePoll = async () => {
-    setErrorOnCreate(false);
+    setErrorOnUpdate(false);
     setShowAlert(true);
     setUpdating(true);
     clearTimeout(alertTimeout);
@@ -230,11 +230,11 @@ const UpdatePoll = ({ wrapperRef }) => {
           data: formData,
         });
       } catch (error) {
-        setErrorOnCreate(true);
+        setErrorOnUpdate(true);
         successfulyUpdated = false;
       }
     } else {
-      setErrorOnCreate(true);
+      setErrorOnUpdate(true);
       successfulyUpdated = false;
     }
 

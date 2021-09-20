@@ -4,11 +4,14 @@ const deleteFile = require('../utils/deleteFile');
 module.exports = {
   async index(req, res) {
     try {
-      const { query, page = 1, page_size = 30 } = req.query;
+      const { query, exact_name, page = 1, page_size = 30 } = req.query;
 
       const errors = [];
       if (query && typeof query !== 'string') {
         errors.push({ erro: 'O parâmetro query deve ser uma string' });
+      }
+      if (exact_name && typeof exact_name !== 'string') {
+        errors.push({ erro: 'O parâmetro exact_name deve ser uma string' });
       }
       if (isNaN(page)) {
         errors.push('O parâmetro page deve ser um número');
@@ -40,6 +43,12 @@ module.exports = {
         countQuery.where(
           knex.raw('u.document @@ users_plainto_tsquery(:query)', { query })
         );
+      }
+
+      if (exact_name) {
+        usersQuery.where({ 'u.name': exact_name });
+
+        countQuery.where({ 'u.name': exact_name });
       }
 
       const users = await usersQuery;
@@ -98,7 +107,6 @@ module.exports = {
 
       return res.json(profile);
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },
@@ -134,7 +142,8 @@ module.exports = {
           .json({ erro: 'Dados do usuário não informados' });
       }
 
-      const { name = user.name } = JSON.parse(data);
+      const dataObj = JSON.parse(data);
+      const { name = user.name } = dataObj;
       const errors = [];
 
       if (!name) {
@@ -147,6 +156,21 @@ module.exports = {
           await deleteFile(req.file.key);
         } catch (error) {}
         return res.status(400).json({ erros: errors });
+      }
+
+      if (dataObj.name) {
+        const userWithSameName = await knex
+          .select()
+          .from('users as u')
+          .where({ 'u.name': name })
+          .first();
+
+        if (userWithSameName) {
+          try {
+            await deleteFile(req.file.key);
+          } catch (error) {}
+          return res.status(400).json({ erro: 'Nome de usuário indisponível' });
+        }
       }
 
       const deleteOldProfileImage = req.file ? true : false;
@@ -170,7 +194,6 @@ module.exports = {
 
       return res.sendStatus(200);
     } catch (error) {
-      console.log(error);
       try {
         await deleteFile(req.file.key);
       } catch (error) {}

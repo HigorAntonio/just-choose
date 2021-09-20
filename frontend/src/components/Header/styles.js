@@ -349,6 +349,46 @@ export const ProfileDropDown = styled.div`
   }
 `;
 
+export const ProfileOption = styled.div`
+  display: flex;
+  justify-content: flex-start;
+`;
+
+export const ProfileImage = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-image: url('${(props) => props.src}');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-color: var(--background-700);
+  flex-shrink: 0;
+`;
+
+export const ProfileData = styled.div`
+  display: flex;
+  align-items: center;
+
+  white-space: nowrap;
+  overflow: hidden;
+
+  > span {
+    font-size: 15px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    margin-left: 10px;
+  }
+`;
+
+export const DropDownSeparator = styled.div`
+  margin-top: 10px;
+  border-top: 1px solid var(--background-700);
+  padding-bottom: 10px;
+`;
+
 export const DropDownOption = styled.div`
   display: flex;
   align-items: center;
