@@ -6,6 +6,7 @@ module.exports = async (contentListId) => {
       'cl.id',
       'cl.user_id',
       'users.name as user_name',
+      'users.profile_image_url',
       'cl.title',
       'cl.description',
       'cl.sharing_option',
