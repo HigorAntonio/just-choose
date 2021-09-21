@@ -1,4 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import {
+  Link,
+  Switch,
+  Route,
+  useRouteMatch,
+  useLocation,
+  useHistory,
+} from 'react-router-dom';
 
 import SettingsProfile from '../../components/SettingsProfile';
 import SettingsSecurity from '../../components/SettingsSecurity';
@@ -6,7 +14,19 @@ import SettingsSecurity from '../../components/SettingsSecurity';
 import { Container, Header, Navigation, Main } from './styles';
 
 const Settings = ({ wrapperRef }) => {
-  const [navOption, setNavOption] = useState('profile');
+  const history = useHistory();
+  const { path, url } = useRouteMatch();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (
+      location.pathname !== `${path}/profile` &&
+      location.pathname !== `${path}/security` &&
+      location.pathname !== `${path}/devices`
+    ) {
+      history.replace(`${path}/profile`);
+    }
+  }, [location, path, history]);
 
   useEffect(() => {
     // Posiciona o scroll no início da página
@@ -21,29 +41,39 @@ const Settings = ({ wrapperRef }) => {
       </Header>
       <Navigation>
         <div
-          className={navOption === 'profile' ? 'active' : ''}
-          onClick={() => setNavOption('profile')}
+          className={location.pathname === `${path}/profile` ? 'active' : ''}
         >
-          <p>Perfil</p>
+          <Link to={`${url}/profile`}>Perfil</Link>
         </div>
         <div
-          className={navOption === 'security' ? 'active' : ''}
-          onClick={() => setNavOption('security')}
+          className={location.pathname === `${path}/security` ? 'active' : ''}
         >
-          <p>Segurança e privacidade</p>
+          <Link to={`${url}/security`}>Segurança e privacidade</Link>
         </div>
         <div
-          className={navOption === 'devices' ? 'active' : ''}
-          onClick={() => setNavOption('devices')}
+          className={location.pathname === `${path}/devices` ? 'active' : ''}
         >
-          <p>Seus dispositivos</p>
+          <Link to={`${url}/devices`}>Seus dispositivos</Link>
         </div>
       </Navigation>
       <Main>
-        {navOption === 'profile' && <SettingsProfile wrapperRef={wrapperRef} />}
-        {navOption === 'security' && (
-          <SettingsSecurity wrapperRef={wrapperRef} />
-        )}
+        <Switch>
+          <Route
+            exact
+            path={`${path}/profile`}
+            component={() => <SettingsProfile wrapperRef={wrapperRef} />}
+          />
+          <Route
+            exact
+            path={`${path}/security`}
+            component={() => <SettingsSecurity wrapperRef={wrapperRef} />}
+          />
+          <Route
+            exact
+            path={`${path}/devices`}
+            component={() => <h3>Devices</h3>}
+          />
+        </Switch>
       </Main>
     </Container>
   );

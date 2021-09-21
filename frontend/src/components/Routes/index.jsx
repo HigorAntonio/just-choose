@@ -12,6 +12,7 @@ import ShowPoll from '../../routes/ShowPoll';
 import Search from '../../routes/Search';
 import UpdatePoll from '../../routes/UpdatePoll';
 import Settings from '../../routes/Settings';
+import UserProfile from '../../routes/UserProfile';
 import NotFound from '../../components/NotFound';
 
 const CustomRoute = ({ isPrivate, ...rest }) => {
@@ -75,9 +76,13 @@ const Routes = ({ wrapperRef }) => {
       />
       <CustomRoute
         isPrivate
-        exact
         path="/settings"
         component={() => <Settings wrapperRef={wrapperRef} />}
+      />
+      <CustomRoute
+        exact
+        path="/users/:id"
+        component={() => <UserProfile wrapperRef={wrapperRef} />}
       />
       <Route component={NotFound} />
     </Switch>

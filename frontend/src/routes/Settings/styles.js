@@ -26,13 +26,19 @@ export const Navigation = styled.div`
     display: flex;
     align-items: center;
 
+    > a {
+      text-decoration: none;
+      margin: 5px 0;
+    }
+
     &:hover,
     &.active {
       cursor: pointer;
       border-bottom: 2px solid var(--primary-400);
 
-      > p {
+      > a {
         color: var(--primary-400);
+        text-decoration: none;
       }
     }
   }
