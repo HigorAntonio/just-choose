@@ -87,23 +87,19 @@ const SettingsProfile = ({ wrapperRef }) => {
     }
   };
 
-  const handleUserName = (e) => {
-    setUserName(e.target.value);
+  const validateUserName = (userName) => {
     setUserNameError('');
-    setProfileSettingsChange(true);
-  };
-
-  const validateFields = () => {
-    setUserNameError('');
-    let isValid = true;
-    if (!userName || userName.length < 4 || userName.length > 25) {
+    if (userName.length < 4 || userName.length > 25) {
       setUserNameError(
         'Os nomes de usuário devem ter entre 4 e 25 caracteres.'
       );
-      isValid = false;
     }
+  };
 
-    return isValid;
+  const handleUserName = (e) => {
+    setUserName(e.target.value);
+    validateUserName(e.target.value);
+    setProfileSettingsChange(true);
   };
 
   const handleUpdateProfile = async () => {
@@ -113,39 +109,33 @@ const SettingsProfile = ({ wrapperRef }) => {
     clearTimeout(alertTimeout);
 
     let successfulyUpdated = true;
-    const isValid = validateFields();
-    if (isValid) {
-      const data = {};
-      if (userName !== userProfile.name) {
-        data.name = userName;
-      }
+    const data = {};
+    if (userName !== userProfile.name) {
+      data.name = userName;
+    }
 
-      const formData = new FormData();
-      if (profileImage) {
-        formData.append('profile_image', profileImage);
-      }
-      formData.append('data', JSON.stringify(data));
-      try {
-        await justChooseApi({
-          url: `/users`,
-          method: 'PUT',
-          data: formData,
-        });
-      } catch (error) {
-        setErrorOnUpdate(true);
-        successfulyUpdated = false;
-
-        if (
-          error.response &&
-          error.response.status === 400 &&
-          error.response.data.erro === 'Nome de usuário indisponível'
-        ) {
-          setUserNameError('Nome de usuário indisponível');
-        }
-      }
-    } else {
+    const formData = new FormData();
+    if (profileImage) {
+      formData.append('profile_image', profileImage);
+    }
+    formData.append('data', JSON.stringify(data));
+    try {
+      await justChooseApi({
+        url: `/users`,
+        method: 'PUT',
+        data: formData,
+      });
+    } catch (error) {
       setErrorOnUpdate(true);
       successfulyUpdated = false;
+
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.erro === 'Nome de usuário indisponível'
+      ) {
+        setUserNameError('Nome de usuário indisponível');
+      }
     }
 
     setUpdating(false);
@@ -156,6 +146,12 @@ const SettingsProfile = ({ wrapperRef }) => {
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
+  };
+
+  const isDisabledUpdateProfileButton = () => {
+    return (
+      !profileSettingsChange || userName.length < 4 || userName.length > 25
+    );
   };
 
   return (
@@ -207,7 +203,7 @@ const SettingsProfile = ({ wrapperRef }) => {
         </InputWrapper>
         <ButtonWrapper>
           <ProfileButton
-            disabled={!profileSettingsChange}
+            disabled={isDisabledUpdateProfileButton()}
             onClick={handleUpdateProfile}
           >
             Salvar alterações

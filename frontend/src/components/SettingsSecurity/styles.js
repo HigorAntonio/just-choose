@@ -1,11 +1,4 @@
-import styled, { css } from 'styled-components';
-
-const labelCss = css`
-  flex-shrink: 0;
-  font-size: 14px;
-  font-weight: bold;
-  margin-right: 15px;
-`;
+import styled from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -17,10 +10,6 @@ export const Container = styled.div`
 
   > div + h3 {
     margin-top: 40px;
-  }
-
-  @media (max-width: 768px) {
-    padding: 20px;
   }
 `;
 
@@ -189,11 +178,19 @@ export const ChangePasswordButton = styled.div`
   }
 `;
 
-export const Email = styled.p`
+export const EmailWrapper = styled.span`
   display: flex;
   align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+`;
+
+export const Email = styled.p`
   font-size: 1.8rem;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const EmailStatus = styled.p`
@@ -210,6 +207,7 @@ export const ResendEmailButton = styled.button`
   font-weight: bold;
   background: var(--background-400);
   padding: 5px 8px;
+  margin-left: 20px;
 
   &:hover {
     background: var(--background-500);

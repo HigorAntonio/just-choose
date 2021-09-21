@@ -18,10 +18,6 @@ export const Container = styled.div`
   > div + h3 {
     margin-top: 40px;
   }
-
-  @media (max-width: 768px) {
-    padding: 20px;
-  }
 `;
 
 export const LayoutBox = styled.div`
