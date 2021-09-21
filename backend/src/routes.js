@@ -37,6 +37,11 @@ routes.get(
   authorization,
   LocalAuthController.resendConfirmEmail
 );
+routes.put(
+  '/updatepassword',
+  authorization,
+  LocalAuthController.updatePassword
+);
 
 // UserController
 routes.get('/users', getLoggedUserId, UserController.index);

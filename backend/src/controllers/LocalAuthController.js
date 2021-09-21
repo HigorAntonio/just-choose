@@ -444,4 +444,52 @@ module.exports = {
       return res.sendStatus(500);
     }
   },
+
+  async updatePassword(req, res) {
+    try {
+      const userId = req.userId;
+
+      const { currentPassword, newPassword } = req.body;
+      const errors = [];
+
+      if (!currentPassword) {
+        errors.push('Senha atual não informada');
+      } else if (typeof currentPassword !== 'string') {
+        errors.push('Senha atual, valor inválido');
+      }
+      if (!newPassword) {
+        errors.push('Nova senha não informada');
+      } else if (typeof newPassword !== 'string') {
+        errors.push('Nova senha, valor inválido');
+      } else if (newPassword.length < 8) {
+        errors.push('A nova senha deve ter no mínimo 8 caracteres');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const user = await knex
+        .select('u.id', 'u.name', 'u.email', 'lu.password')
+        .from('users as u')
+        .where('u.id', userId)
+        .innerJoin('local_users as lu', 'u.id', 'lu.user_id')
+        .first();
+
+      if (!user)
+        return res.status(400).json({ erro: 'Usuário não encontrado' });
+
+      if (!bcrypt.compareSync(currentPassword, user.password))
+        return res.status(400).json({ erro: 'Senha inválida' });
+
+      const encryptedPassword = encryptPassword(newPassword);
+
+      await knex('local_users')
+        .update({ password: encryptedPassword })
+        .where({ user_id: userId });
+
+      return res.sendStatus(200);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
 };
