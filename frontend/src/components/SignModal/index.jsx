@@ -35,6 +35,67 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
   const [signUpErrors, setSignUpErrors] = useState([]);
   const [signInErrors, setSignInErrors] = useState([]);
 
+  const validateSignUpName = (signUpName) => {
+    setSignUpErrors((prevState) =>
+      prevState.filter(
+        (error) =>
+          error !== 'Os nomes de usuário devem ter entre 4 e 25 caracteres.'
+      )
+    );
+    if (signUpName.length < 4 || signUpName.length > 25) {
+      setSignUpErrors((prevState) => [
+        ...prevState,
+        'Os nomes de usuário devem ter entre 4 e 25 caracteres.',
+      ]);
+    }
+  };
+
+  const validateSignUpPassword = (password) => {
+    setSignUpErrors((prevState) =>
+      prevState.filter(
+        (error) => error !== 'A senha deve ter no mínimo 8 caracteres.'
+      )
+    );
+    if (password.length < 8) {
+      setSignUpErrors((prevState) => [
+        ...prevState,
+        'A senha deve ter no mínimo 8 caracteres.',
+      ]);
+    }
+  };
+
+  const validateSignUpConfirmPassword = (password, confirmPassword) => {
+    setSignUpErrors((prevState) =>
+      prevState.filter(
+        (error) => error !== 'As senhas não conferem. Tente outra vez.'
+      )
+    );
+    if (confirmPassword !== password) {
+      setSignUpErrors((prevState) => [
+        ...prevState,
+        'As senhas não conferem. Tente outra vez.',
+      ]);
+    }
+  };
+
+  const handleSignUpNameInput = (e) => {
+    setSignUpName(e.target.value);
+    validateSignUpName(e.target.value);
+  };
+
+  const handleSignUpPasswordInput = (e) => {
+    setSignUpPassword(e.target.value);
+    validateSignUpPassword(e.target.value);
+    if (signUpConfirmPassword !== '') {
+      validateSignUpConfirmPassword(e.target.value, signUpConfirmPassword);
+    }
+  };
+
+  const handleSignUpConfirmPasswordInput = (e) => {
+    setSignUpConfirmPassword(e.target.value);
+    validateSignUpConfirmPassword(signUpPassword, e.target.value);
+  };
+
   const handleSignUp = async (e) => {
     try {
       e.preventDefault();
@@ -86,16 +147,17 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
     setSignInErrors([]);
   };
 
-  const signUpFormValidation = () => {
+  const isDisabledSignUpButton = () => {
     return (
-      !signUpName ||
-      !signUpPassword ||
+      signUpName.length < 4 ||
+      signUpName.length > 25 ||
+      signUpPassword.length < 8 ||
       signUpPassword !== signUpConfirmPassword ||
       !signUpEmail
     );
   };
 
-  const signInFormValidation = () => {
+  const isDisabledSignInButton = () => {
     return !signInEmail || !signInPassword;
   };
 
@@ -150,7 +212,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
             </InputWithLabel>
             <SignFormButton
               type="submit"
-              disabled={signInFormValidation()}
+              disabled={isDisabledSignInButton()}
               onClick={(e) => handleSignIn(e)}
             >
               Entrar
@@ -171,7 +233,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
                 type="text"
                 id="username"
                 value={signUpName}
-                onChange={(e) => setSignUpName(e.target.value)}
+                onChange={handleSignUpNameInput}
                 autoFocus
               />
             </InputWithLabel>
@@ -180,7 +242,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
                 label="Senha"
                 id="password"
                 value={signUpPassword}
-                onChange={(e) => setSignUpPassword(e.target.value)}
+                onChange={handleSignUpPasswordInput}
               />
             </InputWithLabel>
             <InputWithLabel>
@@ -188,7 +250,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
                 label="Confirmação de senha"
                 id="passwordConfirm"
                 value={signUpConfirmPassword}
-                onChange={(e) => setSignUpConfirmPassword(e.target.value)}
+                onChange={handleSignUpConfirmPasswordInput}
               />
             </InputWithLabel>
             <InputWithLabel>
@@ -202,7 +264,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
             </InputWithLabel>
             <SignFormButton
               type="submit"
-              disabled={signUpFormValidation()}
+              disabled={isDisabledSignUpButton()}
               onClick={(e) => handleSignUp(e)}
             >
               Cadastrar-se
