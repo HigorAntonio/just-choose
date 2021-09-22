@@ -102,7 +102,6 @@ routes.post(
 routes.get(
   '/contentlists/:id/like',
   authorization,
-  isUserActive,
   ContentListLikeController.show
 );
 routes.delete(
