@@ -176,30 +176,32 @@ function Header() {
                   }
                 />
                 <ProfileDropDown show={showProfileDropDown}>
-                  <ProfileOption>
-                    <Link
-                      to={`/settings`}
-                      onClick={() => setShowProfileDropDown(false)}
-                    >
-                      <ProfileImage src={userProfile.profile_image_url} />
-                    </Link>
-                    <ProfileData>
-                      <span>{userProfile.name}</span>
-                    </ProfileData>
-                  </ProfileOption>
-                  <DropDownSeparator />
                   {authenticated && (
-                    <Link
-                      to={`/settings`}
-                      onClick={() => setShowProfileDropDown(false)}
-                    >
-                      <DropDownOption className="hover">
-                        <div className="align-left">
-                          <BiCog size={20} style={{ flexShrink: 0 }} />{' '}
-                        </div>
-                        <div className="align-right">Configurações</div>
-                      </DropDownOption>
-                    </Link>
+                    <>
+                      <ProfileOption>
+                        <Link
+                          to={`/settings`}
+                          onClick={() => setShowProfileDropDown(false)}
+                        >
+                          <ProfileImage src={userProfile.profile_image_url} />
+                        </Link>
+                        <ProfileData>
+                          <span>{userProfile.name}</span>
+                        </ProfileData>
+                      </ProfileOption>
+                      <DropDownSeparator />
+                      <Link
+                        to={`/settings`}
+                        onClick={() => setShowProfileDropDown(false)}
+                      >
+                        <DropDownOption className="hover">
+                          <div className="align-left">
+                            <BiCog size={20} style={{ flexShrink: 0 }} />{' '}
+                          </div>
+                          <div className="align-right">Configurações</div>
+                        </DropDownOption>
+                      </Link>
+                    </>
                   )}
                   <DropDownOption>
                     <div className="align-left">
@@ -226,14 +228,19 @@ function Header() {
                       />
                     </div>
                   </DropDownOption>
-                  <DropDownSeparator />
                   {authenticated && (
-                    <DropDownOption className="hover" onClick={handleUserExit}>
-                      <div className="align-left">
-                        <BiLogOut size={20} style={{ flexShrink: 0 }} />{' '}
-                      </div>
-                      <div className="align-right">Sair</div>
-                    </DropDownOption>
+                    <>
+                      <DropDownSeparator />
+                      <DropDownOption
+                        className="hover"
+                        onClick={handleUserExit}
+                      >
+                        <div className="align-left">
+                          <BiLogOut size={20} style={{ flexShrink: 0 }} />{' '}
+                        </div>
+                        <div className="align-right">Sair</div>
+                      </DropDownOption>
+                    </>
                   )}
                 </ProfileDropDown>
               </div>

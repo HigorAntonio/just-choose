@@ -9,10 +9,11 @@ export const Filters = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 30px 0;
+  padding: 30px 0 20px 0;
   width: 90%;
   max-width: 1280px;
   margin: 0 auto;
+  border-bottom: 1px solid var(--background-700);
 
   @media (max-width: 680px) {
     flex-direction: column;
@@ -30,16 +31,24 @@ export const FiltersLeft = styled.div`
 
   > div {
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 500;
     padding: 5px 0;
 
     &.active {
       color: var(--primary-400);
       border-bottom: 2px solid var(--primary-400);
+
+      > a {
+        color: var(--primary-400);
+      }
     }
 
     &:hover {
       cursor: pointer;
+    }
+
+    > a {
+      text-decoration: none;
     }
   }
 
@@ -87,7 +96,6 @@ export const SearchItems = styled.div`
   width: 90%;
   max-width: 1280px;
   margin: 0 auto;
-  border-top: 1px solid var(--background-700);
   padding: 20px 0 0 0;
 
   > div + div {
