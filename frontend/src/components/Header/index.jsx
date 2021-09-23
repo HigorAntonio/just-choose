@@ -8,6 +8,7 @@ import { HiDocumentAdd } from 'react-icons/hi';
 import { FiSearch } from 'react-icons/fi';
 import queryString from 'query-string';
 
+import TooltipHover from '../TooltipHover';
 import Modal from '../Modal';
 import Sign from '../SignModal';
 import Switch from '../Switch';
@@ -28,7 +29,6 @@ import {
   NavMenu,
   NewListButton,
   // NewListIcon,
-  Tooltip,
   SignIn,
   SignUp,
   ProfileWrapper,
@@ -151,11 +151,16 @@ function Header() {
         <NavMenu>
           {!loading && authenticated && (
             <Link to="/list">
-              <NewListButton>
-                {/* <NewListIcon /> */}
-                <HiDocumentAdd size={25} style={{ flexShrink: 0 }} />
-                <Tooltip width="80px">Nova Lista</Tooltip>
-              </NewListButton>
+              <TooltipHover
+                tooltipText="Nova Lista"
+                width="80px"
+                transitionDuration="0.4s"
+              >
+                <NewListButton>
+                  {/* <NewListIcon /> */}
+                  <HiDocumentAdd size={25} style={{ flexShrink: 0 }} />
+                </NewListButton>
+              </TooltipHover>
             </Link>
           )}
           {!loading && !authenticated && (

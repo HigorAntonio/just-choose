@@ -227,46 +227,6 @@ export const NewPollIcon = styled.img.attrs((props) => ({
   height: 2.7rem;
 `;
 
-export const Tooltip = styled.span`
-  opacity: 0;
-  pointer-events: none;
-  width: ${(props) => props.width || '120px'};
-  background-color: var(--tooltip);
-  color: var(--tooltip-text);
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px;
-  position: absolute;
-  z-index: 1;
-  top: 150%;
-  left: 50%;
-  margin-left: ${(props) =>
-    `-${parseFloat(props.width) / 2}${props.width.replace(
-      `${parseFloat(props.width)}`,
-      ''
-    )}` || '-60px'};
-  font-weight: bold;
-  white-space: nowrap;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent var(--tooltip) transparent;
-  }
-
-  ${NewListButton}:hover &,
-  ${NewPollButton}:hover & {
-    opacity: 1;
-  }
-
-  transition: opacity 0.4s ease-in;
-`;
-
 const signButton = css`
   display: flex;
   align-items: center;
