@@ -40,19 +40,15 @@ const Settings = ({ wrapperRef }) => {
         <h1>Configurações</h1>
       </Header>
       <Navigation>
-        <div
-          className={location.pathname === `${path}/profile` ? 'active' : ''}
-        >
+        <div className={location.pathname === `${url}/profile` ? 'active' : ''}>
           <Link to={`${url}/profile`}>Perfil</Link>
         </div>
         <div
-          className={location.pathname === `${path}/security` ? 'active' : ''}
+          className={location.pathname === `${url}/security` ? 'active' : ''}
         >
           <Link to={`${url}/security`}>Segurança e privacidade</Link>
         </div>
-        <div
-          className={location.pathname === `${path}/devices` ? 'active' : ''}
-        >
+        <div className={location.pathname === `${url}/devices` ? 'active' : ''}>
           <Link to={`${url}/devices`}>Seus dispositivos</Link>
         </div>
       </Navigation>

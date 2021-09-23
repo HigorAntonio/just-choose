@@ -80,7 +80,6 @@ const Routes = ({ wrapperRef }) => {
         component={() => <Settings wrapperRef={wrapperRef} />}
       />
       <CustomRoute
-        exact
         path="/users/:id"
         component={() => <UserProfile wrapperRef={wrapperRef} />}
       />

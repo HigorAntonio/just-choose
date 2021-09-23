@@ -30,7 +30,7 @@ export const FiltersLeft = styled.div`
   align-items: center;
 
   > div {
-    font-size: 18px;
+    font-size: 1.8rem;
     font-weight: 500;
     padding: 5px 0;
 

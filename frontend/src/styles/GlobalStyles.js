@@ -33,6 +33,7 @@ export default createGlobalStyle`
     --white: ${(props) => props.theme.colors.white};
     --black: ${(props) => props.theme.colors.black};
     --gray: ${(props) => props.theme.colors.gray};
+    --light-red: ${(props) => props.theme.colors['light-red']};
     --dark-gray: ${(props) => props.theme.colors['dark-gray']};
     --error: ${(props) => props.theme.colors.error};
     --success: ${(props) => props.theme.colors.success};

@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useHistory, Link } from 'react-router-dom';
 import { ThemeContext } from 'styled-components';
-import { FaHeart } from 'react-icons/fa';
-import { FaRegHeart } from 'react-icons/fa';
-import { FaVoteYea } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaVoteYea, FaTrash } from 'react-icons/fa';
 import { BiGitRepoForked } from 'react-icons/bi';
 import { MdSettings } from 'react-icons/md';
-import { FaTrash } from 'react-icons/fa';
 
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';

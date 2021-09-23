@@ -13,7 +13,7 @@ export const Header = styled.header`
   }
 
   @media (max-width: 768px) {
-    padding: 20px 15px;
+    padding: 30px 20px 10px 20px;
   }
 `;
 
@@ -29,6 +29,7 @@ export const Navigation = styled.div`
     > a {
       text-decoration: none;
       margin: 5px 0;
+      text-align: center;
     }
 
     &:hover,
@@ -38,7 +39,6 @@ export const Navigation = styled.div`
 
       > a {
         color: var(--primary-400);
-        text-decoration: none;
       }
     }
   }
@@ -48,7 +48,7 @@ export const Navigation = styled.div`
   }
 
   @media (max-width: 768px) {
-    margin: 20px;
+    margin: 0 20px;
   }
 `;
 

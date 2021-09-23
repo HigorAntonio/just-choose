@@ -23,6 +23,7 @@ const ligthTheme = {
     white: '#ffffff',
     black: '#000000',
     gray: '#C4C4C4',
+    'light-red': '#ffa0a3',
     'dark-gray': '#888888',
     error: '#eb0400',
     success: '#43a047',
