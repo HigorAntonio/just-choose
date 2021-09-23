@@ -50,9 +50,27 @@ const getSortOption = (option) => {
   }
 };
 
+const pollSortOptions = [
+  'updated.desc',
+  'updated.asc',
+  'title.asc',
+  'title.desc',
+];
+
+const listSortOptions = [
+  'updated.desc',
+  'updated.asc',
+  'popularity.asc',
+  'popularity.desc',
+  'rating.asc',
+  'rating.desc',
+  'title.asc',
+  'title.desc',
+];
+
 const Search = ({ wrapperRef }) => {
   const location = useLocation();
-  const { query, type } = queryString.parse(location.search);
+  const { query, type, sort } = queryString.parse(location.search);
   const history = useHistory();
   const { path, url } = useRouteMatch();
 
@@ -69,6 +87,12 @@ const Search = ({ wrapperRef }) => {
   const [showListOption, setShowListOption] = useState(false);
   const [showPollOption, setShowPollOption] = useState(false);
   const [showProfileOption, setShowProfileOption] = useState(false);
+
+  useEffect(() => {
+    if (!query) {
+      history.replace('/');
+    }
+  }, [query, history]);
 
   const {
     content: contentLists,
@@ -89,13 +113,19 @@ const Search = ({ wrapperRef }) => {
   } = useSearchRequest('/users', profileParams, profilePageNumber);
 
   useEffect(() => {
-    setListParams({ query, sort_by: 'updated.desc' });
+    setListParams({
+      query,
+      sort_by: sort && listSortOptions.includes(sort) ? sort : 'updated.desc',
+    });
     setListPageNumber(1);
-    setPollParams({ query, sort_by: 'updated.desc' });
+    setPollParams({
+      query,
+      sort_by: sort && pollSortOptions.includes(sort) ? sort : 'updated.desc',
+    });
     setPollPageNumber(1);
-    setProfileParams({ query, sort_by: 'updated.desc' });
+    setProfileParams({ query });
     setProfilePageNumber(1);
-  }, [query]);
+  }, [query, sort]);
 
   useEffect(() => {
     setShowListOption(contentLists.length > 0);
@@ -130,22 +160,32 @@ const Search = ({ wrapperRef }) => {
   ]);
 
   useEffect(() => {
-    if (type !== 'list' && type !== 'poll' && type !== 'profile') {
+    if (query && type !== 'list' && type !== 'poll' && type !== 'profile') {
       history.replace(`${path}?query=${query}`);
     }
   }, [type, path, query, history]);
 
   useEffect(() => {
     if (!type && showListOption) {
-      history.replace(`${path}?query=${query}&type=list`);
+      history.replace(
+        `${path}${location.search
+          .split('&')
+          .filter((s) => !s.includes('type='))
+          .join('&')}&type=list`
+      );
     }
-  }, [type, showListOption, history, path, query]);
+  }, [type, showListOption, history, path, query, location]);
 
   useEffect(() => {
     if (!type && showPollOption && !showListOption) {
-      history.replace(`${path}?query=${query}&type=poll`);
+      history.replace(
+        `${path}${location.search
+          .split('&')
+          .filter((s) => !s.includes('type='))
+          .join('&')}&type=poll`
+      );
     }
-  }, [type, showListOption, showPollOption, history, path, query]);
+  }, [type, showListOption, showPollOption, history, path, query, location]);
 
   useEffect(() => {
     if (!type && showProfileOption && !showPollOption && !showListOption) {
@@ -161,18 +201,43 @@ const Search = ({ wrapperRef }) => {
     query,
   ]);
 
+  useEffect(() => {
+    if (
+      (type === 'list' && sort && !listSortOptions.includes(sort)) ||
+      (type === 'poll' && sort && !pollSortOptions.includes(sort)) ||
+      (type === 'profile' && sort)
+    ) {
+      history.replace(
+        `${path}${location.search
+          .split('&')
+          .filter((s) => !s.includes('sort='))
+          .join('&')}`
+      );
+    }
+  }, [type, path, query, history, sort, location]);
+
   const handleListSortOption = (option) => {
     if (listParams.sort_by !== option) {
-      setListParams((prevState) => ({ ...prevState, sort_by: option }));
       setListPageNumber(1);
+      history.push(
+        `${path}${location.search
+          .split('&')
+          .filter((s) => !s.includes('sort='))
+          .join('&')}&sort=${option}`
+      );
     }
     setShowListSortOptions(false);
   };
 
   const handlePollSortOption = (option) => {
     if (pollParams.sort_by !== option) {
-      setPollParams((prevState) => ({ ...prevState, sort_by: option }));
       setPollPageNumber(1);
+      history.push(
+        `${path}${location.search
+          .split('&')
+          .filter((s) => !s.includes('sort='))
+          .join('&')}&sort=${option}`
+      );
     }
     setShowPollSortOptions(false);
   };
@@ -248,7 +313,7 @@ const Search = ({ wrapperRef }) => {
       !pollsLoading &&
       profiles.length === 0 &&
       !profilesLoading ? (
-        <SearchNotFound />
+        <SearchNotFound query={query} />
       ) : (
         <>
           {(showListOption || showPollOption || showProfileOption) && (
@@ -256,17 +321,36 @@ const Search = ({ wrapperRef }) => {
               <FiltersLeft>
                 {showListOption && (
                   <div className={type === 'list' ? 'active' : ''}>
-                    <Link to={`${url}?query=${query}&type=list`}>Listas</Link>
+                    <Link
+                      to={`${url}${location.search
+                        .split('&')
+                        .filter((s) => !s.includes('type='))
+                        .join('&')}&type=list`}
+                    >
+                      Listas
+                    </Link>
                   </div>
                 )}
                 {showPollOption && (
                   <div className={type === 'poll' ? 'active' : ''}>
-                    <Link to={`${url}?query=${query}&type=poll`}>Votações</Link>
+                    <Link
+                      to={`${url}${location.search
+                        .split('&')
+                        .filter((s) => !s.includes('type='))
+                        .join('&')}&type=poll`}
+                    >
+                      Votações
+                    </Link>
                   </div>
                 )}
                 {showProfileOption && (
                   <div className={type === 'profile' ? 'active' : ''}>
-                    <Link to={`${url}?query=${query}&type=profile`}>
+                    <Link
+                      to={`${url}${location.search
+                        .split('&')
+                        .filter((s) => !s.includes('type='))
+                        .join('&')}&type=profile`}
+                    >
                       Perfis
                     </Link>
                   </div>

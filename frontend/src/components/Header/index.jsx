@@ -43,8 +43,8 @@ import {
 
 function Header() {
   const history = useHistory();
-  const { search: searchQuery } = useLocation();
-  const { query } = queryString.parse(searchQuery);
+  const location = useLocation();
+  const { query } = queryString.parse(location.search);
 
   const { title: theme, colors } = useContext(ThemeContext);
   const { theme: appTheme, toggleTheme } = useContext(AppThemeContext);
