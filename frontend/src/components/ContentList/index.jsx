@@ -113,7 +113,11 @@ const ContentList = ({
         content.map((c, i) => {
           const src =
             contentType === 'Jogo'
-              ? c.background_image
+              ? c.background_image &&
+                c.background_image.replace(
+                  'https://media.rawg.io/media',
+                  'https://media.rawg.io/media/resize/420/-'
+                )
               : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
           const title = contentType === 'Filme' ? c.title : c.name;
           if (content.length === i + 1) {
