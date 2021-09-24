@@ -476,7 +476,11 @@ const ShowPoll = ({ wrapperRef }) => {
               {content.map((c, i) => {
                 const src =
                   c.type === 'game'
-                    ? c.poster_path
+                    ? c.poster_path &&
+                      c.poster_path.replace(
+                        'https://media.rawg.io/media',
+                        'https://media.rawg.io/media/resize/420/-'
+                      )
                     : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
                 const href = `${getContentBaseUrl(c.type)}/${
                   c.content_platform_id
