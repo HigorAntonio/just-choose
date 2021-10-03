@@ -164,7 +164,7 @@ module.exports = {
         poll_id: poll.id,
         poll_title: poll.title,
         total_votes: parseInt(total_votes),
-        items: votes,
+        results: votes,
       });
     } catch (error) {
       return res.sendStatus(500);

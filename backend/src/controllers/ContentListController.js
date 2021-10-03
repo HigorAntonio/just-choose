@@ -149,7 +149,7 @@ module.exports = {
         page_size: parseInt(page_size),
         total_pages: total_pages === 0 ? 1 : total_pages,
         total_results: parseInt(count),
-        items: contentLists.map((list) => ({
+        results: contentLists.map((list) => ({
           id: list.id,
           user_id: list.user_id,
           user_name: list.user_name,

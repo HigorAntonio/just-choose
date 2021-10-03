@@ -81,8 +81,11 @@ module.exports = async (
         }
       })
       .limit(page_size)
-      .offset((page - 1) * page_size)
-      .orderByRaw(sort_by);
+      .offset((page - 1) * page_size);
+
+    if (sort_by) {
+      pollsQuery.orderByRaw(sort_by);
+    }
 
     const countObj = knex.count().from(function () {
       this.select()

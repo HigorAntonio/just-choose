@@ -1,5 +1,6 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
+const getUsers = require('../utils/users/getUsers');
 
 module.exports = {
   async index(req, res) {
@@ -27,33 +28,13 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const usersQuery = knex
-        .select('u.id', 'u.name', 'u.profile_image_url')
-        .from('users as u')
-        .limit(page_size)
-        .offset((page - 1) * page_size);
-
-      const countQuery = knex.count().from('users as u');
-
-      if (query) {
-        usersQuery.where(
-          knex.raw('u.document @@ users_plainto_tsquery(:query)', { query })
-        );
-
-        countQuery.where(
-          knex.raw('u.document @@ users_plainto_tsquery(:query)', { query })
-        );
-      }
-
-      if (exact_name) {
-        usersQuery.where({ 'u.name': exact_name });
-
-        countQuery.where({ 'u.name': exact_name });
-      }
-
-      const users = await usersQuery;
-
-      const [{ count }] = await countQuery;
+      const { users, count } = await getUsers(
+        page_size,
+        page,
+        query,
+        exact_name,
+        null
+      );
 
       const total_pages = Math.ceil(count / page_size);
       return res.json({
@@ -61,7 +42,7 @@ module.exports = {
         page_size: parseInt(page_size),
         total_pages: total_pages === 0 ? 1 : total_pages,
         total_results: parseInt(count),
-        items: users,
+        results: users,
       });
     } catch (error) {
       return res.sendStatus(500);

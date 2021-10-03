@@ -9,6 +9,8 @@ const getLoggedUserId = require('./middlewares/getLoggedUserId');
 const LocalAuthController = require('./controllers/LocalAuthController');
 const UserController = require('./controllers/UserController');
 const FollowUsersController = require('./controllers/FollowUsersController');
+const UserFollowingController = require('./controllers/UserFollowingController');
+const UserFollowersController = require('./controllers/UserFollowersController');
 const PollController = require('./controllers/PollController');
 const ContentListController = require('./controllers/ContentListController');
 const ContentListLikeController = require('./controllers/ContentListLikeController');
@@ -18,6 +20,7 @@ const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
 const ShowController = require('./controllers/ShowController');
 const GameController = require('./controllers/GameController');
+const SearchController = require('./controllers/SearchController');
 const ConfigurationController = require('./controllers/ConfigurationController');
 
 const routes = express.Router();
@@ -60,12 +63,25 @@ routes.post(
   isUserActive,
   FollowUsersController.create
 );
-routes.get('/profile/follows', authorization, FollowUsersController.index);
 routes.delete(
   '/users/follow',
   authorization,
   isUserActive,
   FollowUsersController.delete
+);
+
+// UserFollowingController
+routes.get(
+  '/users/:id/following',
+  authorization,
+  UserFollowingController.index
+);
+
+// UserFollowersController
+routes.get(
+  '/users/:id/followers',
+  authorization,
+  UserFollowersController.index
 );
 
 // ContentListController
@@ -203,6 +219,9 @@ routes.get(
   GameController.platforms
 );
 routes.get('/games/genres', authorization, isUserActive, GameController.genres);
+
+// SearchController
+routes.get('/search', getLoggedUserId, SearchController.index);
 
 // ConfigurationController
 routes.get('/configuration/tmdb', authorization, ConfigurationController.tmdb);

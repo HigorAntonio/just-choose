@@ -118,8 +118,11 @@ module.exports = async (
         'clsq.id'
       )
       .limit(page_size)
-      .offset((page - 1) * page_size)
-      .orderByRaw(sort_by);
+      .offset((page - 1) * page_size);
+
+    if (sort_by) {
+      contentListsQuery.orderByRaw(sort_by);
+    }
 
     const countObj = knex.count().from(function () {
       this.select()
