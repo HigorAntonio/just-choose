@@ -7,13 +7,13 @@ module.exports = async (page_size, page, query, exact_name, sort_by) => {
         'u.id',
         'u.name',
         'u.profile_image_url',
-        knex.raw('COALESCE(followers, 0) AS followers'),
-        knex.raw('COALESCE(following, 0) AS following')
+        knex.raw('COALESCE(followers_count, 0) AS followers_count'),
+        knex.raw('COALESCE(following_count, 0) AS following_count')
       )
       .from('users as u')
       .leftJoin(
         knex
-          .select('follows_id', knex.raw('COUNT(*) AS followers'))
+          .select('follows_id', knex.raw('COUNT(*) AS followers_count'))
           .from('follows_users')
           .groupBy('follows_id')
           .as('fers'),
@@ -22,7 +22,7 @@ module.exports = async (page_size, page, query, exact_name, sort_by) => {
       )
       .leftJoin(
         knex
-          .select('user_id', knex.raw('COUNT(*) AS following'))
+          .select('user_id', knex.raw('COUNT(*) AS following_count'))
           .from('follows_users')
           .groupBy('user_id')
           .as('fing'),

@@ -33,7 +33,7 @@ module.exports = {
         page,
         query,
         exact_name,
-        null
+        'u.name ASC'
       );
 
       const total_pages = Math.ceil(count / page_size);
@@ -42,7 +42,13 @@ module.exports = {
         page_size: parseInt(page_size),
         total_pages: total_pages === 0 ? 1 : total_pages,
         total_results: parseInt(count),
-        results: users,
+        results: users.map((user) => ({
+          id: user.id,
+          name: user.name,
+          profile_image_url: user.profile_image_url,
+          followers_count: parseInt(user.followers_count),
+          following_count: parseInt(user.following_count),
+        })),
       });
     } catch (error) {
       return res.sendStatus(500);

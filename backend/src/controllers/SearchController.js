@@ -27,7 +27,7 @@ module.exports = {
         1,
         query,
         null,
-        'followers DESC'
+        'followers_count DESC'
       );
 
       const usersWhoFollowMe = await getFollowingUsers(userId);
@@ -56,7 +56,13 @@ module.exports = {
       return res.json({
         profiles: {
           total_results: parseInt(usersCount),
-          results: users,
+          results: users.map((user) => ({
+            id: user.id,
+            name: user.name,
+            profile_image_url: user.profile_image_url,
+            followers_count: parseInt(user.followers_count),
+            following_count: parseInt(user.following_count),
+          })),
         },
         polls: {
           total_results: parseInt(pollsCount),
