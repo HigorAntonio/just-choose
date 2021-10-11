@@ -200,7 +200,7 @@ const ShowPoll = ({ wrapperRef }) => {
         const { data: result } = await justChooseApi.get(
           `/polls/${data.id}/result`
         );
-        setContent(result.items);
+        setContent(result.results);
       }
       setLoading(false);
     } catch (error) {

@@ -3,8 +3,8 @@ import axios from 'axios';
 
 import justChooseApi from '../apis/justChooseApi';
 
-const useContentRequest = (url, params, pageNumber) => {
-  const [loading, setLoading] = useState(false);
+const useContentRequest = (url, params, page) => {
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [content, setContent] = useState([]);
   const [hasMore, setHasMore] = useState(false);
@@ -21,16 +21,12 @@ const useContentRequest = (url, params, pageNumber) => {
       (async () => {
         try {
           const { data } = await justChooseApi.get(url, {
-            params: { ...params, page: pageNumber },
+            params: { ...params, page },
             cancelToken: new axios.CancelToken((c) => (cancel = c)),
           });
-
-          if (data.results) {
-            setContent((prevState) => {
-              return [...prevState, ...data.results];
-            });
-          }
-
+          setContent((prevState) => {
+            return [...prevState, ...data.results];
+          });
           setHasMore(data.page < data.total_pages || data.next);
           setLoading(false);
         } catch (error) {
@@ -42,7 +38,7 @@ const useContentRequest = (url, params, pageNumber) => {
       })();
       return () => cancel();
     }
-  }, [url, params, pageNumber]);
+  }, [url, params, page]);
 
   return { loading, error, content, hasMore };
 };

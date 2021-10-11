@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 
 import { AuthContext } from '../../context/AuthContext';
 import { ViewportContext } from '../../context/ViewportContext';
-import useUserRequest from '../../hooks/useUserRequest';
+import useAuthenticatedRequest from '../../hooks/useAuthenticatedRequest';
 import breakpoints from '../../styles/breakpoints';
 
 import {
@@ -41,7 +41,7 @@ const NavBar = () => {
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 
-  const { authenticated } = useContext(AuthContext);
+  const { authenticated, userId } = useContext(AuthContext);
   const { width } = useContext(ViewportContext);
 
   const wrapperRef = useRef();
@@ -56,13 +56,17 @@ const NavBar = () => {
     data: following,
     hasMore: followsHasMore,
     loading: followsLoading,
-  } = useUserRequest('/profile/follows', followsParams, followsPageNumber);
+  } = useAuthenticatedRequest(
+    `/users/${userId}/following`,
+    followsParams,
+    followsPageNumber
+  );
 
   const {
     data: users,
     hasMore: usersHasMore,
     loading: usersLoading,
-  } = useUserRequest('/users', usersParams, usersPageNumber);
+  } = useAuthenticatedRequest('/users', usersParams, usersPageNumber);
 
   // useEffect(() => console.debug('following:', following), [following]);
 

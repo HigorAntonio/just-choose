@@ -4,7 +4,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import justChooseApi from '../apis/justChooseApi';
 
-const useUserRequest = (url, params, pageNumber) => {
+const useAuthenticatedRequest = (url, params, page) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [data, setData] = useState([]);
@@ -23,11 +23,11 @@ const useUserRequest = (url, params, pageNumber) => {
       (async () => {
         try {
           const { data } = await justChooseApi.get(url, {
-            params: { ...params, page: pageNumber },
+            params: { ...params, page },
             cancelToken: new axios.CancelToken((c) => (cancel = c)),
           });
           setData((prevState) => {
-            return [...prevState, ...data.items];
+            return [...prevState, ...data.results];
           });
           setHasMore(data.page < data.total_pages || data.next);
           setLoading(false);
@@ -40,9 +40,9 @@ const useUserRequest = (url, params, pageNumber) => {
       })();
       return () => cancel();
     }
-  }, [url, params, pageNumber, authenticated]);
+  }, [url, params, page, authenticated]);
 
   return { loading, error, data, hasMore };
 };
 
-export default useUserRequest;
+export default useAuthenticatedRequest;

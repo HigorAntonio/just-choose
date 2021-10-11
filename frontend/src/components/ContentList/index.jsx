@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useCallback, useContext, memo } from 'react';
+import React, { useEffect, useContext, memo } from 'react';
 import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import ContentCard from '../ContentCard';
-import useContentRequest from '../../hooks/useContentRequest';
+import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
 import mUILightTheme from '../../styles/materialUIThemes/light';
 import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
@@ -45,11 +45,8 @@ const ContentList = ({
     }
   };
 
-  const {
-    content = {},
-    hasMore,
-    loading,
-  } = useContentRequest(getUrl(), params, pageNumber);
+  const { loading, content, lastElementRef } =
+    useLoadMoreWhenLastElementIsOnScreen(getUrl(), params);
 
   // Quando a lista de conteudo muda move o scroll da contentList pro início
   useEffect(() => {
@@ -58,27 +55,6 @@ const ContentList = ({
       wrapperRef.current.scrollLeft = 0;
     }
   }, [pageNumber, wrapperRef]);
-
-  const observer = useRef();
-  const lastElementRef = useCallback(
-    (node) => {
-      if (loading) {
-        return;
-      }
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPageNumber((prevState) => prevState + 1);
-        }
-      });
-      if (node) {
-        observer.current.observe(node);
-      }
-    },
-    [loading, hasMore, setPageNumber]
-  );
 
   const addToContentList = (contentId, posterPath, title) => {
     if (contentList.map((c) => c.contentId).includes(contentId)) {

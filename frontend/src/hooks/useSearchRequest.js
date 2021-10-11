@@ -24,7 +24,7 @@ const useSearchRequest = (url, params, pageNumber) => {
           cancelToken: new axios.CancelToken((c) => (cancel = c)),
         });
         setContent((prevState) => {
-          return [...prevState, ...data.items];
+          return [...prevState, ...data.results];
         });
         setHasMore(data.page < data.total_pages || data.next);
         setLoading(false);
