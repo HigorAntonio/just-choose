@@ -1,11 +1,18 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
 const getUsers = require('../utils/users/getUsers');
+const getUserOrderByQuery = require('../utils/users/getUserOrderByQuery');
 
 module.exports = {
   async index(req, res) {
     try {
-      const { query, exact_name, page = 1, page_size = 30 } = req.query;
+      const {
+        query,
+        exact_name,
+        page = 1,
+        page_size = 30,
+        sort_by = 'name.asc',
+      } = req.query;
 
       const errors = [];
       if (query && typeof query !== 'string') {
@@ -24,6 +31,13 @@ module.exports = {
       } else if (page_size < 1 || page_size > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
+      if (sort_by) {
+        if (typeof sort_by !== 'string') {
+          errors.push('Parâmetro sort_by, valor inválido');
+        } else if (!getUserOrderByQuery(sort_by)) {
+          errors.push('Parâmetro sort_by, valor inválido');
+        }
+      }
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
@@ -33,7 +47,7 @@ module.exports = {
         page,
         query,
         exact_name,
-        'u.name ASC'
+        getUserOrderByQuery(sort_by)
       );
 
       const total_pages = Math.ceil(count / page_size);
