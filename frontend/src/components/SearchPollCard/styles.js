@@ -17,7 +17,15 @@ export const ThumbnailWrapper = styled.div`
   align-items: center;
   margin-right: 20px;
 
-  > svg {
+  > a {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  > a svg {
     width: 50%;
     height: 50%;
     flex-shrink: 0;
@@ -44,6 +52,14 @@ export const Title = styled.h3`
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 1.9rem;
+
+  > a {
+    text-decoration: none;
+
+    &:hover {
+      color: var(--primary-400);
+    }
+  }
 `;
 
 export const Meta = styled.div``;
@@ -65,6 +81,14 @@ export const ProfileInfo = styled.div`
 
 export const UserName = styled.p`
   font-size: 1.5rem;
+
+  > a {
+    text-decoration: none;
+
+    &:hover {
+      color: var(--primary-400);
+    }
+  }
 `;
 
 export const ProfileImageWrapper = styled.div`

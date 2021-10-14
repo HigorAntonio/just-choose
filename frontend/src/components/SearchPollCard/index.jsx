@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory, Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
 import {
@@ -18,6 +19,8 @@ import {
 } from './styles';
 
 const SearchPollCard = ({ poll }) => {
+  const history = useHistory();
+
   const {
     id: pollId,
     user_id: userId,
@@ -32,18 +35,26 @@ const SearchPollCard = ({ poll }) => {
   const [profileImageError, setProfileImageError] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
 
+  const handleContainerClick = () => {
+    history.push(`/polls/${pollId}`);
+  };
+
   return (
-    <Container>
-      <ThumbnailWrapper>
-        <Thumbnail
-          src={thumbnail}
-          onError={() => setThumbnailError(true)}
-          error={thumbnailError}
-        />
-        {thumbnailError && <BsImage />}
+    <Container onClick={handleContainerClick}>
+      <ThumbnailWrapper onClick={(e) => e.stopPropagation()}>
+        <Link to={`/polls/${pollId}`}>
+          <Thumbnail
+            src={thumbnail}
+            onError={() => setThumbnailError(true)}
+            error={thumbnailError}
+          />
+          {thumbnailError && <BsImage />}
+        </Link>
       </ThumbnailWrapper>
       <TextWrapper>
-        <Title>{title}</Title>
+        <Title onClick={(e) => e.stopPropagation()}>
+          <Link to={`/polls/${pollId}`}>{title}</Link>
+        </Title>
         <Meta>
           <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
         </Meta>
@@ -55,7 +66,9 @@ const SearchPollCard = ({ poll }) => {
               error={profileImageError}
             />
           </ProfileImageWrapper>
-          <UserName>{userName}</UserName>
+          <UserName onClick={(e) => e.stopPropagation()}>
+            <Link to={`/users/${userId}`}>{userName}</Link>
+          </UserName>
         </ProfileInfo>
         <DescriptionWrapper>
           <Description>{description}</Description>

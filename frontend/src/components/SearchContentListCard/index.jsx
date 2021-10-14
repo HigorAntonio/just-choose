@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory, Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
 import {
@@ -28,6 +29,8 @@ const formatCount = (votes) => {
 };
 
 const SearchContentListCard = ({ contentList }) => {
+  const history = useHistory();
+
   const {
     id: listId,
     user_id: userId,
@@ -43,18 +46,26 @@ const SearchContentListCard = ({ contentList }) => {
   const [profileImageError, setProfileImageError] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
 
+  const handleContainerClick = () => {
+    history.push(`/lists/${listId}`);
+  };
+
   return (
-    <Container>
-      <ThumbnailWrapper>
-        <Thumbnail
-          src={thumbnail}
-          onError={() => setThumbnailError(true)}
-          error={thumbnailError}
-        />
-        {thumbnailError && <BsImage />}
+    <Container onClick={handleContainerClick}>
+      <ThumbnailWrapper onClick={(e) => e.stopPropagation()}>
+        <Link to={`/lists/${listId}`}>
+          <Thumbnail
+            src={thumbnail}
+            onError={() => setThumbnailError(true)}
+            error={thumbnailError}
+          />
+          {thumbnailError && <BsImage />}
+        </Link>
       </ThumbnailWrapper>
       <TextWrapper>
-        <Title>{title}</Title>
+        <Title onClick={(e) => e.stopPropagation()}>
+          <Link to={`/lists/${listId}`}>{title}</Link>
+        </Title>
         <Meta>
           <Likes>
             {`${formatCount(likes)}`.replace('.', ',')}{' '}
@@ -74,7 +85,9 @@ const SearchContentListCard = ({ contentList }) => {
               error={profileImageError}
             />
           </ProfileImageWrapper>
-          <UserName>{userName}</UserName>
+          <UserName onClick={(e) => e.stopPropagation()}>
+            <Link to={`/users/${userId}`}>{userName}</Link>
+          </UserName>
         </ProfileInfo>
         <DescriptionWrapper>
           <Description>{description}</Description>

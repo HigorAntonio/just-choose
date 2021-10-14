@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import {
   Container,
@@ -17,7 +18,6 @@ const SearchProfileCard = ({ profile }) => {
     id: profileId,
     name: userName,
     followers_count: followersCount,
-    following_count: followingCount,
   } = profile;
   const profileImageUrl = profile.profile_image_url
     ? profile.profile_image_url
@@ -27,25 +27,27 @@ const SearchProfileCard = ({ profile }) => {
 
   return (
     <Container>
-      <ProfileImageWrapper>
-        <ProfileImage
-          src={profileImageUrl}
-          onError={() => setProfileImageError(true)}
-          error={profileImageError}
-        />
-      </ProfileImageWrapper>
-      <TextWrapper>
-        <UserName>{userName}</UserName>
-        <Meta>
-          <FollowersCount>
-            {followersCount}
-            {followersCount === 1 ? ' seguidor' : ' seguidores'}
-          </FollowersCount>
-        </Meta>
-        <DescriptionWrapper>
-          <Description></Description>
-        </DescriptionWrapper>
-      </TextWrapper>
+      <Link to={`users/${profileId}`}>
+        <ProfileImageWrapper>
+          <ProfileImage
+            src={profileImageUrl}
+            onError={() => setProfileImageError(true)}
+            error={profileImageError}
+          />
+        </ProfileImageWrapper>
+        <TextWrapper>
+          <UserName>{userName}</UserName>
+          <Meta>
+            <FollowersCount>
+              {followersCount}
+              {followersCount === 1 ? ' seguidor' : ' seguidores'}
+            </FollowersCount>
+          </Meta>
+          <DescriptionWrapper>
+            <Description></Description>
+          </DescriptionWrapper>
+        </TextWrapper>
+      </Link>
     </Container>
   );
 };

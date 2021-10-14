@@ -6,6 +6,13 @@ export const Container = styled.div`
   &:hover {
     cursor: pointer;
   }
+
+  > a {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    text-decoration: none;
+  }
 `;
 
 export const ProfileImageWrapper = styled.div`
@@ -40,6 +47,10 @@ export const UserName = styled.h3`
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 1.9rem;
+
+  &:hover {
+    color: var(--primary-400);
+  }
 `;
 
 export const Meta = styled.div``;
