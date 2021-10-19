@@ -8,10 +8,17 @@ import {
   useHistory,
 } from 'react-router-dom';
 
+import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import SettingsProfile from '../../components/SettingsProfile';
 import SettingsSecurity from '../../components/SettingsSecurity';
 
-import { Container, Header, Navigation, Main } from './styles';
+import {
+  Container,
+  Header,
+  NavigationWrapper,
+  Navigation,
+  Main,
+} from './styles';
 
 const Settings = ({ wrapperRef }) => {
   const history = useHistory();
@@ -34,24 +41,41 @@ const Settings = ({ wrapperRef }) => {
     wrapperRef.current.scrollLeft = 0;
   }, [wrapperRef]);
 
+  const handlePush = (path) => {
+    history.push(path);
+  };
+
   return (
     <Container>
       <Header>
         <h1>Configurações</h1>
       </Header>
-      <Navigation>
-        <div className={location.pathname === `${url}/profile` ? 'active' : ''}>
-          <Link to={`${url}/profile`}>Perfil</Link>
-        </div>
-        <div
-          className={location.pathname === `${url}/security` ? 'active' : ''}
-        >
-          <Link to={`${url}/security`}>Segurança e privacidade</Link>
-        </div>
-        <div className={location.pathname === `${url}/devices` ? 'active' : ''}>
-          <Link to={`${url}/devices`}>Seus dispositivos</Link>
-        </div>
-      </Navigation>
+      <NavigationWrapper>
+        <HorizontalDragScrolling>
+          <Navigation>
+            <div
+              className={location.pathname === `${url}/profile` ? 'active' : ''}
+              onClick={() => handlePush(`${url}/profile`)}
+            >
+              Perfil
+            </div>
+            <div
+              className={
+                location.pathname === `${url}/security` ? 'active' : ''
+              }
+              onClick={() => handlePush(`${url}/security`)}
+            >
+              Segurança e privacidade
+            </div>
+            <div
+              className={location.pathname === `${url}/devices` ? 'active' : ''}
+              onClick={() => handlePush(`${url}/devices`)}
+            >
+              Seus dispositivos
+            </div>
+          </Navigation>
+        </HorizontalDragScrolling>
+      </NavigationWrapper>
       <Main>
         <Switch>
           <Route

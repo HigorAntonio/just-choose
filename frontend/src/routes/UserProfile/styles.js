@@ -107,7 +107,7 @@ export const NavigationWrapper = styled.div`
 
 export const Navigation = styled.div`
   height: 100%;
-  display: inline-flex;
+  display: flex;
 
   > div {
     display: flex;
@@ -117,6 +117,7 @@ export const Navigation = styled.div`
     font-weight: 500;
     text-decoration: none;
     user-select: none;
+    white-space: nowrap;
 
     &:hover,
     &.active {
