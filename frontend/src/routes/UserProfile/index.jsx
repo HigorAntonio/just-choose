@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouteMatch, useLocation, Link } from 'react-router-dom';
+import {
+  useHistory,
+  useParams,
+  useRouteMatch,
+  useLocation,
+} from 'react-router-dom';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
 import TooltipHover from '../../components/TooltipHover';
+import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 
 import {
   Container,
@@ -21,6 +27,7 @@ import {
 } from './styles';
 
 const UserProfile = ({ wrapperRef }) => {
+  const history = useHistory();
   const { id: userProfileId } = useParams();
   const { path, url } = useRouteMatch();
   const location = useLocation();
@@ -33,6 +40,10 @@ const UserProfile = ({ wrapperRef }) => {
 
   const handleFollow = () => {
     setFollowing((prevState) => !prevState);
+  };
+
+  const handlePush = (path) => {
+    history.push(path);
   };
 
   return (
@@ -68,25 +79,47 @@ const UserProfile = ({ wrapperRef }) => {
         </ProfileWrapper>
       </Header>
       <NavigationWrapper>
-        <Navigation>
-          <div className={location.pathname === `${url}` ? 'active' : ''}>
-            <Link to={`${url}`}>Início</Link>
-          </div>
-          <div className={location.pathname === `${url}/lists` ? 'active' : ''}>
-            <Link to={`${url}/lists`}>Listas</Link>
-          </div>
-          <div className={location.pathname === `${url}/polls` ? 'active' : ''}>
-            <Link to={`${url}/polls`}>Votações</Link>
-          </div>
-          <div
-            className={location.pathname === `${url}/following` ? 'active' : ''}
-          >
-            <Link to={`${url}/following`}>Seguindo</Link>
-          </div>
-          <div className={location.pathname === `${url}/about` ? 'active' : ''}>
-            <Link to={`${url}/about`}>Sobre</Link>
-          </div>
-        </Navigation>
+        <HorizontalDragScrolling>
+          <Navigation>
+            <div
+              className={location.pathname === `${url}` ? 'active' : ''}
+              onClick={() => handlePush(url)}
+            >
+              {/* <Link to={`${url}`}>Início</Link> */}
+              Início
+            </div>
+            <div
+              className={location.pathname === `${url}/lists` ? 'active' : ''}
+              onClick={() => handlePush(`${url}/lists`)}
+            >
+              {/* <Link to={`${url}/lists`}>Listas</Link> */}
+              Listas
+            </div>
+            <div
+              className={location.pathname === `${url}/polls` ? 'active' : ''}
+              onClick={() => handlePush(`${url}/polls`)}
+            >
+              {/* <Link to={`${url}/polls`}>Votações</Link> */}
+              Votações
+            </div>
+            <div
+              className={
+                location.pathname === `${url}/following` ? 'active' : ''
+              }
+              onClick={() => handlePush(`${url}/following`)}
+            >
+              {/* <Link to={`${url}/following`}>Seguindo</Link> */}
+              Seguindo
+            </div>
+            <div
+              className={location.pathname === `${url}/about` ? 'active' : ''}
+              onClick={() => handlePush(`${url}/about`)}
+            >
+              {/* <Link to={`${url}/about`}>Sobre</Link> */}
+              Sobre
+            </div>
+          </Navigation>
+        </HorizontalDragScrolling>
       </NavigationWrapper>
       <Main></Main>
     </Container>

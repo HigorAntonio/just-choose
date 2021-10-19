@@ -8,7 +8,7 @@ import SearchProfileCard from '../SearchProfileCard';
 import { Container, Header, Title, Main } from './styles';
 
 const SearchInfinityLoadProfiles = ({ query }) => {
-  const [params] = useState({ query });
+  const [params] = useState({ query, sort_by: 'followers.desc' });
 
   const { loading, error, content, lastElementRef } =
     useLoadMoreWhenLastElementIsOnScreen('/users', params);

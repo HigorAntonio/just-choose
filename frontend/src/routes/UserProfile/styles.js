@@ -95,17 +95,10 @@ export const FollowButton = styled.button`
 
 export const NavigationWrapper = styled.div`
   width: 100%;
+  height: 4rem;
+  display: flex;
+  align-items: center;
   padding: 0 30px;
-  overflow-x: auto;
-
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
 
   @media (max-width: 768px) {
     padding: 0 15px;
@@ -113,38 +106,35 @@ export const NavigationWrapper = styled.div`
 `;
 
 export const Navigation = styled.div`
+  height: 100%;
   display: inline-flex;
 
   > div {
     display: flex;
     align-items: center;
     font-size: 1.8rem;
-
-    > a {
-      font-weight: 500;
-      text-decoration: none;
-      margin: 5px 0;
-    }
+    user-select: none;
+    font-weight: 500;
+    text-decoration: none;
+    user-select: none;
 
     &:hover,
     &.active {
       cursor: pointer;
-      border-bottom: 2px solid var(--primary-400);
+      color: var(--primary-400);
+      text-decoration: none;
+    }
 
-      > a {
-        color: var(--primary-400);
-        text-decoration: none;
-      }
+    &.active {
+      border-bottom: 2px solid var(--primary-400);
     }
   }
 
   > div + div {
-    margin-left: 20px;
-  }
-
-  > div:last-of-type {
-    margin-right: 20px;
+    margin-left: 2rem;
   }
 `;
 
-export const Main = styled.div``;
+export const Main = styled.div`
+  width: 100%;
+`;
