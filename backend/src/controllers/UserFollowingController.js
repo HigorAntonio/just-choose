@@ -71,4 +71,28 @@ module.exports = {
       return res.sendStatus(500);
     }
   },
+
+  async show(req, res) {
+    try {
+      const userId = req.userId;
+
+      const followsId = req.params.id;
+
+      if (isNaN(followsId)) {
+        return res
+          .status(400)
+          .json({ erro: 'Id do perfil seguido, valor inválido' });
+      }
+
+      const following = await knex
+        .select()
+        .from('follows_users')
+        .where({ user_id: userId, follows_id: followsId })
+        .first();
+
+      return res.json({ following: !!following });
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
 };
