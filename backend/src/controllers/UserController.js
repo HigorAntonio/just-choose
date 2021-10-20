@@ -2,6 +2,7 @@ const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
 const getUsers = require('../utils/users/getUsers');
 const getUserOrderByQuery = require('../utils/users/getUserOrderByQuery');
+const getUser = require('../utils/users/getUser');
 
 module.exports = {
   async index(req, res) {
@@ -81,18 +82,7 @@ module.exports = {
           .json({ erro: 'Id do perfil de usuário, valor inválido' });
       }
 
-      const profile = await knex
-        .select(
-          'id',
-          'name',
-          'email',
-          'profile_image_url',
-          'method',
-          'is_active'
-        )
-        .from('users as u')
-        .where({ 'u.id': profileId })
-        .first();
+      const profile = await getUser(profileId);
 
       if (!profile) {
         return res
@@ -106,7 +96,11 @@ module.exports = {
         delete profile.is_active;
       }
 
-      return res.json(profile);
+      return res.json({
+        ...profile,
+        followers_count: parseInt(profile.followers_count),
+        following_count: parseInt(profile.following_count),
+      });
     } catch (error) {
       return res.sendStatus(500);
     }
