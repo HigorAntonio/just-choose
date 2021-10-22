@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   useHistory,
   useParams,
@@ -7,6 +7,10 @@ import {
 } from 'react-router-dom';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
+import { AuthContext } from '../../context/AuthContext';
+
+import justChooseApi from '../../apis/justChooseApi';
+import NotFound from '../../components/NotFound';
 import TooltipHover from '../../components/TooltipHover';
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 
@@ -28,15 +32,44 @@ import {
 
 const UserProfile = ({ wrapperRef }) => {
   const history = useHistory();
-  const { id: userProfileId } = useParams();
+  const { id: profileId } = useParams();
   const { path, url } = useRouteMatch();
   const location = useLocation();
 
-  const [following, setFollowing] = useState(false);
+  const { userId, authenticated } = useContext(AuthContext);
 
-  useEffect(() => console.debug('url:', url), [url]);
-  useEffect(() => console.debug('path:', path), [path]);
-  useEffect(() => console.debug('location:', location), [location]);
+  const [loading, setLoading] = useState(true);
+  const [loadingError, setLoadingError] = useState(false);
+  const [following, setFollowing] = useState(false);
+  const [profile, setProfile] = useState({});
+  const [profileImageError, setProfileImageError] = useState(false);
+
+  const clearState = () => {
+    setLoadingError(false);
+    setFollowing(false);
+    setProfile({});
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        clearState();
+        const { data } = await justChooseApi.get(`/users/${profileId}`);
+        setProfile(data);
+        if (authenticated) {
+          const {
+            data: { following },
+          } = await justChooseApi.get(`/users/following/${profileId}`);
+          setFollowing(following);
+        }
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        setLoadingError(true);
+      }
+    })();
+  }, [profileId, authenticated]);
 
   const handleFollow = () => {
     setFollowing((prevState) => !prevState);
@@ -46,17 +79,29 @@ const UserProfile = ({ wrapperRef }) => {
     history.push(path);
   };
 
+  if (loading) {
+    return <></>;
+  }
+  if (loadingError) {
+    return <NotFound />;
+  }
   return (
     <Container>
       <Header>
         <ProfileWrapper>
           <Layout>
             <ProfileImageWrapper>
-              <ProfileImage src="#" alt="" />
+              <ProfileImage
+                src={profile.profile_image_url ? profile.profile_image_url : ''}
+                onError={() => setProfileImageError(true)}
+                error={profileImageError}
+              />
             </ProfileImageWrapper>
             <Layout className="column justify-center">
-              <ProfileName>UserName</ProfileName>
-              <ProfileFollowers>234 seguidores</ProfileFollowers>
+              <ProfileName>{profile.name}</ProfileName>
+              <ProfileFollowers>{`${profile.followers_count} ${
+                profile.followers_count === 1 ? 'seguidor' : 'seguidores'
+              }`}</ProfileFollowers>
             </Layout>
           </Layout>
           <Layout>

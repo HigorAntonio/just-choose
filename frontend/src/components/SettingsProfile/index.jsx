@@ -31,7 +31,7 @@ const SettingsProfile = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { userProfile, getUserProfileData } = useContext(ProfileContext);
+  const { userProfile, refreshUserProfileData } = useContext(ProfileContext);
 
   const [profileImagePreview, setProfileImagePreview] = useState();
   const [profileImage, setProfileImage] = useState();
@@ -141,7 +141,7 @@ const SettingsProfile = ({ wrapperRef }) => {
     setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (successfulyUpdated) {
-      getUserProfileData();
+      refreshUserProfileData();
     }
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;

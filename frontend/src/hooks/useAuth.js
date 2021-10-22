@@ -65,8 +65,8 @@ const useAuth = () => {
       const body = { refreshToken: JSON.parse(refreshToken) };
       await justChooseApi.delete('/logout', { data: body });
 
-      setUserId(null);
       setAuthenticated(false);
+      setUserId(null);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 

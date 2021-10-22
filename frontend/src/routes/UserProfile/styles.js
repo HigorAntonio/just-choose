@@ -42,12 +42,22 @@ export const Layout = styled.div`
 export const ProfileImageWrapper = styled.div`
   width: 72px;
   height: 72px;
-  border-radius: 50%;
   background: var(--background-700);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-right: 10px;
+  border-radius: 50%;
 `;
 
-export const ProfileImage = styled.img``;
+export const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  ${(props) => props.error && 'display: none;'}
+`;
 
 export const ProfileName = styled.h1`
   font-size: 2.4rem;

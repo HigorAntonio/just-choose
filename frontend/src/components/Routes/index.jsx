@@ -1,7 +1,7 @@
-import React, { useContext, memo } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import React, { memo } from 'react';
+import { Switch, Route } from 'react-router-dom';
 
-import { AuthContext } from '../../context/AuthContext';
+import CustomRoute from '../CustomRoute';
 
 import Home from '../../routes/Home';
 import CreateList from '../../routes/CreateList';
@@ -14,18 +14,6 @@ import UpdatePoll from '../../routes/UpdatePoll';
 import Settings from '../../routes/Settings';
 import UserProfile from '../../routes/UserProfile';
 import NotFound from '../../components/NotFound';
-
-const CustomRoute = ({ isPrivate, ...rest }) => {
-  const { loading, authenticated } = useContext(AuthContext);
-
-  if (loading) return null;
-
-  if (isPrivate && !authenticated) {
-    return <Redirect to="/" />;
-  }
-
-  return <Route {...rest} />;
-};
 
 const Routes = ({ wrapperRef }) => {
   return (
@@ -42,6 +30,7 @@ const Routes = ({ wrapperRef }) => {
       />
       <CustomRoute
         isPrivate
+        requiresUserActivation
         exact
         path="/list"
         component={() => <CreateList wrapperRef={wrapperRef} />}
@@ -53,12 +42,14 @@ const Routes = ({ wrapperRef }) => {
       />
       <CustomRoute
         isPrivate
+        requiresUserActivation
         exact
         path="/lists/:id/update"
         component={() => <UpdateList wrapperRef={wrapperRef} />}
       />
       <CustomRoute
         isPrivate
+        requiresUserActivation
         exact
         path="/lists/:id/poll"
         component={() => <CreatePoll wrapperRef={wrapperRef} />}
@@ -70,6 +61,7 @@ const Routes = ({ wrapperRef }) => {
       />
       <CustomRoute
         isPrivate
+        requiresUserActivation
         exact
         path="/polls/:id/update"
         component={() => <UpdatePoll wrapperRef={wrapperRef} />}
