@@ -4,6 +4,8 @@ const getFollowingUsers = require('../utils/users/getFollowingUsers');
 const isUserFollowing = require('../utils/users/isUserFollowing');
 const getPollOrderByQuery = require('../utils/polls/getPollOrderByQuery');
 const getPolls = require('../utils/polls/getPolls');
+const getPoll = require('../utils/polls/getPoll');
+const getContentList = require('../utils/contentList/getContentList');
 
 module.exports = {
   async create(req, res) {
@@ -209,28 +211,7 @@ module.exports = {
         return res.status(400).json({ erro: 'Id da votação, valor inválido' });
       }
 
-      const poll = await knex
-        .select(
-          'p.id',
-          'p.user_id',
-          'u.name as user_name',
-          'u.profile_image_url',
-          'p.title',
-          'p.description',
-          'p.sharing_option',
-          'p.thumbnail',
-          'pcl.content_list_id',
-          'p.is_active',
-          'p.created_at',
-          'p.updated_at'
-        )
-        .from('polls as p')
-        .where({
-          'p.id': pollId,
-        })
-        .innerJoin('users as u', 'p.user_id', 'u.id')
-        .innerJoin('poll_content_list as pcl', 'poll_id', 'p.id')
-        .first();
+      const poll = await getPoll(pollId);
 
       if (!poll) {
         return res
@@ -246,6 +227,10 @@ module.exports = {
         return res.sendStatus(403);
       }
 
+      const { content_types: contentTypes, content } = await getContentList(
+        poll.content_list_id
+      );
+
       return res.json({
         id: poll.id,
         user_id: poll.user_id,
@@ -257,11 +242,13 @@ module.exports = {
         is_active: poll.is_active,
         thumbnail: poll.thumbnail,
         content_list_id: poll.content_list_id,
-        content_types: poll.content_types,
+        content_types: contentTypes,
+        content: content,
         created_at: poll.created_at,
         updated_at: poll.updated_at,
       });
     } catch (error) {
+      console.log(error);
       return res.sendStatus(500);
     }
   },
