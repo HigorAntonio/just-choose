@@ -6,6 +6,7 @@ const getPollOrderByQuery = require('../utils/polls/getPollOrderByQuery');
 const getPolls = require('../utils/polls/getPolls');
 const getPoll = require('../utils/polls/getPoll');
 const getContentList = require('../utils/contentList/getContentList');
+const getPollResults = require('../utils/polls/getPollResults');
 
 module.exports = {
   async create(req, res) {
@@ -227,9 +228,22 @@ module.exports = {
         return res.sendStatus(403);
       }
 
-      const { content_types: contentTypes, content } = await getContentList(
-        poll.content_list_id
-      );
+      if (poll.is_active) {
+        const { content_types: contentTypes, content } = await getContentList(
+          poll.content_list_id
+        );
+
+        poll.content_types = contentTypes;
+        poll.content = content;
+      }
+      if (!poll.is_active) {
+        const { total_votes: totalVotes, results } = await getPollResults(
+          poll.id,
+          poll.content_list_id
+        );
+        poll.total_votes = totalVotes;
+        poll.results = results;
+      }
 
       return res.json({
         id: poll.id,
@@ -242,13 +256,14 @@ module.exports = {
         is_active: poll.is_active,
         thumbnail: poll.thumbnail,
         content_list_id: poll.content_list_id,
-        content_types: contentTypes,
-        content: content,
+        content_types: poll.content_types,
+        content: poll.content,
+        total_votes: poll.total_votes,
+        results: poll.results,
         created_at: poll.created_at,
         updated_at: poll.updated_at,
       });
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },
@@ -349,7 +364,6 @@ module.exports = {
 
       return res.sendStatus(200);
     } catch (error) {
-      console.log(error);
       try {
         await deleteFile(req.file.key);
       } catch (error) {}

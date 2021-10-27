@@ -16,7 +16,6 @@ const ContentListController = require('./controllers/ContentListController');
 const ContentListLikeController = require('./controllers/ContentListLikeController');
 const ContentListForkController = require('./controllers/ContentListForkController');
 const VoteController = require('./controllers/VoteController');
-const PollVoteController = require('./controllers/PollVoteController');
 const MovieController = require('./controllers/MovieController');
 const ShowController = require('./controllers/ShowController');
 const GameController = require('./controllers/GameController');
@@ -166,9 +165,6 @@ routes.delete(
   isUserActive,
   VoteController.delete
 );
-
-// PollVoteController
-routes.get('/polls/:id/result', PollVoteController.show);
 
 // MovieController
 routes.get('/movies', authorization, isUserActive, MovieController.index);
