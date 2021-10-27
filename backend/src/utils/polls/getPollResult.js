@@ -2,7 +2,7 @@ const knex = require('../../database');
 
 module.exports = async (pollId, contentListId) => {
   try {
-    const results = await knex
+    const result = await knex
       .select()
       .from(function () {
         this.select(
@@ -143,7 +143,7 @@ module.exports = async (pollId, contentListId) => {
 
     return {
       total_votes: parseInt(total_votes),
-      results: results.map((r) => ({ ...r, votes: parseInt(r.votes) })),
+      result: result.map((r) => ({ ...r, votes: parseInt(r.votes) })),
     };
   } catch (error) {
     throw error;

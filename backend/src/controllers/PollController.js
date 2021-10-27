@@ -6,7 +6,7 @@ const getPollOrderByQuery = require('../utils/polls/getPollOrderByQuery');
 const getPolls = require('../utils/polls/getPolls');
 const getPoll = require('../utils/polls/getPoll');
 const getContentList = require('../utils/contentList/getContentList');
-const getPollResults = require('../utils/polls/getPollResults');
+const getPollResult = require('../utils/polls/getPollResult');
 
 module.exports = {
   async create(req, res) {
@@ -237,12 +237,12 @@ module.exports = {
         poll.content = content;
       }
       if (!poll.is_active) {
-        const { total_votes: totalVotes, results } = await getPollResults(
+        const { total_votes: totalVotes, result } = await getPollResult(
           poll.id,
           poll.content_list_id
         );
         poll.total_votes = totalVotes;
-        poll.results = results;
+        poll.result = result;
       }
 
       return res.json({
@@ -259,7 +259,7 @@ module.exports = {
         content_types: poll.content_types,
         content: poll.content,
         total_votes: poll.total_votes,
-        results: poll.results,
+        result: poll.result,
         created_at: poll.created_at,
         updated_at: poll.updated_at,
       });
