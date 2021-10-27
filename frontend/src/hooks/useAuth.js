@@ -70,7 +70,7 @@ const useAuth = () => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 
-      justChooseApi.defaults.headers.Authorization = undefined;
+      delete justChooseApi.defaults.headers.Authorization;
     } catch (error) {
       throw error;
     }

@@ -6,6 +6,7 @@ import { BiGitRepoForked } from 'react-icons/bi';
 import { MdSettings } from 'react-icons/md';
 
 import { AuthContext } from '../../context/AuthContext';
+import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../apis/justChooseApi';
@@ -104,6 +105,9 @@ const ShowList = ({ wrapperRef }) => {
 
   const { userId, authenticated } = useContext(AuthContext);
   const {
+    userProfile: { is_active: isUserActive },
+  } = useContext(ProfileContext);
+  const {
     setMessage,
     setSeverity,
     setShow: setShowAlert,
@@ -152,7 +156,7 @@ const ShowList = ({ wrapperRef }) => {
         setContentList(data);
         setCreatedAt(new Date(data.created_at));
         setContentTypes(['all', ...data.content_types]);
-        if (authenticated) {
+        if (authenticated && isUserActive) {
           const {
             data: { like },
           } = await justChooseApi.get(`/contentlists/${listId}/like`);
@@ -169,7 +173,7 @@ const ShowList = ({ wrapperRef }) => {
         }
       }
     })();
-  }, [listId, authenticated]);
+  }, [listId, authenticated, isUserActive]);
 
   useEffect(() => {
     if (JSON.stringify(contentList) !== '{}') {
@@ -184,7 +188,7 @@ const ShowList = ({ wrapperRef }) => {
   }, [contentList, typeFilter]);
 
   const handleLike = async () => {
-    if (!authenticated) {
+    if (!authenticated || !isUserActive) {
       return;
     }
     try {
@@ -207,7 +211,7 @@ const ShowList = ({ wrapperRef }) => {
   };
 
   const handleFork = async () => {
-    if (!authenticated) {
+    if (!authenticated || !isUserActive) {
       return;
     }
     try {
@@ -233,7 +237,7 @@ const ShowList = ({ wrapperRef }) => {
   };
 
   const handleDelete = async () => {
-    if (!authenticated) {
+    if (!authenticated || !isUserActive) {
       return;
     }
     try {
@@ -276,7 +280,13 @@ const ShowList = ({ wrapperRef }) => {
             <div>
               <HeaderButton
                 title={
-                  authenticated ? (liked ? 'Não gostei' : 'Gostei') : 'Likes'
+                  authenticated
+                    ? isUserActive
+                      ? liked
+                        ? 'Não gostei'
+                        : 'Gostei'
+                      : 'Confirme seu e-mail para deixar sua reação'
+                    : 'Faça login para deixar sua reação'
                 }
                 onClick={handleLike}
               >
@@ -289,8 +299,10 @@ const ShowList = ({ wrapperRef }) => {
               <HeaderButton
                 title={
                   authenticated
-                    ? 'Criar uma cópia da lista para sua conta'
-                    : 'Forks'
+                    ? isUserActive
+                      ? 'Criar uma cópia da lista para sua conta'
+                      : 'Confirme seu e-mail para criar uma cópia da lista'
+                    : 'Faça login para criar uma cópia da lista'
                 }
                 onClick={handleFork}
               >

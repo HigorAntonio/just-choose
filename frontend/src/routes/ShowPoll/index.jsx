@@ -9,6 +9,7 @@ import { FaTrash } from 'react-icons/fa';
 import { FaHashtag } from 'react-icons/fa';
 
 import { AuthContext } from '../../context/AuthContext';
+import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../apis/justChooseApi';
@@ -132,6 +133,9 @@ const ShowPoll = ({ wrapperRef }) => {
 
   const { userId, authenticated } = useContext(AuthContext);
   const {
+    userProfile: { is_active: isUserActive },
+  } = useContext(ProfileContext);
+  const {
     setMessage,
     setSeverity,
     setShow: setShowAlert,
@@ -144,16 +148,14 @@ const ShowPoll = ({ wrapperRef }) => {
   const [loadingError, setLoadingError] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
   const [poll, setPoll] = useState({});
-  const [contentList, setContentList] = useState({});
   const [createdAt, setCreatedAt] = useState();
   const [content, setContent] = useState([]);
   const [contentTypes, setContentTypes] = useState([]);
   const [typeFilter, setTypeFilter] = useState('all');
+  const [showListOption, setShowListOption] = useState(false);
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [vote, setVote] = useState({});
-
-  useEffect(() => console.log(content), [content]);
 
   useEffect(() => {
     // Posiciona o scroll no início da página
@@ -165,43 +167,43 @@ const ShowPoll = ({ wrapperRef }) => {
     setLoadingError(false);
     setDenyAccess(false);
     setPoll({});
-    setContentList({});
     setCreatedAt(null);
     setContent([]);
     setContentTypes([]);
     setTypeFilter('all');
+    setShowListOption(false);
     setShowTypeOptions(false);
     setShowDeleteDialog(false);
+    setVote({});
   };
 
   const getPageData = useCallback(async () => {
     try {
       setLoading(true);
       clearState();
-      const { data } = await justChooseApi.get(`/polls/${pollId}`);
-      setPoll(data);
-      setCreatedAt(new Date(data.created_at));
-      if (JSON.stringify(data) !== '{}' && data.is_active) {
-        const { data: list } = await justChooseApi.get(
-          `/contentlists/${data.content_list_id}`
+      const { data: pollData } = await justChooseApi.get(`/polls/${pollId}`);
+      setPoll(pollData);
+      setCreatedAt(new Date(pollData.created_at));
+      if (
+        JSON.stringify(pollData) !== '{}' &&
+        pollData.is_active &&
+        authenticated
+      ) {
+        setContentTypes(['all', ...pollData.content_types]);
+        const { data: vote } = await justChooseApi.get(
+          `/polls/${pollData.id}/votes`
         );
-        setContentList(list);
-        setContentTypes(['all', ...list.content_types]);
-        if (authenticated) {
-          const { data: vote } = await justChooseApi.get(
-            `/polls/${data.id}/votes`
-          );
-          if (vote) {
-            setVote(vote);
-          }
+        if (vote) {
+          setVote(vote);
         }
       }
-      if (JSON.stringify(data) !== '{}' && !data.is_active) {
-        const { data: result } = await justChooseApi.get(
-          `/polls/${data.id}/result`
-        );
-        setContent(result.results);
+      if (JSON.stringify(pollData) !== '{}' && !pollData.is_active) {
+        setContent(pollData.result);
       }
+      try {
+        await justChooseApi.get(`/contentlists/${pollData.content_list_id}`);
+        setShowListOption(true);
+      } catch (error) {}
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -219,16 +221,12 @@ const ShowPoll = ({ wrapperRef }) => {
   }, [getPageData]);
 
   useEffect(() => {
-    if (JSON.stringify(contentList) !== '{}' && poll.is_active) {
+    if (JSON.stringify(poll) !== '{}' && poll.is_active) {
       setContent(
-        getFilteredContent(
-          contentList.content,
-          contentList.content_types,
-          typeFilter
-        )
+        getFilteredContent(poll.content, poll.content_types, typeFilter)
       );
     }
-  }, [contentList, typeFilter, poll]);
+  }, [poll, typeFilter]);
 
   const handleActive = async () => {
     if (!authenticated) {
@@ -251,10 +249,6 @@ const ShowPoll = ({ wrapperRef }) => {
         method: 'PUT',
         data: formData,
       });
-      setPoll((prevState) => ({
-        ...prevState,
-        is_active: !prevState.is_active,
-      }));
       await getPageData();
       setLoading(false);
       setMessage(
@@ -301,12 +295,26 @@ const ShowPoll = ({ wrapperRef }) => {
   };
 
   const handleVote = async (e, content) => {
+    e.preventDefault();
     if (!authenticated) {
+      setShowDeleteDialog(false);
+      clearTimeout(alertTimeout);
+      setMessage('Faça login para poder votar.');
+      setSeverity('info');
+      setShowAlert(true);
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+      return;
+    }
+    if (!isUserActive) {
+      setShowDeleteDialog(false);
+      clearTimeout(alertTimeout);
+      setMessage('Confirme seu e-mail para poder votar.');
+      setSeverity('info');
+      setShowAlert(true);
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       return;
     }
     try {
-      e.preventDefault();
-      // e.stopPropagation();
       if (vote && JSON.stringify(vote) !== '{}') {
         await justChooseApi.delete(`/polls/${pollId}/votes`);
       }
@@ -345,14 +353,16 @@ const ShowPoll = ({ wrapperRef }) => {
           </TitleWrapper>
           <HeaderButtons>
             <div>
-              <Link to={`/lists/${poll.content_list_id}`}>
-                <HeaderButton title="Visualizar lista de conteúdo">
-                  <IoMdListBox
-                    size={'25px'}
-                    style={{ flexShrink: 0, margin: '0 5px' }}
-                  />
-                </HeaderButton>
-              </Link>
+              {showListOption && (
+                <Link to={`/lists/${poll.content_list_id}`}>
+                  <HeaderButton title="Visualizar lista de conteúdo">
+                    <IoMdListBox
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
+                    />
+                  </HeaderButton>
+                </Link>
+              )}
               {userId === poll.user_id && (
                 <>
                   <HeaderButton
