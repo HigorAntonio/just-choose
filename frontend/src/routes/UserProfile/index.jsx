@@ -8,6 +8,9 @@ import {
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
 import { AuthContext } from '../../context/AuthContext';
+import { ProfileContext } from '../../context/ProfileContext';
+import { AlertContext } from '../../context/AlertContext';
+import { FollowingProfilesContext } from '../../context/FollowingProfilesContext';
 
 import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
@@ -37,6 +40,19 @@ const UserProfile = ({ wrapperRef }) => {
   const location = useLocation();
 
   const { userId, authenticated } = useContext(AuthContext);
+  const {
+    userProfile: { is_active: isUserActive },
+  } = useContext(ProfileContext);
+  const {
+    setMessage,
+    setSeverity,
+    setShow: setShowAlert,
+    duration: alertTimeout,
+    setDuration: setAlertTimeout,
+  } = useContext(AlertContext);
+  const { setFollowing: setFollowingList } = useContext(
+    FollowingProfilesContext
+  );
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -57,7 +73,7 @@ const UserProfile = ({ wrapperRef }) => {
         clearState();
         const { data } = await justChooseApi.get(`/users/${profileId}`);
         setProfile(data);
-        if (authenticated) {
+        if (authenticated && isUserActive) {
           const {
             data: { following },
           } = await justChooseApi.get(`/users/following/${profileId}`);
@@ -69,10 +85,51 @@ const UserProfile = ({ wrapperRef }) => {
         setLoadingError(true);
       }
     })();
-  }, [profileId, authenticated]);
+  }, [profileId, authenticated, isUserActive]);
 
-  const handleFollow = () => {
-    setFollowing((prevState) => !prevState);
+  const handleFollow = async () => {
+    if (!authenticated || !isUserActive) {
+      clearTimeout(alertTimeout);
+      setMessage(
+        authenticated
+          ? 'Confirme seu e-mail para seguir esse perfil'
+          : 'Faça login para seguir esse perfil'
+      );
+      setSeverity('info');
+      setShowAlert(true);
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+      return;
+    }
+    try {
+      if (!following) {
+        await justChooseApi.post(`/users/follow`, { followsId: profileId });
+        setProfile((prevState) => ({
+          ...prevState,
+          followers_count: prevState.followers_count + 1,
+        }));
+        setFollowingList((prevState) => [
+          ...prevState,
+          {
+            user_id: profile.id,
+            user_name: profile.name,
+            profile_image_url: profile.profile_image_url,
+          },
+        ]);
+      }
+      if (following) {
+        await justChooseApi.delete(`/users/follow`, {
+          data: { followsId: profileId },
+        });
+        setProfile((prevState) => ({
+          ...prevState,
+          followers_count: prevState.followers_count - 1,
+        }));
+        setFollowingList((prevState) =>
+          prevState.filter((fl) => fl.user_id !== profile.id)
+        );
+      }
+      setFollowing((prevState) => !prevState);
+    } catch (error) {}
   };
 
   const handlePush = (path) => {
@@ -106,19 +163,21 @@ const UserProfile = ({ wrapperRef }) => {
           </Layout>
           <Layout>
             <HeaderButtons>
-              <TooltipHover
-                tooltipText={!following ? 'Seguir' : 'Deixar de seguir'}
-                width={!following ? '55px' : '110px'}
-              >
-                <FollowButton following={following} onClick={handleFollow}>
-                  {!following && (
-                    <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />
-                  )}
-                  {following && (
-                    <FaHeart size={'25px'} style={{ flexShrink: 0 }} />
-                  )}
-                </FollowButton>
-              </TooltipHover>
+              {userId != profileId && (
+                <TooltipHover
+                  tooltipText={!following ? 'Seguir' : 'Deixar de seguir'}
+                  width={!following ? '55px' : '110px'}
+                >
+                  <FollowButton following={following} onClick={handleFollow}>
+                    {!following && (
+                      <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />
+                    )}
+                    {following && (
+                      <FaHeart size={'25px'} style={{ flexShrink: 0 }} />
+                    )}
+                  </FollowButton>
+                </TooltipHover>
+              )}
             </HeaderButtons>
           </Layout>
         </ProfileWrapper>

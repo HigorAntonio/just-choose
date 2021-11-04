@@ -9,7 +9,7 @@ module.exports = {
       if (!followsId) {
         return res.status(400).json({ erro: 'Id do usuário não informado' });
       }
-      if (userId === followsId) {
+      if (userId == followsId) {
         return res.status(400).json({ erro: 'Id do usuário inválido' });
       }
 

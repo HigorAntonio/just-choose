@@ -42,7 +42,7 @@ const useAuthenticatedRequest = (url, params, page) => {
     }
   }, [url, params, page, authenticated]);
 
-  return { loading, error, data, hasMore };
+  return { loading, error, data, setData, hasMore };
 };
 
 export default useAuthenticatedRequest;

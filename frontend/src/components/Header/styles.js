@@ -56,7 +56,7 @@ export const Logo = styled.img.attrs((props) => ({
   src:
     props.src ||
     (props.theme === 'light' ? JustChooseLogoLight : JustChooseLogoDark),
-  alt: props.alt || 'JustChose Logo',
+  alt: props.alt || 'JustChose',
 }))`
   height: 3.5rem;
   margin-left: 0.5rem;

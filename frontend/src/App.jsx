@@ -5,6 +5,7 @@ import { ProfileContextProvider } from './context/ProfileContext';
 import { ThemeContextProvider } from './context/ThemeContext';
 import { ViewportContextProvider } from './context/ViewportContext';
 import { AlertContextProvider } from './context/AlertContext';
+import { FollowingProfilesContextProvider } from './context/FollowingProfilesContext';
 
 function App() {
   return (
@@ -13,7 +14,9 @@ function App() {
         <ProfileContextProvider>
           <ViewportContextProvider>
             <AlertContextProvider>
-              <Layout />
+              <FollowingProfilesContextProvider>
+                <Layout />
+              </FollowingProfilesContextProvider>
             </AlertContextProvider>
           </ViewportContextProvider>
         </ProfileContextProvider>

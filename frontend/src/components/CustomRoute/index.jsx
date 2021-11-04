@@ -21,13 +21,13 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
   } = useContext(AlertContext);
 
   useEffect(() => {
-    if (isPrivate && !authenticated) {
+    if (!loadingAuth && isPrivate && !authenticated) {
       setSeverity('info');
       setMessage('Para acessar a página você precisar estar logado.');
       setShowAlert(true);
       clearTimeout(alertTimeout);
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    } else if (requiresUserActivation && !isActive) {
+    } else if (!loadingProfile && requiresUserActivation && !isActive) {
       setSeverity('info');
       setMessage('Para acessar a página você precisa confirmar seu e-mail.');
       setShowAlert(true);
@@ -37,7 +37,9 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
   }, [
     isPrivate,
     requiresUserActivation,
+    loadingAuth,
     authenticated,
+    loadingProfile,
     isActive,
     setSeverity,
     setMessage,

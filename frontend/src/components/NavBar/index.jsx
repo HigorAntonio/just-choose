@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 
 import { AuthContext } from '../../context/AuthContext';
 import { ViewportContext } from '../../context/ViewportContext';
+import { FollowingProfilesContext } from '../../context/FollowingProfilesContext';
 import useAuthenticatedRequest from '../../hooks/useAuthenticatedRequest';
 import breakpoints from '../../styles/breakpoints';
 
@@ -34,15 +35,14 @@ import {
 } from './styles';
 
 const NavBar = () => {
-  const [followsParams] = useState({});
-  const [followsPageNumber, setFollowsPageNumber] = useState(1);
+  const { authenticated } = useContext(AuthContext);
+  const { width } = useContext(ViewportContext);
+  const { following, lastFollowRef } = useContext(FollowingProfilesContext);
+
   const [usersParams, setUsersParams] = useState({});
   const [usersPageNumber, setUsersPageNumber] = useState(1);
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-
-  const { authenticated, userId } = useContext(AuthContext);
-  const { width } = useContext(ViewportContext);
 
   const wrapperRef = useRef();
 
@@ -51,16 +51,6 @@ const NavBar = () => {
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
   }, [wrapperRef, showSearch]);
-
-  const {
-    data: following,
-    hasMore: followsHasMore,
-    loading: followsLoading,
-  } = useAuthenticatedRequest(
-    `/users/${userId}/following`,
-    followsParams,
-    followsPageNumber
-  );
 
   const {
     data: users,
@@ -89,27 +79,6 @@ const NavBar = () => {
       setUsersPageNumber(1);
     }
   };
-
-  const followsObserver = useRef();
-  const lastFollowRef = useCallback(
-    (node) => {
-      if (followsLoading) {
-        return;
-      }
-      if (followsObserver.current) {
-        followsObserver.current.disconnect();
-      }
-      followsObserver.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && followsHasMore) {
-          setFollowsPageNumber((prevState) => prevState + 1);
-        }
-      });
-      if (node) {
-        followsObserver.current.observe(node);
-      }
-    },
-    [followsLoading, followsHasMore, setFollowsPageNumber]
-  );
 
   const usersObserver = useRef();
   const lastUserRef = useCallback(
@@ -166,25 +135,25 @@ const NavBar = () => {
               {following.map((p, i) => {
                 if (following.length === i + 1) {
                   return (
-                    <Profile
-                      ref={lastFollowRef}
-                      key={p.user_id}
-                      title={p.user_name}
-                    >
+                    <Link key={p.user_id} to={`/users/${p.user_id}`}>
+                      <Profile ref={lastFollowRef} title={p.user_name}>
+                        <ProfileImage src={p.profile_image_url} />
+                        <ProfileData>
+                          <span>{p.user_name}</span>
+                        </ProfileData>
+                      </Profile>
+                    </Link>
+                  );
+                }
+                return (
+                  <Link key={p.user_id} to={`/users/${p.user_id}`}>
+                    <Profile title={p.user_name}>
                       <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
                         <span>{p.user_name}</span>
                       </ProfileData>
                     </Profile>
-                  );
-                }
-                return (
-                  <Profile key={p.user_id} title={p.user_name}>
-                    <ProfileImage src={p.profile_image_url} />
-                    <ProfileData>
-                      <span>{p.user_name}</span>
-                    </ProfileData>
-                  </Profile>
+                  </Link>
                 );
               })}
             </Profiles>
@@ -199,21 +168,25 @@ const NavBar = () => {
               {users.map((p, i) => {
                 if (users.length === i + 1) {
                   return (
-                    <Profile ref={lastUserRef} key={p.id} title={p.name}>
+                    <Link key={p.id} to={`/users/${p.id}`}>
+                      <Profile ref={lastUserRef} title={p.name}>
+                        <ProfileImage src={p.profile_image_url} />
+                        <ProfileData>
+                          <span>{p.name}</span>
+                        </ProfileData>
+                      </Profile>
+                    </Link>
+                  );
+                }
+                return (
+                  <Link key={p.id} to={`/users/${p.id}`}>
+                    <Profile title={p.name}>
                       <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
                         <span>{p.name}</span>
                       </ProfileData>
                     </Profile>
-                  );
-                }
-                return (
-                  <Profile key={p.id} title={p.name}>
-                    <ProfileImage src={p.profile_image_url} />
-                    <ProfileData>
-                      <span>{p.name}</span>
-                    </ProfileData>
-                  </Profile>
+                  </Link>
                 );
               })}
             </Profiles>

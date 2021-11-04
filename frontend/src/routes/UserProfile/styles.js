@@ -67,9 +67,7 @@ export const ProfileFollowers = styled.p`
   font-size: 1.4rem;
 `;
 
-export const HeaderButtons = styled.div`
-  margin-right: 50px;
-`;
+export const HeaderButtons = styled.div``;
 
 const buttonCss = css`
   display: flex;

@@ -118,6 +118,10 @@ export const Profiles = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+
+  > a {
+    text-decoration: none;
+  }
 `;
 
 export const Profile = styled.div`
