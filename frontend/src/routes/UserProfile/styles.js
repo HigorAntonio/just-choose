@@ -2,15 +2,19 @@ import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
+  align-items: center;
   flex-direction: column;
-`;
-
-export const Header = styled.header`
-  padding: 30px 30px 10px 30px;
+  padding: 30px;
+  overflow-x: hidden;
 
   @media (max-width: 768px) {
     padding: 20px 15px;
   }
+`;
+
+export const Header = styled.header`
+  width: 100%;
+  max-width: 2000px;
 `;
 
 export const ProfileWrapper = styled.div`
@@ -44,6 +48,7 @@ export const ProfileImageWrapper = styled.div`
   height: 72px;
   background: var(--background-700);
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
   margin-right: 10px;
@@ -67,7 +72,9 @@ export const ProfileFollowers = styled.p`
   font-size: 1.4rem;
 `;
 
-export const HeaderButtons = styled.div``;
+export const HeaderButtons = styled.div`
+  padding-right: 25px;
+`;
 
 const buttonCss = css`
   display: flex;
@@ -103,18 +110,14 @@ export const FollowButton = styled.button`
 
 export const NavigationWrapper = styled.div`
   width: 100%;
+  max-width: 2000px;
   height: 4rem;
   display: flex;
   align-items: center;
-  padding: 0 30px;
-
-  @media (max-width: 768px) {
-    padding: 0 15px;
-  }
 `;
 
 export const Navigation = styled.div`
-  height: 100%;
+  height: 4rem;
   display: flex;
 
   > div {
@@ -146,4 +149,10 @@ export const Navigation = styled.div`
 
 export const Main = styled.div`
   width: 100%;
+  max-width: 2000px;
+  margin-top: 10px;
+
+  > div {
+    margin-bottom: 20px;
+  }
 `;

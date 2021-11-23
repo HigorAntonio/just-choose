@@ -168,6 +168,8 @@ const MovieFilters = ({
                   sortBy.value !== sb.value && setSortBy(sb);
                   setShowSortOptions(false);
                 }}
+                tabIndex="-1"
+                data-select-option
               >
                 {sb.key}
               </Option>
@@ -197,6 +199,8 @@ const MovieFilters = ({
                       key={p.id}
                       click={() => handleSelectProvider(p.id)}
                       check={isProviderCheck(p.id)}
+                      tabIndex="-1"
+                      data-select-option
                     >
                       {p.name}
                     </ContentProvider>

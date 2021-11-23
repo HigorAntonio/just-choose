@@ -199,7 +199,7 @@ const NavBar = () => {
           </Following>
         )}
       </TopSide>
-      {authenticated && width >= breakpoints.getInt(breakpoints.size1) && (
+      {authenticated && width > breakpoints.getInt(breakpoints.size1) && (
         <BottomSide>
           <SearchUser>
             <GoSearch size={15} style={{ flexShrink: 0 }} />

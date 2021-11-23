@@ -9,7 +9,7 @@ import ContentCard from '../../components/ContentCard';
 import mUILightTheme from '../../styles/materialUIThemes/light';
 import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
-import { Container } from './styles';
+import { Container, CardWrapper } from './styles';
 
 const getContentBaseUrl = (type) => {
   switch (type) {
@@ -46,7 +46,7 @@ const ContentGrid = ({
               : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
           const href = `${getContentBaseUrl(c.type)}/${c.content_platform_id}`;
           return (
-            <div key={c.type + c.content_id} className="cardWrapper">
+            <CardWrapper key={c.type + c.content_id}>
               <a href={href} target="_blank" rel="noreferrer">
                 {checkbox ? (
                   <ContentCard
@@ -59,18 +59,18 @@ const ContentGrid = ({
                   <ContentCardSimple src={src} title={c.title} />
                 )}
               </a>
-            </div>
+            </CardWrapper>
           );
         })}
       {content.length <= 0 &&
         [...Array(30).keys()].map((c) => (
-          <div key={c} className="cardWrapper">
+          <CardWrapper key={c}>
             <ThemeProvider
               theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
             >
               <Skeleton variant="rect" width={'100%'} height={'100%'} />
             </ThemeProvider>
-          </div>
+          </CardWrapper>
         ))}
     </Container>
   );

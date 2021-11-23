@@ -128,9 +128,14 @@ export const ThumbnailWrapper = styled.div`
         background: var(--background-400);
         border-radius: 5px;
 
-        &:hover {
+        &:hover,
+        &:focus {
           background: var(--background-500);
           cursor: pointer;
+        }
+
+        &:focus {
+          outline: 2px solid var(--primary-400);
         }
       }
     }
@@ -336,9 +341,14 @@ export const Option = styled.div`
   padding: 10px;
   border-radius: 5px;
 
-  &:hover {
+  &:hover,
+  &:focus {
     background: var(--background-500);
     cursor: pointer;
+  }
+
+  &:focus {
+    outline: 2px solid var(--primary-400);
   }
 `;
 
@@ -450,8 +460,13 @@ export const ClearButton = styled.button`
   ${buttonCss}
   background: var(--background-400);
 
-  &:hover {
+  &:hover,
+  &:focus {
     background: var(--background-500);
+  }
+
+  &:focus {
+    outline: 2px solid var(--primary-400);
   }
 `;
 
@@ -459,8 +474,13 @@ export const PreviewButton = styled.button`
   ${buttonCss}
   background: var(--background-400);
 
-  &:hover {
+  &:hover,
+  &:focus {
     background: var(--background-500);
+  }
+
+  &:focus {
+    outline: 2px solid var(--primary-400);
   }
 `;
 
@@ -469,7 +489,12 @@ export const CreateButton = styled.button`
   color: var(--white);
   background: var(--primary-400);
 
-  &:hover {
+  &:hover,
+  &:focus {
     background: var(--primary-500);
+  }
+
+  &:focus {
+    outline: 2px solid var(--primary-400);
   }
 `;

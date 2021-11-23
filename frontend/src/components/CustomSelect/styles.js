@@ -27,7 +27,7 @@ export const Container = styled.div`
   }
 `;
 
-export const FilterDropDown = styled.div`
+export const SelectMenu = styled.div`
   display: flex;
   flex-direction: column;
   background: var(--background-100);

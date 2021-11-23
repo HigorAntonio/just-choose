@@ -5,17 +5,17 @@ export const Container = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   grid-template-rows: 1fr;
   grid-gap: 15px;
+`;
 
-  .cardWrapper {
-    display: flex;
-  }
+export const CardWrapper = styled.div`
+  display: flex;
 
-  .cardWrapper a {
+  > a {
     width: 100%;
     height: 100%;
   }
 
-  .cardWrapper:before {
+  &:before {
     content: '';
     display: block;
     height: 0;

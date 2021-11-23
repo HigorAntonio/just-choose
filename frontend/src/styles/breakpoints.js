@@ -1,5 +1,5 @@
 module.exports = {
-  size1: '1200px', //usando na sidebar
+  size1: '1199px', //usando na sidebar
   size2: '1886px', //usando no filtro de conteudo
   size3: '775px', //usando no filtro de conteudo
   size4: '1670px', //usando no filtro de conteudo

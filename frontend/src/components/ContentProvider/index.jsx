@@ -3,12 +3,13 @@ import { ImCheckboxUnchecked, ImCheckboxChecked } from 'react-icons/im';
 
 import { Container, Logo } from './styles';
 
-const ContentProvider = ({ click, children, check }) => {
+const ContentProvider = ({ click, children, check, ...rest }) => {
   return (
     <Container
       onClick={() => {
         click();
       }}
+      {...rest}
     >
       <div>
         <Logo src={children} />

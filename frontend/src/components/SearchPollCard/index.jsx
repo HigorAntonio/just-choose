@@ -35,13 +35,15 @@ const SearchPollCard = ({ poll }) => {
   const [profileImageError, setProfileImageError] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
 
-  const handleContainerClick = () => {
-    history.push(`/polls/${pollId}`);
+  const handleContainerClick = (e) => {
+    if (!['A', 'svg', 'path', 'IMG'].includes(e.target.tagName)) {
+      history.push(`/polls/${pollId}`);
+    }
   };
 
   return (
     <Container onClick={handleContainerClick}>
-      <ThumbnailWrapper onClick={(e) => e.stopPropagation()}>
+      <ThumbnailWrapper>
         <Link to={`/polls/${pollId}`}>
           <Thumbnail
             src={thumbnail}
@@ -52,7 +54,7 @@ const SearchPollCard = ({ poll }) => {
         </Link>
       </ThumbnailWrapper>
       <TextWrapper>
-        <Title onClick={(e) => e.stopPropagation()}>
+        <Title>
           <Link to={`/polls/${pollId}`}>{title}</Link>
         </Title>
         <Meta>
@@ -60,13 +62,15 @@ const SearchPollCard = ({ poll }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <ProfileImage
-              src={profileImageUrl}
-              onError={() => setProfileImageError(true)}
-              error={profileImageError}
-            />
+            <Link to={`/users/${userId}`}>
+              <ProfileImage
+                src={profileImageUrl}
+                onError={() => setProfileImageError(true)}
+                error={profileImageError}
+              />
+            </Link>
           </ProfileImageWrapper>
-          <UserName onClick={(e) => e.stopPropagation()}>
+          <UserName>
             <Link to={`/users/${userId}`}>{userName}</Link>
           </UserName>
         </ProfileInfo>

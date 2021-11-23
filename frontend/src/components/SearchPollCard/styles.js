@@ -101,6 +101,11 @@ export const ProfileImageWrapper = styled.div`
   background-color: var(--background-700);
   flex-shrink: 0;
   margin-right: 8px;
+
+  > a {
+    width: 24px;
+    height: 24px;
+  }
 `;
 
 export const ProfileImage = styled.img`

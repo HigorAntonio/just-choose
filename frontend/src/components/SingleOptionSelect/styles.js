@@ -20,10 +20,15 @@ export const Container = styled.div`
       flex-shrink: 0;
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
       background: ${(props) =>
         props.hover ? props.hover : `var(--background-500)`};
       cursor: pointer;
+    }
+
+    &:focus {
+      outline: 2px solid var(--primary-400);
     }
 
     > div {
@@ -33,7 +38,7 @@ export const Container = styled.div`
   }
 `;
 
-export const FilterDropDown = styled.div`
+export const SelectMenu = styled.div`
   display: flex;
   flex-direction: column;
   background: var(--background-100);

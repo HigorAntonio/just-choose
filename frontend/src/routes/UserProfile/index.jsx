@@ -16,6 +16,7 @@ import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
 import TooltipHover from '../../components/TooltipHover';
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
+import UserProfileStartResults from '../../components/UserProfileStartResults';
 
 import {
   Container,
@@ -163,7 +164,7 @@ const UserProfile = ({ wrapperRef }) => {
           </Layout>
           <Layout>
             <HeaderButtons>
-              {userId != profileId && (
+              {parseInt(userId) !== parseInt(profileId) && (
                 <TooltipHover
                   tooltipText={!following ? 'Seguir' : 'Deixar de seguir'}
                   width={!following ? '55px' : '110px'}
@@ -225,7 +226,10 @@ const UserProfile = ({ wrapperRef }) => {
           </Navigation>
         </HorizontalDragScrolling>
       </NavigationWrapper>
-      <Main></Main>
+      <Main>
+        <UserProfileStartResults title="Listas" />
+        <UserProfileStartResults title="Votações" />
+      </Main>
     </Container>
   );
 };

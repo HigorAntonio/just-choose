@@ -142,7 +142,7 @@ const CreateList = ({ wrapperRef }) => {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleContentInputEnterKey = (e) => {
     if (e.key === 'Enter' && e.target.value) {
       if (contentType === 'Filme') {
         setRequestType('movie-search');
@@ -156,6 +156,47 @@ const CreateList = ({ wrapperRef }) => {
       }
       setPageNumber(1);
       setShowListPreview(false);
+    }
+  };
+
+  const handleSharingOption = (option) => {
+    setSharingOption(option);
+    setSharingOptionError(false);
+    setShowSharingOption(false);
+  };
+
+  const handleSelectSharingOptionEnterKey = (e, option) => {
+    if (e.key === 'Enter') {
+      handleSharingOption(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
+  };
+
+  const handleContentType = (option) => {
+    setContentType(option);
+    setShowContent(false);
+  };
+
+  const handleSelectContentTypeEnterKey = (e, option) => {
+    if (e.key === 'Enter') {
+      handleContentType(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
+  };
+
+  const handleThumbnail = () => {
+    thumbInputFileRef.current.click();
+  };
+
+  const handleThumbnailKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleThumbnail();
     }
   };
 
@@ -300,10 +341,13 @@ const CreateList = ({ wrapperRef }) => {
                 <Options>
                   <Option
                     onClick={() => {
-                      setSharingOption('public');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('public');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectSharingOptionEnterKey(e, 'public')
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Pública</div>
@@ -312,10 +356,13 @@ const CreateList = ({ wrapperRef }) => {
                   </Option>
                   <Option
                     onClick={() => {
-                      setSharingOption('followed_profiles');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('followed_profiles');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectSharingOptionEnterKey(e, 'followed_profiles')
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Perfis seguidos</div>
@@ -324,10 +371,13 @@ const CreateList = ({ wrapperRef }) => {
                   </Option>
                   <Option
                     onClick={() => {
-                      setSharingOption('private');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('private');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectSharingOptionEnterKey(e, 'private')
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Privada</div>
@@ -350,7 +400,13 @@ const CreateList = ({ wrapperRef }) => {
             </div>
             <div className="column button-wrapper">
               <div className="file-input">
-                <label htmlFor="thumbnail">Selecione uma imagem</label>
+                <label
+                  htmlFor="thumbnail"
+                  onKeyPress={handleThumbnailKeyPress}
+                  tabIndex="0"
+                >
+                  Selecione uma imagem
+                </label>
                 <input
                   type="file"
                   id="thumbnail"
@@ -387,9 +443,13 @@ const CreateList = ({ wrapperRef }) => {
                         <Option
                           key={`contentTypesList${i}`}
                           onClick={() => {
-                            setContentType(ct);
-                            setShowContent(false);
+                            handleContentType(ct);
                           }}
+                          onKeyPress={(e) =>
+                            handleSelectContentTypeEnterKey(e, ct)
+                          }
+                          tabIndex="-1"
+                          data-select-option
                         >
                           {ct}
                         </Option>
@@ -404,7 +464,7 @@ const CreateList = ({ wrapperRef }) => {
                       type="search"
                       id="search"
                       placeholder="Buscar"
-                      onKeyPress={handleKeyPress}
+                      onKeyPress={handleContentInputEnterKey}
                     />
                   </SearchWrapper>
                 )}

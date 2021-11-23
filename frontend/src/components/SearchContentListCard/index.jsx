@@ -46,13 +46,15 @@ const SearchContentListCard = ({ contentList }) => {
   const [profileImageError, setProfileImageError] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
 
-  const handleContainerClick = () => {
-    history.push(`/lists/${listId}`);
+  const handleContainerClick = (e) => {
+    if (!['A', 'svg', 'path', 'IMG'].includes(e.target.tagName)) {
+      history.push(`/lists/${listId}`);
+    }
   };
 
   return (
     <Container onClick={handleContainerClick}>
-      <ThumbnailWrapper onClick={(e) => e.stopPropagation()}>
+      <ThumbnailWrapper>
         <Link to={`/lists/${listId}`}>
           <Thumbnail
             src={thumbnail}
@@ -63,7 +65,7 @@ const SearchContentListCard = ({ contentList }) => {
         </Link>
       </ThumbnailWrapper>
       <TextWrapper>
-        <Title onClick={(e) => e.stopPropagation()}>
+        <Title>
           <Link to={`/lists/${listId}`}>{title}</Link>
         </Title>
         <Meta>
@@ -79,13 +81,15 @@ const SearchContentListCard = ({ contentList }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <ProfileImage
-              src={profileImageUrl}
-              onError={() => setProfileImageError(true)}
-              error={profileImageError}
-            />
+            <Link to={`/users/${userId}`}>
+              <ProfileImage
+                src={profileImageUrl}
+                onError={() => setProfileImageError(true)}
+                error={profileImageError}
+              />
+            </Link>
           </ProfileImageWrapper>
-          <UserName onClick={(e) => e.stopPropagation()}>
+          <UserName>
             <Link to={`/users/${userId}`}>{userName}</Link>
           </UserName>
         </ProfileInfo>

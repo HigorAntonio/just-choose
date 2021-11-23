@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ClickAwayListener } from '@material-ui/core';
 
 import Tooltip from '../Tooltip';
 
@@ -22,17 +23,19 @@ const TooltipHover = ({
   };
 
   return (
-    <Container onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
-      {children}
-      <Tooltip
-        width={width}
-        spacing={spacing}
-        show={showTooltip}
-        transitionDuration={transitionDuration}
-      >
-        {tooltipText}
-      </Tooltip>
-    </Container>
+    <ClickAwayListener onClickAway={handleMouseOut}>
+      <Container onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+        {children}
+        <Tooltip
+          width={width}
+          spacing={spacing}
+          show={showTooltip}
+          transitionDuration={transitionDuration}
+        >
+          {tooltipText}
+        </Tooltip>
+      </Container>
+    </ClickAwayListener>
   );
 };
 
