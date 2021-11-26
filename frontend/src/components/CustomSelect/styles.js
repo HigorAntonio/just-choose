@@ -48,10 +48,16 @@ export const SelectMenu = styled.div`
   ${(props) =>
     props.show
       ? props.align === 'center'
-        ? 'opacity: 1; pointer-events: all; transform: translate(-50%, 0);'
-        : 'opacity: 1; pointer-events: all; transform: translateY(0);'
+        ? 'opacity: 1; pointer-events: initial; transform: translate(-50%, 0);'
+        : 'opacity: 1; pointer-events: initial; transform: translateY(0);'
       : props.align === 'center'
       ? 'opacity: 0; pointer-events: none; transform: translate(-50%, -10px);'
       : 'opacity: 0; pointer-events: none; transform: translateY(-10px);'}
+
+  /* Faz com que as opções do select que tenham a propriedade
+  tabindex="0" por padrão (input, button, .etc) se tornem não 'focaveis'
+  (não serão selecionadas através da navegação com a tecla tab)*/
+  ${(props) =>
+    props.show ? '> * { visibility: visible; }' : '> * { visibility: hidden; }'}
   transition: opacity 0.4s ease, transform 0.4s ease;
 `;

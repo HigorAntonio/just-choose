@@ -3,12 +3,13 @@ import { ImCheckboxUnchecked, ImCheckboxChecked } from 'react-icons/im';
 
 import { Container } from './styles';
 
-const CustomOption = ({ click, children, check }) => {
+const CustomOption = ({ click, children, check, ...rest }) => {
   return (
     <Container
       onClick={() => {
         click();
       }}
+      {...rest}
     >
       <span>{children}</span>
       {check ? (

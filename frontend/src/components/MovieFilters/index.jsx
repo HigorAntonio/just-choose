@@ -63,6 +63,11 @@ const MovieFilters = ({
   const [showSortOptions, setShowSortOptions] = useState(false);
   const { width } = useContext(ViewportContext);
 
+  const handleSelectSortBy = (sb) => {
+    sortBy.value !== sb.value && setSortBy(sb);
+    setShowSortOptions(false);
+  };
+
   const handleSelectProvider = (id) => {
     if (selectedProviders.includes(id)) {
       setSelectedProviders((prevState) => prevState.filter((p) => p !== id));
@@ -86,6 +91,22 @@ const MovieFilters = ({
       );
     } else {
       setSelectedCertifications((prevState) => [...prevState, order]);
+    }
+  };
+
+  const handleSingleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
+  };
+
+  const handleMultipleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
     }
   };
 
@@ -164,10 +185,10 @@ const MovieFilters = ({
             {sortByList.map((sb, i) => (
               <Option
                 key={`movieOrderByList${i}`}
-                onClick={() => {
-                  sortBy.value !== sb.value && setSortBy(sb);
-                  setShowSortOptions(false);
-                }}
+                onClick={() => handleSelectSortBy(sb)}
+                onKeyPress={(e) =>
+                  handleSingleSelectOnPressEnter(e, handleSelectSortBy, sb)
+                }
                 tabIndex="-1"
                 data-select-option
               >
@@ -199,6 +220,13 @@ const MovieFilters = ({
                       key={p.id}
                       click={() => handleSelectProvider(p.id)}
                       check={isProviderCheck(p.id)}
+                      onKeyPress={(e) =>
+                        handleMultipleSelectOnPressEnter(
+                          e,
+                          handleSelectProvider,
+                          p.id
+                        )
+                      }
                       tabIndex="-1"
                       data-select-option
                     >
@@ -215,13 +243,26 @@ const MovieFilters = ({
                       key={g.id}
                       click={() => handleSelectGenre(g.id)}
                       check={isGenreCheck(g.id)}
+                      onKeyPress={(e) =>
+                        handleMultipleSelectOnPressEnter(
+                          e,
+                          handleSelectGenre,
+                          g.id
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
                     >
                       {g.name}
                     </CustomOption>
                   ))}
               </Genres>
             </CustomSelect>
-            <CustomSelect label="Data de lançamento" dropDownAlign="center">
+            <CustomSelect
+              label="Data de lançamento"
+              dropDownAlign="center"
+              disableChildren
+            >
               <ReleaseDate>
                 <div>
                   <span>de</span>
@@ -254,6 +295,15 @@ const MovieFilters = ({
                       key={c.order}
                       click={() => handleSelectCertification(c.order)}
                       check={isCertificationCheck(c.order)}
+                      onKeyPress={(e) =>
+                        handleMultipleSelectOnPressEnter(
+                          e,
+                          handleSelectCertification,
+                          c.order
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
                     >
                       {c.certification}
                     </CustomOption>

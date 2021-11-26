@@ -165,24 +165,14 @@ const CreateList = ({ wrapperRef }) => {
     setShowSharingOption(false);
   };
 
-  const handleSelectSharingOptionEnterKey = (e, option) => {
-    if (e.key === 'Enter') {
-      handleSharingOption(option);
-      document.activeElement
-        .closest('[data-select]')
-        .querySelector('[data-select-button]')
-        .focus();
-    }
-  };
-
   const handleContentType = (option) => {
     setContentType(option);
     setShowContent(false);
   };
 
-  const handleSelectContentTypeEnterKey = (e, option) => {
+  const handleSelectOnPressEnter = (e, cb, option) => {
     if (e.key === 'Enter') {
-      handleContentType(option);
+      cb(option);
       document.activeElement
         .closest('[data-select]')
         .querySelector('[data-select-button]')
@@ -344,7 +334,7 @@ const CreateList = ({ wrapperRef }) => {
                       handleSharingOption('public');
                     }}
                     onKeyPress={(e) =>
-                      handleSelectSharingOptionEnterKey(e, 'public')
+                      handleSelectOnPressEnter(e, handleSharingOption, 'public')
                     }
                     tabIndex="-1"
                     data-select-option
@@ -359,7 +349,11 @@ const CreateList = ({ wrapperRef }) => {
                       handleSharingOption('followed_profiles');
                     }}
                     onKeyPress={(e) =>
-                      handleSelectSharingOptionEnterKey(e, 'followed_profiles')
+                      handleSelectOnPressEnter(
+                        e,
+                        handleSharingOption,
+                        'followed_profiles'
+                      )
                     }
                     tabIndex="-1"
                     data-select-option
@@ -374,7 +368,11 @@ const CreateList = ({ wrapperRef }) => {
                       handleSharingOption('private');
                     }}
                     onKeyPress={(e) =>
-                      handleSelectSharingOptionEnterKey(e, 'private')
+                      handleSelectOnPressEnter(
+                        e,
+                        handleSharingOption,
+                        'private'
+                      )
                     }
                     tabIndex="-1"
                     data-select-option
@@ -446,7 +444,7 @@ const CreateList = ({ wrapperRef }) => {
                             handleContentType(ct);
                           }}
                           onKeyPress={(e) =>
-                            handleSelectContentTypeEnterKey(e, ct)
+                            handleSelectOnPressEnter(e, handleContentType, ct)
                           }
                           tabIndex="-1"
                           data-select-option

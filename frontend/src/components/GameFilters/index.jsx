@@ -57,6 +57,11 @@ const GameFilters = ({
   const [showSortOptions, setShowSortOptions] = useState(false);
   const { width } = useContext(ViewportContext);
 
+  const handleSelectSortBy = (sb) => {
+    sortBy.value !== sb.value && setSortBy(sb);
+    setShowSortOptions(false);
+  };
+
   const handleSelectPlatform = (id) => {
     if (selectedPlatforms.includes(id)) {
       setSelectedPlatforms((prevState) => prevState.filter((p) => p !== id));
@@ -70,6 +75,22 @@ const GameFilters = ({
       setSelectedGenres((prevState) => prevState.filter((p) => p !== id));
     } else {
       setSelectedGenres((prevState) => [...prevState, id]);
+    }
+  };
+
+  const handleSingleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
+  };
+
+  const handleMultipleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
     }
   };
 
@@ -138,10 +159,12 @@ const GameFilters = ({
             {sortByList.map((sb, i) => (
               <Option
                 key={`movieOrderByList${i}`}
-                onClick={() => {
-                  sortBy.value !== sb.value && setSortBy(sb);
-                  setShowSortOptions(false);
-                }}
+                onClick={() => handleSelectSortBy(sb)}
+                onKeyPress={(e) =>
+                  handleSingleSelectOnPressEnter(e, handleSelectSortBy, sb)
+                }
+                tabIndex="-1"
+                data-select-option
               >
                 {sb.key}
               </Option>
@@ -171,6 +194,15 @@ const GameFilters = ({
                       key={p.id}
                       click={() => handleSelectPlatform(p.id)}
                       check={isPlatformCheck(p.id)}
+                      onKeyPress={(e) =>
+                        handleMultipleSelectOnPressEnter(
+                          e,
+                          handleSelectPlatform,
+                          p.id
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
                     >
                       {p.name}
                     </ContentProvider>
@@ -185,6 +217,15 @@ const GameFilters = ({
                       key={g.id}
                       click={() => handleSelectGenre(g.id)}
                       check={isGenreCheck(g.id)}
+                      onKeyPress={(e) =>
+                        handleMultipleSelectOnPressEnter(
+                          e,
+                          handleSelectGenre,
+                          g.id
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
                     >
                       {g.name}
                     </CustomOption>
