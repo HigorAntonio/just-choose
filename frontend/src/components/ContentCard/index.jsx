@@ -10,13 +10,25 @@ const ContentCard = ({ src, title, check, click }) => {
     click(e);
   };
 
+  const handleOnPressEnter = (e) => {
+    if (e.key === 'Enter') {
+      click(e);
+    }
+  };
+
   useEffect(() => !src && setError(true), [src, setError]);
 
   return (
     <Container title={title}>
       <Poster src={src} alt="" onError={() => setError(true)} error={error} />
       {error && <BsImage size={'50%'} style={{ flexShrink: 0 }} />}
-      <div className="check-box" onClick={handleClick}>
+      <div
+        className="check-box"
+        onClick={handleClick}
+        onKeyPress={handleOnPressEnter}
+        tabIndex="-1"
+        data-focusable
+      >
         {check ? (
           <ImCheckboxChecked
             size={15}

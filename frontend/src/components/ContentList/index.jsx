@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, memo } from 'react';
+import React, { useEffect, useContext, useRef, memo } from 'react';
 import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -22,6 +22,69 @@ const ContentList = ({
   wrapperRef,
 }) => {
   const { title: theme } = useContext(ThemeContext);
+  const containerRef = useRef();
+
+  useEffect(() => {
+    const handleKeydown = (e) => {
+      if (document.hasFocus()) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          e.preventDefault();
+        }
+        if (
+          document.activeElement.hasAttribute('data-content-list-container')
+        ) {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            if (
+              document.activeElement
+                .closest('[data-content-list-container]')
+                .querySelectorAll('[data-focusable]')[0]
+            ) {
+              document.activeElement
+                .closest('[data-content-list-container]')
+                .querySelectorAll('[data-focusable]')[0]
+                .focus();
+            }
+          }
+        } else if (
+          document.activeElement.closest('[data-content-list-container]') !=
+          null
+        ) {
+          let activeElementIndex = [
+            ...document.activeElement
+              .closest('[data-content-list-container]')
+              .querySelectorAll('[data-focusable]'),
+          ].indexOf(document.activeElement);
+          if (e.key === 'ArrowRight') {
+            if (
+              ++activeElementIndex <
+              [
+                ...document.activeElement
+                  .closest('[data-content-list-container]')
+                  .querySelectorAll('[data-focusable]'),
+              ].length
+            ) {
+              [
+                ...document.activeElement
+                  .closest('[data-content-list-container]')
+                  .querySelectorAll('[data-focusable]'),
+              ][activeElementIndex].focus();
+            }
+          }
+          if (e.key === 'ArrowLeft') {
+            if (--activeElementIndex >= 0) {
+              [
+                ...document.activeElement
+                  .closest('[data-content-list-container]')
+                  .querySelectorAll('[data-focusable]'),
+              ][activeElementIndex].focus();
+            }
+          }
+        }
+      }
+    };
+
+    containerRef.current.addEventListener('keydown', handleKeydown);
+  }, []);
 
   useEffect(() => {
     setPageNumber(1);
@@ -83,7 +146,7 @@ const ContentList = ({
     contentList.map((c) => c.contentId).includes(contentId);
 
   return (
-    <Container>
+    <Container ref={containerRef} tabIndex="0" data-content-list-container>
       {!showPreview &&
         content.length > 0 &&
         content.map((c, i) => {

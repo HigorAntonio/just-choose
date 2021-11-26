@@ -499,7 +499,7 @@ const CreateList = ({ wrapperRef }) => {
               )}
             </ContentListHeader>
             {contentType && (
-              <ContentListWrapper ref={contentListWrapperRef}>
+              <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
                 <ContentList
                   requestType={requestType}
                   contentType={contentType}
