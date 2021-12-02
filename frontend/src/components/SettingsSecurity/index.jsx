@@ -40,8 +40,14 @@ const SettingsSecurity = ({ wrapperRef }) => {
     useState(false);
   const [errorOnResendConfirmationEmail, setErrorOnResendConfirmationEmail] =
     useState(false);
+  const [
+    confirmationEmailSentSuccessfully,
+    setConfirmationEmailSentSuccessfully,
+  ] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [errorOnUpdatePassword, setErrorOnUpdatePassword] = useState(false);
+  const [passwordUpdatedSuccessfully, setPasswordUpdatedSuccessfully] =
+    useState(false);
 
   useEffect(() => {
     if (resendingConfirmationEmail) {
@@ -52,13 +58,14 @@ const SettingsSecurity = ({ wrapperRef }) => {
       setMessage(
         'Não foi possível solicitar o reenvio do e-mail. Por favor, tente novamente.'
       );
-    } else {
+    } else if (confirmationEmailSentSuccessfully) {
       setSeverity('success');
       setMessage('Reenvio do e-mail solicitado com sucesso.');
     }
   }, [
     resendingConfirmationEmail,
     errorOnResendConfirmationEmail,
+    confirmationEmailSentSuccessfully,
     setMessage,
     setSeverity,
   ]);
@@ -72,11 +79,17 @@ const SettingsSecurity = ({ wrapperRef }) => {
       setMessage(
         'Não foi possível alterar a senha. Por favor, tente novamente.'
       );
-    } else {
+    } else if (passwordUpdatedSuccessfully) {
       setSeverity('success');
       setMessage('Senha alterada com sucesso.');
     }
-  }, [updatingPassword, errorOnUpdatePassword, setMessage, setSeverity]);
+  }, [
+    updatingPassword,
+    errorOnUpdatePassword,
+    passwordUpdatedSuccessfully,
+    setMessage,
+    setSeverity,
+  ]);
 
   const clearUpdatePasswordForm = () => {
     setShowChangePasswordForm(false);
@@ -122,27 +135,34 @@ const SettingsSecurity = ({ wrapperRef }) => {
 
   const handleResendConfirmationEmail = async () => {
     setErrorOnResendConfirmationEmail(false);
+    setConfirmationEmailSentSuccessfully(false);
     setShowAlert(true);
     setResendingConfirmationEmail(true);
     clearTimeout(alertTimeout);
 
+    let successfullySent = true;
     try {
       await justChooseApi.get('/confirmation');
     } catch (error) {
       setErrorOnResendConfirmationEmail(true);
+      successfullySent = false;
     }
 
     setResendingConfirmationEmail(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+    if (successfullySent) {
+      setConfirmationEmailSentSuccessfully(true);
+    }
   };
 
   const handleUpdatePassword = async () => {
     setErrorOnUpdatePassword(false);
+    setPasswordUpdatedSuccessfully(false);
     setShowAlert(true);
     setUpdatingPassword(true);
     clearTimeout(alertTimeout);
 
-    let successfulyUpdated = true;
+    let successfullyUpdated = true;
     try {
       await justChooseApi({
         url: `/updatepassword`,
@@ -151,7 +171,7 @@ const SettingsSecurity = ({ wrapperRef }) => {
       });
     } catch (error) {
       setErrorOnUpdatePassword(true);
-      successfulyUpdated = false;
+      successfullyUpdated = false;
 
       if (
         error.response &&
@@ -164,8 +184,9 @@ const SettingsSecurity = ({ wrapperRef }) => {
 
     setUpdatingPassword(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    if (successfulyUpdated) {
+    if (successfullyUpdated) {
       clearUpdatePasswordForm();
+      setPasswordUpdatedSuccessfully(true);
     }
   };
 

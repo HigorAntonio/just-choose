@@ -15,6 +15,12 @@ const InputToggleVisibility = (props) => {
     );
   };
 
+  const handleOnPressEnter = (e) => {
+    if (e.key === 'Enter') {
+      handleTogglePassword();
+    }
+  };
+
   return (
     <Container>
       <Input>
@@ -23,6 +29,8 @@ const InputToggleVisibility = (props) => {
           <ToggleVisibility
             onClick={handleTogglePassword}
             onMouseDown={(e) => e.preventDefault()}
+            onKeyPress={handleOnPressEnter}
+            tabIndex="0"
           >
             {showPassword ? (
               <MdVisibilityOff size={16} style={{ flexShrink: 0 }} />

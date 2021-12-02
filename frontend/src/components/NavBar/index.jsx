@@ -103,7 +103,7 @@ const NavBar = () => {
 
   return (
     <Container>
-      <TopSide ref={wrapperRef}>
+      <TopSide ref={wrapperRef} tabIndex="-1">
         <Navigation>
           <Link to="/">
             <NavOption title="Início">

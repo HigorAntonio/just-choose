@@ -41,6 +41,7 @@ const SettingsProfile = ({ wrapperRef }) => {
   const [profileSettingsChange, setProfileSettingsChange] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [errorOnUpdate, setErrorOnUpdate] = useState(false);
+  const [updatedSuccessfully, setUpdatedSuccessfully] = useState(false);
 
   const profileImageInputFileRef = useRef();
 
@@ -64,13 +65,13 @@ const SettingsProfile = ({ wrapperRef }) => {
       setMessage(
         'Não foi possível atualizar os dados do perfil. Por favor, tente novamente.'
       );
-    } else {
+    } else if (updatedSuccessfully) {
       setSeverity('success');
       setMessage('Dados do perfil atualizados com sucesso.');
     }
-  }, [updating, errorOnUpdate, setMessage, setSeverity]);
+  }, [updating, errorOnUpdate, updatedSuccessfully, setMessage, setSeverity]);
 
-  const handleProfileImage = (e) => {
+  const handleProfileImageInput = (e) => {
     setProfileImageError('');
     if (e.target.files[0].size > 2097152) {
       setProfileImageError('A imagem não pode ter mais do que 2 MB.');
@@ -84,6 +85,16 @@ const SettingsProfile = ({ wrapperRef }) => {
       reader.readAsDataURL(e.target.files[0]);
       setProfileImage(e.target.files[0]);
       setProfileSettingsChange(true);
+    }
+  };
+
+  const handleProfileImage = () => {
+    profileImageInputFileRef.current.click();
+  };
+
+  const handleProfileImageKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleProfileImage();
     }
   };
 
@@ -104,6 +115,7 @@ const SettingsProfile = ({ wrapperRef }) => {
 
   const handleUpdateProfile = async () => {
     setErrorOnUpdate(false);
+    setUpdatedSuccessfully(false);
     setShowAlert(true);
     setUpdating(true);
     clearTimeout(alertTimeout);
@@ -141,6 +153,7 @@ const SettingsProfile = ({ wrapperRef }) => {
     setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (successfulyUpdated) {
+      setUpdatedSuccessfully(true);
       refreshUserProfileData();
     }
     // Posiciona o scroll no início da página
@@ -164,12 +177,18 @@ const SettingsProfile = ({ wrapperRef }) => {
           </div>
           <div className="column button-wrapper">
             <div className="file-input">
-              <label htmlFor="thumbnail">Selecione uma imagem</label>
+              <label
+                htmlFor="thumbnail"
+                onKeyPress={handleProfileImageKeyPress}
+                tabIndex="0"
+              >
+                Selecione uma imagem
+              </label>
               <input
                 type="file"
                 id="thumbnail"
                 accept="image/*"
-                onChange={handleProfileImage}
+                onChange={handleProfileImageInput}
                 ref={profileImageInputFileRef}
               />
             </div>

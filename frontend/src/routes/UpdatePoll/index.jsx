@@ -69,6 +69,7 @@ const UpdatePoll = ({ wrapperRef }) => {
   const [contentList, setContentList] = useState([]);
   const [updating, setUpdating] = useState(false);
   const [errorOnUpdate, setErrorOnUpdate] = useState(false);
+  const [updatedSuccessfully, setUpdatedSuccessfully] = useState(false);
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
@@ -143,11 +144,11 @@ const UpdatePoll = ({ wrapperRef }) => {
       setMessage(
         'Não foi possível atualizar a votação. Por favor, tente novamente.'
       );
-    } else {
+    } else if (updatedSuccessfully) {
       setSeverity('success');
       setMessage('Votação atualizada com sucesso.');
     }
-  }, [updating, errorOnUpdate, setMessage, setSeverity]);
+  }, [updating, errorOnUpdate, updatedSuccessfully, setMessage, setSeverity]);
 
   const clearForm = () => {
     setTitle('');
@@ -185,6 +186,32 @@ const UpdatePoll = ({ wrapperRef }) => {
     }
   };
 
+  const handleSharingOption = (option) => {
+    setSharingOption(option);
+    setSharingOptionError(false);
+    setShowSharingOption(false);
+  };
+
+  const handleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
+  };
+
+  const handleThumbnail = () => {
+    thumbInputFileRef.current.click();
+  };
+
+  const handleThumbnailKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleThumbnail();
+    }
+  };
+
   const validateFields = () => {
     setTitleError('');
     setSharingOptionError('');
@@ -205,11 +232,12 @@ const UpdatePoll = ({ wrapperRef }) => {
 
   const handleUpdatePoll = async () => {
     setErrorOnUpdate(false);
+    setUpdatedSuccessfully(false);
     setShowAlert(true);
     setUpdating(true);
     clearTimeout(alertTimeout);
 
-    let successfulyUpdated = true;
+    let successfullyUpdated = true;
     const isValid = validateFields();
     if (isValid) {
       const data = {
@@ -231,16 +259,17 @@ const UpdatePoll = ({ wrapperRef }) => {
         });
       } catch (error) {
         setErrorOnUpdate(true);
-        successfulyUpdated = false;
+        successfullyUpdated = false;
       }
     } else {
       setErrorOnUpdate(true);
-      successfulyUpdated = false;
+      successfullyUpdated = false;
     }
 
     setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    if (successfulyUpdated) {
+    if (successfullyUpdated) {
+      setUpdatedSuccessfully(true);
       history.push(`/polls/${pollId}`);
     }
     // Posiciona o scroll no início da página
@@ -309,10 +338,13 @@ const UpdatePoll = ({ wrapperRef }) => {
                 <Options>
                   <Option
                     onClick={() => {
-                      setSharingOption('public');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('public');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectOnPressEnter(e, handleSharingOption, 'public')
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Pública</div>
@@ -321,10 +353,17 @@ const UpdatePoll = ({ wrapperRef }) => {
                   </Option>
                   <Option
                     onClick={() => {
-                      setSharingOption('followed_profiles');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('followed_profiles');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectOnPressEnter(
+                        e,
+                        handleSharingOption,
+                        'followed_profiles'
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Perfis seguidos</div>
@@ -333,10 +372,17 @@ const UpdatePoll = ({ wrapperRef }) => {
                   </Option>
                   <Option
                     onClick={() => {
-                      setSharingOption('private');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('private');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectOnPressEnter(
+                        e,
+                        handleSharingOption,
+                        'private'
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Privada</div>
@@ -359,7 +405,13 @@ const UpdatePoll = ({ wrapperRef }) => {
             </div>
             <div className="column button-wrapper">
               <div className="file-input">
-                <label htmlFor="thumbnail">Selecione uma imagem</label>
+                <label
+                  htmlFor="thumbnail"
+                  onKeyPress={handleThumbnailKeyPress}
+                  tabIndex="0"
+                >
+                  Selecione uma imagem
+                </label>
                 <input
                   type="file"
                   id="thumbnail"
@@ -379,8 +431,8 @@ const UpdatePoll = ({ wrapperRef }) => {
         <h3>Conteúdo</h3>
         <div className="content-list">
           <ContentListContainer>
-            <ContentListWrapper ref={contentListWrapperRef}>
-              <ContentGrid content={contentList} />
+            <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
+              <ContentGrid content={contentList} tabIndex="-1" />
             </ContentListWrapper>
           </ContentListContainer>
           <CreationOptions>

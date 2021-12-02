@@ -34,7 +34,7 @@ const Layout = () => {
             <NavBarWrapper>
               <NavBar />
             </NavBarWrapper>
-            <ContentWrapper ref={contentWrapperRef}>
+            <ContentWrapper ref={contentWrapperRef} tabIndex="-1">
               <Alert />
               <Routes wrapperRef={contentWrapperRef} />
             </ContentWrapper>

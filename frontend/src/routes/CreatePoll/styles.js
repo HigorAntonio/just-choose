@@ -289,7 +289,6 @@ export const SharingOption = styled.div`
 
 export const ContentListWrapper = styled.div`
   max-height: 550px;
-  padding: 20px;
   overflow-y: auto;
 
   /* Scrollbar on Firefox */
@@ -298,6 +297,10 @@ export const ContentListWrapper = styled.div`
   /* Scrollbar on Chrome, Edge, and Safari */
   &::-webkit-scrollbar-track {
     background: var(--background-100);
+  }
+
+  > div {
+    padding: 20px;
   }
 `;
 

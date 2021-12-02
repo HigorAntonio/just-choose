@@ -75,10 +75,19 @@ function Header() {
 
   const handleUserExit = async () => {
     try {
+      history.push('/');
       await handleLogout();
       setUserProfile({});
       setShowProfileDropDown(false);
     } catch (error) {}
+  };
+
+  const handleUserExitOnKeyPress = async (e) => {
+    if (e.key === 'Enter') {
+      try {
+        await handleUserExit();
+      } catch (error) {}
+    }
   };
 
   const searchChange = (e) => {
@@ -89,9 +98,31 @@ function Header() {
     history.push(`/search?query=${search}`);
   };
 
-  const handleKeyPress = (e) => {
+  const handleSearchInputKeyPress = (e) => {
     if (e.key === 'Enter' && e.target.value) {
       handleSearch();
+    }
+  };
+
+  const handleProfileDropdownKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      document.activeElement
+        .closest('[data-profile-wrapper]')
+        .querySelector('[data-profile-image]')
+        .focus();
+      setShowProfileDropDown(false);
+    }
+  };
+
+  const handleProfileImageOnKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      setShowProfileDropDown((prevState) => !prevState);
+    }
+  };
+
+  const handleThemeSwitchOnKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      toggleTheme();
     }
   };
 
@@ -110,7 +141,7 @@ function Header() {
             placeholder="Buscar"
             value={search}
             onChange={searchChange}
-            onKeyPress={handleKeyPress}
+            onKeyPress={handleSearchInputKeyPress}
           />
           <SearchButton disabled={!search} onClick={handleSearch}>
             <FiSearch size={25} style={{ flexShrink: 0 }} />
@@ -137,7 +168,7 @@ function Header() {
                 placeholder="Buscar"
                 value={search}
                 onChange={searchChange}
-                onKeyPress={handleKeyPress}
+                onKeyPress={handleSearchInputKeyPress}
               />
               <SearchButton disabled={!search} onClick={handleSearch}>
                 <FiSearch size={25} style={{ flexShrink: 0 }} />
@@ -150,7 +181,7 @@ function Header() {
       <NavMenuWrapper>
         <NavMenu>
           {!loading && authenticated && (
-            <Link to="/list">
+            <Link to="/list" tabIndex="-1">
               <TooltipHover
                 tooltipText="Nova Lista"
                 width="80px"
@@ -169,7 +200,10 @@ function Header() {
               <SignUp onClick={handleSignUp}>Cadastrar-se</SignUp>
             </>
           )}
-          <ProfileWrapper>
+          <ProfileWrapper
+            onKeyDown={handleProfileDropdownKeyDown}
+            data-profile-wrapper
+          >
             <ClickAwayListener
               onClickAway={() => setShowProfileDropDown(false)}
             >
@@ -179,6 +213,9 @@ function Header() {
                   onClick={() =>
                     setShowProfileDropDown((prevState) => !prevState)
                   }
+                  onKeyPress={handleProfileImageOnKeyPress}
+                  tabIndex="0"
+                  data-profile-image
                 />
                 <ProfileDropDown show={showProfileDropDown}>
                   {authenticated && (
@@ -187,6 +224,7 @@ function Header() {
                         <Link
                           to={`/settings`}
                           onClick={() => setShowProfileDropDown(false)}
+                          tabIndex="-1"
                         >
                           <ProfileImage src={userProfile.profile_image_url} />
                         </Link>
@@ -208,7 +246,10 @@ function Header() {
                       </Link>
                     </>
                   )}
-                  <DropDownOption>
+                  <DropDownOption
+                    onKeyPress={handleThemeSwitchOnKeyPress}
+                    tabIndex="0"
+                  >
                     <div className="align-left">
                       <HiOutlineMoon size={20} style={{ flexShrink: 0 }} />{' '}
                     </div>
@@ -230,6 +271,7 @@ function Header() {
                         onHandleColor={colors['primary-400']}
                         offHandleColor={colors.text}
                         checkedcolor={colors['primary-400']}
+                        tabIndex="-1"
                       />
                     </div>
                   </DropDownOption>
@@ -239,6 +281,8 @@ function Header() {
                       <DropDownOption
                         className="hover"
                         onClick={handleUserExit}
+                        onKeyPress={handleUserExitOnKeyPress}
+                        tabIndex="0"
                       >
                         <div className="align-left">
                           <BiLogOut size={20} style={{ flexShrink: 0 }} />{' '}

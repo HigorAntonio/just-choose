@@ -224,7 +224,7 @@ export const ButtonWrapper = styled.div`
   background: var(--background-600);
 `;
 
-export const ProfileButton = styled.div`
+export const ProfileButton = styled.button`
   display: flex;
   align-items: center;
   font-weight: bold;

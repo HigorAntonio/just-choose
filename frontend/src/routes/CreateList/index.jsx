@@ -74,6 +74,7 @@ const CreateList = ({ wrapperRef }) => {
   const [showListPreview, setShowListPreview] = useState(false);
   const [creating, setCreating] = useState(false);
   const [errorOnCreate, setErrorOnCreate] = useState(false);
+  const [createdSuccessfully, setCreatedSuccessfully] = useState(false);
   const [titleError, setTitleError] = useState('');
   const [contentError, setContentError] = useState('');
 
@@ -111,11 +112,11 @@ const CreateList = ({ wrapperRef }) => {
     } else if (errorOnCreate) {
       setSeverity('error');
       setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
-    } else {
+    } else if (createdSuccessfully) {
       setSeverity('success');
       setMessage('Lista criada com sucesso.');
     }
-  }, [creating, errorOnCreate, setMessage, setSeverity]);
+  }, [creating, errorOnCreate, createdSuccessfully, setMessage, setSeverity]);
 
   const handleTitle = (e) => {
     setTitle(e.target.value);
@@ -235,6 +236,7 @@ const CreateList = ({ wrapperRef }) => {
 
   const handleCreateList = async () => {
     setErrorOnCreate(false);
+    setCreatedSuccessfully(false);
     setShowAlert(true);
     setCreating(true);
     clearTimeout(alertTimeout);
@@ -269,6 +271,7 @@ const CreateList = ({ wrapperRef }) => {
     setCreating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (listId) {
+      setCreatedSuccessfully(true);
       return history.push(`/lists/${listId}`);
     }
     // Posiciona o scroll no início da página

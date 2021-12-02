@@ -335,6 +335,12 @@ const ShowPoll = ({ wrapperRef }) => {
     } catch (error) {}
   };
 
+  const handleContentEnterKey = (e, href) => {
+    if (e.key === 'Enter') {
+      window.open(href);
+    }
+  };
+
   if (loading) {
     return <ShowListSkeleton />;
   }
@@ -354,7 +360,7 @@ const ShowPoll = ({ wrapperRef }) => {
           <HeaderButtons>
             <div>
               {showListOption && (
-                <Link to={`/lists/${poll.content_list_id}`}>
+                <Link to={`/lists/${poll.content_list_id}`} tabIndex="-1">
                   <HeaderButton title="Visualizar lista de conteúdo">
                     <IoMdListBox
                       size={'25px'}
@@ -382,7 +388,7 @@ const ShowPoll = ({ wrapperRef }) => {
                       />
                     )}
                   </HeaderButton>
-                  <Link to={`/polls/${pollId}/update`}>
+                  <Link to={`/polls/${pollId}/update`} tabIndex="-1">
                     <HeaderButton title="Editar votação">
                       <MdSettings
                         size={'25px'}
@@ -505,7 +511,11 @@ const ShowPoll = ({ wrapperRef }) => {
                     }}
                   >
                     <div className="bodyPosition">{i + 1}</div>
-                    <div className="bodyTitle">
+                    <div
+                      className="bodyTitle"
+                      onKeyPress={(e) => handleContentEnterKey(e, href)}
+                      tabIndex="0"
+                    >
                       <div className="posterWrapper">
                         <ContentCardSimple src={src} title={c.title} />
                       </div>

@@ -1,12 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  Link,
-  Switch,
-  Route,
-  useRouteMatch,
-  useLocation,
-  useHistory,
-} from 'react-router-dom';
+import { useRouteMatch, useLocation, useHistory } from 'react-router-dom';
 
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import SettingsProfile from '../../components/SettingsProfile';
@@ -45,6 +38,18 @@ const Settings = ({ wrapperRef }) => {
     history.push(path);
   };
 
+  const handleNavOnAuxClick = (e, href) => {
+    if (e.button == 1) {
+      window.open(href);
+    }
+  };
+
+  const handleOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
+    }
+  };
+
   return (
     <Container>
       <Header>
@@ -56,6 +61,11 @@ const Settings = ({ wrapperRef }) => {
             <div
               className={location.pathname === `${url}/profile` ? 'active' : ''}
               onClick={() => handlePush(`${url}/profile`)}
+              onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/profile`)}
+              onKeyPress={(e) => {
+                handleOnPressEnter(e, handlePush, `${url}/profile`);
+              }}
+              tabIndex="0"
             >
               Perfil
             </div>
@@ -64,12 +74,22 @@ const Settings = ({ wrapperRef }) => {
                 location.pathname === `${url}/security` ? 'active' : ''
               }
               onClick={() => handlePush(`${url}/security`)}
+              onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/security`)}
+              onKeyPress={(e) => {
+                handleOnPressEnter(e, handlePush, `${url}/security`);
+              }}
+              tabIndex="0"
             >
               Segurança e privacidade
             </div>
             <div
               className={location.pathname === `${url}/devices` ? 'active' : ''}
               onClick={() => handlePush(`${url}/devices`)}
+              onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/devices`)}
+              onKeyPress={(e) => {
+                handleOnPressEnter(e, handlePush, `${url}/devices`);
+              }}
+              tabIndex="0"
             >
               Seus dispositivos
             </div>
@@ -77,23 +97,13 @@ const Settings = ({ wrapperRef }) => {
         </HorizontalDragScrolling>
       </NavigationWrapper>
       <Main>
-        <Switch>
-          <Route
-            exact
-            path={`${path}/profile`}
-            component={() => <SettingsProfile wrapperRef={wrapperRef} />}
-          />
-          <Route
-            exact
-            path={`${path}/security`}
-            component={() => <SettingsSecurity wrapperRef={wrapperRef} />}
-          />
-          <Route
-            exact
-            path={`${path}/devices`}
-            component={() => <h3>Devices</h3>}
-          />
-        </Switch>
+        {location.pathname === `${path}/profile` && (
+          <SettingsProfile wrapperRef={wrapperRef} />
+        )}
+        {location.pathname === `${path}/security` && (
+          <SettingsSecurity wrapperRef={wrapperRef} />
+        )}
+        {location.pathname === `${path}/devices` && <h3>Devices</h3>}
       </Main>
     </Container>
   );

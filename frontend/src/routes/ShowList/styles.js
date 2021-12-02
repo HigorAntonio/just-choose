@@ -68,9 +68,9 @@ export const HeaderButtons = styled.div`
   > div {
     display: flex;
 
-    > div + div,
-    a + div,
-    div + a,
+    > button + button,
+    a + button,
+    button + a,
     a + a {
       margin-left: 10px;
     }
@@ -88,7 +88,7 @@ export const HeaderButtons = styled.div`
     flex-direction: column;
 
     > div {
-      > div {
+      > button {
         flex: 1;
       }
     }
@@ -100,7 +100,7 @@ export const HeaderButtons = styled.div`
   }
 `;
 
-export const HeaderButton = styled.div`
+export const HeaderButton = styled.button`
   height: 100%;
   display: flex;
   align-items: center;
@@ -128,7 +128,7 @@ export const HeaderButton = styled.div`
   }
 `;
 
-export const HeaderDeleteButton = styled.div`
+export const HeaderDeleteButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;

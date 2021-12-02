@@ -295,8 +295,14 @@ export const ProfileDropDown = styled.div`
 
   ${(props) =>
     props.show
-      ? 'opacity: 1; pointer-events: all; transform: translateY(100%);'
+      ? 'opacity: 1; pointer-events: initial; transform: translateY(100%);'
       : 'opacity: 0; pointer-events: none; transform: translateY(90%);'}
+
+  /* Faz com que as opções do dropdown que tenham a propriedade
+  tabindex="0" por padrão (input, button, .etc) se tornem não 'focaveis'
+  (não serão selecionadas através da navegação com a tecla tab)*/
+  ${(props) =>
+    props.show ? '> * { visibility: visible; }' : '> * { visibility: hidden; }'}
   transition: opacity 0.4s ease, transform 0.4s ease;
 
   .hover:hover {

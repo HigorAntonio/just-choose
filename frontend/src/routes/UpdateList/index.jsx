@@ -90,6 +90,7 @@ const UpdateList = ({ wrapperRef }) => {
   const [showListPreview, setShowListPreview] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [errorOnUpdate, setErrorOnUpdate] = useState(false);
+  const [updatedSuccessfully, setUpdatedSuccessfully] = useState(false);
   const [titleError, setTitleError] = useState('');
   const [contentError, setContentError] = useState('');
 
@@ -176,11 +177,11 @@ const UpdateList = ({ wrapperRef }) => {
       setMessage(
         'Não foi possível atualizar a lista. Por favor, tente novamente.'
       );
-    } else {
+    } else if (updatedSuccessfully) {
       setSeverity('success');
       setMessage('Lista atualizada com sucesso.');
     }
-  }, [updating, errorOnUpdate, setMessage, setSeverity]);
+  }, [updating, errorOnUpdate, updatedSuccessfully, setMessage, setSeverity]);
 
   const clearForm = () => {
     setTitle('');
@@ -308,11 +309,12 @@ const UpdateList = ({ wrapperRef }) => {
 
   const handleUpdateList = async () => {
     setErrorOnUpdate(false);
+    setUpdatedSuccessfully(false);
     setShowAlert(true);
     setUpdating(true);
     clearTimeout(alertTimeout);
 
-    let successfulyUpdated = true;
+    let successfullyUpdated = true;
     const isValid = validateFields();
     if (isValid) {
       const data = {
@@ -335,16 +337,17 @@ const UpdateList = ({ wrapperRef }) => {
         });
       } catch (error) {
         setErrorOnUpdate(true);
-        successfulyUpdated = false;
+        successfullyUpdated = false;
       }
     } else {
       setErrorOnUpdate(true);
-      successfulyUpdated = false;
+      successfullyUpdated = false;
     }
 
     setUpdating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    if (successfulyUpdated) {
+    if (successfullyUpdated) {
+      setUpdatedSuccessfully(true);
       history.push(`/lists/${listId}`);
     }
     // Posiciona o scroll no início da página

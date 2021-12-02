@@ -67,6 +67,7 @@ const CreatePoll = ({ wrapperRef }) => {
   const [contentList, setContentList] = useState([]);
   const [creating, setCreating] = useState(false);
   const [errorOnCreate, setErrorOnCreate] = useState(false);
+  const [createdSuccessfully, setCreatedSuccessfully] = useState(false);
   const [titleError, setTitleError] = useState('');
 
   const contentListWrapperRef = useRef();
@@ -114,11 +115,11 @@ const CreatePoll = ({ wrapperRef }) => {
       setMessage(
         'Não foi possível criar a votação. Por favor, tente novamente.'
       );
-    } else {
+    } else if (createdSuccessfully) {
       setSeverity('success');
       setMessage('Votação criada com sucesso.');
     }
-  }, [creating, errorOnCreate, setMessage, setSeverity]);
+  }, [creating, errorOnCreate, createdSuccessfully, setMessage, setSeverity]);
 
   const clearForm = () => {
     setTitle('');
@@ -155,6 +156,32 @@ const CreatePoll = ({ wrapperRef }) => {
     }
   };
 
+  const handleSharingOption = (option) => {
+    setSharingOption(option);
+    setSharingOptionError(false);
+    setShowSharingOption(false);
+  };
+
+  const handleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
+  };
+
+  const handleThumbnail = () => {
+    thumbInputFileRef.current.click();
+  };
+
+  const handleThumbnailKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleThumbnail();
+    }
+  };
+
   const validateFields = () => {
     setTitleError('');
     setSharingOptionError('');
@@ -179,6 +206,7 @@ const CreatePoll = ({ wrapperRef }) => {
 
   const handleCreatePoll = async () => {
     setErrorOnCreate(false);
+    setCreatedSuccessfully(false);
     setShowAlert(true);
     setCreating(true);
     clearTimeout(alertTimeout);
@@ -213,6 +241,7 @@ const CreatePoll = ({ wrapperRef }) => {
     setCreating(false);
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (pollId) {
+      setCreatedSuccessfully(true);
       return history.push(`/polls/${pollId}`);
     }
     console.log('Reposicionando scroll...');
@@ -282,10 +311,13 @@ const CreatePoll = ({ wrapperRef }) => {
                 <Options>
                   <Option
                     onClick={() => {
-                      setSharingOption('public');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('public');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectOnPressEnter(e, handleSharingOption, 'public')
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Pública</div>
@@ -294,10 +326,17 @@ const CreatePoll = ({ wrapperRef }) => {
                   </Option>
                   <Option
                     onClick={() => {
-                      setSharingOption('followed_profiles');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('followed_profiles');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectOnPressEnter(
+                        e,
+                        handleSharingOption,
+                        'followed_profiles'
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Perfis seguidos</div>
@@ -306,10 +345,17 @@ const CreatePoll = ({ wrapperRef }) => {
                   </Option>
                   <Option
                     onClick={() => {
-                      setSharingOption('private');
-                      setSharingOptionError(false);
-                      setShowSharingOption(false);
+                      handleSharingOption('private');
                     }}
+                    onKeyPress={(e) =>
+                      handleSelectOnPressEnter(
+                        e,
+                        handleSharingOption,
+                        'private'
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
                   >
                     <SharingOption>
                       <div>Privada</div>
@@ -332,7 +378,13 @@ const CreatePoll = ({ wrapperRef }) => {
             </div>
             <div className="column button-wrapper">
               <div className="file-input">
-                <label htmlFor="thumbnail">Selecione uma imagem</label>
+                <label
+                  htmlFor="thumbnail"
+                  onKeyPress={handleThumbnailKeyPress}
+                  tabIndex="0"
+                >
+                  Selecione uma imagem
+                </label>
                 <input
                   type="file"
                   id="thumbnail"
@@ -352,8 +404,8 @@ const CreatePoll = ({ wrapperRef }) => {
         <h3>Conteúdo</h3>
         <div className="content-list">
           <ContentListContainer>
-            <ContentListWrapper ref={contentListWrapperRef}>
-              <ContentGrid content={contentList} />
+            <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
+              <ContentGrid content={contentList} tabIndex="-1" />
             </ContentListWrapper>
           </ContentListContainer>
           <CreationOptions>

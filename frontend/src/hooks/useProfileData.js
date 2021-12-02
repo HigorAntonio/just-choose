@@ -11,6 +11,7 @@ const useProfileData = () => {
 
   const refreshUserProfileData = useCallback(async () => {
     try {
+      setLoading(true);
       if (userId) {
         const { data } = await justChooseApi.get(`/users/${userId}`);
         setUserProfile(data);

@@ -312,7 +312,7 @@ const ShowList = ({ wrapperRef }) => {
             </div>
             {userId === contentList.user_id && (
               <div>
-                <Link to={`/lists/${listId}/poll`}>
+                <Link to={`/lists/${listId}/poll`} tabIndex="-1">
                   <HeaderButton title="Criar uma votação a partir da lista">
                     <FaVoteYea
                       size={'25px'}
@@ -320,7 +320,7 @@ const ShowList = ({ wrapperRef }) => {
                     />
                   </HeaderButton>
                 </Link>
-                <Link to={`/lists/${listId}/update`}>
+                <Link to={`/lists/${listId}/update`} tabIndex="-1">
                   <HeaderButton title="Editar lista">
                     <MdSettings
                       size={'25px'}
