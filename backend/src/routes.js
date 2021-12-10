@@ -158,6 +158,7 @@ routes.post(
   isUserActive,
   VoteController.create
 );
+routes.get('/votes', authorization, isUserActive, VoteController.index);
 routes.get('/polls/:id/votes', authorization, VoteController.show);
 routes.delete(
   '/polls/:id/votes',

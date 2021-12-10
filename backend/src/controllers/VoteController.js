@@ -1,5 +1,7 @@
 const knex = require('../database');
 const isUserFollowing = require('../utils/users/isUserFollowing');
+const getVotes = require('../utils/votes/getVotes');
+const getVoteOrderByQuery = require('../utils/votes/getVoteOrderByQuery');
 
 module.exports = {
   async create(req, res) {
@@ -85,6 +87,48 @@ module.exports = {
       });
 
       return res.sendStatus(201);
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
+
+  async index(req, res) {
+    try {
+      const userId = req.userId;
+
+      const { page = 1, page_size = 30, sort_by = 'updated.desc' } = req.query;
+
+      const errors = [];
+
+      if (isNaN(page)) {
+        errors.push('O parâmetro page deve ser um número');
+      } else if (page < 1) {
+        errors.push('O parâmetro page inválido. Min 1');
+      }
+      if (isNaN(page_size)) {
+        errors.push('O parâmetro page_size deve ser um número');
+      } else if (page_size < 1 || page_size > 100) {
+        errors.push('Parâmetro page_size inválido. Min 1, Max 100');
+      }
+      if (errors.length > 0) {
+        return res.status(400).json({ erros: errors });
+      }
+
+      const { votes, count } = await getVotes(
+        userId,
+        page_size,
+        page,
+        getVoteOrderByQuery(sort_by)
+      );
+
+      const total_pages = Math.ceil(count / page_size);
+      return res.json({
+        page: parseInt(page),
+        page_size: parseInt(page_size),
+        total_pages: total_pages === 0 ? 1 : total_pages,
+        total_results: parseInt(count),
+        results: votes,
+      });
     } catch (error) {
       return res.sendStatus(500);
     }
