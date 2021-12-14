@@ -244,7 +244,7 @@ const CreatePoll = ({ wrapperRef }) => {
       setCreatedSuccessfully(true);
       return history.push(`/polls/${pollId}`);
     }
-    console.log('Reposicionando scroll...');
+
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;

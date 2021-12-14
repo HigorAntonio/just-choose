@@ -1,11 +1,16 @@
 import React from 'react';
 
-import { Container } from './styles';
+import { Container, CardWrapper, Top, ThumbWrapper, Bottom } from './styles';
 
 const UserProfileContentCard = () => {
   return (
     <Container>
-      <div />
+      <CardWrapper>
+        <Top>
+          <ThumbWrapper></ThumbWrapper>
+        </Top>
+        <Bottom></Bottom>
+      </CardWrapper>
     </Container>
   );
 };

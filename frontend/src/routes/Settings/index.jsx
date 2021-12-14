@@ -7,6 +7,7 @@ import SettingsSecurity from '../../components/SettingsSecurity';
 
 import {
   Container,
+  StickyWrapper,
   Header,
   NavigationWrapper,
   Navigation,
@@ -32,14 +33,14 @@ const Settings = ({ wrapperRef }) => {
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
     wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+  }, [wrapperRef, location]);
 
   const handlePush = (path) => {
     history.push(path);
   };
 
   const handleNavOnAuxClick = (e, href) => {
-    if (e.button == 1) {
+    if (e.button === 1) {
       window.open(href);
     }
   };
@@ -52,50 +53,56 @@ const Settings = ({ wrapperRef }) => {
 
   return (
     <Container>
-      <Header>
-        <h1>Configurações</h1>
-      </Header>
-      <NavigationWrapper>
-        <HorizontalDragScrolling>
-          <Navigation>
-            <div
-              className={location.pathname === `${url}/profile` ? 'active' : ''}
-              onClick={() => handlePush(`${url}/profile`)}
-              onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/profile`)}
-              onKeyPress={(e) => {
-                handleOnPressEnter(e, handlePush, `${url}/profile`);
-              }}
-              tabIndex="0"
-            >
-              Perfil
-            </div>
-            <div
-              className={
-                location.pathname === `${url}/security` ? 'active' : ''
-              }
-              onClick={() => handlePush(`${url}/security`)}
-              onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/security`)}
-              onKeyPress={(e) => {
-                handleOnPressEnter(e, handlePush, `${url}/security`);
-              }}
-              tabIndex="0"
-            >
-              Segurança e privacidade
-            </div>
-            <div
-              className={location.pathname === `${url}/devices` ? 'active' : ''}
-              onClick={() => handlePush(`${url}/devices`)}
-              onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/devices`)}
-              onKeyPress={(e) => {
-                handleOnPressEnter(e, handlePush, `${url}/devices`);
-              }}
-              tabIndex="0"
-            >
-              Seus dispositivos
-            </div>
-          </Navigation>
-        </HorizontalDragScrolling>
-      </NavigationWrapper>
+      <StickyWrapper>
+        <Header>
+          <h1>Configurações</h1>
+        </Header>
+        <NavigationWrapper>
+          <HorizontalDragScrolling>
+            <Navigation>
+              <div
+                className={
+                  location.pathname === `${url}/profile` ? 'active' : ''
+                }
+                onClick={() => handlePush(`${url}/profile`)}
+                onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/profile`)}
+                onKeyPress={(e) => {
+                  handleOnPressEnter(e, handlePush, `${url}/profile`);
+                }}
+                tabIndex="0"
+              >
+                Perfil
+              </div>
+              <div
+                className={
+                  location.pathname === `${url}/security` ? 'active' : ''
+                }
+                onClick={() => handlePush(`${url}/security`)}
+                onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/security`)}
+                onKeyPress={(e) => {
+                  handleOnPressEnter(e, handlePush, `${url}/security`);
+                }}
+                tabIndex="0"
+              >
+                Segurança e privacidade
+              </div>
+              <div
+                className={
+                  location.pathname === `${url}/devices` ? 'active' : ''
+                }
+                onClick={() => handlePush(`${url}/devices`)}
+                onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/devices`)}
+                onKeyPress={(e) => {
+                  handleOnPressEnter(e, handlePush, `${url}/devices`);
+                }}
+                tabIndex="0"
+              >
+                Seus dispositivos
+              </div>
+            </Navigation>
+          </HorizontalDragScrolling>
+        </NavigationWrapper>
+      </StickyWrapper>
       <Main>
         {location.pathname === `${path}/profile` && (
           <SettingsProfile wrapperRef={wrapperRef} />

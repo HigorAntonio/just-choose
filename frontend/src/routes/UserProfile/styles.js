@@ -4,11 +4,18 @@ export const Container = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 30px;
-  overflow-x: hidden;
+  background: var(--background-410);
+`;
+
+export const StickyWrapper = styled.div`
+  width: 100%;
+  background: var(--background-410);
+  position: sticky;
+  top: 0;
+  padding: 30px 30px 0 30px;
 
   @media (max-width: 768px) {
-    padding: 20px 15px;
+    padding: 20px 15px 0 15px;
   }
 `;
 
@@ -151,8 +158,9 @@ export const Main = styled.div`
   width: 100%;
   max-width: 2000px;
   margin-top: 10px;
+  padding: 0 30px 30px 30px;
 
-  > div {
-    margin-bottom: 20px;
+  @media (max-width: 768px) {
+    padding: 0 15px 20px 15px;
   }
 `;

@@ -3,17 +3,24 @@ import styled from 'styled-components';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
+  background: var(--background-410);
+`;
+
+export const StickyWrapper = styled.div`
+  width: 100%;
+  background: var(--background-410);
+  position: sticky;
+  top: 0;
+  padding: 30px 30px 0 30px;
+
+  @media (max-width: 768px) {
+    padding: 20px 15px 0 15px;
+  }
 `;
 
 export const Header = styled.header`
-  padding: 30px 30px 10px 30px;
-
   > h1 {
     font-size: 36px;
-  }
-
-  @media (max-width: 768px) {
-    padding: 30px 20px 10px 20px;
   }
 `;
 
@@ -21,12 +28,7 @@ export const NavigationWrapper = styled.div`
   height: 4rem;
   display: flex;
   align-items: center;
-  margin: 0 30px;
   border-bottom: 1px solid var(--background-700);
-
-  @media (max-width: 768px) {
-    margin: 0 20px;
-  }
 `;
 
 export const Navigation = styled.div`
@@ -74,6 +76,6 @@ export const Main = styled.main`
   }
 
   @media (max-width: 768px) {
-    padding: 20px;
+    padding: 20px 15px;
   }
 `;
