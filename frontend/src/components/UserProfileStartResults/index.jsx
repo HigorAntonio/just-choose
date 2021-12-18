@@ -2,11 +2,9 @@ import React, { useState, useContext, useEffect } from 'react';
 
 import { ViewportContext } from '../../context/ViewportContext';
 
-import UserProfileContentCard from '../UserProfileContentCard';
-
 import { Container, TitleWrapper, Title, Main } from './styles';
 
-const UserProfileStartResults = ({ title }) => {
+const UserProfileStartResults = ({ title, children }) => {
   const { width } = useContext(ViewportContext);
 
   const [lastContentIndex, setLastContentIndex] = useState(0);
@@ -17,7 +15,6 @@ const UserProfileStartResults = ({ title }) => {
   }, [content]);
 
   useEffect(() => {
-    console.debug('width:', width);
     if (width < 547) {
       setLastContentIndex(1);
     } else if (width < 938) {
@@ -42,7 +39,9 @@ const UserProfileStartResults = ({ title }) => {
       </TitleWrapper>
       <Main>
         {content.map((c, i) =>
-          i < lastContentIndex ? <UserProfileContentCard key={c} /> : ''
+          i < lastContentIndex
+            ? React.cloneElement(children, { ...children.props, key: c })
+            : ''
         )}
       </Main>
     </Container>

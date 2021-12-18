@@ -65,7 +65,7 @@ const SearchContentListCard = ({ contentList }) => {
         </Link>
       </ThumbnailWrapper>
       <TextWrapper>
-        <Title>
+        <Title title={title}>
           <Link to={`/lists/${listId}`}>{title}</Link>
         </Title>
         <Meta>

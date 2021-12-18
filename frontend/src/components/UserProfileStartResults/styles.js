@@ -19,7 +19,7 @@ export const Main = styled.div`
   min-width: 100%;
 
   > div {
-    flex: 1 0 auto;
+    flex: 1;
     padding: 0 0.5rem;
   }
 

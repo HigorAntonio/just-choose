@@ -11,9 +11,7 @@ import {
   Bottom,
   Title,
   Meta,
-  Likes,
-  MetaSeparator,
-  Forks,
+  PollStatus,
 } from './styles';
 
 const formatCount = (votes) => {
@@ -24,17 +22,17 @@ const formatCount = (votes) => {
   if (votes >= 1e12) return +(votes / 1e12).toFixed(1) + 'T';
 };
 
-const UserProfileContentCard = ({
-  contentList = {
+const UserProfilePollCard = ({
+  poll = {
     id: 1,
     thumbnail:
-      'http://localhost:3333/files/06f301969844b23c331f71b8d2741784-black_mirror.jpg',
-    title: 'JINGLE ALL THE WAY | Siga @patriota nas redes',
-    likes: 342,
-    forks: 138,
+      'http://localhost:3333/files/92024286d8505464992c35b468f3f2cc-BobaFett.jpg',
+    title:
+      'Web App Vulnerabilities - DevSecOps Course for Beginners freeCodeCamp.org',
+    is_active: true,
   },
 }) => {
-  const { id: listId, thumbnail, title, likes, forks } = contentList;
+  const { id: pollId, thumbnail, title, is_active: isActive } = poll;
 
   const [thumbnailError, setThumbnailError] = useState(false);
 
@@ -55,15 +53,7 @@ const UserProfileContentCard = ({
         <Bottom>
           <Title title={title}>{title}</Title>
           <Meta>
-            <Likes>
-              {`${formatCount(likes)}`.replace('.', ',')}{' '}
-              {likes === 1 ? 'curtida' : 'curtidas'}
-            </Likes>
-            <MetaSeparator>•</MetaSeparator>
-            <Forks>
-              {`${formatCount(forks)}`.replace('.', ',')}{' '}
-              {forks === 1 ? 'fork' : 'forks'}
-            </Forks>
+            <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
           </Meta>
         </Bottom>
       </CardWrapper>
@@ -71,4 +61,4 @@ const UserProfileContentCard = ({
   );
 };
 
-export default UserProfileContentCard;
+export default UserProfilePollCard;

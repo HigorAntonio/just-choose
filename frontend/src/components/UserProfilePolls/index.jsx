@@ -1,6 +1,6 @@
 import React from 'react';
 
-import UserProfileContentCard from '../UserProfileContentCard';
+import UserProfilePollCard from '../UserProfilePollCard';
 import UserProfileGrid from '../UserProfileGrid';
 
 import { Container } from './styles';
@@ -10,7 +10,7 @@ const UserProfilePolls = () => {
     <Container>
       <UserProfileGrid minWidth="29rem" gridGap="1rem">
         {[...Array(30).keys()].map((c) => (
-          <UserProfileContentCard key={c} />
+          <UserProfilePollCard key={c} />
         ))}
       </UserProfileGrid>
     </Container>

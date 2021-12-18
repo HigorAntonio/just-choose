@@ -54,7 +54,7 @@ const SearchPollCard = ({ poll }) => {
         </Link>
       </ThumbnailWrapper>
       <TextWrapper>
-        <Title>
+        <Title title={title}>
           <Link to={`/polls/${pollId}`}>{title}</Link>
         </Title>
         <Meta>

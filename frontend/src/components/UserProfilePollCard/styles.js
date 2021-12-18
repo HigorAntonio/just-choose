@@ -85,10 +85,6 @@ export const MetaSeparator = styled.span`
   margin: 0 4px;
 `;
 
-export const Likes = styled.span`
-  font-size: 1.4rem;
-`;
-
-export const Forks = styled.span`
+export const PollStatus = styled.span`
   font-size: 1.4rem;
 `;
