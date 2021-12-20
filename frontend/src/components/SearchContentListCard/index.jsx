@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
+import { fromNow } from '../../utils/dataUtility';
+
 import {
   Container,
   ThumbnailWrapper,
   Thumbnail,
+  TimeFromNow,
   TextWrapper,
   Title,
   Meta,
@@ -41,6 +44,7 @@ const SearchContentListCard = ({ contentList }) => {
     thumbnail,
     likes,
     forks,
+    updated_at,
   } = contentList;
 
   const [profileImageError, setProfileImageError] = useState(false);
@@ -62,6 +66,7 @@ const SearchContentListCard = ({ contentList }) => {
             error={thumbnailError}
           />
           {thumbnailError && <BsImage />}
+          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
         </Link>
       </ThumbnailWrapper>
       <TextWrapper>

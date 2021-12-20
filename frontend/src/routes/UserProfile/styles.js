@@ -13,6 +13,7 @@ export const StickyWrapper = styled.div`
   position: sticky;
   top: 0;
   padding: 30px 30px 0 30px;
+  z-index: 300;
 
   @media (max-width: 768px) {
     padding: 20px 15px 0 15px;
@@ -157,7 +158,7 @@ export const Navigation = styled.div`
 export const Main = styled.div`
   width: 100%;
   max-width: 2000px;
-  margin-top: 10px;
+  margin-top: 20px;
   padding: 0 30px 30px 30px;
 
   @media (max-width: 768px) {

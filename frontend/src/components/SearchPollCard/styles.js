@@ -16,6 +16,7 @@ export const ThumbnailWrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-right: 20px;
+  position: relative;
 
   > a {
     width: 100%;
@@ -38,6 +39,17 @@ export const Thumbnail = styled.img`
   object-fit: cover;
   flex-shrink: 0;
   ${(props) => props.error && 'display: none;'}
+`;
+
+export const TimeFromNow = styled.div`
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 1.4rem;
+  color: var(--white);
+  padding: 2px 4px;
+  border-radius: 2px;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
 `;
 
 export const TextWrapper = styled.div`

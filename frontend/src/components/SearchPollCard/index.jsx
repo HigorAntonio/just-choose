@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
+import { fromNow } from '../../utils/dataUtility';
+
 import {
   Container,
   ThumbnailWrapper,
   Thumbnail,
+  TimeFromNow,
   TextWrapper,
   Title,
   Meta,
@@ -30,6 +33,7 @@ const SearchPollCard = ({ poll }) => {
     description,
     thumbnail,
     is_active: isActive,
+    updated_at,
   } = poll;
 
   const [profileImageError, setProfileImageError] = useState(false);
@@ -51,6 +55,7 @@ const SearchPollCard = ({ poll }) => {
             error={thumbnailError}
           />
           {thumbnailError && <BsImage />}
+          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
         </Link>
       </ThumbnailWrapper>
       <TextWrapper>

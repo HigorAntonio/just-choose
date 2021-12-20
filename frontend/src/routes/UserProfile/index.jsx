@@ -257,10 +257,10 @@ const UserProfile = ({ wrapperRef }) => {
           <UserProfileStart />
         )}
         {location.pathname === `${path.replace(':id', profileId)}/lists` && (
-          <UserProfileLists />
+          <UserProfileLists profileId={profileId} />
         )}
         {location.pathname === `${path.replace(':id', profileId)}/polls` && (
-          <UserProfilePolls />
+          <UserProfilePolls profileId={profileId} />
         )}
         {location.pathname ===
           `${path.replace(':id', profileId)}/following` && (

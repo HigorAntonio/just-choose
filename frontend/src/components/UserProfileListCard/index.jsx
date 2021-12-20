@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { BsImage } from 'react-icons/bs';
 
+import { fromNow } from '../../utils/dataUtility';
+
 import {
   Container,
   CardWrapper,
@@ -24,17 +26,15 @@ const formatCount = (votes) => {
   if (votes >= 1e12) return +(votes / 1e12).toFixed(1) + 'T';
 };
 
-const UserProfileContentCard = ({
-  contentList = {
-    id: 1,
-    thumbnail:
-      'http://localhost:3333/files/06f301969844b23c331f71b8d2741784-black_mirror.jpg',
-    title: 'JINGLE ALL THE WAY | Siga @patriota nas redes',
-    likes: 342,
-    forks: 138,
-  },
-}) => {
-  const { id: listId, thumbnail, title, likes, forks } = contentList;
+const UserProfileListCard = ({ contentList }) => {
+  const {
+    id: listId,
+    thumbnail,
+    title,
+    likes,
+    forks,
+    updated_at,
+  } = contentList;
 
   const [thumbnailError, setThumbnailError] = useState(false);
 
@@ -50,7 +50,7 @@ const UserProfileContentCard = ({
             />
             {thumbnailError && <BsImage />}
           </ThumbWrapper>
-          <TimeFromNow>anteontem</TimeFromNow>
+          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
         </Top>
         <Bottom>
           <Title title={title}>{title}</Title>
@@ -71,4 +71,4 @@ const UserProfileContentCard = ({
   );
 };
 
-export default UserProfileContentCard;
+export default UserProfileListCard;

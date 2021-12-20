@@ -2,19 +2,7 @@ import styled from 'styled-components';
 
 export const Container = styled.div``;
 
-export const CardWrapper = styled.div`
-  /* background: var(--background-500); */
-  /* width: 100%;
-  height: 100%;
-
-  &:before {
-    content: '';
-    display: block;
-    height: 0;
-    width: 0;
-    padding-bottom: calc(252 / 320 * 100%);
-  } */
-`;
+export const CardWrapper = styled.div``;
 
 export const Top = styled.div`
   position: relative;
@@ -23,31 +11,35 @@ export const Top = styled.div`
 export const ThumbWrapper = styled.div`
   background: var(--background-600);
   width: 100%;
-  height: 100%;
+  height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-
-  &:before {
-    content: '';
-    display: block;
-    height: 0;
-    width: 0;
-    padding-bottom: calc(180 / 320 * 100%);
-  }
+  padding-top: calc(9 / 16 * 100%);
+  position: relative;
+  overflow: hidden;
 
   > svg {
-    width: 25%;
-    height: 25%;
+    width: 50%;
+    height: 50%;
     flex-shrink: 0;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
   }
 `;
 
 export const Thumbnail = styled.img`
-  width: 100%;
-  height: 100%;
+  width: auto;
+  max-width: 100%;
+  height: auto;
   object-fit: cover;
   flex-shrink: 0;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
   ${(props) => props.error && 'display: none;'}
 `;
 
