@@ -58,10 +58,10 @@ function Header() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    if (query) {
+    if (location.pathname === '/search' && query) {
       setSearch(query);
     }
-  }, [query]);
+  }, [query, location]);
 
   const handleSignIn = () => {
     setShowSignModal(true);

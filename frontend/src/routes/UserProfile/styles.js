@@ -9,6 +9,7 @@ export const Container = styled.div`
 
 export const StickyWrapper = styled.div`
   width: 100%;
+  max-width: 2000px;
   background: var(--background-410);
   position: sticky;
   top: 0;

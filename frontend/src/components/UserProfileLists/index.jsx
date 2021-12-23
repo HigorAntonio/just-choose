@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import { GoSearch } from 'react-icons/go';
 
+import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
 import SingleOptionSelect from '../SingleOptionSelect';
 import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
 import UserProfileListCard from '../UserProfileListCard';
@@ -50,33 +51,18 @@ const UserProfileLists = ({ profileId }) => {
   });
   const [showSortOptions, setShowSortOptions] = useState(false);
 
-  const getNewUrl = useCallback(
-    (queryKey, queryValue) => {
-      const queryParamsKeys = Object.keys(queryParams);
-      const queryParamsValues = Object.values(queryParams);
-
-      if (!queryParamsKeys.includes(queryKey)) {
-        queryParamsKeys.push(queryKey);
-        queryParamsValues.push(queryValue);
-      }
-
-      const newPath = `${location.pathname}${queryParamsKeys
-        .map((key, i) => {
-          const value = key === queryKey ? queryValue : queryParamsValues[i];
-
-          return i === 0 ? `?${key}=${value}` : `&${key}=${value}`;
-        })
-        .join('')}`;
-      return newPath;
-    },
-    [queryParams, location]
-  );
-
   useEffect(() => {
     if (!isSortValid(sort)) {
-      history.replace(getNewUrl('sort', 'updated.desc'));
+      history.replace(
+        setQueryParamAndGetNewUrl(
+          location.pathname,
+          queryParams,
+          'sort',
+          'updated.desc'
+        )
+      );
     }
-  }, [sort, history, getNewUrl]);
+  }, [sort, history, location, queryParams]);
 
   useEffect(() => {
     setParams({
@@ -91,14 +77,28 @@ const UserProfileLists = ({ profileId }) => {
 
   const handleSearchInputEnterKey = (e) => {
     if (e.key === 'Enter' && e.target.value) {
-      history.push(getNewUrl('query', e.target.value));
+      history.push(
+        setQueryParamAndGetNewUrl(
+          location.pathname,
+          queryParams,
+          'query',
+          e.target.value
+        )
+      );
     }
   };
 
   const handleSelectSortBy = (sb) => {
     if (sort !== sb.value) {
       setShowSortOptions(false);
-      history.push(getNewUrl('sort', sb.value));
+      history.push(
+        setQueryParamAndGetNewUrl(
+          location.pathname,
+          queryParams,
+          'sort',
+          sb.value
+        )
+      );
     }
   };
 
@@ -143,7 +143,7 @@ const UserProfileLists = ({ profileId }) => {
             <OrderByOptions>
               {sortByList.map((sb, i) => (
                 <Option
-                  key={`movieOrderByList${i}`}
+                  key={`listOrderBy${i}`}
                   onClick={() => handleSelectSortBy(sb)}
                   onKeyPress={(e) =>
                     handleSingleSelectOnPressEnter(e, handleSelectSortBy, sb)

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import UserProfileListCard from '../UserProfileListCard';
+import UserProfileFollowingCard from '../UserProfileFollowingCard';
 import UserProfileGrid from '../UserProfileGrid';
 
 import { Container } from './styles';
@@ -8,11 +8,11 @@ import { Container } from './styles';
 const UserProfileFollowing = () => {
   return (
     <Container>
-      <UserProfileGrid minWidth="29rem" gridGap="1rem">
+      <UserProfileGrid minWidth="21rem" gridGap="2rem">
         {[...Array(30).keys()].map((c) => (
-          <UserProfileListCard
+          <UserProfileFollowingCard
             key={c}
-            contentList={{
+            profile={{
               id: 1,
               thumbnail:
                 'http://localhost:3333/files/06f301969844b23c331f71b8d2741784-black_mirror.jpg',
