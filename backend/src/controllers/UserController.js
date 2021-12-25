@@ -138,13 +138,25 @@ module.exports = {
       }
 
       const dataObj = JSON.parse(data);
-      const { name = user.name } = dataObj;
+      const {
+        name = user.name,
+        following_privacy: followingPrivacy = user.following_privacy,
+      } = dataObj;
       const errors = [];
 
       if (!name) {
         errors.push('Nome do usuário não informado');
       } else if (typeof name !== 'string') {
         errors.push('Nome do usuário, valor inválido');
+      }
+      if (
+        followingPrivacy !== 'private' &&
+        followingPrivacy !== 'public' &&
+        followingPrivacy !== 'followed_profiles'
+      ) {
+        errors.push(
+          'Opção de privacidade das listas de perfis seguidos e de seguidores, valor inválido'
+        );
       }
       if (errors.length > 0) {
         try {
@@ -174,7 +186,11 @@ module.exports = {
         : user.profile_image_url;
 
       await knex('users')
-        .update({ name, profile_image_url: profileImageUrl })
+        .update({
+          name,
+          profile_image_url: profileImageUrl,
+          following_privacy: followingPrivacy,
+        })
         .where({ id: userId });
 
       if (deleteOldProfileImage) {

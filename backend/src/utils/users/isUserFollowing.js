@@ -5,7 +5,7 @@ module.exports = async (userId, followsId) => {
     if (!userId || !followsId) {
       return false;
     }
-    if (userId === followsId) {
+    if (parseInt(userId) === parseInt(followsId)) {
       return true;
     }
     const following = await knex

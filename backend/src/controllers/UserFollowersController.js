@@ -1,8 +1,10 @@
 const knex = require('../database');
+const isUserFollowing = require('../utils/users/isUserFollowing');
 
 module.exports = {
   async index(req, res) {
     try {
+      const userId = req.userId;
       const profileId = req.params.id;
 
       const { page = 1, page_size = 30 } = req.query;
@@ -32,6 +34,14 @@ module.exports = {
         .first();
       if (!profile) {
         return res.status(400).json({ erro: 'Perfil não encontrado' });
+      }
+
+      if (
+        (profile.following_privacy === 'private' && profile.id !== userId) ||
+        (profile.following_privacy === 'followed_profiles' &&
+          !(await isUserFollowing(profile.id, userId)))
+      ) {
+        return res.sendStatus(403);
       }
 
       const following = await knex

@@ -70,7 +70,11 @@ routes.delete(
 );
 
 // UserFollowingController
-routes.get('/users/:id/following', UserFollowingController.index);
+routes.get(
+  '/users/:id/following',
+  getLoggedUserId,
+  UserFollowingController.index
+);
 routes.get(
   '/users/following/:id',
   authorization,
@@ -79,7 +83,11 @@ routes.get(
 );
 
 // UserFollowersController
-routes.get('/users/:id/followers', UserFollowersController.index);
+routes.get(
+  '/users/:id/followers',
+  getLoggedUserId,
+  UserFollowersController.index
+);
 
 // ContentListController
 routes.post(
