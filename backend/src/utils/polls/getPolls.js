@@ -11,7 +11,20 @@ module.exports = async (
 ) => {
   try {
     const pollsQuery = knex
-      .select()
+      .select(
+        'pq.id',
+        'pq.user_id',
+        'pq.user_name',
+        'pq.profile_image_url',
+        'pq.title',
+        'pq.description',
+        'pq.sharing_option',
+        'pq.is_active',
+        'pq.thumbnail',
+        'pq.content_list_id',
+        'pq.created_at',
+        'pq.updated_at'
+      )
       .from(function () {
         this.select(
           'p.id',

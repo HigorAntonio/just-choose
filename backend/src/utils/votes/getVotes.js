@@ -1,6 +1,6 @@
 const knex = require('../../database');
 
-module.exports = async (userId, page_size, page, sort_by) => {
+module.exports = async (userId, page_size, page, query, sort_by) => {
   try {
     const votesQuery = knex
       .select(
@@ -48,7 +48,6 @@ module.exports = async (userId, page_size, page, sort_by) => {
               .from('show_votes AS sv')
               .innerJoin('shows as s', 's.id', 'sv.show_id');
           })
-          .as('show_votes_query')
           .union(function () {
             this.select(
               'gv.poll_id',
@@ -75,23 +74,35 @@ module.exports = async (userId, page_size, page, sort_by) => {
       votesQuery.orderByRaw(sort_by);
     }
 
-    const countObj = await knex.count().from(function () {
-      this.select()
+    const countObj = knex.count().from(function () {
+      this.select('vote_user_id', 'poll_id', 'p.document as poll_document')
         .from(function () {
-          this.select()
+          this.select('user_id as vote_user_id', 'poll_id')
             .from('movie_votes as mv')
             .union(function () {
-              this.select()
+              this.select('user_id as vote_user_id', 'poll_id')
                 .from('show_votes as sv')
                 .union(function () {
-                  this.select().from('game_votes as gv');
+                  this.select('user_id as vote_user_id', 'poll_id').from(
+                    'game_votes as gv'
+                  );
                 });
             })
             .as('count_votes_union_query');
         })
-        .where('count_votes_union_query.user_id', userId)
+        .innerJoin('polls as p', 'p.id', 'count_votes_union_query.poll_id')
+        .where('count_votes_union_query.vote_user_id', userId)
         .as('count_votes_query');
     });
+
+    if (query) {
+      votesQuery.where(
+        knex.raw('p.document @@ polls_plainto_tsquery(:query)', { query })
+      );
+      countObj.where(
+        knex.raw('poll_document @@ polls_plainto_tsquery(:query)', { query })
+      );
+    }
 
     const votes = await votesQuery;
     const [{ count }] = await countObj;

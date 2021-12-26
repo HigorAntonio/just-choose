@@ -95,8 +95,14 @@ module.exports = {
   async index(req, res) {
     try {
       const userId = req.userId;
+      const profileId = req.params.id;
 
-      const { page = 1, page_size = 30, sort_by = 'updated.desc' } = req.query;
+      const {
+        page = 1,
+        page_size = 30,
+        query,
+        sort_by = 'updated.desc',
+      } = req.query;
 
       const errors = [];
 
@@ -110,14 +116,29 @@ module.exports = {
       } else if (page_size < 1 || page_size > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
+      if (query && typeof query !== 'string') {
+        errors.push({ erro: 'O parâmetro query deve ser uma string' });
+      }
+      if (sort_by) {
+        if (typeof sort_by !== 'string') {
+          errors.push('Parâmetro sort_by, valor inválido');
+        } else if (!getVoteOrderByQuery(sort_by)) {
+          errors.push('Parâmetro sort_by, valor inválido');
+        }
+      }
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
 
+      if (parseInt(userId) !== parseInt(profileId)) {
+        return res.sendStatus(403);
+      }
+
       const { votes, count } = await getVotes(
-        userId,
+        profileId,
         page_size,
         page,
+        query,
         getVoteOrderByQuery(sort_by)
       );
 

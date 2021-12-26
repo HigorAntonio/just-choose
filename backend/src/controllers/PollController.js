@@ -181,21 +181,7 @@ module.exports = {
         page_size: parseInt(page_size),
         total_pages: total_pages === 0 ? 1 : total_pages,
         total_results: parseInt(count),
-        results: polls.map((poll) => ({
-          id: poll.id,
-          user_id: poll.user_id,
-          user_name: poll.user_name,
-          profile_image_url: poll.profile_image_url,
-          title: poll.title,
-          description: poll.description,
-          sharing_option: poll.sharing_option,
-          is_active: poll.is_active,
-          thumbnail: poll.thumbnail,
-          content_list_id: poll.content_list_id,
-          content_types: poll.content_types,
-          created_at: poll.created_at,
-          updated_at: poll.updated_at,
-        })),
+        results: polls,
       });
     } catch (error) {
       return res.sendStatus(500);
