@@ -1,5 +1,6 @@
 const knex = require('../database');
 const isUserFollowing = require('../utils/users/isUserFollowing');
+const getUserFollowers = require('../utils/userFollowers/getUserFollowers');
 
 module.exports = {
   async index(req, res) {
@@ -44,24 +45,11 @@ module.exports = {
         return res.sendStatus(403);
       }
 
-      const following = await knex
-        .select(
-          'u.id',
-          'u.name',
-          'u.profile_image_url',
-          'fu.created_at',
-          'fu.updated_at'
-        )
-        .from('follows_users as fu')
-        .where({ 'fu.follows_id': profileId })
-        .innerJoin('users as u', 'fu.user_id', 'u.id')
-        .limit(page_size)
-        .offset((page - 1) * page_size)
-        .orderBy('u.name');
-
-      const [{ count }] = await knex('follows_users')
-        .count()
-        .where({ follows_id: profileId });
+      const { followers, count } = await getUserFollowers(
+        profileId,
+        page_size,
+        page
+      );
 
       const total_pages = Math.ceil(count / page_size);
       return res.json({
@@ -69,10 +57,12 @@ module.exports = {
         page_size: parseInt(page_size),
         total_pages: total_pages === 0 ? 1 : total_pages,
         total_results: parseInt(count),
-        results: following.map((user) => ({
+        results: followers.map((user) => ({
           user_id: user.id,
           user_name: user.name,
           profile_image_url: user.profile_image_url,
+          followers_count: parseInt(user.followers_count),
+          following_count: parseInt(user.following_count),
           created_at: user.created_at,
           updated_at: user.updated_at,
         })),
