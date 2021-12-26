@@ -42,7 +42,13 @@ module.exports = {
         (profile.following_privacy === 'followed_profiles' &&
           !(await isUserFollowing(profile.id, userId)))
       ) {
-        return res.sendStatus(403);
+        return res.json({
+          page: parseInt(page),
+          page_size: parseInt(page_size),
+          total_pages: 1,
+          total_results: 0,
+          results: [],
+        });
       }
 
       const { following, count } = await getUserFollowing(
