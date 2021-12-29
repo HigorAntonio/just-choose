@@ -28,6 +28,9 @@ import {
   HeaderButton,
   HeaderDeleteButton,
   ListInfo,
+  CreatedAt,
+  CreatedBy,
+  ProfileImageWrapper,
   Description,
   Filters,
   TypeOptions,
@@ -343,19 +346,29 @@ const ShowList = ({ wrapperRef }) => {
           </HeaderButtons>
         </HeaderRow>
         <ListInfo>
-          <span>
-            Criada em{' '}
-            <span className="created-at">
-              {createdAt
-                ? `${createdAt.getDate()}  de ${getMonth(
-                    createdAt.getMonth()
-                  )} de ${createdAt.getFullYear()}`
-                : '-'}
-            </span>{' '}
-          </span>
-          <span>
-            por <span className="created-by">{contentList.user_name}</span>
-          </span>
+          <CreatedAt>
+            <span>Criada em</span>&nbsp;
+            {createdAt
+              ? `${createdAt.getDate()}  de ${getMonth(
+                  createdAt.getMonth()
+                )} de ${createdAt.getFullYear()}`
+              : '-'}
+            &nbsp;
+          </CreatedAt>
+          <CreatedBy>
+            <span>por</span>&nbsp;
+            <Link to={`/users/${contentList.user_id}`}>
+              <ProfileImageWrapper>
+                <img
+                  src={contentList.profile_image_url}
+                  alt=""
+                  onError={(e) => (e.target.style.display = 'none')}
+                />
+              </ProfileImageWrapper>
+              &nbsp;
+              {contentList.user_name}&nbsp;
+            </Link>
+          </CreatedBy>
         </ListInfo>
         <Description>{contentList.description}</Description>
         <Filters>

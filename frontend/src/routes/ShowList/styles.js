@@ -156,24 +156,48 @@ export const HeaderDeleteButton = styled.button`
 `;
 
 export const ListInfo = styled.div`
-  font-size: 16px;
   margin: 30px 0;
   display: flex;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+export const CreatedAt = styled.div`
+  font-size: 16px;
+
+  > span {
+    color: var(--dark-gray);
+  }
+`;
+
+export const CreatedBy = styled.div`
+  font-size: 16px;
+  display: flex;
+  align-items: center;
 
   > span {
     color: var(--dark-gray);
   }
 
-  > span + span {
-    margin-left: 5px;
+  > a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
   }
+`;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
+export const ProfileImageWrapper = styled.div`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--gray);
 
-    > span + span {
-      margin-left: 0;
-    }
+  > img {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
   }
 `;
 
