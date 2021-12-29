@@ -24,15 +24,15 @@ import {
 const sortByList = [
   { key: 'Atualização (novo)', value: 'updated.desc' },
   { key: 'Atualização (antigo)', value: 'updated.asc' },
-  { key: 'Título (A-Z)', value: 'title.asc' },
-  { key: 'Título (Z-A)', value: 'title.desc' },
+  { key: 'Título (A-Z)', value: 'poll_title.asc' },
+  { key: 'Título (Z-A)', value: 'poll_title.desc' },
 ];
 
 const isSortValid = (sort) => {
   return !!sortByList.find((e) => e.value === sort);
 };
 
-const UserProfilePolls = () => {
+const UserProfileVotes = () => {
   const { id: profileId } = useParams();
   const location = useLocation();
   const queryParams = useMemo(
@@ -42,7 +42,6 @@ const UserProfilePolls = () => {
   const { query, sort = 'updated.desc' } = queryParams;
   const history = useHistory();
   const [params, setParams] = useState({
-    user_id: profileId,
     sort_by: sort,
     query,
   });
@@ -70,7 +69,7 @@ const UserProfilePolls = () => {
   }, [profileId, sort, query]);
 
   const { loading, content, lastElementRef } =
-    useLoadMoreWhenLastElementIsOnScreen('/polls', params);
+    useLoadMoreWhenLastElementIsOnScreen(`/users/${profileId}/votes`, params);
 
   const handleSearchInputEnterKey = (e) => {
     if (e.key === 'Enter' && e.target.value) {
@@ -156,25 +155,32 @@ const UserProfilePolls = () => {
         </AlignRightFilters>
       </Filters>
       {!loading && content.length === 0 && (
-        <NotFound>Nenhuma votação encontrada.</NotFound>
+        <NotFound>Nenhum voto encontrado.</NotFound>
       )}
       {content.length > 0 && (
         <UserProfileGrid minWidth="29rem" gridGap="1rem">
-          {content.map((poll, i) =>
-            content.length === i + 1 ? (
-              <div key={`poll${poll.id}`} ref={lastElementRef}>
+          {content.map((vote, i) => {
+            const poll = {
+              id: vote.poll_id,
+              thumbnail: vote.poll_thumbnail,
+              title: vote.poll_title,
+              is_active: vote.poll_is_active,
+              updated_at: vote.updated_at,
+            };
+            return content.length === i + 1 ? (
+              <div key={`vote${vote.poll_id}`} ref={lastElementRef}>
                 <UserProfilePollCard poll={poll} />
               </div>
             ) : (
-              <div key={`poll${poll.id}`}>
+              <div key={`vote${vote.poll_id}`}>
                 <UserProfilePollCard poll={poll} />
               </div>
-            )
-          )}
+            );
+          })}
         </UserProfileGrid>
       )}
     </Container>
   );
 };
 
-export default UserProfilePolls;
+export default UserProfileVotes;

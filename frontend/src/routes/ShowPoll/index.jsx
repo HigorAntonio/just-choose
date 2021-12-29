@@ -21,6 +21,7 @@ import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import DeletePollDialog from '../../components/DeletePollDialog';
 import ShowListSkeleton from '../../components/Skeleton/ShowListSkeleton';
+import formatCount from '../../utils/formatCount';
 
 import {
   Container,
@@ -117,14 +118,6 @@ const getFilteredContent = (content, contentTypes, typeFilter) => {
   if (typeFilter === 'game') {
     return content.games;
   }
-};
-
-const formatVotes = (votes) => {
-  if (votes < 1e3) return votes;
-  if (votes >= 1e3 && votes < 1e6) return +(votes / 1e3).toFixed(1) + 'K';
-  if (votes >= 1e6 && votes < 1e9) return +(votes / 1e6).toFixed(1) + 'M';
-  if (votes >= 1e9 && votes < 1e12) return +(votes / 1e9).toFixed(1) + 'B';
-  if (votes >= 1e12) return +(votes / 1e12).toFixed(1) + 'T';
 };
 
 const ShowPoll = ({ wrapperRef }) => {
@@ -501,7 +494,7 @@ const ShowPoll = ({ wrapperRef }) => {
                 const href = `${getContentBaseUrl(c.type)}/${
                   c.content_platform_id
                 }`;
-                const votes = `${formatVotes(c.votes)}`.replace('.', ',');
+                const votes = formatCount(c.votes);
                 return (
                   <div
                     className="row"

@@ -14,21 +14,23 @@ import { FollowingProfilesContext } from '../../context/FollowingProfilesContext
 
 import justChooseApi from '../../apis/justChooseApi';
 import NotFound from '../../components/NotFound';
-import TooltipHover from '../../components/TooltipHover';
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import UserProfileStart from '../../components/UserProfileStart';
 import UserProfileLists from '../../components/UserProfileLists';
 import UserProfilePolls from '../../components/UserProfilePolls';
+import UserProfileVotes from '../../components/UserProfileVotes';
 import UserProfileFollowing from '../../components/UserProfileFollowing';
+import navOnAuxClick from '../../utils/navOnAuxClick';
 
 import {
   Container,
   StickyWrapper,
   Header,
+  HeaderContainer,
   ProfileWrapper,
-  Layout,
   ProfileImage,
   ProfileImageWrapper,
+  ProfileMeta,
   ProfileName,
   ProfileFollowers,
   HeaderButtons,
@@ -43,24 +45,6 @@ const UserProfile = ({ wrapperRef }) => {
   const { id: profileId } = useParams();
   const { path, url } = useRouteMatch();
   const location = useLocation();
-
-  useEffect(() => {
-    if (
-      location.pathname !== `${path.replace(':id', profileId)}` &&
-      location.pathname !== `${path.replace(':id', profileId)}/lists` &&
-      location.pathname !== `${path.replace(':id', profileId)}/polls` &&
-      location.pathname !== `${path.replace(':id', profileId)}/following` &&
-      location.pathname !== `${path.replace(':id', profileId)}/about`
-    ) {
-      history.replace(`${path.replace(':id', profileId)}`);
-    }
-  }, [location, path, profileId, history]);
-
-  useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef, location]);
 
   const { userId, authenticated } = useContext(AuthContext);
   const {
@@ -88,6 +72,27 @@ const UserProfile = ({ wrapperRef }) => {
     setFollowing(false);
     setProfile({});
   };
+
+  useEffect(() => {
+    if (
+      (location.pathname !== `${path.replace(':id', profileId)}` &&
+        location.pathname !== `${path.replace(':id', profileId)}/lists` &&
+        location.pathname !== `${path.replace(':id', profileId)}/polls` &&
+        location.pathname !== `${path.replace(':id', profileId)}/votes` &&
+        location.pathname !== `${path.replace(':id', profileId)}/following` &&
+        location.pathname !== `${path.replace(':id', profileId)}/about`) ||
+      (location.pathname === `${path.replace(':id', profileId)}/votes` &&
+        parseInt(userId) !== parseInt(profileId))
+    ) {
+      history.replace(`${path.replace(':id', profileId)}`);
+    }
+  }, [location, path, profileId, userId, history]);
+
+  useEffect(() => {
+    // Posiciona o scroll no início da página
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
+  }, [wrapperRef, location]);
 
   useEffect(() => {
     (async () => {
@@ -169,8 +174,8 @@ const UserProfile = ({ wrapperRef }) => {
     <Container>
       <StickyWrapper>
         <Header>
-          <ProfileWrapper>
-            <Layout>
+          <HeaderContainer>
+            <ProfileWrapper>
               <ProfileImageWrapper>
                 <ProfileImage
                   src={
@@ -180,88 +185,110 @@ const UserProfile = ({ wrapperRef }) => {
                   error={profileImageError}
                 />
               </ProfileImageWrapper>
-              <Layout className="column justify-center">
+              <ProfileMeta>
                 <ProfileName>{profile.name}</ProfileName>
                 <ProfileFollowers>{`${profile.followers_count} ${
                   profile.followers_count === 1 ? 'seguidor' : 'seguidores'
                 }`}</ProfileFollowers>
-              </Layout>
-            </Layout>
-            <Layout>
+              </ProfileMeta>
+            </ProfileWrapper>
+            {parseInt(userId) !== parseInt(profileId) && (
               <HeaderButtons>
-                {parseInt(userId) !== parseInt(profileId) && (
-                  <TooltipHover
-                    tooltipText={!following ? 'Seguir' : 'Deixar de seguir'}
-                    width={!following ? '55px' : '110px'}
-                  >
+                {parseInt(userId) !== parseInt(profileId) &&
+                  (!following ? (
                     <FollowButton following={following} onClick={handleFollow}>
-                      {!following && (
-                        <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />
-                      )}
-                      {following && (
-                        <FaHeart size={'25px'} style={{ flexShrink: 0 }} />
-                      )}
+                      <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
+                      <span>Seguir</span>
                     </FollowButton>
-                  </TooltipHover>
-                )}
+                  ) : (
+                    <FollowButton following={following} onClick={handleFollow}>
+                      <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
+                      <span>Seguindo</span>
+                    </FollowButton>
+                  ))}
               </HeaderButtons>
-            </Layout>
-          </ProfileWrapper>
+            )}
+          </HeaderContainer>
+          <NavigationWrapper>
+            <HorizontalDragScrolling>
+              <Navigation>
+                <div
+                  className={location.pathname === `${url}` ? 'active' : ''}
+                  onClick={() => handlePush(url)}
+                  onAuxClick={(e) => navOnAuxClick(e, url)}
+                >
+                  {/* <Link to={`${url}`}>Início</Link> */}
+                  Início
+                </div>
+                <div
+                  className={
+                    location.pathname === `${url}/lists` ? 'active' : ''
+                  }
+                  onClick={() => handlePush(`${url}/lists`)}
+                  onAuxClick={(e) => navOnAuxClick(e, `${url}/lists`)}
+                >
+                  {/* <Link to={`${url}/lists`}>Listas</Link> */}
+                  Listas
+                </div>
+                <div
+                  className={
+                    location.pathname === `${url}/polls` ? 'active' : ''
+                  }
+                  onClick={() => handlePush(`${url}/polls`)}
+                  onAuxClick={(e) => navOnAuxClick(e, `${url}/polls`)}
+                >
+                  {/* <Link to={`${url}/polls`}>Votações</Link> */}
+                  Votações
+                </div>
+                {parseInt(userId) === parseInt(profileId) && (
+                  <div
+                    className={
+                      location.pathname === `${url}/votes` ? 'active' : ''
+                    }
+                    onClick={() => handlePush(`${url}/votes`)}
+                    onAuxClick={(e) => navOnAuxClick(e, `${url}/votes`)}
+                  >
+                    {/* <Link to={`${url}/votes`}>Votos</Link> */}
+                    Votos
+                  </div>
+                )}
+                <div
+                  className={
+                    location.pathname === `${url}/following` ? 'active' : ''
+                  }
+                  onClick={() => handlePush(`${url}/following`)}
+                  onAuxClick={(e) => navOnAuxClick(e, `${url}/following`)}
+                >
+                  {/* <Link to={`${url}/following`}>Seguindo</Link> */}
+                  Seguindo
+                </div>
+                <div
+                  className={
+                    location.pathname === `${url}/about` ? 'active' : ''
+                  }
+                  onClick={() => handlePush(`${url}/about`)}
+                  onAuxClick={(e) => navOnAuxClick(e, `${url}/about`)}
+                >
+                  {/* <Link to={`${url}/about`}>Sobre</Link> */}
+                  Sobre
+                </div>
+              </Navigation>
+            </HorizontalDragScrolling>
+          </NavigationWrapper>
         </Header>
-        <NavigationWrapper>
-          <HorizontalDragScrolling>
-            <Navigation>
-              <div
-                className={location.pathname === `${url}` ? 'active' : ''}
-                onClick={() => handlePush(url)}
-              >
-                {/* <Link to={`${url}`}>Início</Link> */}
-                Início
-              </div>
-              <div
-                className={location.pathname === `${url}/lists` ? 'active' : ''}
-                onClick={() => handlePush(`${url}/lists`)}
-              >
-                {/* <Link to={`${url}/lists`}>Listas</Link> */}
-                Listas
-              </div>
-              <div
-                className={location.pathname === `${url}/polls` ? 'active' : ''}
-                onClick={() => handlePush(`${url}/polls`)}
-              >
-                {/* <Link to={`${url}/polls`}>Votações</Link> */}
-                Votações
-              </div>
-              <div
-                className={
-                  location.pathname === `${url}/following` ? 'active' : ''
-                }
-                onClick={() => handlePush(`${url}/following`)}
-              >
-                {/* <Link to={`${url}/following`}>Seguindo</Link> */}
-                Seguindo
-              </div>
-              <div
-                className={location.pathname === `${url}/about` ? 'active' : ''}
-                onClick={() => handlePush(`${url}/about`)}
-              >
-                {/* <Link to={`${url}/about`}>Sobre</Link> */}
-                Sobre
-              </div>
-            </Navigation>
-          </HorizontalDragScrolling>
-        </NavigationWrapper>
       </StickyWrapper>
       <Main>
         {location.pathname === `${path.replace(':id', profileId)}` && (
           <UserProfileStart />
         )}
         {location.pathname === `${path.replace(':id', profileId)}/lists` && (
-          <UserProfileLists profileId={profileId} />
+          <UserProfileLists />
         )}
         {location.pathname === `${path.replace(':id', profileId)}/polls` && (
-          <UserProfilePolls profileId={profileId} />
+          <UserProfilePolls />
         )}
+        {location.pathname === `${path.replace(':id', profileId)}/votes` &&
+          parseInt(userId) === parseInt(profileId) && <UserProfileVotes />}
         {location.pathname ===
           `${path.replace(':id', profileId)}/following` && (
           <UserProfileFollowing />

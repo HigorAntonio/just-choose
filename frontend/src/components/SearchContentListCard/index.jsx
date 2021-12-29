@@ -3,6 +3,7 @@ import { useHistory, Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
 import { fromNow } from '../../utils/dataUtility';
+import formatCount from '../../utils/formatCount';
 
 import {
   Container,
@@ -22,14 +23,6 @@ import {
   DescriptionWrapper,
   Description,
 } from './styles';
-
-const formatCount = (votes) => {
-  if (votes < 1e3) return votes;
-  if (votes >= 1e3 && votes < 1e6) return +(votes / 1e3).toFixed(1) + 'K';
-  if (votes >= 1e6 && votes < 1e9) return +(votes / 1e6).toFixed(1) + 'M';
-  if (votes >= 1e9 && votes < 1e12) return +(votes / 1e9).toFixed(1) + 'B';
-  if (votes >= 1e12) return +(votes / 1e12).toFixed(1) + 'T';
-};
 
 const SearchContentListCard = ({ contentList }) => {
   const history = useHistory();
@@ -75,12 +68,12 @@ const SearchContentListCard = ({ contentList }) => {
         </Title>
         <Meta>
           <Likes>
-            {`${formatCount(likes)}`.replace('.', ',')}{' '}
+            {formatCount(15000) + ' '}
             {likes === 1 ? 'curtida' : 'curtidas'}
           </Likes>
           <MetaSeparator>•</MetaSeparator>
           <Forks>
-            {`${formatCount(forks)}`.replace('.', ',')}{' '}
+            {formatCount(299792458) + ' '}
             {forks === 1 ? 'fork' : 'forks'}
           </Forks>
         </Meta>

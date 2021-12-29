@@ -17,6 +17,7 @@ import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import DeleteListDialog from '../../components/DeleteListDialog';
 import ShowListSkeleton from '../../components/Skeleton/ShowListSkeleton';
+import formatCount from '../../utils/formatCount';
 
 import {
   Container,
@@ -294,7 +295,7 @@ const ShowList = ({ wrapperRef }) => {
                   <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />
                 )}
                 {liked && <FaHeart size={'25px'} style={{ flexShrink: 0 }} />}
-                <span>{contentList.likes}</span>
+                <span>{formatCount(contentList.likes)}</span>
               </HeaderButton>
               <HeaderButton
                 title={
@@ -307,7 +308,7 @@ const ShowList = ({ wrapperRef }) => {
                 onClick={handleFork}
               >
                 <BiGitRepoForked size={'25px'} style={{ flexShrink: 0 }} />
-                <span>{contentList.forks}</span>
+                <span>{formatCount(contentList.forks)}</span>
               </HeaderButton>
             </div>
             {userId === contentList.user_id && (

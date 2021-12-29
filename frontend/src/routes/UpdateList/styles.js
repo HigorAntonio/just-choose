@@ -412,7 +412,7 @@ export const ContentListSkeleton = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   grid-template-rows: 1fr;
-  grid-gap: 15px;
+  grid-gap: 10px;
   padding: 20px;
 
   .cardWrapper {

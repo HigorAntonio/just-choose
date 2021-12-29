@@ -3,6 +3,10 @@ import styled from 'styled-components';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
+
+  > div:last-child {
+    margin-bottom: 3rem;
+  }
 `;
 
 export const Filters = styled.div`

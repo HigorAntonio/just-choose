@@ -27,10 +27,11 @@ export const ProfileImage = styled.img`
 
 export const UserName = styled.h3`
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 1.9rem;
+  text-align: center;
 
   &:hover {
     color: var(--primary-400);

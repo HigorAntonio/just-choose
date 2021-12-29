@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import formatCount from '../../utils/formatCount';
+
 import {
   Container,
   ProfileImageWrapper,
@@ -22,7 +24,7 @@ const UserProfileFollowingCard = ({ profile }) => {
   const [profileImageError, setProfileImageError] = useState(false);
 
   return (
-    <Container>
+    <Container title={userName}>
       <ProfileImageWrapper>
         <ProfileImage
           src={profileImageUrl}
@@ -30,9 +32,12 @@ const UserProfileFollowingCard = ({ profile }) => {
           error={profileImageError}
         />
       </ProfileImageWrapper>
-      <UserName>UserName</UserName>
+      <UserName>{userName}</UserName>
       <Meta>
-        <FollowersCount>291 seguidores</FollowersCount>
+        <FollowersCount>
+          {formatCount(followersCount)}
+          {followersCount === 1 ? ' seguidor' : ' seguidores'}
+        </FollowersCount>
       </Meta>
     </Container>
   );

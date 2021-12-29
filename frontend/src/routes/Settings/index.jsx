@@ -4,6 +4,7 @@ import { useRouteMatch, useLocation, useHistory } from 'react-router-dom';
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import SettingsProfile from '../../components/SettingsProfile';
 import SettingsSecurity from '../../components/SettingsSecurity';
+import navOnAuxClick from '../../utils/navOnAuxClick';
 
 import {
   Container,
@@ -39,12 +40,6 @@ const Settings = ({ wrapperRef }) => {
     history.push(path);
   };
 
-  const handleNavOnAuxClick = (e, href) => {
-    if (e.button === 1) {
-      window.open(href);
-    }
-  };
-
   const handleOnPressEnter = (e, cb, option) => {
     if (e.key === 'Enter') {
       cb(option);
@@ -65,7 +60,7 @@ const Settings = ({ wrapperRef }) => {
                   location.pathname === `${url}/profile` ? 'active' : ''
                 }
                 onClick={() => handlePush(`${url}/profile`)}
-                onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/profile`)}
+                onAuxClick={(e) => navOnAuxClick(e, `${url}/profile`)}
                 onKeyPress={(e) => {
                   handleOnPressEnter(e, handlePush, `${url}/profile`);
                 }}
@@ -78,7 +73,7 @@ const Settings = ({ wrapperRef }) => {
                   location.pathname === `${url}/security` ? 'active' : ''
                 }
                 onClick={() => handlePush(`${url}/security`)}
-                onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/security`)}
+                onAuxClick={(e) => navOnAuxClick(e, `${url}/security`)}
                 onKeyPress={(e) => {
                   handleOnPressEnter(e, handlePush, `${url}/security`);
                 }}
@@ -91,7 +86,7 @@ const Settings = ({ wrapperRef }) => {
                   location.pathname === `${url}/devices` ? 'active' : ''
                 }
                 onClick={() => handlePush(`${url}/devices`)}
-                onAuxClick={(e) => handleNavOnAuxClick(e, `${url}/devices`)}
+                onAuxClick={(e) => navOnAuxClick(e, `${url}/devices`)}
                 onKeyPress={(e) => {
                   handleOnPressEnter(e, handlePush, `${url}/devices`);
                 }}

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useParams, useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import { GoSearch } from 'react-icons/go';
 
@@ -36,7 +36,8 @@ const isSortValid = (sort) => {
   return !!sortByList.find((e) => e.value === sort);
 };
 
-const UserProfileLists = ({ profileId }) => {
+const UserProfileLists = () => {
+  const { id: profileId } = useParams();
   const location = useLocation();
   const queryParams = useMemo(
     () => queryString.parse(location.search),
@@ -158,6 +159,9 @@ const UserProfileLists = ({ profileId }) => {
           </SingleOptionSelect>
         </AlignRightFilters>
       </Filters>
+      {!loading && content.length === 0 && (
+        <NotFound>Nenhuma lista encontrada.</NotFound>
+      )}
       {content.length > 0 && (
         <UserProfileGrid minWidth="29rem" gridGap="1rem">
           {content.map((contentList, i) =>
@@ -172,9 +176,6 @@ const UserProfileLists = ({ profileId }) => {
             )
           )}
         </UserProfileGrid>
-      )}
-      {content.length === 0 && query && (
-        <NotFound>Nenhuma lista encontrada.</NotFound>
       )}
     </Container>
   );

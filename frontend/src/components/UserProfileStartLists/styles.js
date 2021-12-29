@@ -7,7 +7,7 @@ export const Container = styled.div`
 
 export const TitleWrapper = styled.div`
   display: flex;
-  margin: 1rem 0;
+  margin-bottom: 1rem;
 `;
 
 export const Title = styled.h3`
@@ -17,6 +17,7 @@ export const Title = styled.h3`
 export const Main = styled.div`
   display: flex;
   min-width: 100%;
+  margin-bottom: 1rem;
 
   > div {
     flex: 1;

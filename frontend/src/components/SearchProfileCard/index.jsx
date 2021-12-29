@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import formatCount from '../../utils/formatCount';
+
 import {
   Container,
   ProfileImageWrapper,
@@ -39,7 +41,7 @@ const SearchProfileCard = ({ profile }) => {
           <UserName>{userName}</UserName>
           <Meta>
             <FollowersCount>
-              {followersCount}
+              {formatCount(followersCount)}
               {followersCount === 1 ? ' seguidor' : ' seguidores'}
             </FollowersCount>
           </Meta>

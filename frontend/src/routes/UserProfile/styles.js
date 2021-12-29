@@ -9,46 +9,43 @@ export const Container = styled.div`
 
 export const StickyWrapper = styled.div`
   width: 100%;
-  max-width: 2000px;
-  background: var(--background-410);
   position: sticky;
+  z-index: 2;
   top: 0;
-  padding: 30px 30px 0 30px;
-  z-index: 300;
-
-  @media (max-width: 768px) {
-    padding: 20px 15px 0 15px;
-  }
 `;
 
 export const Header = styled.header`
+  width: calc(100% - 8rem);
+  max-width: 200rem;
+  margin: 0 auto;
+  padding-top: 2rem;
+  background: var(--background-410);
+
+  @media (max-width: 768px) {
+    width: calc(100% - 3rem);
+  }
+`;
+
+export const HeaderContainer = styled.div`
   width: 100%;
-  max-width: 2000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  @media (max-width: 650px) {
+    flex-direction: column;
+  }
 `;
 
 export const ProfileWrapper = styled.div`
+  width: max(18.2rem, calc(100% - 16.2rem));
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`;
+  align-items: center;
 
-export const Layout = styled.div`
-  display: flex;
-
-  &.column {
+  @media (max-width: 650px) {
+    width: 100%;
     flex-direction: column;
-  }
-
-  &.justify-center {
-    justify-content: center;
-  }
-
-  &.justify-space-between {
-    justify-content: space-between;
-  }
-
-  &.align-center {
-    align-items: center;
   }
 `;
 
@@ -60,8 +57,13 @@ export const ProfileImageWrapper = styled.div`
   flex-shrink: 0;
   justify-content: center;
   align-items: center;
-  margin-right: 10px;
+  margin-right: 1rem;
   border-radius: 50%;
+
+  @media (max-width: 650px) {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
 `;
 
 export const ProfileImage = styled.img`
@@ -73,8 +75,29 @@ export const ProfileImage = styled.img`
   ${(props) => props.error && 'display: none;'}
 `;
 
+export const ProfileMeta = styled.div`
+  width: max(10rem, calc(100% - 8.2rem));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  @media (max-width: 650px) {
+    width: 100%;
+    align-items: center;
+  }
+`;
+
 export const ProfileName = styled.h1`
+  max-width: 100%;
   font-size: 2.4rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+
+  @media (max-width: 650px) {
+    max-width: 70%;
+  }
 `;
 
 export const ProfileFollowers = styled.p`
@@ -82,7 +105,11 @@ export const ProfileFollowers = styled.p`
 `;
 
 export const HeaderButtons = styled.div`
-  padding-right: 25px;
+  margin: 0 2.5rem;
+
+  @media (max-width: 650px) {
+    margin: 2.5rem 0 0 0;
+  }
 `;
 
 const buttonCss = css`
@@ -96,7 +123,7 @@ const buttonCss = css`
 
   > span {
     margin-left: 10px;
-    font-size: 25px;
+    font-size: 16px;
   }
 
   &:hover {
@@ -107,9 +134,25 @@ const buttonCss = css`
 
 export const FollowButton = styled.button`
   ${buttonCss}
+  ${(props) => !props.following && `background: var(--primary-400);`}
+
+  > span {
+    ${(props) => !props.following && `color: var(--white);`}
+  }
+
+  > svg {
+    ${(props) => !props.following && `fill: var(--white);`}
+  }
 
   &:hover {
-    ${(props) => props.following && `background: var(--light-red);`}
+    ${(props) =>
+      props.following
+        ? `background: var(--light-red);`
+        : `background: var(--primary-500);`}
+
+    > span {
+      ${(props) => props.following && `color: var(--black);`}
+    }
 
     > svg {
       ${(props) => props.following && `fill: var(--black);`}
@@ -119,7 +162,6 @@ export const FollowButton = styled.button`
 
 export const NavigationWrapper = styled.div`
   width: 100%;
-  max-width: 2000px;
   height: 4rem;
   display: flex;
   align-items: center;
@@ -157,12 +199,12 @@ export const Navigation = styled.div`
 `;
 
 export const Main = styled.div`
-  width: 100%;
-  max-width: 2000px;
-  margin-top: 20px;
-  padding: 0 30px 30px 30px;
+  width: calc(100% - 8rem);
+  max-width: 200rem;
+  margin: 0 auto;
+  padding-top: 20px;
 
   @media (max-width: 768px) {
-    padding: 0 15px 20px 15px;
+    width: calc(100% - 3rem);
   }
 `;

@@ -88,4 +88,9 @@ export default createGlobalStyle`
     color: var(--white);
     background: var(--primary-400);
   }
+  *:focus {
+    outline: 2px solid var(--text) !important;
+    -webkit-box-shadow: inset 0px 0px 0px 2px var(--text);
+    box-shadow: inset 0px 0px 0px 2px var(--text);
+  }
 `;
