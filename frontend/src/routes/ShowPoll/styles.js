@@ -251,6 +251,15 @@ export const Main = styled.main`
   }
 `;
 
+export const Message = styled.span`
+  font-size: 1.8rem;
+  font-weight: 500;
+  font-style: italic;
+  text-align: center;
+  color: var(--dark-gray);
+  padding: 5rem 0;
+`;
+
 export const ResultContainer = styled.div`
   display: flex;
   flex-direction: column;

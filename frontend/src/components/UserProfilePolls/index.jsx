@@ -86,8 +86,8 @@ const UserProfilePolls = () => {
   };
 
   const handleSelectSortBy = (sb) => {
+    setShowSortOptions(false);
     if (sort !== sb.value) {
-      setShowSortOptions(false);
       history.push(
         setQueryParamAndGetNewUrl(
           location.pathname,

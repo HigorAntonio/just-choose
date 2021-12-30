@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useHistory, Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
+import { useParams, useHistory, Link, useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 import { ThemeContext } from 'styled-components';
 import { FaHeart, FaRegHeart, FaVoteYea, FaTrash } from 'react-icons/fa';
 import { BiGitRepoForked } from 'react-icons/bi';
@@ -18,6 +19,7 @@ import Modal from '../../components/Modal';
 import DeleteListDialog from '../../components/DeleteListDialog';
 import ShowListSkeleton from '../../components/Skeleton/ShowListSkeleton';
 import formatCount from '../../utils/formatCount';
+import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
 
 import {
   Container,
@@ -36,6 +38,7 @@ import {
   TypeOptions,
   Option,
   Main,
+  Message,
 } from './styles';
 
 const getMonth = (month) => {
@@ -69,19 +72,15 @@ const getMonth = (month) => {
   }
 };
 
-const getTypeOption = (type) => {
-  switch (type) {
-    case 'all':
-      return 'Todos';
-    case 'movie':
-      return 'Filmes';
-    case 'show':
-      return 'Séries';
-    case 'game':
-      return 'Jogos';
-    default:
-      return '';
-  }
+const contentTypeList = [
+  { key: 'Todos', value: 'all' },
+  { key: 'Filme', value: 'movie' },
+  { key: 'Série', value: 'show' },
+  { key: 'Jogo', value: 'game' },
+];
+
+const isContentTypeValid = (contentType) => {
+  return !!contentTypeList.find((e) => e.value === contentType);
 };
 
 const getFilteredContent = (content, contentTypes, typeFilter) => {
@@ -93,18 +92,24 @@ const getFilteredContent = (content, contentTypes, typeFilter) => {
     return filteredContent;
   }
   if (typeFilter === 'movie') {
-    return content.movies;
+    return content.movies ? content.movies : [];
   }
   if (typeFilter === 'show') {
-    return content.shows;
+    return content.shows ? content.shows : [];
   }
   if (typeFilter === 'game') {
-    return content.games;
+    return content.games ? content.games : [];
   }
 };
 
 const ShowList = ({ wrapperRef }) => {
   const { id: listId } = useParams();
+  const location = useLocation();
+  const queryParams = useMemo(
+    () => queryString.parse(location.search),
+    [location]
+  );
+  const { type: contentType = 'all' } = queryParams;
   const history = useHistory();
 
   const { userId, authenticated } = useContext(AuthContext);
@@ -127,7 +132,6 @@ const ShowList = ({ wrapperRef }) => {
   const [createdAt, setCreatedAt] = useState();
   const [content, setContent] = useState([]);
   const [contentTypes, setContentTypes] = useState([]);
-  const [typeFilter, setTypeFilter] = useState('all');
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [liked, setLiked] = useState();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -145,11 +149,18 @@ const ShowList = ({ wrapperRef }) => {
     setCreatedAt(null);
     setContent([]);
     setContentTypes([]);
-    setTypeFilter('all');
     setShowTypeOptions(false);
     setLiked(null);
     setShowDeleteDialog(false);
   };
+
+  useEffect(() => {
+    if (!isContentTypeValid(contentType)) {
+      history.replace(
+        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', 'all')
+      );
+    }
+  }, [contentType, history, location, queryParams]);
 
   useEffect(() => {
     (async () => {
@@ -185,11 +196,11 @@ const ShowList = ({ wrapperRef }) => {
         getFilteredContent(
           contentList.content,
           contentList.content_types,
-          typeFilter
+          contentType
         )
       );
     }
-  }, [contentList, typeFilter]);
+  }, [contentList, contentType]);
 
   const handleLike = async () => {
     if (!authenticated || !isUserActive) {
@@ -261,6 +272,15 @@ const ShowList = ({ wrapperRef }) => {
       );
       setSeverity('error');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+    }
+  };
+
+  const handleSelectContentType = (ct) => {
+    setShowTypeOptions(false);
+    if (contentType !== ct) {
+      history.push(
+        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+      );
     }
   };
 
@@ -376,7 +396,11 @@ const ShowList = ({ wrapperRef }) => {
             <>
               <label>Tipo</label>
               <SingleOptionSelect
-                label={!typeFilter ? 'Todos' : getTypeOption(typeFilter)}
+                label={
+                  !contentType || !contentTypes.find((ct) => ct === contentType)
+                    ? 'Selecionar'
+                    : contentTypeList.find((e) => e.value === contentType).key
+                }
                 dropDownAlign="center"
                 show={showTypeOptions}
                 setShow={setShowTypeOptions}
@@ -385,15 +409,12 @@ const ShowList = ({ wrapperRef }) => {
                 hover={colors['background-700']}
               >
                 <TypeOptions>
-                  {contentTypes.map((t, i) => (
+                  {contentTypes.map((ct, i) => (
                     <Option
                       key={`typeFilter${i}`}
-                      onClick={() => {
-                        typeFilter !== t && setTypeFilter(t);
-                        setShowTypeOptions(false);
-                      }}
+                      onClick={() => handleSelectContentType(ct)}
                     >
-                      {getTypeOption(t)}
+                      {contentTypeList.find((e) => e.value === ct).key}
                     </Option>
                   ))}
                 </TypeOptions>
@@ -402,7 +423,18 @@ const ShowList = ({ wrapperRef }) => {
           )}
         </Filters>
       </Header>
-      <Main>{content && <ContentGrid content={content} />}</Main>
+      <Main>
+        {content.length === 0 && (
+          <Message>
+            Esta lista não apresenta nehum conteúdo do tipo{' '}
+            {contentTypeList
+              .find((e) => e.value === contentType)
+              .key.toLowerCase()}
+            .
+          </Message>
+        )}
+        {content.length > 0 && <ContentGrid content={content} />}
+      </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <DeleteListDialog
           createdBy={contentList.user_name}

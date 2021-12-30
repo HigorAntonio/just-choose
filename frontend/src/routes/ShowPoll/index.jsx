@@ -1,5 +1,12 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useParams, useHistory, Link } from 'react-router-dom';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useMemo,
+} from 'react';
+import { useParams, useHistory, Link, useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 import { ThemeContext } from 'styled-components';
 import { IoMdListBox } from 'react-icons/io';
 import { FaPlay } from 'react-icons/fa';
@@ -22,6 +29,7 @@ import Modal from '../../components/Modal';
 import DeletePollDialog from '../../components/DeletePollDialog';
 import ShowListSkeleton from '../../components/Skeleton/ShowListSkeleton';
 import formatCount from '../../utils/formatCount';
+import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
 
 import {
   Container,
@@ -40,6 +48,7 @@ import {
   TypeOptions,
   Option,
   Main,
+  Message,
   ResultContainer,
   ResultHeader,
   ResultBody,
@@ -89,19 +98,15 @@ const getContentBaseUrl = (type) => {
   }
 };
 
-const getTypeOption = (type) => {
-  switch (type) {
-    case 'all':
-      return 'Todos';
-    case 'movie':
-      return 'Filmes';
-    case 'show':
-      return 'Séries';
-    case 'game':
-      return 'Jogos';
-    default:
-      return '';
-  }
+const contentTypeList = [
+  { key: 'Todos', value: 'all' },
+  { key: 'Filme', value: 'movie' },
+  { key: 'Série', value: 'show' },
+  { key: 'Jogo', value: 'game' },
+];
+
+const isContentTypeValid = (contentType) => {
+  return !!contentTypeList.find((e) => e.value === contentType);
 };
 
 const getFilteredContent = (content, contentTypes, typeFilter) => {
@@ -113,18 +118,24 @@ const getFilteredContent = (content, contentTypes, typeFilter) => {
     return filteredContent;
   }
   if (typeFilter === 'movie') {
-    return content.movies;
+    return content.movies ? content.movies : [];
   }
   if (typeFilter === 'show') {
-    return content.shows;
+    return content.shows ? content.shows : [];
   }
   if (typeFilter === 'game') {
-    return content.games;
+    return content.games ? content.games : [];
   }
 };
 
 const ShowPoll = ({ wrapperRef }) => {
   const { id: pollId } = useParams();
+  const location = useLocation();
+  const queryParams = useMemo(
+    () => queryString.parse(location.search),
+    [location]
+  );
+  const { type: contentType = 'all' } = queryParams;
   const history = useHistory();
 
   const { userId, authenticated } = useContext(AuthContext);
@@ -147,7 +158,6 @@ const ShowPoll = ({ wrapperRef }) => {
   const [createdAt, setCreatedAt] = useState();
   const [content, setContent] = useState([]);
   const [contentTypes, setContentTypes] = useState([]);
-  const [typeFilter, setTypeFilter] = useState('all');
   const [showListOption, setShowListOption] = useState(false);
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -166,12 +176,19 @@ const ShowPoll = ({ wrapperRef }) => {
     setCreatedAt(null);
     setContent([]);
     setContentTypes([]);
-    setTypeFilter('all');
     setShowListOption(false);
     setShowTypeOptions(false);
     setShowDeleteDialog(false);
     setVote({});
   };
+
+  useEffect(() => {
+    if (!isContentTypeValid(contentType)) {
+      history.replace(
+        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', 'all')
+      );
+    }
+  }, [contentType, history, location, queryParams]);
 
   const getPageData = useCallback(async () => {
     try {
@@ -180,12 +197,14 @@ const ShowPoll = ({ wrapperRef }) => {
       const { data: pollData } = await justChooseApi.get(`/polls/${pollId}`);
       setPoll(pollData);
       setCreatedAt(new Date(pollData.created_at));
+      if (pollData.content_types) {
+        setContentTypes(['all', ...pollData.content_types]);
+      }
       if (
         JSON.stringify(pollData) !== '{}' &&
         pollData.is_active &&
         authenticated
       ) {
-        setContentTypes(['all', ...pollData.content_types]);
         const { data: vote } = await justChooseApi.get(
           `/polls/${pollData.id}/votes`
         );
@@ -219,10 +238,10 @@ const ShowPoll = ({ wrapperRef }) => {
   useEffect(() => {
     if (JSON.stringify(poll) !== '{}' && poll.is_active) {
       setContent(
-        getFilteredContent(poll.content, poll.content_types, typeFilter)
+        getFilteredContent(poll.content, poll.content_types, contentType)
       );
     }
-  }, [poll, typeFilter]);
+  }, [poll, contentType]);
 
   const handleActive = async () => {
     if (!authenticated) {
@@ -329,6 +348,15 @@ const ShowPoll = ({ wrapperRef }) => {
       });
       setVote(content);
     } catch (error) {}
+  };
+
+  const handleSelectContentType = (ct) => {
+    setShowTypeOptions(false);
+    if (contentType !== ct) {
+      history.push(
+        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+      );
+    }
   };
 
   const handleContentEnterKey = (e, href) => {
@@ -438,7 +466,12 @@ const ShowPoll = ({ wrapperRef }) => {
               <>
                 <label>Tipo</label>
                 <SingleOptionSelect
-                  label={!typeFilter ? 'Todos' : getTypeOption(typeFilter)}
+                  label={
+                    !contentType ||
+                    !contentTypes.find((ct) => ct === contentType)
+                      ? 'Selecionar'
+                      : contentTypeList.find((e) => e.value === contentType).key
+                  }
                   dropDownAlign="center"
                   show={showTypeOptions}
                   setShow={setShowTypeOptions}
@@ -447,15 +480,12 @@ const ShowPoll = ({ wrapperRef }) => {
                   hover={colors['background-700']}
                 >
                   <TypeOptions>
-                    {contentTypes.map((t, i) => (
+                    {contentTypes.map((ct, i) => (
                       <Option
                         key={`typeFilter${i}`}
-                        onClick={() => {
-                          typeFilter !== t && setTypeFilter(t);
-                          setShowTypeOptions(false);
-                        }}
+                        onClick={() => handleSelectContentType(ct)}
                       >
-                        {getTypeOption(t)}
+                        {contentTypeList.find((e) => e.value === ct).key}
                       </Option>
                     ))}
                   </TypeOptions>
@@ -466,6 +496,15 @@ const ShowPoll = ({ wrapperRef }) => {
         )}
       </Header>
       <Main>
+        {poll.is_active && content.length === 0 && (
+          <Message>
+            Esta votação não apresenta nehum conteúdo do tipo{' '}
+            {contentTypeList
+              .find((e) => e.value === contentType)
+              .key.toLowerCase()}
+            .
+          </Message>
+        )}
         {poll.is_active && content.length > 0 && (
           <ContentGrid
             content={content}
