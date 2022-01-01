@@ -29,6 +29,7 @@ export const UserName = styled.h3`
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+  word-break: break-word;
   overflow: hidden;
   font-size: 1.9rem;
   text-align: center;

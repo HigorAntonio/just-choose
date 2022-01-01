@@ -365,6 +365,7 @@ export const ResultBody = styled.div`
         display: -webkit-box;
         -webkit-line-clamp: 3; /* number of lines to show */
         -webkit-box-orient: vertical;
+        word-break: break-word;
 
         @media (max-width: 640px) {
           -webkit-line-clamp: 2; /* number of lines to show */

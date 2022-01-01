@@ -65,6 +65,7 @@ export const Title = styled.h3`
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+  word-break: break-word;
   overflow: hidden;
   font-size: 1.6rem;
   margin-bottom: 3px;

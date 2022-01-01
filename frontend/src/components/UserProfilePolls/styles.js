@@ -14,12 +14,21 @@ export const Filters = styled.div`
   justify-content: space-between;
   align-items: center;
   padding-bottom: 10px;
+
+  @media (max-width: 880px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 export const AlignLeftFilters = styled.div`
   display: flex;
   align-items: center;
   padding: 0 10px 10px 0;
+
+  @media (max-width: 880px) {
+    width: 100%;
+  }
 `;
 
 export const AlignRightFilters = styled.div`
@@ -32,6 +41,15 @@ export const AlignRightFilters = styled.div`
 
     &:hover {
       background: var(--background-700);
+    }
+  }
+
+  @media (max-width: 324px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    > label {
+      margin-bottom: 5px;
     }
   }
 `;
@@ -64,6 +82,15 @@ export const SearchWrapper = styled.div`
     }
 
     transition: border 0.3s;
+
+    @media (max-width: 880px) {
+      width: 100%;
+      max-width: 350px;
+    }
+  }
+
+  @media (max-width: 880px) {
+    width: 100%;
   }
 `;
 

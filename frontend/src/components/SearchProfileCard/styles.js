@@ -24,6 +24,11 @@ export const ProfileImageWrapper = styled.div`
   align-items: center;
   margin-right: 20px;
   border-radius: 50%;
+
+  @media (max-width: 768px) {
+    width: 76px;
+    height: 76px;
+  }
 `;
 
 export const ProfileImage = styled.img`
@@ -45,6 +50,7 @@ export const UserName = styled.h3`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-word;
   overflow: hidden;
   font-size: 1.9rem;
 
@@ -74,6 +80,7 @@ export const Description = styled.p`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-word;
   overflow: hidden;
   font-size: 1.5rem;
 `;

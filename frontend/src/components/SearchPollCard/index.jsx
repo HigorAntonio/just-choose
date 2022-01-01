@@ -6,13 +6,16 @@ import { fromNow } from '../../utils/dataUtility';
 
 import {
   Container,
+  ThumbnailContainer,
   ThumbnailWrapper,
   Thumbnail,
   TimeFromNow,
-  TextWrapper,
+  TextWrapperLargeScreen,
+  TextWrapperSmallScreen,
   Title,
   Meta,
   PollStatus,
+  MetaSeparator,
   ProfileInfo,
   UserName,
   ProfileImageWrapper,
@@ -47,18 +50,20 @@ const SearchPollCard = ({ poll }) => {
 
   return (
     <Container onClick={handleContainerClick}>
-      <ThumbnailWrapper>
-        <Link to={`/polls/${pollId}`}>
-          <Thumbnail
-            src={thumbnail}
-            onError={() => setThumbnailError(true)}
-            error={thumbnailError}
-          />
-          {thumbnailError && <BsImage />}
-          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
-        </Link>
-      </ThumbnailWrapper>
-      <TextWrapper>
+      <ThumbnailContainer>
+        <ThumbnailWrapper>
+          <Link to={`/polls/${pollId}`}>
+            <Thumbnail
+              src={thumbnail}
+              onError={() => setThumbnailError(true)}
+              error={thumbnailError}
+            />
+            {thumbnailError && <BsImage />}
+            <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
+          </Link>
+        </ThumbnailWrapper>
+      </ThumbnailContainer>
+      <TextWrapperLargeScreen>
         <Title title={title}>
           <Link to={`/polls/${pollId}`}>{title}</Link>
         </Title>
@@ -82,7 +87,28 @@ const SearchPollCard = ({ poll }) => {
         <DescriptionWrapper>
           <Description>{description}</Description>
         </DescriptionWrapper>
-      </TextWrapper>
+      </TextWrapperLargeScreen>
+      <TextWrapperSmallScreen>
+        <ProfileImageWrapper>
+          <Link to={`/users/${userId}`}>
+            <ProfileImage
+              src={profileImageUrl}
+              onError={() => setProfileImageError(true)}
+              error={profileImageError}
+            />
+          </Link>
+        </ProfileImageWrapper>
+        <Meta>
+          <Title title={title}>
+            <Link to={`/polls/${pollId}`}>{title}</Link>
+          </Title>
+          <Meta>
+            <UserName>{userName}</UserName>
+            <MetaSeparator>•</MetaSeparator>
+            <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
+          </Meta>
+        </Meta>
+      </TextWrapperSmallScreen>
     </Container>
   );
 };

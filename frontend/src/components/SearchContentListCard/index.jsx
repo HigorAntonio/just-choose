@@ -7,10 +7,12 @@ import formatCount from '../../utils/formatCount';
 
 import {
   Container,
+  ThumbnailContainer,
   ThumbnailWrapper,
   Thumbnail,
   TimeFromNow,
-  TextWrapper,
+  TextWrapperLargeScreen,
+  TextWrapperSmallScreen,
   Title,
   Meta,
   Likes,
@@ -51,29 +53,31 @@ const SearchContentListCard = ({ contentList }) => {
 
   return (
     <Container onClick={handleContainerClick}>
-      <ThumbnailWrapper>
-        <Link to={`/lists/${listId}`}>
-          <Thumbnail
-            src={thumbnail}
-            onError={() => setThumbnailError(true)}
-            error={thumbnailError}
-          />
-          {thumbnailError && <BsImage />}
-          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
-        </Link>
-      </ThumbnailWrapper>
-      <TextWrapper>
+      <ThumbnailContainer>
+        <ThumbnailWrapper>
+          <Link to={`/lists/${listId}`}>
+            <Thumbnail
+              src={thumbnail}
+              onError={() => setThumbnailError(true)}
+              error={thumbnailError}
+            />
+            {thumbnailError && <BsImage />}
+            <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
+          </Link>
+        </ThumbnailWrapper>
+      </ThumbnailContainer>
+      <TextWrapperLargeScreen>
         <Title title={title}>
           <Link to={`/lists/${listId}`}>{title}</Link>
         </Title>
         <Meta>
           <Likes>
-            {formatCount(15000) + ' '}
+            {formatCount(likes) + ' '}
             {likes === 1 ? 'curtida' : 'curtidas'}
           </Likes>
           <MetaSeparator>•</MetaSeparator>
           <Forks>
-            {formatCount(299792458) + ' '}
+            {formatCount(forks) + ' '}
             {forks === 1 ? 'fork' : 'forks'}
           </Forks>
         </Meta>
@@ -94,7 +98,36 @@ const SearchContentListCard = ({ contentList }) => {
         <DescriptionWrapper>
           <Description>{description}</Description>
         </DescriptionWrapper>
-      </TextWrapper>
+      </TextWrapperLargeScreen>
+      <TextWrapperSmallScreen>
+        <ProfileImageWrapper>
+          <Link to={`/users/${userId}`}>
+            <ProfileImage
+              src={profileImageUrl}
+              onError={() => setProfileImageError(true)}
+              error={profileImageError}
+            />
+          </Link>
+        </ProfileImageWrapper>
+        <Meta>
+          <Title title={title}>
+            <Link to={`/lists/${listId}`}>{title}</Link>
+          </Title>
+          <Meta>
+            <UserName>{userName}</UserName>
+            <MetaSeparator>•</MetaSeparator>
+            <Likes>
+              {formatCount(likes) + ' '}
+              {likes === 1 ? 'curtida' : 'curtidas'}
+            </Likes>
+            <MetaSeparator>•</MetaSeparator>
+            <Forks>
+              {formatCount(forks) + ' '}
+              {forks === 1 ? 'fork' : 'forks'}
+            </Forks>
+          </Meta>
+        </Meta>
+      </TextWrapperSmallScreen>
     </Container>
   );
 };

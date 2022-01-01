@@ -95,6 +95,7 @@ function Header() {
   };
 
   const handleSearch = () => {
+    setShowSearchDropDown(false);
     history.push(`/search?query=${search}`);
   };
 

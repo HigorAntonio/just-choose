@@ -10,8 +10,9 @@ export const Container = styled.div`
 export const StickyWrapper = styled.div`
   width: 100%;
   position: sticky;
-  z-index: 2;
+  z-index: 300;
   top: 0;
+  background: var(--background-410);
 `;
 
 export const Header = styled.header`

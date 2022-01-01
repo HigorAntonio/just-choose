@@ -6,30 +6,58 @@ export const Container = styled.div`
   &:hover {
     cursor: pointer;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+export const ThumbnailContainer = styled.div`
+  width: 50%;
+  max-width: 36rem;
+  margin-right: 20px;
+
+  @media (max-width: 1024px) {
+    width: 35%;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
 `;
 
 export const ThumbnailWrapper = styled.div`
-  width: 360px;
-  height: 202.5px;
   background: var(--background-600);
+  width: 100%;
+  height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 20px;
+  padding-top: calc(9 / 16 * 100%);
   position: relative;
+  overflow: hidden;
 
   > a {
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-shrink: 0;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
   }
 
   > a svg {
     width: 50%;
     height: 50%;
     flex-shrink: 0;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
   }
 `;
 
@@ -52,16 +80,21 @@ export const TimeFromNow = styled.div`
   bottom: 10px;
 `;
 
-export const TextWrapper = styled.div`
+export const TextWrapperLargeScreen = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const Title = styled.h3`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-word;
   overflow: hidden;
   font-size: 1.9rem;
 
@@ -138,6 +171,27 @@ export const Description = styled.p`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  word-break: break-word;
   overflow: hidden;
   font-size: 1.5rem;
+`;
+
+export const TextWrapperSmallScreen = styled.div`
+  display: none;
+  padding-bottom: 5px;
+
+  > ${ProfileImageWrapper}, ${ProfileImageWrapper} a,
+  ${ProfileImage} {
+    width: 48px;
+    height: 48px;
+  }
+
+  > ${Meta} ${UserName}, ${Meta} ${PollStatus} {
+    display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex: 1;
+  }
 `;
