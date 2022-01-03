@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
 import { fromNow } from '../../utils/dataUtility';
@@ -29,25 +30,27 @@ const UserProfilePollCard = ({ poll }) => {
 
   return (
     <Container>
-      <CardWrapper>
-        <Top>
-          <ThumbWrapper>
-            <Thumbnail
-              src={thumbnail}
-              onError={() => setThumbnailError(true)}
-              error={thumbnailError}
-            />
-            {thumbnailError && <BsImage />}
-          </ThumbWrapper>
-          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
-        </Top>
-        <Bottom>
-          <Title title={title}>{title}</Title>
-          <Meta>
-            <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
-          </Meta>
-        </Bottom>
-      </CardWrapper>
+      <Link to={`/polls/${pollId}`}>
+        <CardWrapper>
+          <Top>
+            <ThumbWrapper>
+              <Thumbnail
+                src={thumbnail}
+                onError={() => setThumbnailError(true)}
+                error={thumbnailError}
+              />
+              {thumbnailError && <BsImage />}
+            </ThumbWrapper>
+            <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
+          </Top>
+          <Bottom>
+            <Title title={title}>{title}</Title>
+            <Meta>
+              <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
+            </Meta>
+          </Bottom>
+        </CardWrapper>
+      </Link>
     </Container>
   );
 };

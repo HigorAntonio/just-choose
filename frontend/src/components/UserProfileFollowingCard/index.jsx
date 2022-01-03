@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import formatCount from '../../utils/formatCount';
 
@@ -25,20 +26,22 @@ const UserProfileFollowingCard = ({ profile }) => {
 
   return (
     <Container title={userName}>
-      <ProfileImageWrapper>
-        <ProfileImage
-          src={profileImageUrl}
-          onError={() => setProfileImageError(true)}
-          error={profileImageError}
-        />
-      </ProfileImageWrapper>
-      <UserName>{userName}</UserName>
-      <Meta>
-        <FollowersCount>
-          {formatCount(followersCount)}
-          {followersCount === 1 ? ' seguidor' : ' seguidores'}
-        </FollowersCount>
-      </Meta>
+      <Link to={`/users/${profileId}`}>
+        <ProfileImageWrapper>
+          <ProfileImage
+            src={profileImageUrl}
+            onError={() => setProfileImageError(true)}
+            error={profileImageError}
+          />
+        </ProfileImageWrapper>
+        <UserName>{userName}</UserName>
+        <Meta>
+          <FollowersCount>
+            {formatCount(followersCount)}
+            {followersCount === 1 ? ' seguidor' : ' seguidores'}
+          </FollowersCount>
+        </Meta>
+      </Link>
     </Container>
   );
 };

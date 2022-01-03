@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
 import { fromNow } from '../../utils/dataUtility';
@@ -33,33 +34,35 @@ const UserProfileListCard = ({ contentList }) => {
 
   return (
     <Container>
-      <CardWrapper>
-        <Top>
-          <ThumbWrapper>
-            <Thumbnail
-              src={thumbnail}
-              onError={() => setThumbnailError(true)}
-              error={thumbnailError}
-            />
-            {thumbnailError && <BsImage />}
-          </ThumbWrapper>
-          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
-        </Top>
-        <Bottom>
-          <Title title={title}>{title}</Title>
-          <Meta>
-            <Likes>
-              {formatCount(likes) + ' '}
-              {likes === 1 ? 'curtida' : 'curtidas'}
-            </Likes>
-            <MetaSeparator>•</MetaSeparator>
-            <Forks>
-              {formatCount(forks) + ' '}
-              {forks === 1 ? 'fork' : 'forks'}
-            </Forks>
-          </Meta>
-        </Bottom>
-      </CardWrapper>
+      <Link to={`/lists/${listId}`}>
+        <CardWrapper>
+          <Top>
+            <ThumbWrapper>
+              <Thumbnail
+                src={thumbnail}
+                onError={() => setThumbnailError(true)}
+                error={thumbnailError}
+              />
+              {thumbnailError && <BsImage />}
+            </ThumbWrapper>
+            <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
+          </Top>
+          <Bottom>
+            <Title title={title}>{title}</Title>
+            <Meta>
+              <Likes>
+                {formatCount(likes) + ' '}
+                {likes === 1 ? 'curtida' : 'curtidas'}
+              </Likes>
+              <MetaSeparator>•</MetaSeparator>
+              <Forks>
+                {formatCount(forks) + ' '}
+                {forks === 1 ? 'fork' : 'forks'}
+              </Forks>
+            </Meta>
+          </Bottom>
+        </CardWrapper>
+      </Link>
     </Container>
   );
 };

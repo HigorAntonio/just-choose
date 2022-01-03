@@ -71,6 +71,7 @@ const UserProfile = ({ wrapperRef }) => {
     setLoadingError(false);
     setFollowing(false);
     setProfile({});
+    setProfileImageError(false);
   };
 
   useEffect(() => {
