@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 import justChooseApi from '../apis/justChooseApi';
 
@@ -51,22 +52,34 @@ const useMovieFilters = () => {
   };
 
   useEffect(() => {
+    let source = axios.CancelToken.source();
+
     (async () => {
       try {
-        const { data } = await justChooseApi.get('/movies/watch_providers');
+        const { data } = await justChooseApi.get('/movies/watch_providers', {
+          cancelToken: source.token,
+        });
         setProviders(data);
       } catch (error) {}
       try {
-        const { data } = await justChooseApi.get('/movies/genres');
+        const { data } = await justChooseApi.get('/movies/genres', {
+          cancelToken: source.token,
+        });
         setGenres(data.genres);
       } catch (error) {}
       try {
-        const { data } = await justChooseApi.get('/movies/certifications');
+        const { data } = await justChooseApi.get('/movies/certifications', {
+          cancelToken: source.token,
+        });
         setCertifications(
           data.certifications['BR'].sort(compareCertifications)
         );
       } catch (error) {}
     })();
+
+    return () => {
+      source.cancel();
+    };
   }, [setProviders, setGenres, setCertifications]);
 
   return {

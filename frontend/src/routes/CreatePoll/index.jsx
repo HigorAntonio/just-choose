@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import axios from 'axios';
 
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
@@ -72,6 +73,8 @@ const CreatePoll = ({ wrapperRef }) => {
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
+  const mounted = useRef();
+  const source = useRef();
 
   useEffect(() => {
     // Posiciona o scroll no início da página
@@ -82,10 +85,15 @@ const CreatePoll = ({ wrapperRef }) => {
   }, [wrapperRef]);
 
   useEffect(() => {
+    mounted.current = true;
+    source.current = axios.CancelToken.source();
+
     (async () => {
       try {
         clearForm();
-        const { data } = await justChooseApi.get(`/contentlists/${listId}`);
+        const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
+          cancelToken: source.current.token,
+        });
         if (userId !== data.user_id) {
           setDenyAccess(true);
           return;
@@ -96,14 +104,18 @@ const CreatePoll = ({ wrapperRef }) => {
         );
         setContentList(content);
       } catch (error) {
-        if (error.response && error.response.status === 400) {
-          setLoadingError(true);
+        if (axios.isCancel(error)) {
+          return;
         }
-        if (error.response && error.response.status === 403) {
-          setDenyAccess(true);
-        }
+        setLoadingError(true);
+        setDenyAccess(true);
       }
     })();
+
+    return () => {
+      mounted.current = false;
+      source.current.cancel();
+    };
   }, [listId, userId]);
 
   useEffect(() => {
@@ -232,16 +244,24 @@ const CreatePoll = ({ wrapperRef }) => {
         });
         pollId = data.id;
       } catch (error) {
-        setErrorOnCreate(true);
+        if (mounted.current) {
+          setErrorOnCreate(true);
+        }
       }
     } else {
-      setErrorOnCreate(true);
+      if (mounted.current) {
+        setErrorOnCreate(true);
+      }
     }
 
-    setCreating(false);
+    if (mounted.current) {
+      setCreating(false);
+    }
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (pollId) {
-      setCreatedSuccessfully(true);
+      if (mounted.current) {
+        setCreatedSuccessfully(true);
+      }
       return history.push(`/polls/${pollId}`);
     }
 

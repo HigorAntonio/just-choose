@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useRef, useMemo } from 'react';
 import { useParams, useHistory, Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import queryString from 'query-string';
 import { ThemeContext } from 'styled-components';
 import { FaHeart, FaRegHeart, FaVoteYea, FaTrash } from 'react-icons/fa';
@@ -136,6 +137,9 @@ const ShowList = ({ wrapperRef }) => {
   const [liked, setLiked] = useState();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  const mounted = useRef();
+  const source = useRef();
+
   useEffect(() => {
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
@@ -163,22 +167,32 @@ const ShowList = ({ wrapperRef }) => {
   }, [contentType, history, location, queryParams]);
 
   useEffect(() => {
+    mounted.current = true;
+    source.current = axios.CancelToken.source();
+
     (async () => {
       try {
         setLoading(true);
         clearState();
-        const { data } = await justChooseApi.get(`/contentlists/${listId}`);
+        const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
+          cancelToken: source.current.token,
+        });
         setContentList(data);
         setCreatedAt(new Date(data.created_at));
         setContentTypes(['all', ...data.content_types]);
         if (authenticated && isUserActive) {
           const {
             data: { like },
-          } = await justChooseApi.get(`/contentlists/${listId}/like`);
+          } = await justChooseApi.get(`/contentlists/${listId}/like`, {
+            cancelToken: source.current.token,
+          });
           setLiked(like);
         }
         setLoading(false);
       } catch (error) {
+        if (axios.isCancel(error)) {
+          return;
+        }
         setLoading(false);
         if (error.response && error.response.status === 400) {
           setLoadingError(true);
@@ -188,6 +202,11 @@ const ShowList = ({ wrapperRef }) => {
         }
       }
     })();
+
+    return () => {
+      mounted.current = false;
+      source.current.cancel();
+    };
   }, [listId, authenticated, isUserActive]);
 
   useEffect(() => {
@@ -209,19 +228,25 @@ const ShowList = ({ wrapperRef }) => {
     try {
       if (!liked) {
         await justChooseApi.post(`/contentlists/${listId}/like`);
-        setContentList((prevState) => ({
-          ...prevState,
-          likes: prevState.likes + 1,
-        }));
+        if (mounted.current) {
+          setContentList((prevState) => ({
+            ...prevState,
+            likes: prevState.likes + 1,
+          }));
+        }
       }
       if (liked) {
         await justChooseApi.delete(`/contentlists/${listId}/like`);
-        setContentList((prevState) => ({
-          ...prevState,
-          likes: prevState.likes - 1,
-        }));
+        if (mounted.current) {
+          setContentList((prevState) => ({
+            ...prevState,
+            likes: prevState.likes - 1,
+          }));
+        }
       }
-      setLiked((prevState) => !prevState);
+      if (mounted.current) {
+        setLiked((prevState) => !prevState);
+      }
     } catch (error) {}
   };
 
@@ -238,13 +263,17 @@ const ShowList = ({ wrapperRef }) => {
       const { data } = await justChooseApi.post(
         `/contentlists/${listId}/fork/`
       );
-      setLoading(false);
+      if (mounted.current) {
+        setLoading(false);
+      }
       setMessage('Lista criada com sucesso.');
       setSeverity('success');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       history.push(`/lists/${data.forked_list_id}`);
     } catch (error) {
-      setLoading(false);
+      if (mounted.current) {
+        setLoading(false);
+      }
       setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
       setSeverity('error');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));

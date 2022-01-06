@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 
 import { AlertContext } from '../../context/AlertContext';
 import { ProfileContext } from '../../context/ProfileContext';
@@ -48,6 +48,16 @@ const SettingsSecurity = ({ wrapperRef }) => {
   const [errorOnUpdatePassword, setErrorOnUpdatePassword] = useState(false);
   const [passwordUpdatedSuccessfully, setPasswordUpdatedSuccessfully] =
     useState(false);
+
+  const mounted = useRef();
+
+  useEffect(() => {
+    mounted.current = true;
+
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (resendingConfirmationEmail) {
@@ -144,13 +154,17 @@ const SettingsSecurity = ({ wrapperRef }) => {
     try {
       await justChooseApi.get('/confirmation');
     } catch (error) {
-      setErrorOnResendConfirmationEmail(true);
+      if (mounted.current) {
+        setErrorOnResendConfirmationEmail(true);
+      }
       successfullySent = false;
     }
 
-    setResendingConfirmationEmail(false);
+    if (mounted.current) {
+      setResendingConfirmationEmail(false);
+    }
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    if (successfullySent) {
+    if (mounted.current && successfullySent) {
       setConfirmationEmailSentSuccessfully(true);
     }
   };
@@ -170,10 +184,13 @@ const SettingsSecurity = ({ wrapperRef }) => {
         data: { currentPassword, newPassword },
       });
     } catch (error) {
-      setErrorOnUpdatePassword(true);
+      if (mounted.current) {
+        setErrorOnUpdatePassword(true);
+      }
       successfullyUpdated = false;
 
       if (
+        mounted.current &&
         error.response &&
         error.response.status === 400 &&
         error.response.data.erro === 'Senha inválida'
@@ -182,9 +199,11 @@ const SettingsSecurity = ({ wrapperRef }) => {
       }
     }
 
-    setUpdatingPassword(false);
+    if (mounted.current) {
+      setUpdatingPassword(false);
+    }
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    if (successfullyUpdated) {
+    if (mounted.current && successfullyUpdated) {
       clearUpdatePasswordForm();
       setPasswordUpdatedSuccessfully(true);
     }

@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 import { ViewportContext } from '../../context/ViewportContext';
 
@@ -18,6 +19,9 @@ const UserProfileStartVotes = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+    let source = axios.CancelToken.source();
+
     (async () => {
       try {
         const { data } = await justChooseApi.get(`/users/${profileId}/votes`, {
@@ -26,13 +30,21 @@ const UserProfileStartVotes = () => {
             page_size: 6,
             sort_by: 'updated.desc',
           },
+          cancelToken: source.token,
         });
         setContent(data.results);
         setLoading(false);
       } catch (error) {
+        if (axios.isCancel(error)) {
+          return;
+        }
         setLoading(false);
       }
     })();
+
+    return () => {
+      source.cancel();
+    };
   }, [profileId]);
 
   useEffect(() => {

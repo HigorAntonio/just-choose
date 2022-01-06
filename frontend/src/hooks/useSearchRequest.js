@@ -16,12 +16,13 @@ const useSearchRequest = (url, params, pageNumber) => {
   useEffect(() => {
     setLoading(true);
     setError(false);
-    let cancel;
+    let source = axios.CancelToken.source();
+
     (async () => {
       try {
         const { data } = await justChooseApi.get(url, {
           params: { ...params, page: pageNumber },
-          cancelToken: new axios.CancelToken((c) => (cancel = c)),
+          cancelToken: source.token,
         });
         setContent((prevState) => {
           return [...prevState, ...data.results];
@@ -35,7 +36,10 @@ const useSearchRequest = (url, params, pageNumber) => {
         setError(true);
       }
     })();
-    return () => cancel();
+
+    return () => {
+      source.cancel();
+    };
   }, [url, params, pageNumber]);
 
   return { loading, error, content, hasMore };

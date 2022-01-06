@@ -4,8 +4,10 @@ import React, {
   useCallback,
   useContext,
   useMemo,
+  useRef,
 } from 'react';
 import { useParams, useHistory, Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import queryString from 'query-string';
 import { ThemeContext } from 'styled-components';
 import { IoMdListBox } from 'react-icons/io';
@@ -163,6 +165,9 @@ const ShowPoll = ({ wrapperRef }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [vote, setVote] = useState({});
 
+  const mounted = useRef();
+  const source = useRef();
+
   useEffect(() => {
     // Posiciona o scroll no início da página
     wrapperRef.current.scrollTop = 0;
@@ -194,7 +199,9 @@ const ShowPoll = ({ wrapperRef }) => {
     try {
       setLoading(true);
       clearState();
-      const { data: pollData } = await justChooseApi.get(`/polls/${pollId}`);
+      const { data: pollData } = await justChooseApi.get(`/polls/${pollId}`, {
+        cancelToken: source.current.token,
+      });
       setPoll(pollData);
       setCreatedAt(new Date(pollData.created_at));
       if (pollData.content_types) {
@@ -206,7 +213,10 @@ const ShowPoll = ({ wrapperRef }) => {
         authenticated
       ) {
         const { data: vote } = await justChooseApi.get(
-          `/polls/${pollData.id}/votes`
+          `/polls/${pollData.id}/votes`,
+          {
+            cancelToken: source.current.token,
+          }
         );
         if (vote) {
           setVote(vote);
@@ -216,11 +226,16 @@ const ShowPoll = ({ wrapperRef }) => {
         setContent(pollData.result);
       }
       try {
-        await justChooseApi.get(`/contentlists/${pollData.content_list_id}`);
+        await justChooseApi.get(`/contentlists/${pollData.content_list_id}`, {
+          cancelToken: source.current.token,
+        });
         setShowListOption(true);
       } catch (error) {}
       setLoading(false);
     } catch (error) {
+      if (axios.isCancel(error)) {
+        return;
+      }
       setLoading(false);
       if (error.response && error.response.status === 400) {
         setLoadingError(true);
@@ -232,7 +247,15 @@ const ShowPoll = ({ wrapperRef }) => {
   }, [pollId, authenticated]);
 
   useEffect(() => {
+    mounted.current = true;
+    source.current = axios.CancelToken.source();
+
     (async () => await getPageData())();
+
+    return () => {
+      mounted.current = false;
+      source.current.cancel();
+    };
   }, [getPageData]);
 
   useEffect(() => {
@@ -264,8 +287,10 @@ const ShowPoll = ({ wrapperRef }) => {
         method: 'PUT',
         data: formData,
       });
-      await getPageData();
-      setLoading(false);
+      if (mounted.current) {
+        await getPageData();
+        setLoading(false);
+      }
       setMessage(
         poll.is_active
           ? 'Votação fechada com sucesso.'
@@ -274,7 +299,9 @@ const ShowPoll = ({ wrapperRef }) => {
       setSeverity('success');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     } catch (error) {
-      setLoading(false);
+      if (mounted.current) {
+        setLoading(false);
+      }
       setMessage(
         poll.is_active
           ? 'Não foi possível fechar a votação. Por favor, tente novamente.'
@@ -335,6 +362,7 @@ const ShowPoll = ({ wrapperRef }) => {
       }
 
       if (
+        mounted.current &&
         vote.content_id === content.content_id &&
         vote.type === content.type
       ) {
@@ -346,7 +374,9 @@ const ShowPoll = ({ wrapperRef }) => {
         contentId: content.content_id,
         type: content.type,
       });
-      setVote(content);
+      if (mounted.current) {
+        setVote(content);
+      }
     } catch (error) {}
   };
 

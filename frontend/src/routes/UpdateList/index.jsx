@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import axios from 'axios';
 import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -96,6 +97,8 @@ const UpdateList = ({ wrapperRef }) => {
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
+  const mounted = useRef();
+  const source = useRef();
 
   const contentTypesList = ['Filme', 'Série', 'Jogo'];
 
@@ -108,11 +111,16 @@ const UpdateList = ({ wrapperRef }) => {
   }, [wrapperRef]);
 
   useEffect(() => {
+    mounted.current = true;
+    source.current = axios.CancelToken.source();
+
     (async () => {
       try {
         setLoading(true);
         clearForm();
-        const { data } = await justChooseApi.get(`/contentlists/${listId}`);
+        const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
+          cancelToken: source.current.token,
+        });
         if (userId !== data.user_id) {
           setDenyAccess(true);
           return;
@@ -140,6 +148,9 @@ const UpdateList = ({ wrapperRef }) => {
         setContentList(content);
         setLoading(false);
       } catch (error) {
+        if (axios.isCancel(error)) {
+          return;
+        }
         if (error.response && error.response.status === 400) {
           setLoading(false);
           setLoadingError(true);
@@ -150,6 +161,11 @@ const UpdateList = ({ wrapperRef }) => {
         }
       }
     })();
+
+    return () => {
+      mounted.current = false;
+      source.current.cancel();
+    };
   }, [listId, userId]);
 
   useEffect(() => {
@@ -336,7 +352,9 @@ const UpdateList = ({ wrapperRef }) => {
           data: formData,
         });
       } catch (error) {
-        setErrorOnUpdate(true);
+        if (mounted.current) {
+          setErrorOnUpdate(true);
+        }
         successfullyUpdated = false;
       }
     } else {
@@ -344,10 +362,14 @@ const UpdateList = ({ wrapperRef }) => {
       successfullyUpdated = false;
     }
 
-    setUpdating(false);
+    if (mounted.current) {
+      setUpdating(false);
+    }
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (successfullyUpdated) {
-      setUpdatedSuccessfully(true);
+      if (mounted.current) {
+        setUpdatedSuccessfully(true);
+      }
       history.push(`/lists/${listId}`);
     }
     // Posiciona o scroll no início da página

@@ -11,12 +11,13 @@ const useSearch = (query) => {
     if (query) {
       setLoading(true);
       setError(false);
-      let cancel;
+      let source = axios.CancelToken.source();
+
       (async () => {
         try {
           const { data } = await justChooseApi.get('/search', {
             params: { query },
-            cancelToken: new axios.CancelToken((c) => (cancel = c)),
+            cancelToken: source.token,
           });
           setContent(data);
           setLoading(false);
@@ -27,7 +28,10 @@ const useSearch = (query) => {
           setError(true);
         }
       })();
-      return () => cancel();
+
+      return () => {
+        source.cancel();
+      };
     }
   }, [query]);
 

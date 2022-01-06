@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 import justChooseApi from '../apis/justChooseApi';
 
@@ -38,16 +39,26 @@ const useShowFilters = () => {
   };
 
   useEffect(() => {
+    let source = axios.CancelToken.source();
+
     (async () => {
       try {
-        const { data } = await justChooseApi.get('/shows/watch_providers');
+        const { data } = await justChooseApi.get('/shows/watch_providers', {
+          cancelToken: source.token,
+        });
         setProviders(data);
       } catch (error) {}
       try {
-        const { data } = await justChooseApi.get('/shows/genres');
+        const { data } = await justChooseApi.get('/shows/genres', {
+          cancelToken: source.token,
+        });
         setGenres(data.genres);
       } catch (error) {}
     })();
+
+    return () => {
+      source.cancel();
+    };
   }, [setProviders, setGenres]);
 
   return {

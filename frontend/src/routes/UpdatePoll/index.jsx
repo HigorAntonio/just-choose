@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import axios from 'axios';
 
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
@@ -73,6 +74,8 @@ const UpdatePoll = ({ wrapperRef }) => {
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
+  const mounted = useRef();
+  const source = useRef();
 
   useEffect(() => {
     // Posiciona o scroll no início da página
@@ -83,10 +86,22 @@ const UpdatePoll = ({ wrapperRef }) => {
   }, [wrapperRef]);
 
   useEffect(() => {
+    mounted.current = true;
+    source.current = axios.CancelToken.source();
+
+    return () => {
+      mounted.current = false;
+      source.current.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
     (async () => {
       try {
         clearForm();
-        const { data } = await justChooseApi.get(`/polls/${pollId}`);
+        const { data } = await justChooseApi.get(`/polls/${pollId}`, {
+          cancelToken: source.current.token,
+        });
         if (userId !== data.user_id) {
           setDenyAccess(true);
           return;
@@ -97,6 +112,9 @@ const UpdatePoll = ({ wrapperRef }) => {
         setThumbPreview(data.thumbnail);
         setContentListId(data.content_list_id);
       } catch (error) {
+        if (axios.isCancel(error)) {
+          return;
+        }
         if (error.response && error.response.status === 400) {
           setLoadingError(true);
         }
@@ -112,7 +130,10 @@ const UpdatePoll = ({ wrapperRef }) => {
       if (contentListId) {
         try {
           const { data } = await justChooseApi.get(
-            `/contentlists/${contentListId}`
+            `/contentlists/${contentListId}`,
+            {
+              cancelToken: source.current.token,
+            }
           );
           if (userId !== data.user_id) {
             setDenyAccess(true);
@@ -124,6 +145,9 @@ const UpdatePoll = ({ wrapperRef }) => {
           );
           setContentList(content);
         } catch (error) {
+          if (axios.isCancel(error)) {
+            return;
+          }
           if (error.response && error.response.status === 400) {
             setLoadingError(true);
           }
@@ -258,7 +282,9 @@ const UpdatePoll = ({ wrapperRef }) => {
           data: formData,
         });
       } catch (error) {
-        setErrorOnUpdate(true);
+        if (mounted.current) {
+          setErrorOnUpdate(true);
+        }
         successfullyUpdated = false;
       }
     } else {
@@ -266,10 +292,14 @@ const UpdatePoll = ({ wrapperRef }) => {
       successfullyUpdated = false;
     }
 
-    setUpdating(false);
+    if (mounted.current) {
+      setUpdating(false);
+    }
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (successfullyUpdated) {
-      setUpdatedSuccessfully(true);
+      if (mounted.current) {
+        setUpdatedSuccessfully(true);
+      }
       history.push(`/polls/${pollId}`);
     }
     // Posiciona o scroll no início da página

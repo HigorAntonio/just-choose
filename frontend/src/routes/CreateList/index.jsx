@@ -80,8 +80,17 @@ const CreateList = ({ wrapperRef }) => {
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
+  const mounted = useRef();
 
   const contentTypesList = ['Filme', 'Série', 'Jogo'];
+
+  useEffect(() => {
+    mounted.current = true;
+
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     // Posiciona o scroll no início da página
@@ -262,16 +271,22 @@ const CreateList = ({ wrapperRef }) => {
         });
         listId = data.id;
       } catch (error) {
-        setErrorOnCreate(true);
+        if (mounted.current) {
+          setErrorOnCreate(true);
+        }
       }
     } else {
       setErrorOnCreate(true);
     }
 
-    setCreating(false);
+    if (mounted.current) {
+      setCreating(false);
+    }
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (listId) {
-      setCreatedSuccessfully(true);
+      if (mounted.current) {
+        setCreatedSuccessfully(true);
+      }
       return history.push(`/lists/${listId}`);
     }
     // Posiciona o scroll no início da página

@@ -44,6 +44,7 @@ const SettingsProfile = ({ wrapperRef }) => {
   const [updatedSuccessfully, setUpdatedSuccessfully] = useState(false);
 
   const profileImageInputFileRef = useRef();
+  const mounted = useRef();
 
   const setInitialFormData = useCallback(() => {
     userProfile.profile_image_url &&
@@ -51,6 +52,14 @@ const SettingsProfile = ({ wrapperRef }) => {
     userProfile.name && setUserName(userProfile.name);
     setProfileSettingsChange(false);
   }, [userProfile]);
+
+  useEffect(() => {
+    mounted.current = true;
+
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     setInitialFormData();
@@ -138,10 +147,13 @@ const SettingsProfile = ({ wrapperRef }) => {
         data: formData,
       });
     } catch (error) {
-      setErrorOnUpdate(true);
+      if (mounted.current) {
+        setErrorOnUpdate(true);
+      }
       successfulyUpdated = false;
 
       if (
+        mounted.current &&
         error.response &&
         error.response.status === 400 &&
         error.response.data.erro === 'Nome de usuário indisponível'
@@ -150,10 +162,14 @@ const SettingsProfile = ({ wrapperRef }) => {
       }
     }
 
-    setUpdating(false);
+    if (mounted.current) {
+      setUpdating(false);
+    }
     setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     if (successfulyUpdated) {
-      setUpdatedSuccessfully(true);
+      if (mounted.current) {
+        setUpdatedSuccessfully(true);
+      }
       refreshUserProfileData();
     }
     // Posiciona o scroll no início da página

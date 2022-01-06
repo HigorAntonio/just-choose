@@ -37,9 +37,7 @@ justChooseApi.interceptors.response.use(
           },
         });
       }
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    } catch (error) {}
 
     return Promise.reject(error);
   }

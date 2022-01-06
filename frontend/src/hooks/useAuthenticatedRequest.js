@@ -19,12 +19,13 @@ const useAuthenticatedRequest = (url, params, page) => {
     if (authenticated) {
       setLoading(true);
       setError(false);
-      let cancel;
+      let source = axios.CancelToken.source();
+
       (async () => {
         try {
           const { data } = await justChooseApi.get(url, {
             params: { ...params, page },
-            cancelToken: new axios.CancelToken((c) => (cancel = c)),
+            cancelToken: source.token,
           });
           setData((prevState) => {
             return [...prevState, ...data.results];
@@ -38,7 +39,10 @@ const useAuthenticatedRequest = (url, params, page) => {
           setError(true);
         }
       })();
-      return () => cancel();
+
+      return () => {
+        source.cancel();
+      };
     }
   }, [url, params, page, authenticated]);
 

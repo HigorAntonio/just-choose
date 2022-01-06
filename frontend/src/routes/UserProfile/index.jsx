@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import {
   useHistory,
   useParams,
   useRouteMatch,
   useLocation,
 } from 'react-router-dom';
+import axios from 'axios';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
 import { AuthContext } from '../../context/AuthContext';
@@ -67,6 +68,9 @@ const UserProfile = ({ wrapperRef }) => {
   const [profile, setProfile] = useState({});
   const [profileImageError, setProfileImageError] = useState(false);
 
+  const mounted = useRef();
+  const source = useRef();
+
   const clearState = () => {
     setLoadingError(false);
     setFollowing(false);
@@ -96,24 +100,39 @@ const UserProfile = ({ wrapperRef }) => {
   }, [wrapperRef, location]);
 
   useEffect(() => {
+    mounted.current = true;
+    source.current = axios.CancelToken.source();
+
     (async () => {
       try {
         setLoading(true);
         clearState();
-        const { data } = await justChooseApi.get(`/users/${profileId}`);
+        const { data } = await justChooseApi.get(`/users/${profileId}`, {
+          cancelToken: source.current.token,
+        });
         setProfile(data);
         if (authenticated && isUserActive) {
           const {
             data: { following },
-          } = await justChooseApi.get(`/users/following/${profileId}`);
+          } = await justChooseApi.get(`/users/following/${profileId}`, {
+            cancelToken: source.current.token,
+          });
           setFollowing(following);
         }
         setLoading(false);
       } catch (error) {
+        if (axios.isCancel(error)) {
+          return;
+        }
         setLoading(false);
         setLoadingError(true);
       }
     })();
+
+    return () => {
+      mounted.current = false;
+      source.current.cancel();
+    };
   }, [profileId, authenticated, isUserActive]);
 
   const handleFollow = async () => {
@@ -132,32 +151,38 @@ const UserProfile = ({ wrapperRef }) => {
     try {
       if (!following) {
         await justChooseApi.post(`/users/follow`, { followsId: profileId });
-        setProfile((prevState) => ({
-          ...prevState,
-          followers_count: prevState.followers_count + 1,
-        }));
-        setFollowingList((prevState) => [
-          ...prevState,
-          {
-            user_id: profile.id,
-            user_name: profile.name,
-            profile_image_url: profile.profile_image_url,
-          },
-        ]);
+        if (mounted.current) {
+          setProfile((prevState) => ({
+            ...prevState,
+            followers_count: prevState.followers_count + 1,
+          }));
+          setFollowingList((prevState) => [
+            ...prevState,
+            {
+              user_id: profile.id,
+              user_name: profile.name,
+              profile_image_url: profile.profile_image_url,
+            },
+          ]);
+        }
       }
       if (following) {
         await justChooseApi.delete(`/users/follow`, {
           data: { followsId: profileId },
         });
-        setProfile((prevState) => ({
-          ...prevState,
-          followers_count: prevState.followers_count - 1,
-        }));
-        setFollowingList((prevState) =>
-          prevState.filter((fl) => fl.user_id !== profile.id)
-        );
+        if (mounted.current) {
+          setProfile((prevState) => ({
+            ...prevState,
+            followers_count: prevState.followers_count - 1,
+          }));
+          setFollowingList((prevState) =>
+            prevState.filter((fl) => fl.user_id !== profile.id)
+          );
+        }
       }
-      setFollowing((prevState) => !prevState);
+      if (mounted.current) {
+        setFollowing((prevState) => !prevState);
+      }
     } catch (error) {}
   };
 
@@ -218,7 +243,6 @@ const UserProfile = ({ wrapperRef }) => {
                   onClick={() => handlePush(url)}
                   onAuxClick={(e) => navOnAuxClick(e, url)}
                 >
-                  {/* <Link to={`${url}`}>Início</Link> */}
                   Início
                 </div>
                 <div
@@ -228,7 +252,6 @@ const UserProfile = ({ wrapperRef }) => {
                   onClick={() => handlePush(`${url}/lists`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/lists`)}
                 >
-                  {/* <Link to={`${url}/lists`}>Listas</Link> */}
                   Listas
                 </div>
                 <div
@@ -238,7 +261,6 @@ const UserProfile = ({ wrapperRef }) => {
                   onClick={() => handlePush(`${url}/polls`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/polls`)}
                 >
-                  {/* <Link to={`${url}/polls`}>Votações</Link> */}
                   Votações
                 </div>
                 {parseInt(userId) === parseInt(profileId) && (
@@ -249,7 +271,6 @@ const UserProfile = ({ wrapperRef }) => {
                     onClick={() => handlePush(`${url}/votes`)}
                     onAuxClick={(e) => navOnAuxClick(e, `${url}/votes`)}
                   >
-                    {/* <Link to={`${url}/votes`}>Votos</Link> */}
                     Votos
                   </div>
                 )}
@@ -260,7 +281,6 @@ const UserProfile = ({ wrapperRef }) => {
                   onClick={() => handlePush(`${url}/following`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/following`)}
                 >
-                  {/* <Link to={`${url}/following`}>Seguindo</Link> */}
                   Seguindo
                 </div>
                 <div
@@ -270,7 +290,6 @@ const UserProfile = ({ wrapperRef }) => {
                   onClick={() => handlePush(`${url}/about`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/about`)}
                 >
-                  {/* <Link to={`${url}/about`}>Sobre</Link> */}
                   Sobre
                 </div>
               </Navigation>

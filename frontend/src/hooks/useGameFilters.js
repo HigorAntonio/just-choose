@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 import justChooseApi from '../apis/justChooseApi';
 
@@ -38,16 +39,26 @@ const useGameFilters = () => {
   };
 
   useEffect(() => {
+    let source = axios.CancelToken.source();
+
     (async () => {
       try {
-        const { data } = await justChooseApi.get('/games/platforms');
+        const { data } = await justChooseApi.get('/games/platforms', {
+          cancelToken: source.token,
+        });
         setPlatforms(data.platforms);
       } catch (error) {}
       try {
-        const { data } = await justChooseApi.get('/games/genres');
+        const { data } = await justChooseApi.get('/games/genres', {
+          cancelToken: source.token,
+        });
         setGenres(data.genres);
       } catch (error) {}
     })();
+
+    return () => {
+      source.cancel();
+    };
   }, [setPlatforms, setGenres]);
 
   return {

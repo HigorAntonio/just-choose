@@ -17,12 +17,13 @@ const useContentRequest = (url, params, page) => {
     if (url) {
       setLoading(true);
       setError(false);
-      let cancel;
+      let source = axios.CancelToken.source();
+
       (async () => {
         try {
           const { data } = await justChooseApi.get(url, {
             params: { ...params, page },
-            cancelToken: new axios.CancelToken((c) => (cancel = c)),
+            cancelToken: source.token,
           });
           setContent((prevState) => {
             return [...prevState, ...data.results];
@@ -36,7 +37,10 @@ const useContentRequest = (url, params, page) => {
           setError(true);
         }
       })();
-      return () => cancel();
+
+      return () => {
+        source.cancel();
+      };
     }
   }, [url, params, page]);
 
