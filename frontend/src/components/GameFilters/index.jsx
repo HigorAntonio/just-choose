@@ -29,12 +29,7 @@ import {
   Option,
 } from './styles';
 
-const GameFilters = ({
-  setParams,
-  setPageNumber,
-  setRequestType,
-  setShowListPreview,
-}) => {
+const GameFilters = ({ setParams, setRequestType, setShowListPreview }) => {
   const {
     sortByList,
     sortBy,
@@ -104,8 +99,7 @@ const GameFilters = ({
         releaseDateGte.toISOString().split('T')[0] +
         ',' +
         releaseDateLte.toISOString().split('T')[0]);
-    metacritic[0] !== 0 &&
-      metacritic[1] !== 100 &&
+    (metacritic[0] !== 0 || metacritic[1] !== 100) &&
       (params.metacritic = `${metacritic[0] === 0 ? 1 : metacritic[0]},${
         metacritic[1] === 0 ? 1 : metacritic[1]
       }`);
@@ -117,22 +111,19 @@ const GameFilters = ({
   const handleSearch = () => {
     setRequestType('game');
     setParams(sanitizeParams());
-    setPageNumber(1);
     setShowListPreview(false);
   };
 
   useEffect(() => {
     setRequestType('game');
     setParams((prevState) => ({ ...prevState, ordering: sortBy.value }));
-    setPageNumber(1);
     setShowListPreview(false);
-  }, [sortBy, setParams, setPageNumber, setRequestType, setShowListPreview]);
+  }, [sortBy, setParams, setRequestType, setShowListPreview]);
 
   const handleClearFilters = () => {
     setRequestType('game');
     clearFilters();
     setParams({});
-    setPageNumber(1);
     setShowListPreview(false);
   };
 

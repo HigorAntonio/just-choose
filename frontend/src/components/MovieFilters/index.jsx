@@ -30,12 +30,7 @@ import {
   Option,
 } from './styles';
 
-const MovieFilters = ({
-  setParams,
-  setPageNumber,
-  setRequestType,
-  setShowListPreview,
-}) => {
+const MovieFilters = ({ setParams, setRequestType, setShowListPreview }) => {
   const {
     sortByList,
     sortBy,
@@ -139,22 +134,19 @@ const MovieFilters = ({
   const handleSearch = () => {
     setRequestType('movie');
     setParams(sanitizeParams());
-    setPageNumber(1);
     setShowListPreview(false);
   };
 
   useEffect(() => {
     setRequestType('movie');
     setParams((prevState) => ({ ...prevState, sort_by: sortBy.value }));
-    setPageNumber(1);
     setShowListPreview(false);
-  }, [sortBy, setParams, setPageNumber, setRequestType, setShowListPreview]);
+  }, [sortBy, setParams, setRequestType, setShowListPreview]);
 
   const handleClearFilters = () => {
     setRequestType('movie');
     clearFilters();
     setParams({});
-    setPageNumber(1);
     setShowListPreview(false);
   };
 

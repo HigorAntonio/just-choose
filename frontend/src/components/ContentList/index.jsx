@@ -14,12 +14,11 @@ const ContentList = ({
   requestType,
   contentType,
   params,
-  pageNumber,
-  setPageNumber,
   contentList = {},
   setContentList,
   showPreview,
   wrapperRef,
+  showSkeleton = true,
 }) => {
   const { title: theme } = useContext(ThemeContext);
   const containerRef = useRef();
@@ -86,10 +85,6 @@ const ContentList = ({
     containerRef.current.addEventListener('keydown', handleKeydown);
   }, []);
 
-  useEffect(() => {
-    setPageNumber(1);
-  }, [setPageNumber]);
-
   const getUrl = () => {
     if (requestType === 'movie') {
       return '/movies';
@@ -113,11 +108,9 @@ const ContentList = ({
 
   // Quando a lista de conteudo muda move o scroll da contentList pro início
   useEffect(() => {
-    if (pageNumber === 1) {
-      wrapperRef.current.scrollTop = 0;
-      wrapperRef.current.scrollLeft = 0;
-    }
-  }, [pageNumber, wrapperRef]);
+    wrapperRef.current.scrollTop = 0;
+    wrapperRef.current.scrollLeft = 0;
+  }, [wrapperRef, requestType, params]);
 
   const addToContentList = (contentId, posterPath, title) => {
     if (contentList.map((c) => c.contentId).includes(contentId)) {
@@ -199,7 +192,8 @@ const ContentList = ({
       {showPreview && !contentList.length && (
         <Message>Você não adicionou itens à lista</Message>
       )}
-      {loading &&
+      {showSkeleton &&
+        loading &&
         [...new Array(30).keys()].map((_, i) => (
           <div key={i} className="skeleton">
             <ThemeProvider

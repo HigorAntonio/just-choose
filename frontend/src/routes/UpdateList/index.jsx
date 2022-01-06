@@ -86,7 +86,6 @@ const UpdateList = ({ wrapperRef }) => {
   const [showContent, setShowContent] = useState(false);
   const [requestType, setRequestType] = useState('');
   const [params, setParams] = useState({});
-  const [pageNumber, setPageNumber] = useState(1);
   const [contentList, setContentList] = useState([]);
   const [showListPreview, setShowListPreview] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -173,7 +172,6 @@ const UpdateList = ({ wrapperRef }) => {
   }, [contentList]);
 
   useEffect(() => {
-    setPageNumber(1);
     setParams({});
     if (contentType === 'Filme') {
       setRequestType('movie');
@@ -248,7 +246,6 @@ const UpdateList = ({ wrapperRef }) => {
         setRequestType('game');
         setParams({ search: e.target.value });
       }
-      setPageNumber(1);
       setShowListPreview(false);
     }
   };
@@ -578,7 +575,6 @@ const UpdateList = ({ wrapperRef }) => {
                 <div className="wrapper">
                   <MovieFilters
                     setParams={setParams}
-                    setPageNumber={setPageNumber}
                     setRequestType={setRequestType}
                     setShowListPreview={setShowListPreview}
                   />
@@ -588,7 +584,6 @@ const UpdateList = ({ wrapperRef }) => {
                 <div className="wrapper">
                   <ShowFilters
                     setParams={setParams}
-                    setPageNumber={setPageNumber}
                     setRequestType={setRequestType}
                     setShowListPreview={setShowListPreview}
                   />
@@ -598,7 +593,6 @@ const UpdateList = ({ wrapperRef }) => {
                 <div className="wrapper">
                   <GameFilters
                     setParams={setParams}
-                    setPageNumber={setPageNumber}
                     setRequestType={setRequestType}
                     setShowListPreview={setShowListPreview}
                   />
@@ -612,12 +606,11 @@ const UpdateList = ({ wrapperRef }) => {
                   requestType={requestType}
                   contentType={contentType}
                   params={params}
-                  pageNumber={pageNumber}
-                  setPageNumber={setPageNumber}
                   contentList={contentList}
                   setContentList={setContentList}
                   showPreview={showListPreview}
                   wrapperRef={contentListWrapperRef}
+                  showSkeleton={!!contentType}
                 />
               )}
               {loading && (

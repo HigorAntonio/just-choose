@@ -29,12 +29,7 @@ import {
   Option,
 } from './styles';
 
-const ShowFilters = ({
-  setParams,
-  setPageNumber,
-  setRequestType,
-  setShowListPreview,
-}) => {
+const ShowFilters = ({ setParams, setRequestType, setShowListPreview }) => {
   const {
     sortByList,
     sortBy,
@@ -115,22 +110,19 @@ const ShowFilters = ({
   const handleSearch = () => {
     setRequestType('show');
     setParams(sanitizeParams());
-    setPageNumber(1);
     setShowListPreview(false);
   };
 
   useEffect(() => {
     setRequestType('show');
     setParams((prevState) => ({ ...prevState, sort_by: sortBy.value }));
-    setPageNumber(1);
     setShowListPreview(false);
-  }, [sortBy, setParams, setPageNumber, setRequestType, setShowListPreview]);
+  }, [sortBy, setParams, setRequestType, setShowListPreview]);
 
   const handleClearFilters = () => {
     setRequestType('show');
     clearFilters();
     setParams({});
-    setPageNumber(1);
     setShowListPreview(false);
   };
 
