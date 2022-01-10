@@ -88,6 +88,7 @@ routes.get(
   getLoggedUserId,
   UserFollowersController.index
 );
+routes.get('/users/followers/:id', authorization, UserFollowersController.show);
 
 // ContentListController
 routes.post(

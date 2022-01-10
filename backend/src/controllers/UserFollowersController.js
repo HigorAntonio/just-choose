@@ -77,4 +77,24 @@ module.exports = {
       return res.sendStatus(500);
     }
   },
+
+  async show(req, res) {
+    try {
+      const userId = req.userId;
+
+      const followerId = req.params.id;
+
+      if (isNaN(followerId)) {
+        return res
+          .status(400)
+          .json({ erro: 'Id do perfil seguidor, valor inválido' });
+      }
+
+      const follower = await isUserFollowing(followerId, userId);
+
+      return res.json({ follower });
+    } catch (error) {
+      return res.sendStatus(500);
+    }
+  },
 };

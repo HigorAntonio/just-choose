@@ -225,12 +225,26 @@ const ShowPoll = ({ wrapperRef }) => {
       if (JSON.stringify(pollData) !== '{}' && !pollData.is_active) {
         setContent(pollData.result);
       }
-      try {
-        await justChooseApi.get(`/contentlists/${pollData.content_list_id}`, {
-          cancelToken: source.current.token,
-        });
+      if (pollData.content_list_sharing_option === 'public') {
         setShowListOption(true);
-      } catch (error) {}
+      }
+      if (
+        pollData.content_list_sharing_option === 'followed_profiles' &&
+        authenticated
+      ) {
+        try {
+          const isFollower = await justChooseApi.get(
+            `/users/followers/${pollData.user_id}`,
+            {
+              cancelToken: source.current.token,
+            }
+          );
+          setShowListOption(isFollower);
+        } catch (error) {}
+      }
+      if (pollData.content_list_sharing_option === 'private') {
+        setShowListOption(parseInt(userId) === parseInt(pollData.user_id));
+      }
       setLoading(false);
     } catch (error) {
       if (axios.isCancel(error)) {
@@ -244,7 +258,7 @@ const ShowPoll = ({ wrapperRef }) => {
         setDenyAccess(true);
       }
     }
-  }, [pollId, authenticated]);
+  }, [pollId, authenticated, userId]);
 
   useEffect(() => {
     mounted.current = true;

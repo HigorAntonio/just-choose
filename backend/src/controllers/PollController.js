@@ -231,6 +231,14 @@ module.exports = {
         poll.result = result;
       }
 
+      poll.content_list_sharing_option = (
+        await knex
+          .select('sharing_option')
+          .from('content_lists')
+          .where({ id: poll.content_list_id })
+          .first()
+      ).sharing_option;
+
       return res.json({
         id: poll.id,
         user_id: poll.user_id,
@@ -242,6 +250,7 @@ module.exports = {
         is_active: poll.is_active,
         thumbnail: poll.thumbnail,
         content_list_id: poll.content_list_id,
+        content_list_sharing_option: poll.content_list_sharing_option,
         content_types: poll.content_types,
         content: poll.content,
         total_votes: poll.total_votes,
