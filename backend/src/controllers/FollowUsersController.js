@@ -41,7 +41,6 @@ module.exports = {
 
       return res.sendStatus(201);
     } catch (error) {
-      console.log(error);
       return res.sendStatus(500);
     }
   },

@@ -1,6 +1,8 @@
 const knex = require('../../database');
 
-module.exports = async (page_size, page, query, exact_name, sort_by) => {
+module.exports = async (options) => {
+  const { pageSize, page, query, exactName, sortBy } = options;
+
   try {
     const usersQuery = knex
       .select(
@@ -29,11 +31,11 @@ module.exports = async (page_size, page, query, exact_name, sort_by) => {
         'u.id',
         'fing.user_id'
       )
-      .limit(page_size)
-      .offset((page - 1) * page_size);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
 
-    if (sort_by) {
-      usersQuery.orderByRaw(sort_by);
+    if (sortBy) {
+      usersQuery.orderByRaw(sortBy);
     }
 
     const countObj = knex.count().from('users as u');
@@ -47,12 +49,16 @@ module.exports = async (page_size, page, query, exact_name, sort_by) => {
       );
     }
 
-    if (exact_name) {
-      usersQuery.where({ 'u.name': exact_name });
-      countObj.where({ 'u.name': exact_name });
+    if (exactName) {
+      usersQuery.where({ 'u.name': exactName });
+      countObj.where({ 'u.name': exactName });
     }
 
-    const users = await usersQuery;
+    const users = (await usersQuery).map((u) => {
+      u.followers_count = parseInt(u.followers_count);
+      u.following_count = parseInt(u.following_count);
+      return u;
+    });
     const [{ count }] = await countObj;
 
     return { users, count };

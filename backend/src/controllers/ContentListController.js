@@ -1,7 +1,7 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
-const createContentListOnDB = require('../utils/contentList/createContentListOnDB');
-const updateContentListOnDB = require('../utils/contentList/updateContentListOnDB');
+const createContentList = require('../utils/contentList/createContentList');
+const updateContentList = require('../utils/contentList/updateContentList');
 const getFollowingUsers = require('../utils/users/getFollowingUsers');
 const isUserFollowing = require('../utils/users/isUserFollowing');
 const getContentLists = require('../utils/contentList/getContentLists');
@@ -66,14 +66,14 @@ module.exports = {
 
       const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
 
-      const contentListId = await createContentListOnDB(
+      const contentListId = await createContentList({
         userId,
         title,
         description,
         sharingOption,
         thumbnail,
-        content
-      );
+        content,
+      });
 
       return res.status(201).json({ id: contentListId });
     } catch (error) {
@@ -86,22 +86,22 @@ module.exports = {
 
   async index(req, res) {
     try {
-      const userId = req.userId;
+      const authUserId = req.userId;
 
       const {
-        user_id,
+        user_id: reqUserId,
         query,
         page = 1,
-        page_size = 30,
-        sort_by = 'updated.desc',
+        page_size: pageSize = 30,
+        sort_by: sortBy = 'updated.desc',
       } = req.query;
 
       const errors = [];
 
-      if (user_id && isNaN(user_id)) {
+      if (reqUserId && isNaN(reqUserId)) {
         errors.push('O parâmetro user_id deve ser um número');
-      } else if (user_id) {
-        const user = await knex('users').where({ id: user_id }).first();
+      } else if (reqUserId) {
+        const user = await knex('users').where({ id: reqUserId }).first();
         if (!user) {
           errors.push('Usuário não encontrado');
         }
@@ -114,15 +114,15 @@ module.exports = {
       } else if (page < 1) {
         errors.push('O parâmetro page inválido. Min 1');
       }
-      if (isNaN(page_size)) {
+      if (isNaN(pageSize)) {
         errors.push('O parâmetro page_size deve ser um número');
-      } else if (page_size < 1 || page_size > 100) {
+      } else if (pageSize < 1 || pageSize > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
-      if (sort_by) {
-        if (typeof sort_by !== 'string') {
+      if (sortBy) {
+        if (typeof sortBy !== 'string') {
           errors.push('Parâmetro sort_by, valor inválido');
-        } else if (!getListOrderByQuery(sort_by)) {
+        } else if (!getListOrderByQuery(sortBy)) {
           errors.push('Parâmetro sort_by, valor inválido');
         }
       }
@@ -130,40 +130,26 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const usersWhoFollowMe = await getFollowingUsers(userId);
+      const usersWhoFollowMe = await getFollowingUsers(authUserId);
       const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
 
-      const { contentLists, count } = await getContentLists(
-        userId,
-        user_id,
+      const { contentLists, count } = await getContentLists({
+        userId: reqUserId,
+        getPrivate: parseInt(authUserId) === parseInt(reqUserId),
         followMeIds,
-        page_size,
+        pageSize,
         page,
         query,
-        getListOrderByQuery(sort_by)
-      );
+        sortBy: getListOrderByQuery(sortBy),
+      });
 
-      const total_pages = Math.ceil(count / page_size);
+      const totalPages = Math.ceil(count / pageSize);
       return res.json({
         page: parseInt(page),
-        page_size: parseInt(page_size),
-        total_pages: total_pages === 0 ? 1 : total_pages,
+        page_size: parseInt(pageSize),
+        total_pages: totalPages === 0 ? 1 : totalPages,
         total_results: parseInt(count),
-        results: contentLists.map((list) => ({
-          id: list.id,
-          user_id: list.user_id,
-          user_name: list.user_name,
-          profile_image_url: list.profile_image_url,
-          title: list.title,
-          description: list.description,
-          sharing_option: list.sharing_option,
-          thumbnail: list.thumbnail,
-          likes: parseInt(list.likes),
-          forks: parseInt(list.forks),
-          content_types: list.content_types,
-          created_at: list.created_at,
-          updated_at: list.updated_at,
-        })),
+        results: contentLists,
       });
     } catch (error) {
       return res.sendStatus(500);
@@ -307,14 +293,14 @@ module.exports = {
         ? `${process.env.APP_URL}/files/${req.file.key}`
         : contentList.thumbnail;
 
-      await updateContentListOnDB(
+      await updateContentList({
         contentListId,
         title,
         description,
         sharingOption,
         thumbnail,
-        content
-      );
+        content,
+      });
 
       if (deleteOldThumbnail) {
         await deleteFile(

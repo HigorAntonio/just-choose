@@ -58,8 +58,6 @@ const NavBar = () => {
     loading: usersLoading,
   } = useAuthenticatedRequest('/users', usersParams, usersPageNumber);
 
-  // useEffect(() => console.debug('following:', following), [following]);
-
   useEffect(() => {
     if (search === '') {
       setShowSearch(false);
@@ -135,22 +133,22 @@ const NavBar = () => {
               {following.map((p, i) => {
                 if (following.length === i + 1) {
                   return (
-                    <Link key={p.user_id} to={`/users/${p.user_id}`}>
-                      <Profile ref={lastFollowRef} title={p.user_name}>
+                    <Link key={p.id} to={`/users/${p.id}`}>
+                      <Profile ref={lastFollowRef} title={p.name}>
                         <ProfileImage src={p.profile_image_url} />
                         <ProfileData>
-                          <span>{p.user_name}</span>
+                          <span>{p.name}</span>
                         </ProfileData>
                       </Profile>
                     </Link>
                   );
                 }
                 return (
-                  <Link key={p.user_id} to={`/users/${p.user_id}`}>
-                    <Profile title={p.user_name}>
+                  <Link key={p.id} to={`/users/${p.id}`}>
+                    <Profile title={p.name}>
                       <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
-                        <span>{p.user_name}</span>
+                        <span>{p.name}</span>
                       </ProfileData>
                     </Profile>
                   </Link>

@@ -118,22 +118,22 @@ module.exports = {
 
   async index(req, res) {
     try {
-      const userId = req.userId;
+      const authUserId = req.userId;
 
       const {
-        user_id,
+        user_id: reqUserId,
         query,
         page = 1,
-        page_size = 30,
-        sort_by = 'updated.desc',
+        page_size: pageSize = 30,
+        sort_by: sortBy = 'updated.desc',
       } = req.query;
 
       const errors = [];
 
-      if (user_id && isNaN(user_id)) {
+      if (reqUserId && isNaN(reqUserId)) {
         errors.push('O parâmetro user_id deve ser um número');
-      } else if (user_id) {
-        const user = await knex('users').where({ id: user_id }).first();
+      } else if (reqUserId) {
+        const user = await knex('users').where({ id: reqUserId }).first();
         if (!user) {
           errors.push('Usuário não encontrado');
         }
@@ -146,15 +146,15 @@ module.exports = {
       } else if (page < 1) {
         errors.push('O parâmetro page inválido. Min 1');
       }
-      if (isNaN(page_size)) {
+      if (isNaN(pageSize)) {
         errors.push('O parâmetro page_size deve ser um número');
-      } else if (page_size < 1 || page_size > 100) {
+      } else if (pageSize < 1 || pageSize > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
-      if (sort_by) {
-        if (typeof sort_by !== 'string') {
+      if (sortBy) {
+        if (typeof sortBy !== 'string') {
           errors.push('Parâmetro sort_by, valor inválido');
-        } else if (!getPollOrderByQuery(sort_by)) {
+        } else if (!getPollOrderByQuery(sortBy)) {
           errors.push('Parâmetro sort_by, valor inválido');
         }
       }
@@ -162,24 +162,24 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const usersWhoFollowMe = await getFollowingUsers(userId);
+      const usersWhoFollowMe = await getFollowingUsers(authUserId);
       const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
 
-      const { polls, count } = await getPolls(
-        userId,
-        user_id,
+      const { polls, count } = await getPolls({
+        userId: reqUserId,
+        getPrivate: parseInt(authUserId) === parseInt(reqUserId),
         followMeIds,
-        page_size,
+        pageSize,
         page,
         query,
-        getPollOrderByQuery(sort_by)
-      );
+        sortBy: getPollOrderByQuery(sortBy),
+      });
 
-      const total_pages = Math.ceil(count / page_size);
+      const totalPages = Math.ceil(count / pageSize);
       return res.json({
         page: parseInt(page),
-        page_size: parseInt(page_size),
-        total_pages: total_pages === 0 ? 1 : total_pages,
+        page_size: parseInt(pageSize),
+        total_pages: totalPages === 0 ? 1 : totalPages,
         total_results: parseInt(count),
         results: polls,
       });

@@ -1,14 +1,22 @@
 const knex = require('../../database');
+const getTimeWindowStartTime = require('../getTimeWindowStartTime');
 
-module.exports = async (
-  userId,
-  user_id,
-  followMeIds,
-  page_size,
-  page,
-  query,
-  sort_by
-) => {
+module.exports = async (options) => {
+  const {
+    userId,
+    getPrivate = false,
+    followMeIds = [],
+    pageSize,
+    page,
+    query,
+    sortBy,
+    timeWindowUnit,
+  } = options;
+
+  if (getPrivate && !userId) {
+    throw new Error('Can not get private data without a valid user id');
+  }
+
   try {
     const contentListsQuery = knex
       .select(
@@ -24,8 +32,7 @@ module.exports = async (
         knex.raw('COALESCE(likes, 0) AS likes'),
         knex.raw('COALESCE(forks, 0) AS forks'),
         'clsq.created_at',
-        'clsq.updated_at',
-        'clsq.document'
+        'clsq.updated_at'
       )
       .from(function () {
         this.select(
@@ -64,7 +71,7 @@ module.exports = async (
               .whereIn('u.id', followMeIds);
           })
           .as('clsq');
-        if (userId && user_id) {
+        if (getPrivate) {
           this.union(function () {
             this.select(
               'cl.id',
@@ -117,31 +124,31 @@ module.exports = async (
         'clf.list_id',
         'clsq.id'
       )
-      .limit(page_size)
-      .offset((page - 1) * page_size);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
 
-    if (sort_by) {
-      contentListsQuery.orderByRaw(sort_by);
+    if (sortBy) {
+      contentListsQuery.orderByRaw(sortBy);
     }
 
     const countObj = knex.count().from(function () {
       this.select()
         .from(function () {
-          this.select('cl.id', 'cl.user_id', 'cl.document')
+          this.select('cl.id', 'cl.user_id', 'cl.document', 'cl.created_at')
             .from('content_lists as cl')
             .where({ sharing_option: 'public' })
             .as('public_lists');
         })
         .union(function () {
-          this.select('cl.id', 'cl.user_id', 'cl.document')
+          this.select('cl.id', 'cl.user_id', 'cl.document', 'cl.created_at')
             .from('content_lists as cl')
             .where({ sharing_option: 'followed_profiles' })
             .whereIn('cl.user_id', followMeIds);
         })
         .as('count_query');
-      if (userId && user_id) {
+      if (getPrivate) {
         this.union(function () {
-          this.select('cl.id', 'cl.user_id', 'cl.document')
+          this.select('cl.id', 'cl.user_id', 'cl.document', 'cl.created_at')
             .from('content_lists as cl')
             .where({ sharing_option: 'private' })
             .where('cl.user_id', userId);
@@ -149,9 +156,9 @@ module.exports = async (
       }
     });
 
-    if (user_id) {
-      contentListsQuery.where({ user_id });
-      countObj.where({ user_id });
+    if (userId) {
+      contentListsQuery.where({ user_id: userId });
+      countObj.where({ user_id: userId });
     }
 
     if (query) {
@@ -163,7 +170,17 @@ module.exports = async (
       );
     }
 
-    const contentLists = await contentListsQuery;
+    if (timeWindowUnit) {
+      const startTime = getTimeWindowStartTime(timeWindowUnit);
+      contentListsQuery.where('created_at', '>=', startTime);
+      countObj.where('created_at', '>=', startTime);
+    }
+
+    const contentLists = (await contentListsQuery).map((c) => {
+      c.likes = parseInt(c.likes);
+      c.forks = parseInt(c.forks);
+      return c;
+    });
     const [{ count }] = await countObj;
 
     return { contentLists, count };

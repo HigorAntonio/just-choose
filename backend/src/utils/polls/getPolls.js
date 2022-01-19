@@ -1,14 +1,20 @@
 const knex = require('../../database');
 
-module.exports = async (
-  userId,
-  user_id,
-  followMeIds,
-  page_size,
-  page,
-  query,
-  sort_by
-) => {
+module.exports = async (options) => {
+  const {
+    userId,
+    getPrivate = false,
+    followMeIds,
+    pageSize,
+    page,
+    query,
+    sortBy,
+  } = options;
+
+  if (getPrivate && !userId) {
+    throw new Error('Can not get private data without a valid user id');
+  }
+
   try {
     const pollsQuery = knex
       .select(
@@ -68,7 +74,7 @@ module.exports = async (
               .innerJoin('poll_content_list as pcl', 'poll_id', 'p.id');
           })
           .as('pq');
-        if (userId && user_id) {
+        if (getPrivate) {
           this.union(function () {
             this.select(
               'p.id',
@@ -93,11 +99,11 @@ module.exports = async (
           });
         }
       })
-      .limit(page_size)
-      .offset((page - 1) * page_size);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
 
-    if (sort_by) {
-      pollsQuery.orderByRaw(sort_by);
+    if (sortBy) {
+      pollsQuery.orderByRaw(sortBy);
     }
 
     const countObj = knex.count().from(function () {
@@ -111,7 +117,7 @@ module.exports = async (
             .whereIn('p.user_id', followMeIds);
         })
         .as('count_query');
-      if (userId && user_id) {
+      if (getPrivate) {
         this.union(function () {
           this.select()
             .from('polls as p')
@@ -121,9 +127,9 @@ module.exports = async (
       }
     });
 
-    if (user_id) {
-      pollsQuery.where({ user_id });
-      countObj.where({ user_id });
+    if (userId) {
+      pollsQuery.where({ user_id: userId });
+      countObj.where({ user_id: userId });
     }
 
     if (query) {

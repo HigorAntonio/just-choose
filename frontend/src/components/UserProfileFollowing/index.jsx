@@ -28,12 +28,12 @@ const UserProfileFollowing = () => {
           {content.map((p, i) => {
             if (content.length === i + 1) {
               return (
-                <div key={p.user_id} ref={lastElementRef}>
+                <div key={p.id} ref={lastElementRef}>
                   <UserProfileFollowingCard
                     profile={{
-                      id: p.user_id,
+                      id: p.id,
                       profile_image_url: p.profile_image_url,
-                      name: p.user_name,
+                      name: p.name,
                       followers_count: p.followers_count,
                     }}
                   />
@@ -41,12 +41,12 @@ const UserProfileFollowing = () => {
               );
             }
             return (
-              <div key={p.user_id}>
+              <div key={p.id}>
                 <UserProfileFollowingCard
                   profile={{
-                    id: p.user_id,
+                    id: p.id,
                     profile_image_url: p.profile_image_url,
-                    name: p.user_name,
+                    name: p.name,
                     followers_count: p.followers_count,
                   }}
                 />

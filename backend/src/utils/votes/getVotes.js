@@ -1,6 +1,8 @@
 const knex = require('../../database');
 
-module.exports = async (userId, page_size, page, query, sort_by) => {
+module.exports = async (options) => {
+  const { userId, pageSize, page, query, sortBy } = options;
+
   try {
     const votesQuery = knex
       .select(
@@ -67,11 +69,11 @@ module.exports = async (userId, page_size, page, query, sort_by) => {
       .innerJoin('polls as p', 'p.id', 'poll_id')
       .innerJoin('users as u', 'u.id', 'p.user_id')
       .where('vote_user_id', userId)
-      .limit(page_size)
-      .offset((page - 1) * page_size);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
 
-    if (sort_by) {
-      votesQuery.orderByRaw(sort_by);
+    if (sortBy) {
+      votesQuery.orderByRaw(sortBy);
     }
 
     const countObj = knex.count().from(function () {

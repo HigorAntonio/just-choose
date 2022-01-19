@@ -1,8 +1,10 @@
 const knex = require('../../database');
 
-module.exports = async (profileId, page_size, page) => {
+module.exports = async (options) => {
+  const { profileId, pageSize, page } = options;
+
   try {
-    const followers = await knex
+    const followersQuery = knex
       .select(
         'u.id',
         'u.name',
@@ -33,13 +35,19 @@ module.exports = async (profileId, page_size, page) => {
         'u.id',
         'fing.user_id'
       )
-      .limit(page_size)
-      .offset((page - 1) * page_size)
+      .limit(pageSize)
+      .offset((page - 1) * pageSize)
       .orderBy('u.name');
 
     const [{ count }] = await knex('follows_users')
       .count()
       .where({ follows_id: profileId });
+
+    const followers = (await followersQuery).map((f) => {
+      f.followers_count = parseInt(f.followers_count);
+      f.following_count = parseInt(f.following_count);
+      return f;
+    });
 
     return { followers, count };
   } catch (error) {

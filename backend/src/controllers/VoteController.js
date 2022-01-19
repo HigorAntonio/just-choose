@@ -99,9 +99,9 @@ module.exports = {
 
       const {
         page = 1,
-        page_size = 30,
+        page_size: pageSize = 30,
         query,
-        sort_by = 'updated.desc',
+        sort_by: sortBy = 'updated.desc',
       } = req.query;
 
       const errors = [];
@@ -111,18 +111,18 @@ module.exports = {
       } else if (page < 1) {
         errors.push('O parâmetro page inválido. Min 1');
       }
-      if (isNaN(page_size)) {
+      if (isNaN(pageSize)) {
         errors.push('O parâmetro page_size deve ser um número');
-      } else if (page_size < 1 || page_size > 100) {
+      } else if (pageSize < 1 || pageSize > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
       if (query && typeof query !== 'string') {
         errors.push({ erro: 'O parâmetro query deve ser uma string' });
       }
-      if (sort_by) {
-        if (typeof sort_by !== 'string') {
+      if (sortBy) {
+        if (typeof sortBy !== 'string') {
           errors.push('Parâmetro sort_by, valor inválido');
-        } else if (!getVoteOrderByQuery(sort_by)) {
+        } else if (!getVoteOrderByQuery(sortBy)) {
           errors.push('Parâmetro sort_by, valor inválido');
         }
       }
@@ -134,19 +134,19 @@ module.exports = {
         return res.sendStatus(403);
       }
 
-      const { votes, count } = await getVotes(
-        profileId,
-        page_size,
+      const { votes, count } = await getVotes({
+        userId: profileId,
+        pageSize,
         page,
         query,
-        getVoteOrderByQuery(sort_by)
-      );
+        sortBy: getVoteOrderByQuery(sortBy),
+      });
 
-      const total_pages = Math.ceil(count / page_size);
+      const totalPages = Math.ceil(count / pageSize);
       return res.json({
         page: parseInt(page),
-        page_size: parseInt(page_size),
-        total_pages: total_pages === 0 ? 1 : total_pages,
+        page_size: parseInt(pageSize),
+        total_pages: totalPages === 0 ? 1 : totalPages,
         total_results: parseInt(count),
         results: votes,
       });

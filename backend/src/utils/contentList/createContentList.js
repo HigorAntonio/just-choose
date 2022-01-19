@@ -1,14 +1,10 @@
 const knex = require('../../database');
 const sanitizeListData = require('./sanitizeListData');
 
-module.exports = async (
-  userId,
-  title,
-  description,
-  sharingOption,
-  thumbnail,
-  content
-) => {
+module.exports = async (contentList) => {
+  const { userId, title, description, sharingOption, thumbnail, content } =
+    contentList;
+
   try {
     const [contentTypes, contentToInsert] = await sanitizeListData(content);
 

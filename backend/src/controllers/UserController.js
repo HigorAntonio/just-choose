@@ -9,17 +9,17 @@ module.exports = {
     try {
       const {
         query,
-        exact_name,
+        exact_name: exactName,
         page = 1,
-        page_size = 30,
-        sort_by = 'name.asc',
+        page_size: pageSize = 30,
+        sort_by: sortBy = 'name.asc',
       } = req.query;
 
       const errors = [];
       if (query && typeof query !== 'string') {
         errors.push({ erro: 'O parâmetro query deve ser uma string' });
       }
-      if (exact_name && typeof exact_name !== 'string') {
+      if (exactName && typeof exactName !== 'string') {
         errors.push({ erro: 'O parâmetro exact_name deve ser uma string' });
       }
       if (isNaN(page)) {
@@ -27,15 +27,15 @@ module.exports = {
       } else if (page < 1) {
         errors.push('O parâmetro page inválido. Min 1');
       }
-      if (isNaN(page_size)) {
+      if (isNaN(pageSize)) {
         errors.push('O parâmetro page_size deve ser um número');
-      } else if (page_size < 1 || page_size > 100) {
+      } else if (pageSize < 1 || pageSize > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
-      if (sort_by) {
-        if (typeof sort_by !== 'string') {
+      if (sortBy) {
+        if (typeof sortBy !== 'string') {
           errors.push('Parâmetro sort_by, valor inválido');
-        } else if (!getUserOrderByQuery(sort_by)) {
+        } else if (!getUserOrderByQuery(sortBy)) {
           errors.push('Parâmetro sort_by, valor inválido');
         }
       }
@@ -43,27 +43,21 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const { users, count } = await getUsers(
-        page_size,
+      const { users, count } = await getUsers({
+        pageSize,
         page,
         query,
-        exact_name,
-        getUserOrderByQuery(sort_by)
-      );
+        exactName,
+        sortBy: getUserOrderByQuery(sortBy),
+      });
 
-      const total_pages = Math.ceil(count / page_size);
+      const totalPages = Math.ceil(count / pageSize);
       return res.json({
         page: parseInt(page),
-        page_size: parseInt(page_size),
-        total_pages: total_pages === 0 ? 1 : total_pages,
+        page_size: parseInt(pageSize),
+        total_pages: totalPages === 0 ? 1 : totalPages,
         total_results: parseInt(count),
-        results: users.map((user) => ({
-          id: user.id,
-          name: user.name,
-          profile_image_url: user.profile_image_url,
-          followers_count: parseInt(user.followers_count),
-          following_count: parseInt(user.following_count),
-        })),
+        results: users,
       });
     } catch (error) {
       return res.sendStatus(500);

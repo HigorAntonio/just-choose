@@ -22,36 +22,31 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const { users, count: usersCount } = await getUsers(
-        10,
-        1,
+      const { users, count: usersCount } = await getUsers({
+        pageSize: 10,
+        page: 1,
         query,
-        null,
-        'followers_count DESC'
-      );
+        sortBy: 'followers_count DESC',
+      });
 
       const usersWhoFollowMe = await getFollowingUsers(userId);
       const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
 
-      const { polls, count: pollsCount } = await getPolls(
-        null,
-        null,
+      const { polls, count: pollsCount } = await getPolls({
         followMeIds,
-        10,
-        1,
+        pageSize: 10,
+        page: 1,
         query,
-        'updated_at DESC'
-      );
+        sortBy: 'updated_at DESC',
+      });
 
-      const { contentLists, count: contentListsCount } = await getContentLists(
-        null,
-        null,
+      const { contentLists, count: contentListsCount } = await getContentLists({
         followMeIds,
-        10,
-        1,
+        pageSize: 10,
+        page: 1,
         query,
-        'likes DESC'
-      );
+        sortBy: 'likes DESC',
+      });
 
       return res.json({
         profiles: {
@@ -84,21 +79,7 @@ module.exports = {
         },
         content_lists: {
           total_results: parseInt(contentListsCount),
-          results: contentLists.map((list) => ({
-            id: list.id,
-            user_id: list.user_id,
-            user_name: list.user_name,
-            profile_image_url: list.profile_image_url,
-            title: list.title,
-            description: list.description,
-            sharing_option: list.sharing_option,
-            thumbnail: list.thumbnail,
-            likes: parseInt(list.likes),
-            forks: parseInt(list.forks),
-            content_types: list.content_types,
-            created_at: list.created_at,
-            updated_at: list.updated_at,
-          })),
+          results: contentLists,
         },
       });
     } catch (error) {

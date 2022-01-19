@@ -8,7 +8,7 @@ module.exports = {
       const userId = req.userId;
       const profileId = req.params.id;
 
-      const { page = 1, page_size = 30 } = req.query;
+      const { page = 1, page_size: pageSize = 30 } = req.query;
 
       const errors = [];
       if (isNaN(profileId)) {
@@ -19,9 +19,9 @@ module.exports = {
       } else if (page < 1) {
         errors.push('O parâmetro page inválido. Min 1');
       }
-      if (isNaN(page_size)) {
+      if (isNaN(pageSize)) {
         errors.push('O parâmetro page_size deve ser um número');
-      } else if (page_size < 1 || page_size > 100) {
+      } else if (pageSize < 1 || pageSize > 100) {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
       if (errors.length > 0) {
@@ -44,34 +44,26 @@ module.exports = {
       ) {
         return res.json({
           page: parseInt(page),
-          page_size: parseInt(page_size),
+          page_size: parseInt(pageSize),
           total_pages: 1,
           total_results: 0,
           results: [],
         });
       }
 
-      const { followers, count } = await getUserFollowers(
+      const { followers, count } = await getUserFollowers({
         profileId,
-        page_size,
-        page
-      );
+        pageSize,
+        page,
+      });
 
-      const total_pages = Math.ceil(count / page_size);
+      const totalPages = Math.ceil(count / pageSize);
       return res.json({
         page: parseInt(page),
-        page_size: parseInt(page_size),
-        total_pages: total_pages === 0 ? 1 : total_pages,
+        page_size: parseInt(pageSize),
+        total_pages: totalPages === 0 ? 1 : totalPages,
         total_results: parseInt(count),
-        results: followers.map((user) => ({
-          user_id: user.id,
-          user_name: user.name,
-          profile_image_url: user.profile_image_url,
-          followers_count: parseInt(user.followers_count),
-          following_count: parseInt(user.following_count),
-          created_at: user.created_at,
-          updated_at: user.updated_at,
-        })),
+        results: followers,
       });
     } catch (error) {
       return res.sendStatus(500);
