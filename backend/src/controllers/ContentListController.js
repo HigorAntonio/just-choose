@@ -7,6 +7,7 @@ const isUserFollowing = require('../utils/users/isUserFollowing');
 const getContentLists = require('../utils/contentList/getContentLists');
 const getListOrderByQuery = require('../utils/contentList/getListOrderByQuery');
 const getContentList = require('../utils/contentList/getContentList');
+const deleteContentList = require('../utils/contentList/deleteContentList');
 
 module.exports = {
   async create(req, res) {
@@ -347,7 +348,7 @@ module.exports = {
         return res.status(403).json({ erro: 'Usuário inválido' });
       }
 
-      await knex('content_lists').del().where({ id: contentListId });
+      await deleteContentList(contentListId);
 
       await deleteFile(
         contentList.thumbnail.substring(`${process.env.APP_URL}/files/`.length)
