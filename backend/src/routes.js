@@ -21,6 +21,7 @@ const ShowController = require('./controllers/ShowController');
 const GameController = require('./controllers/GameController');
 const SearchController = require('./controllers/SearchController');
 const TrendingController = require('./controllers/TrendingController');
+const FollowedProfilePostController = require('./controllers/FollowedProfilePostController');
 const ConfigurationController = require('./controllers/ConfigurationController');
 
 const routes = express.Router();
@@ -230,6 +231,14 @@ routes.get('/search', getLoggedUserId, SearchController.index);
 
 // TrendingController
 routes.get('/trending', TrendingController.index);
+
+// FollowedProfilePostController
+routes.get(
+  '/following',
+  authorization,
+  isUserActive,
+  FollowedProfilePostController.index
+);
 
 // ConfigurationController
 routes.get('/configuration/tmdb', authorization, ConfigurationController.tmdb);

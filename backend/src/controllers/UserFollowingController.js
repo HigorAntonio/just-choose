@@ -62,7 +62,7 @@ module.exports = {
         page: parseInt(page),
         page_size: parseInt(pageSize),
         total_pages: totalPages === 0 ? 1 : totalPages,
-        total_results: parseInt(count),
+        total_results: count,
         results: following,
       });
     } catch (error) {

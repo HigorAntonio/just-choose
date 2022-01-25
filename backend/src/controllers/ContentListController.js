@@ -2,7 +2,7 @@ const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
 const createContentList = require('../utils/contentList/createContentList');
 const updateContentList = require('../utils/contentList/updateContentList');
-const getFollowingUsers = require('../utils/users/getFollowingUsers');
+const getUserFollowersIds = require('../utils/userFollowers/getUserFollowersIds');
 const isUserFollowing = require('../utils/users/isUserFollowing');
 const getContentLists = require('../utils/contentList/getContentLists');
 const getListOrderByQuery = require('../utils/contentList/getListOrderByQuery');
@@ -122,7 +122,7 @@ module.exports = {
       }
       if (sortBy) {
         if (typeof sortBy !== 'string') {
-          errors.push('Parâmetro sort_by, valor inválido');
+          errors.push('O parâmetro sort_by deve ser uma string');
         } else if (!getListOrderByQuery(sortBy)) {
           errors.push('Parâmetro sort_by, valor inválido');
         }
@@ -131,13 +131,12 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const usersWhoFollowMe = await getFollowingUsers(authUserId);
-      const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
+      const followersIds = await getUserFollowersIds(authUserId);
 
       const { contentLists, count } = await getContentLists({
         userId: reqUserId,
         getPrivate: parseInt(authUserId) === parseInt(reqUserId),
-        followMeIds,
+        followersIds,
         pageSize,
         page,
         query,
@@ -149,7 +148,7 @@ module.exports = {
         page: parseInt(page),
         page_size: parseInt(pageSize),
         total_pages: totalPages === 0 ? 1 : totalPages,
-        total_results: parseInt(count),
+        total_results: count,
         results: contentLists,
       });
     } catch (error) {

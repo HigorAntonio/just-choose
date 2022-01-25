@@ -61,7 +61,7 @@ module.exports = async (options) => {
     });
     const [{ count }] = await countObj;
 
-    return { users, count };
+    return { users, count: parseInt(count) };
   } catch (error) {
     throw error;
   }

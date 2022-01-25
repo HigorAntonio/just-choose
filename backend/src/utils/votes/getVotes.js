@@ -109,7 +109,7 @@ module.exports = async (options) => {
     const votes = await votesQuery;
     const [{ count }] = await countObj;
 
-    return { votes, count };
+    return { votes, count: parseInt(count) };
   } catch (error) {
     throw error;
   }

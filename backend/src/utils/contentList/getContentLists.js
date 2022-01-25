@@ -5,7 +5,8 @@ module.exports = async (options) => {
   const {
     userId,
     getPrivate = false,
-    followMeIds = [],
+    followersIds = [],
+    followingIds,
     pageSize,
     page,
     query,
@@ -68,7 +69,7 @@ module.exports = async (options) => {
               .from('content_lists as cl')
               .where({ sharing_option: 'followed_profiles' })
               .innerJoin('users as u', 'cl.user_id', 'u.id')
-              .whereIn('u.id', followMeIds);
+              .whereIn('u.id', followersIds);
           })
           .as('clsq');
         if (getPrivate) {
@@ -143,7 +144,7 @@ module.exports = async (options) => {
           this.select('cl.id', 'cl.user_id', 'cl.document', 'cl.created_at')
             .from('content_lists as cl')
             .where({ sharing_option: 'followed_profiles' })
-            .whereIn('cl.user_id', followMeIds);
+            .whereIn('cl.user_id', followersIds);
         })
         .as('count_query');
       if (getPrivate) {
@@ -155,6 +156,11 @@ module.exports = async (options) => {
         });
       }
     });
+
+    if (followingIds) {
+      contentListsQuery.whereIn('user_id', followingIds);
+      countObj.whereIn('user_id', followingIds);
+    }
 
     if (userId) {
       contentListsQuery.where({ user_id: userId });
@@ -183,7 +189,7 @@ module.exports = async (options) => {
     });
     const [{ count }] = await countObj;
 
-    return { contentLists, count };
+    return { contentLists, count: parseInt(count) };
   } catch (error) {
     throw error;
   }

@@ -1,5 +1,4 @@
-const knex = require('../database');
-const getFollowingUsers = require('../utils/users/getFollowingUsers');
+const getUserFollowersIds = require('../utils/userFollowers/getUserFollowersIds');
 const getUsers = require('../utils/users/getUsers');
 const getPolls = require('../utils/polls/getPolls');
 const getContentLists = require('../utils/contentList/getContentLists');
@@ -9,10 +8,20 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      const { query } = req.query;
+      const { page = 1, page_size: pageSize = 10, query } = req.query;
 
       const errors = [];
 
+      if (isNaN(page)) {
+        errors.push('O parâmetro page deve ser um número');
+      } else if (page < 1) {
+        errors.push('O parâmetro page inválido. Min 1');
+      }
+      if (isNaN(pageSize)) {
+        errors.push('O parâmetro page_size deve ser um número');
+      } else if (pageSize < 1 || pageSize > 100) {
+        errors.push('Parâmetro page_size inválido. Min 1, Max 100');
+      }
       if (!query) {
         errors.push({ erro: 'Parâmetro query não informado' });
       } else if (typeof query !== 'string') {
@@ -23,62 +32,41 @@ module.exports = {
       }
 
       const { users, count: usersCount } = await getUsers({
-        pageSize: 10,
-        page: 1,
+        pageSize,
+        page,
         query,
         sortBy: 'followers_count DESC',
       });
 
-      const usersWhoFollowMe = await getFollowingUsers(userId);
-      const followMeIds = usersWhoFollowMe.map((u) => u.user_id);
+      const followersIds = await getUserFollowersIds(userId);
 
       const { polls, count: pollsCount } = await getPolls({
-        followMeIds,
-        pageSize: 10,
-        page: 1,
+        followersIds,
+        pageSize,
+        page,
         query,
         sortBy: 'updated_at DESC',
       });
 
       const { contentLists, count: contentListsCount } = await getContentLists({
-        followMeIds,
-        pageSize: 10,
-        page: 1,
+        followersIds,
+        pageSize,
+        page,
         query,
         sortBy: 'likes DESC',
       });
 
       return res.json({
         profiles: {
-          total_results: parseInt(usersCount),
-          results: users.map((user) => ({
-            id: user.id,
-            name: user.name,
-            profile_image_url: user.profile_image_url,
-            followers_count: parseInt(user.followers_count),
-            following_count: parseInt(user.following_count),
-          })),
+          total_results: usersCount,
+          results: users,
         },
         polls: {
-          total_results: parseInt(pollsCount),
-          results: polls.map((poll) => ({
-            id: poll.id,
-            user_id: poll.user_id,
-            user_name: poll.user_name,
-            profile_image_url: poll.profile_image_url,
-            title: poll.title,
-            description: poll.description,
-            sharing_option: poll.sharing_option,
-            is_active: poll.is_active,
-            thumbnail: poll.thumbnail,
-            content_list_id: poll.content_list_id,
-            content_types: poll.content_types,
-            created_at: poll.created_at,
-            updated_at: poll.updated_at,
-          })),
+          total_results: pollsCount,
+          results: polls,
         },
         content_lists: {
-          total_results: parseInt(contentListsCount),
+          total_results: contentListsCount,
           results: contentLists,
         },
       });

@@ -49,7 +49,7 @@ module.exports = async (options) => {
       return f;
     });
 
-    return { following, count };
+    return { following, count: parseInt(count) };
   } catch (error) {
     throw error;
   }

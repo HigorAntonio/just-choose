@@ -34,7 +34,7 @@ module.exports = {
       }
       if (sortBy) {
         if (typeof sortBy !== 'string') {
-          errors.push('Parâmetro sort_by, valor inválido');
+          errors.push('O parâmetro sort_by deve ser uma string');
         } else if (!getUserOrderByQuery(sortBy)) {
           errors.push('Parâmetro sort_by, valor inválido');
         }
@@ -56,7 +56,7 @@ module.exports = {
         page: parseInt(page),
         page_size: parseInt(pageSize),
         total_pages: totalPages === 0 ? 1 : totalPages,
-        total_results: parseInt(count),
+        total_results: count,
         results: users,
       });
     } catch (error) {

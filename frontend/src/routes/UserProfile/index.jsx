@@ -159,8 +159,8 @@ const UserProfile = ({ wrapperRef }) => {
           setFollowingList((prevState) => [
             ...prevState,
             {
-              user_id: profile.id,
-              user_name: profile.name,
+              id: profile.id,
+              name: profile.name,
               profile_image_url: profile.profile_image_url,
             },
           ]);
@@ -176,7 +176,7 @@ const UserProfile = ({ wrapperRef }) => {
             followers_count: prevState.followers_count - 1,
           }));
           setFollowingList((prevState) =>
-            prevState.filter((fl) => fl.user_id !== profile.id)
+            prevState.filter((fl) => fl.id !== profile.id)
           );
         }
       }
