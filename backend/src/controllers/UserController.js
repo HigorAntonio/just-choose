@@ -90,11 +90,7 @@ module.exports = {
         delete profile.is_active;
       }
 
-      return res.json({
-        ...profile,
-        followers_count: parseInt(profile.followers_count),
-        following_count: parseInt(profile.following_count),
-      });
+      return res.json(profile);
     } catch (error) {
       return res.sendStatus(500);
     }

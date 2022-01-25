@@ -185,22 +185,7 @@ module.exports = {
         return res.sendStatus(403);
       }
 
-      return res.json({
-        id: contentList.id,
-        user_id: contentList.user_id,
-        user_name: contentList.user_name,
-        profile_image_url: contentList.profile_image_url,
-        title: contentList.title,
-        description: contentList.description,
-        sharing_option: contentList.sharing_option,
-        thumbnail: contentList.thumbnail,
-        likes: parseInt(contentList.likes),
-        forks: parseInt(contentList.forks),
-        content_types: contentList.content_types,
-        content: contentList.content,
-        created_at: contentList.created_at,
-        updated_at: contentList.updated_at,
-      });
+      return res.json(contentList);
     } catch (error) {
       return res.sendStatus(500);
     }

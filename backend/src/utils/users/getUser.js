@@ -35,6 +35,9 @@ module.exports = async (userId) => {
       .where({ 'u.id': userId })
       .first();
 
+    user.followers_count = parseInt(user.followers_count);
+    user.following_count = parseInt(user.following_count);
+
     return user;
   } catch (error) {
     throw error;

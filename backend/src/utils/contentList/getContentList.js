@@ -12,14 +12,14 @@ module.exports = async (contentListId) => {
         'cl.description',
         'cl.sharing_option',
         'cl.thumbnail',
+        knex.raw('COALESCE(likes, 0) AS likes'),
+        knex.raw('COALESCE(forks, 0) AS forks'),
         'content_types',
         knex.raw(
           `JSON_BUILD_OBJECT(` +
             `'movies', movies, 'shows', shows, 'games', games) ` +
             `AS content`
         ),
-        knex.raw('COALESCE(likes, 0) AS likes'),
-        knex.raw('COALESCE(forks, 0) AS forks'),
         'cl.created_at',
         'cl.updated_at'
       )
@@ -175,6 +175,8 @@ module.exports = async (contentListId) => {
           delete contentList.content[type];
         }
       });
+      contentList.likes = parseInt(contentList.likes);
+      contentList.forks = parseInt(contentList.forks);
     }
 
     return contentList;
