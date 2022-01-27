@@ -1,4 +1,5 @@
 const isTypeValid = require('../utils/search/isTypeValid');
+const getSearchOrderByQuery = require('../utils/search/getSearchOrderByQuery');
 const getUserFollowersIds = require('../utils/userFollowers/getUserFollowersIds');
 const getUsers = require('../utils/users/getUsers');
 const getPolls = require('../utils/polls/getPolls');
@@ -9,7 +10,13 @@ module.exports = {
     try {
       const userId = req.userId;
 
-      const { page = 1, page_size: pageSize = 10, query, type } = req.query;
+      const {
+        page = 1,
+        page_size: pageSize = 10,
+        query,
+        type,
+        sort_by: sortBy,
+      } = req.query;
 
       const errors = [];
 
@@ -35,6 +42,17 @@ module.exports = {
           errors.push('Parâmetro type, valor inválido');
         }
       }
+      if (sortBy) {
+        if (!isTypeValid(type)) {
+          errors.push(
+            'O parâmetro sort_by só pode ser usado com um parâmetro type válido'
+          );
+        } else if (typeof sortBy !== 'string') {
+          errors.push('O parâmetro sort_by deve ser uma string');
+        } else if (!getSearchOrderByQuery(type, sortBy)) {
+          errors.push('Parâmetro sort_by, valor inválido');
+        }
+      }
       if (errors.length > 0) {
         return res.status(400).json({ erros: errors });
       }
@@ -45,7 +63,9 @@ module.exports = {
               pageSize,
               page,
               query,
-              sortBy: 'followers_count DESC',
+              sortBy: sortBy
+                ? getSearchOrderByQuery(type, sortBy)
+                : 'followers_count DESC',
             })
           : { users: [], count: 0 };
 
@@ -58,7 +78,9 @@ module.exports = {
               pageSize,
               page,
               query,
-              sortBy: 'updated_at DESC',
+              sortBy: sortBy
+                ? getSearchOrderByQuery(type, sortBy)
+                : 'updated_at DESC',
             })
           : { polls: [], count: 0 };
 
@@ -69,7 +91,9 @@ module.exports = {
               pageSize,
               page,
               query,
-              sortBy: 'likes DESC',
+              sortBy: sortBy
+                ? getSearchOrderByQuery(type, sortBy)
+                : 'likes DESC',
             })
           : { contentLists: [], count: 0 };
 
