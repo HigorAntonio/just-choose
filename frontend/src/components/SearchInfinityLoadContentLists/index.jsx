@@ -8,10 +8,10 @@ import SearchContentListCard from '../SearchContentListCard';
 import { Container, Header, Title, Main } from './styles';
 
 const SearchInfinityLoadContentLists = ({ query }) => {
-  const [params] = useState({ query, sort_by: 'rating.desc' });
+  const [params] = useState({ query, page_size: 30, type: 'content_list' });
 
   const { loading, error, content, lastElementRef } =
-    useLoadMoreWhenLastElementIsOnScreen('/contentlists', params);
+    useLoadMoreWhenLastElementIsOnScreen('/search', params);
 
   return (
     <>

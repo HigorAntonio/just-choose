@@ -53,6 +53,7 @@ export const UserName = styled.h3`
   word-break: break-word;
   overflow: hidden;
   font-size: 1.9rem;
+  margin-top: 1rem;
 
   &:hover {
     color: var(--primary-400);

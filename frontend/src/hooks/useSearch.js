@@ -19,7 +19,7 @@ const useSearch = (query) => {
             params: { query },
             cancelToken: source.token,
           });
-          setContent(data);
+          setContent(data.results);
           setLoading(false);
         } catch (error) {
           if (axios.isCancel(error)) {

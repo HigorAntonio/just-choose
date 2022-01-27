@@ -8,10 +8,10 @@ import SearchPollCard from '../SearchPollCard';
 import { Container, Header, Title, Main } from './styles';
 
 const SearchInfinityLoadPolls = ({ query }) => {
-  const [params] = useState({ query, sort_by: 'updated.desc' });
+  const [params] = useState({ query, page_size: 30, type: 'poll' });
 
   const { loading, error, content, lastElementRef } =
-    useLoadMoreWhenLastElementIsOnScreen('/polls', params);
+    useLoadMoreWhenLastElementIsOnScreen('/search', params);
 
   return (
     <>
