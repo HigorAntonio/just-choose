@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
 
+import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
 
@@ -42,7 +43,7 @@ const getSharingOption = (type) => {
   }
 };
 
-const UpdatePoll = ({ wrapperRef }) => {
+const UpdatePoll = () => {
   const { id: pollId } = useParams();
   const history = useHistory();
 
@@ -54,6 +55,7 @@ const UpdatePoll = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
+  const { contentWrapperRef } = useContext(LayoutContext);
 
   const [loadingError, setLoadingError] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
@@ -78,12 +80,9 @@ const UpdatePoll = ({ wrapperRef }) => {
   const source = useRef();
 
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-    contentListWrapperRef.current.scrollTop = 0;
-    contentListWrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+    contentWrapperRef.current.scrollTo(0, 0);
+    contentListWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef]);
 
   useEffect(() => {
     mounted.current = true;
@@ -302,9 +301,7 @@ const UpdatePoll = ({ wrapperRef }) => {
       }
       history.push(`/polls/${pollId}`);
     }
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
+    contentWrapperRef.current.scrollTo(0, 0);
   };
 
   if (loadingError) {

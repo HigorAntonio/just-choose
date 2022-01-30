@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useRouteMatch, useLocation, useHistory } from 'react-router-dom';
+
+import { LayoutContext } from '../../context/LayoutContext';
 
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import SettingsProfile from '../../components/SettingsProfile';
@@ -15,10 +17,12 @@ import {
   Main,
 } from './styles';
 
-const Settings = ({ wrapperRef }) => {
+const Settings = () => {
   const history = useHistory();
   const { path, url } = useRouteMatch();
   const location = useLocation();
+
+  const { contentWrapperRef } = useContext(LayoutContext);
 
   useEffect(() => {
     if (
@@ -31,10 +35,8 @@ const Settings = ({ wrapperRef }) => {
   }, [location, path, history]);
 
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef, location]);
+    contentWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef, location]);
 
   const handlePush = (path) => {
     history.push(path);
@@ -99,12 +101,8 @@ const Settings = ({ wrapperRef }) => {
         </NavigationWrapper>
       </StickyWrapper>
       <Main>
-        {location.pathname === `${path}/profile` && (
-          <SettingsProfile wrapperRef={wrapperRef} />
-        )}
-        {location.pathname === `${path}/security` && (
-          <SettingsSecurity wrapperRef={wrapperRef} />
-        )}
+        {location.pathname === `${path}/profile` && <SettingsProfile />}
+        {location.pathname === `${path}/security` && <SettingsSecurity />}
         {location.pathname === `${path}/devices` && <h3>Devices</h3>}
       </Main>
     </Container>

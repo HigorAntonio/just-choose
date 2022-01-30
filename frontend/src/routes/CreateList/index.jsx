@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { GoSearch } from 'react-icons/go';
 
+import { LayoutContext } from '../../context/LayoutContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
@@ -46,7 +47,7 @@ const getSharingOption = (type) => {
   }
 };
 
-const CreateList = ({ wrapperRef }) => {
+const CreateList = () => {
   const {
     setMessage,
     setSeverity,
@@ -54,6 +55,7 @@ const CreateList = ({ wrapperRef }) => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
+  const { contentWrapperRef } = useContext(LayoutContext);
 
   const history = useHistory();
 
@@ -92,10 +94,8 @@ const CreateList = ({ wrapperRef }) => {
   }, []);
 
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+    contentWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef]);
 
   useEffect(() => {
     setContentError('');
@@ -203,8 +203,7 @@ const CreateList = ({ wrapperRef }) => {
 
   const handlePreviewList = () => {
     setShowListPreview((prevState) => !prevState);
-    contentListWrapperRef.current.scrollTop = 0;
-    contentListWrapperRef.current.scrollLeft = 0;
+    contentListWrapperRef.current.scrollTo(0, 0);
   };
 
   const validateFields = () => {
@@ -286,9 +285,7 @@ const CreateList = ({ wrapperRef }) => {
       }
       return history.push(`/lists/${listId}`);
     }
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
+    contentWrapperRef.current.scrollTo(0, 0);
   };
 
   return (

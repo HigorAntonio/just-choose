@@ -48,8 +48,7 @@ const NavBar = () => {
 
   useEffect(() => {
     // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
+    wrapperRef.current.scrollTo(0, 0);
   }, [wrapperRef, showSearch]);
 
   const {

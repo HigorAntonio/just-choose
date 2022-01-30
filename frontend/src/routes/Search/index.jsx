@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
+
+import { LayoutContext } from '../../context/LayoutContext';
 
 import SearchMainResults from '../../components/SearchMainResults';
 import SearchInfinityLoadProfiles from '../../components/SearchInfinityLoadProfiles';
@@ -9,16 +11,16 @@ import SearchInfinityLoadContentLists from '../../components/SearchInfinityLoadC
 
 import { Container } from './styles';
 
-const Search = ({ wrapperRef }) => {
+const Search = () => {
   const location = useLocation();
   const { query, type } = queryString.parse(location.search);
   const history = useHistory();
 
+  const { contentWrapperRef } = useContext(LayoutContext);
+
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+    contentWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef]);
 
   useEffect(() => {
     if (!query) {

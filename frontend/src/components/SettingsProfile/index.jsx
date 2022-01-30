@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 
+import { LayoutContext } from '../../context/LayoutContext';
 import { AlertContext } from '../../context/AlertContext';
 import { ProfileContext } from '../../context/ProfileContext';
 
@@ -23,7 +24,8 @@ import {
   ProfileButton,
 } from './styles';
 
-const SettingsProfile = ({ wrapperRef }) => {
+const SettingsProfile = () => {
+  const { contentWrapperRef } = useContext(LayoutContext);
   const {
     setMessage,
     setSeverity,
@@ -172,9 +174,7 @@ const SettingsProfile = ({ wrapperRef }) => {
       }
       refreshUserProfileData();
     }
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
+    contentWrapperRef.current.scrollTo(0, 0);
   };
 
   const isDisabledUpdateProfileButton = () => {

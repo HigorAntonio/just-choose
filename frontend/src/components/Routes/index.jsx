@@ -15,66 +15,43 @@ import Settings from '../../routes/Settings';
 import UserProfile from '../../routes/UserProfile';
 import NotFound from '../../components/NotFound';
 
-const Routes = ({ wrapperRef }) => {
+const Routes = () => {
   return (
     <Switch>
-      <CustomRoute
-        exact
-        path="/"
-        component={() => <Home wrapperRef={wrapperRef} />}
-      />
-      <CustomRoute
-        exact
-        path="/search"
-        component={() => <Search wrapperRef={wrapperRef} />}
-      />
+      <CustomRoute exact path="/" component={() => <Home />} />
+      <CustomRoute exact path="/search" component={() => <Search />} />
       <CustomRoute
         isPrivate
         requiresUserActivation
         exact
         path="/list"
-        component={() => <CreateList wrapperRef={wrapperRef} />}
+        component={() => <CreateList />}
       />
-      <CustomRoute
-        exact
-        path="/lists/:id"
-        component={() => <ShowList wrapperRef={wrapperRef} />}
-      />
+      <CustomRoute exact path="/lists/:id" component={() => <ShowList />} />
       <CustomRoute
         isPrivate
         requiresUserActivation
         exact
         path="/lists/:id/update"
-        component={() => <UpdateList wrapperRef={wrapperRef} />}
+        component={() => <UpdateList />}
       />
       <CustomRoute
         isPrivate
         requiresUserActivation
         exact
         path="/lists/:id/poll"
-        component={() => <CreatePoll wrapperRef={wrapperRef} />}
+        component={() => <CreatePoll />}
       />
-      <CustomRoute
-        exact
-        path="/polls/:id"
-        component={() => <ShowPoll wrapperRef={wrapperRef} />}
-      />
+      <CustomRoute exact path="/polls/:id" component={() => <ShowPoll />} />
       <CustomRoute
         isPrivate
         requiresUserActivation
         exact
         path="/polls/:id/update"
-        component={() => <UpdatePoll wrapperRef={wrapperRef} />}
+        component={() => <UpdatePoll />}
       />
-      <CustomRoute
-        isPrivate
-        path="/settings"
-        component={() => <Settings wrapperRef={wrapperRef} />}
-      />
-      <CustomRoute
-        path="/users/:id"
-        component={() => <UserProfile wrapperRef={wrapperRef} />}
-      />
+      <CustomRoute isPrivate path="/settings" component={() => <Settings />} />
+      <CustomRoute path="/users/:id" component={() => <UserProfile />} />
       <Route component={NotFound} />
     </Switch>
   );

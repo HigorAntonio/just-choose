@@ -1,8 +1,9 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 
 import { ThemeContext } from '../../context/ThemeContext';
+import { LayoutContext } from '../../context/LayoutContext';
 
 import Alert from '../Alert';
 import Header from '../Header';
@@ -20,8 +21,7 @@ import {
 
 const Layout = () => {
   const { theme } = useContext(ThemeContext);
-
-  const contentWrapperRef = useRef();
+  const { contentWrapperRef } = useContext(LayoutContext);
 
   return (
     <ThemeProvider theme={theme}>
@@ -36,7 +36,7 @@ const Layout = () => {
             </NavBarWrapper>
             <ContentWrapper ref={contentWrapperRef} tabIndex="-1">
               <Alert />
-              <Routes wrapperRef={contentWrapperRef} />
+              <Routes />
             </ContentWrapper>
           </BodyWrapper>
         </Router>

@@ -17,6 +17,7 @@ import { MdSettings } from 'react-icons/md';
 import { FaTrash } from 'react-icons/fa';
 import { FaHashtag } from 'react-icons/fa';
 
+import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
 import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
@@ -130,7 +131,7 @@ const getFilteredContent = (content, contentTypes, typeFilter) => {
   }
 };
 
-const ShowPoll = ({ wrapperRef }) => {
+const ShowPoll = () => {
   const { id: pollId } = useParams();
   const location = useLocation();
   const queryParams = useMemo(
@@ -152,6 +153,7 @@ const ShowPoll = ({ wrapperRef }) => {
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
   const { colors } = useContext(ThemeContext);
+  const { contentWrapperRef } = useContext(LayoutContext);
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -169,10 +171,8 @@ const ShowPoll = ({ wrapperRef }) => {
   const source = useRef();
 
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+    contentWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef]);
 
   const clearState = () => {
     setLoadingError(false);

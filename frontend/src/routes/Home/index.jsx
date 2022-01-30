@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
+
+import { LayoutContext } from '../../context/LayoutContext';
 
 import { Container } from './styles';
 
-const Home = ({ wrapperRef }) => {
+const Home = () => {
+  const { contentWrapperRef } = useContext(LayoutContext);
+
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+    contentWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef]);
 
   return (
     <Container>

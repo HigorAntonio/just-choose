@@ -6,6 +6,7 @@ import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { GoSearch } from 'react-icons/go';
 
+import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
 
@@ -57,10 +58,11 @@ const getSharingOption = (type) => {
   }
 };
 
-const UpdateList = ({ wrapperRef }) => {
+const UpdateList = () => {
   const { id: listId } = useParams();
   const history = useHistory();
 
+  const { contentWrapperRef } = useContext(LayoutContext);
   const { userId } = useContext(AuthContext);
   const {
     setMessage,
@@ -102,12 +104,9 @@ const UpdateList = ({ wrapperRef }) => {
   const contentTypesList = ['Filme', 'Série', 'Jogo'];
 
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-    contentListWrapperRef.current.scrollTop = 0;
-    contentListWrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+    contentWrapperRef.current.scrollTo(0, 0);
+    contentListWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef]);
 
   useEffect(() => {
     mounted.current = true;
@@ -287,8 +286,7 @@ const UpdateList = ({ wrapperRef }) => {
 
   const handlePreviewList = () => {
     setShowListPreview((prevState) => !prevState);
-    contentListWrapperRef.current.scrollTop = 0;
-    contentListWrapperRef.current.scrollLeft = 0;
+    contentListWrapperRef.current.scrollTo(0, 0);
   };
 
   const validateFields = () => {
@@ -369,9 +367,7 @@ const UpdateList = ({ wrapperRef }) => {
       }
       history.push(`/lists/${listId}`);
     }
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
+    contentWrapperRef.current.scrollTo(0, 0);
   };
 
   if (loadingError) {

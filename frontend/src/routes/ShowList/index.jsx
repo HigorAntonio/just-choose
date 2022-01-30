@@ -7,6 +7,7 @@ import { FaHeart, FaRegHeart, FaVoteYea, FaTrash } from 'react-icons/fa';
 import { BiGitRepoForked } from 'react-icons/bi';
 import { MdSettings } from 'react-icons/md';
 
+import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
 import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
@@ -103,7 +104,7 @@ const getFilteredContent = (content, contentTypes, typeFilter) => {
   }
 };
 
-const ShowList = ({ wrapperRef }) => {
+const ShowList = () => {
   const { id: listId } = useParams();
   const location = useLocation();
   const queryParams = useMemo(
@@ -113,6 +114,7 @@ const ShowList = ({ wrapperRef }) => {
   const { type: contentType = 'all' } = queryParams;
   const history = useHistory();
 
+  const { contentWrapperRef } = useContext(LayoutContext);
   const { userId, authenticated } = useContext(AuthContext);
   const {
     userProfile: { is_active: isUserActive },
@@ -141,10 +143,8 @@ const ShowList = ({ wrapperRef }) => {
   const source = useRef();
 
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef]);
+    contentWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef]);
 
   const clearState = () => {
     setLoadingError(false);

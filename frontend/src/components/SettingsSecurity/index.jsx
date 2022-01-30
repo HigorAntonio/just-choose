@@ -19,7 +19,7 @@ import {
   ResendEmailButton,
 } from './styles';
 
-const SettingsSecurity = ({ wrapperRef }) => {
+const SettingsSecurity = () => {
   const {
     setMessage,
     setSeverity,

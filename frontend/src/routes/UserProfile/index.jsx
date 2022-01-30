@@ -8,6 +8,7 @@ import {
 import axios from 'axios';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
+import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
 import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
@@ -41,7 +42,7 @@ import {
   Main,
 } from './styles';
 
-const UserProfile = ({ wrapperRef }) => {
+const UserProfile = () => {
   const history = useHistory();
   const { id: profileId } = useParams();
   const { path, url } = useRouteMatch();
@@ -61,6 +62,7 @@ const UserProfile = ({ wrapperRef }) => {
   const { setFollowing: setFollowingList } = useContext(
     FollowingProfilesContext
   );
+  const { contentWrapperRef } = useContext(LayoutContext);
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -94,10 +96,8 @@ const UserProfile = ({ wrapperRef }) => {
   }, [location, path, profileId, userId, history]);
 
   useEffect(() => {
-    // Posiciona o scroll no início da página
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
-  }, [wrapperRef, location]);
+    contentWrapperRef.current.scrollTo(0, 0);
+  }, [contentWrapperRef, location]);
 
   useEffect(() => {
     mounted.current = true;

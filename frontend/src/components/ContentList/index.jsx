@@ -108,8 +108,7 @@ const ContentList = ({
 
   // Quando a lista de conteudo muda move o scroll da contentList pro início
   useEffect(() => {
-    wrapperRef.current.scrollTop = 0;
-    wrapperRef.current.scrollLeft = 0;
+    wrapperRef.current.scrollTo(0, 0);
   }, [wrapperRef, requestType, params]);
 
   const addToContentList = (contentId, posterPath, title) => {
