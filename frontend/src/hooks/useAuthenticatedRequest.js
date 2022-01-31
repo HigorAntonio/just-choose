@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 
 import { AuthContext } from '../context/AuthContext';
-import justChooseApi from '../apis/justChooseApi';
+import justChooseApi from '../services/justChooseApi';
 
 const useAuthenticatedRequest = (url, params, page) => {
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,6 @@
 import { useContext, useState, useCallback, useEffect } from 'react';
 
-import justChooseApi from '../apis/justChooseApi';
+import justChooseApi from '../services/justChooseApi';
 import { AuthContext } from '../context/AuthContext';
 
 const useProfileData = () => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import justChooseApi from '../apis/justChooseApi';
+import justChooseApi from '../services/justChooseApi';
 
 const useSearch = (query) => {
   const [loading, setLoading] = useState(true);

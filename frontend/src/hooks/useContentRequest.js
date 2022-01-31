@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import justChooseApi from '../apis/justChooseApi';
+import justChooseApi from '../services/justChooseApi';
 
 const useContentRequest = (url, params, page) => {
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import justChooseApi from '../apis/justChooseApi';
+import justChooseApi from '../services/justChooseApi';
 
 const compareCertifications = (a, b) => {
   if (a.order < b.order) {

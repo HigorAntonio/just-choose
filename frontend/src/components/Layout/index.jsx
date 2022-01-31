@@ -8,7 +8,7 @@ import { LayoutContext } from '../../context/LayoutContext';
 import Alert from '../Alert';
 import Header from '../Header';
 import NavBar from '../NavBar';
-import Routes from '../Routes';
+import Routes from '../../routes';
 import GlobalStyles from '../../styles/GlobalStyles';
 
 import {

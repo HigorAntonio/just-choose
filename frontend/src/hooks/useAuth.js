@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import jwt_decode from 'jwt-decode';
 
-import justChooseApi from '../apis/justChooseApi';
+import justChooseApi from '../services/justChooseApi';
 
 const useAuth = () => {
   const [authenticated, setAuthenticated] = useState(false);
