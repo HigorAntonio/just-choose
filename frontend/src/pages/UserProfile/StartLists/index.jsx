@@ -5,7 +5,7 @@ import axios from 'axios';
 import { ViewportContext } from '../../../context/ViewportContext';
 
 import justChooseApi from '../../../services/justChooseApi';
-import ListCard from '../ListCard';
+import ListCard from '../../../components/ListCard';
 
 import { Container, TitleWrapper, Title, Main } from './styles';
 

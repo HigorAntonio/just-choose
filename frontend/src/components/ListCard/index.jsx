@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
-import { fromNow } from '../../../utils/dataUtility';
+import { fromNow } from '../../utils/dataUtility';
+import formatCount from '../../utils/formatCount';
 
 import {
   Container,
@@ -14,23 +15,26 @@ import {
   Bottom,
   Title,
   Meta,
-  PollStatus,
+  Likes,
+  MetaSeparator,
+  Forks,
 } from './styles';
 
-const PollCard = ({ poll }) => {
+const ListCard = ({ contentList }) => {
   const {
-    id: pollId,
+    id: listId,
     thumbnail,
     title,
-    is_active: isActive,
+    likes,
+    forks,
     updated_at,
-  } = poll;
+  } = contentList;
 
   const [thumbnailError, setThumbnailError] = useState(false);
 
   return (
     <Container>
-      <Link to={`/polls/${pollId}`}>
+      <Link to={`/lists/${listId}`}>
         <CardWrapper>
           <Top>
             <ThumbWrapper>
@@ -46,7 +50,15 @@ const PollCard = ({ poll }) => {
           <Bottom>
             <Title title={title}>{title}</Title>
             <Meta>
-              <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
+              <Likes>
+                {formatCount(likes) + ' '}
+                {likes === 1 ? 'curtida' : 'curtidas'}
+              </Likes>
+              <MetaSeparator>•</MetaSeparator>
+              <Forks>
+                {formatCount(forks) + ' '}
+                {forks === 1 ? 'fork' : 'forks'}
+              </Forks>
             </Meta>
           </Bottom>
         </CardWrapper>
@@ -55,4 +67,4 @@ const PollCard = ({ poll }) => {
   );
 };
 
-export default PollCard;
+export default ListCard;

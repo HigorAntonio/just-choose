@@ -5,7 +5,7 @@ import axios from 'axios';
 import { ViewportContext } from '../../../context/ViewportContext';
 
 import justChooseApi from '../../../services/justChooseApi';
-import PollCard from '../PollCard';
+import PollCard from '../../../components/PollCard';
 
 import { Container, TitleWrapper, Title, Main } from './styles';
 

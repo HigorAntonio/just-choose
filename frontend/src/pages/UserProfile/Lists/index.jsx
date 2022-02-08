@@ -6,7 +6,7 @@ import { GoSearch } from 'react-icons/go';
 import setQueryParamAndGetNewUrl from '../../../utils/setQueryParamAndGetNewUrl';
 import SingleOptionSelect from '../../../components/SingleOptionSelect';
 import useLoadMoreWhenLastElementIsOnScreen from '../../../hooks/useLoadMoreWhenLastElementIsOnScreen';
-import ListCard from '../ListCard';
+import ListCard from '../../../components/ListCard';
 import Grid from '../Grid';
 
 import {
