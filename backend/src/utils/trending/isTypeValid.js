@@ -1,3 +1,3 @@
 module.exports = (type) => {
-  return type === 'content_list';
+  return type === 'content_list' || type === 'poll';
 };

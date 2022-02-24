@@ -1,11 +1,11 @@
 module.exports = (sortBy) => {
   const sortByAllowedValues = {
-    'updated.asc': 'updated_at ASC',
-    'updated.desc': 'updated_at DESC',
+    'type.asc': 'type ASC, title ASC',
+    'type.desc': 'type DESC, title ASC',
     'title.asc': 'title ASC',
     'title.desc': 'title DESC',
-    'votes.asc': 'total_votes ASC',
-    'votes.desc': 'total_votes DESC',
+    'votes.asc': 'votes ASC, title ASC',
+    'votes.desc': 'votes DESC, title ASC',
   };
 
   return sortByAllowedValues[sortBy];

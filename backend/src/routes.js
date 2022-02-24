@@ -12,7 +12,9 @@ const FollowUsersController = require('./controllers/FollowUsersController');
 const UserFollowingController = require('./controllers/UserFollowingController');
 const UserFollowersController = require('./controllers/UserFollowersController');
 const PollController = require('./controllers/PollController');
+const PollContentController = require('./controllers/PollContentController');
 const ContentListController = require('./controllers/ContentListController');
+const ContentListContentController = require('./controllers/ContentListContentController');
 const ContentListLikeController = require('./controllers/ContentListLikeController');
 const ContentListForkController = require('./controllers/ContentListForkController');
 const VoteController = require('./controllers/VoteController');
@@ -116,6 +118,13 @@ routes.delete(
   ContentListController.delete
 );
 
+// ContentListContentController
+routes.get(
+  '/contentlists/:id/content',
+  getLoggedUserId,
+  ContentListContentController.index
+);
+
 // ContentListLikeController
 routes.post(
   '/contentlists/:id/like',
@@ -161,6 +170,9 @@ routes.put(
   PollController.update
 );
 routes.delete('/polls/:id', authorization, isUserActive, PollController.delete);
+
+// PollContentController
+routes.get('/polls/:id/content', getLoggedUserId, PollContentController.index);
 
 // VoteController
 routes.post(

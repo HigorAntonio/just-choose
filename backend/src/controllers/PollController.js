@@ -200,9 +200,7 @@ module.exports = {
       const poll = await getPoll(pollId);
 
       if (!poll) {
-        return res
-          .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+        return res.status(400).json({ erro: 'Votação não encontrada' });
       }
 
       if (
@@ -213,50 +211,7 @@ module.exports = {
         return res.sendStatus(403);
       }
 
-      if (poll.is_active) {
-        const { content_types: contentTypes, content } = await getContentList(
-          poll.content_list_id
-        );
-
-        poll.content_types = contentTypes;
-        poll.content = content;
-      }
-      if (!poll.is_active) {
-        const { total_votes: totalVotes, result } = await getPollResult(
-          poll.id,
-          poll.content_list_id
-        );
-        poll.total_votes = totalVotes;
-        poll.result = result;
-      }
-
-      poll.content_list_sharing_option = (
-        await knex
-          .select('sharing_option')
-          .from('content_lists')
-          .where({ id: poll.content_list_id })
-          .first()
-      ).sharing_option;
-
-      return res.json({
-        id: poll.id,
-        user_id: poll.user_id,
-        user_name: poll.user_name,
-        profile_image_url: poll.profile_image_url,
-        title: poll.title,
-        description: poll.description,
-        sharing_option: poll.sharing_option,
-        is_active: poll.is_active,
-        thumbnail: poll.thumbnail,
-        content_list_id: poll.content_list_id,
-        content_list_sharing_option: poll.content_list_sharing_option,
-        content_types: poll.content_types,
-        content: poll.content,
-        total_votes: poll.total_votes,
-        result: poll.result,
-        created_at: poll.created_at,
-        updated_at: poll.updated_at,
-      });
+      return res.json(poll);
     } catch (error) {
       return res.sendStatus(500);
     }

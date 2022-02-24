@@ -28,7 +28,8 @@ module.exports = async (options) => {
         'pq.sharing_option',
         'pq.is_active',
         'pq.thumbnail',
-        'pq.content_list_id',
+        'pcls.content_lists',
+        knex.raw('COALESCE(total_votes, 0) as total_votes'),
         'pq.created_at',
         'pq.updated_at'
       )
@@ -43,7 +44,6 @@ module.exports = async (options) => {
           'p.sharing_option',
           'p.is_active',
           'p.thumbnail',
-          'pcl.content_list_id',
           'p.created_at',
           'p.updated_at',
           'p.document'
@@ -51,7 +51,6 @@ module.exports = async (options) => {
           .from('polls as p')
           .where({ sharing_option: 'public' })
           .innerJoin('users as u', 'user_id', 'u.id')
-          .innerJoin('poll_content_list as pcl', 'poll_id', 'p.id')
           .union(function () {
             this.select(
               'p.id',
@@ -63,7 +62,6 @@ module.exports = async (options) => {
               'p.sharing_option',
               'p.is_active',
               'p.thumbnail',
-              'pcl.content_list_id',
               'p.created_at',
               'p.updated_at',
               'p.document'
@@ -71,8 +69,7 @@ module.exports = async (options) => {
               .from('polls as p')
               .where({ sharing_option: 'followed_profiles' })
               .innerJoin('users as u', 'user_id', 'u.id')
-              .whereIn('u.id', followersIds)
-              .innerJoin('poll_content_list as pcl', 'poll_id', 'p.id');
+              .whereIn('u.id', followersIds);
           })
           .as('pq');
         if (getPrivate) {
@@ -87,7 +84,6 @@ module.exports = async (options) => {
               'p.sharing_option',
               'p.is_active',
               'p.thumbnail',
-              'pcl.content_list_id',
               'p.created_at',
               'p.updated_at',
               'p.document'
@@ -95,11 +91,61 @@ module.exports = async (options) => {
               .from('polls as p')
               .where({ sharing_option: 'private' })
               .innerJoin('users as u', 'user_id', 'u.id')
-              .where({ 'u.id': userId })
-              .innerJoin('poll_content_list as pcl', 'poll_id', 'p.id');
+              .where({ 'u.id': userId });
           });
         }
       })
+      .innerJoin(
+        knex
+          .select(
+            'pcls.poll_id',
+            knex.raw('ARRAY_AGG(pcls.content_list) AS content_lists')
+          )
+          .from(function () {
+            this.select(
+              'pcl.poll_id',
+              knex.raw(`JSON_BUILD_OBJECT(
+              'id', pcl.content_list_id,
+              'sharing_option', cl.sharing_option
+            ) AS content_list`)
+            )
+              .from('poll_content_list as pcl')
+              .innerJoin('content_lists as cl', 'pcl.content_list_id', 'cl.id')
+              .as('pcls');
+          })
+          .groupBy('pcls.poll_id')
+          .as('pcls'),
+        'pcls.poll_id',
+        'pq.id'
+      )
+      .leftJoin(
+        knex
+          .select('poll_id', knex.raw('SUM(votes) AS total_votes'))
+          .from(function () {
+            this.select()
+              .from(function () {
+                this.select('poll_id', knex.raw('COUNT(id) AS votes'))
+                  .from('movie_votes')
+                  .groupBy('poll_id')
+                  .as('movie_votes_count');
+              })
+              .unionAll(function () {
+                this.select('poll_id', knex.raw('COUNT(id) AS votes'))
+                  .from('show_votes')
+                  .groupBy('poll_id');
+              })
+              .unionAll(function () {
+                this.select('poll_id', knex.raw('COUNT(id) AS votes'))
+                  .from('game_votes')
+                  .groupBy('poll_id');
+              })
+              .as('poll_votes');
+          })
+          .groupBy('poll_id')
+          .as('poll_total_votes'),
+        'poll_total_votes.poll_id',
+        'pq.id'
+      )
       .limit(pageSize)
       .offset((page - 1) * pageSize);
 
@@ -147,7 +193,10 @@ module.exports = async (options) => {
       );
     }
 
-    const polls = await pollsQuery;
+    const polls = (await pollsQuery).map((p) => {
+      p.total_votes = parseInt(p.total_votes);
+      return p;
+    });
     const [{ count }] = await countObj;
 
     return { polls, count: parseInt(count) };

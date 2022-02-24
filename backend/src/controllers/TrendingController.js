@@ -1,5 +1,6 @@
 const isTypeValid = require('../utils/trending/isTypeValid');
 const getContentLists = require('../utils/contentList/getContentLists');
+const getPolls = require('../utils/polls/getPolls');
 
 module.exports = {
   async index(req, res) {
@@ -29,6 +30,15 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
+      const { polls, count: pollsCount } =
+        !type || type === 'poll'
+          ? await getPolls({
+              pageSize,
+              page,
+              sortBy: `DATE_TRUNC('week', created_at) DESC, total_votes DESC`,
+            })
+          : { polls: [], count: 0 };
+
       const { contentLists, count: contentListsCount } =
         !type || type === 'content_list'
           ? await getContentLists({
@@ -41,6 +51,10 @@ module.exports = {
       const results = type ? [] : {};
 
       if (!type) {
+        results.polls = {
+          total_results: pollsCount,
+          results: polls,
+        };
         results.content_lists = {
           total_results: contentListsCount,
           results: contentLists,
@@ -48,6 +62,9 @@ module.exports = {
       }
       if (type === 'content_list') {
         results.push(...contentLists);
+      }
+      if (type === 'poll') {
+        results.push(...polls);
       }
 
       const totalResults = contentListsCount;
