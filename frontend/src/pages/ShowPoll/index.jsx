@@ -15,7 +15,6 @@ import { FaPlay } from 'react-icons/fa';
 import { FaStop } from 'react-icons/fa';
 import { MdSettings } from 'react-icons/md';
 import { FaTrash } from 'react-icons/fa';
-import { FaHashtag } from 'react-icons/fa';
 
 import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
@@ -24,15 +23,19 @@ import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../services/justChooseApi';
 import NotFound from '../../components/NotFound';
+import NoContent from './NoContent';
+import Result from './Result';
 import AccessDenied from '../../components/AccessDenied';
-import ContentGrid from '../../components/ContentGrid';
-import ContentCardSimple from '../../components/ContentCardSimple';
+import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import Skeleton from './Skeleton';
-import formatCount from '../../utils/formatCount';
+import contentTypesUtility from '../../utils/contentTypes';
+import { formatCreationDate } from '../../utils/dataUtility';
+import removeQueryParamAndGetNewUrl from '../../utils/removeQueryParamAndGetNewUrl';
 import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
+import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
 
 import {
   Container,
@@ -51,85 +54,10 @@ import {
   TypeOptions,
   Option,
   Main,
-  Message,
   ResultContainer,
   ResultHeader,
   ResultBody,
 } from './styles';
-
-const getMonth = (month) => {
-  switch (month) {
-    case 0:
-      return 'janeiro';
-    case 1:
-      return 'fevereiro';
-    case 2:
-      return 'março';
-    case 3:
-      return 'abril';
-    case 4:
-      return 'maio';
-    case 5:
-      return 'junho';
-    case 6:
-      return 'julho';
-    case 7:
-      return 'agosto';
-    case 8:
-      return 'setembro';
-    case 9:
-      return 'outubro';
-    case 10:
-      return 'novembro';
-    case 11:
-      return 'dezembro';
-    default:
-      return '-';
-  }
-};
-
-const getContentBaseUrl = (type) => {
-  switch (type) {
-    case 'movie':
-      return process.env.REACT_APP_TMDB_MOVIE_URL;
-    case 'show':
-      return process.env.REACT_APP_TMDB_SHOW_URL;
-    case 'game':
-      return process.env.REACT_APP_RAWG_GAME_URL;
-    default:
-      return '';
-  }
-};
-
-const contentTypeList = [
-  { key: 'Todos', value: 'all' },
-  { key: 'Filme', value: 'movie' },
-  { key: 'Série', value: 'show' },
-  { key: 'Jogo', value: 'game' },
-];
-
-const isContentTypeValid = (contentType) => {
-  return !!contentTypeList.find((e) => e.value === contentType);
-};
-
-const getFilteredContent = (content, contentTypes, typeFilter) => {
-  if (typeFilter === 'all') {
-    let filteredContent = [];
-    contentTypes.map(
-      (t) => (filteredContent = [...filteredContent, ...content[`${t}s`]])
-    );
-    return filteredContent;
-  }
-  if (typeFilter === 'movie') {
-    return content.movies ? content.movies : [];
-  }
-  if (typeFilter === 'show') {
-    return content.shows ? content.shows : [];
-  }
-  if (typeFilter === 'game') {
-    return content.games ? content.games : [];
-  }
-};
 
 const ShowPoll = () => {
   const { id: pollId } = useParams();
@@ -138,7 +66,7 @@ const ShowPoll = () => {
     () => queryString.parse(location.search),
     [location]
   );
-  const { type: contentType = 'all' } = queryParams;
+  const { type: contentType } = queryParams;
   const history = useHistory();
 
   const { userId, authenticated } = useContext(AuthContext);
@@ -155,17 +83,17 @@ const ShowPoll = () => {
   const { colors } = useContext(ThemeContext);
   const { contentWrapperRef } = useContext(LayoutContext);
 
+  const [poll, setPoll] = useState({});
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
-  const [poll, setPoll] = useState({});
   const [createdAt, setCreatedAt] = useState();
-  const [content, setContent] = useState([]);
   const [contentTypes, setContentTypes] = useState([]);
   const [showListOption, setShowListOption] = useState(false);
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [vote, setVote] = useState({});
+  const [params, setParams] = useState({ page_size: 30, type: contentType });
 
   const mounted = useRef();
   const source = useRef();
@@ -174,12 +102,27 @@ const ShowPoll = () => {
     contentWrapperRef.current.scrollTo(0, 0);
   }, [contentWrapperRef]);
 
+  useEffect(() => {
+    setParams((prevState) => ({ ...prevState, type: contentType }));
+  }, [contentType]);
+
+  useEffect(() => {
+    if (poll && poll.is_active === false) {
+      setParams((prevState) => ({ ...prevState, sort_by: 'votes.desc' }));
+    } else {
+      setParams((prevState) => {
+        delete prevState.sort_by;
+        return { ...prevState };
+      });
+    }
+  }, [poll]);
+
   const clearState = () => {
+    setPoll({});
+    setLoading(true);
     setLoadingError(false);
     setDenyAccess(false);
-    setPoll({});
     setCreatedAt(null);
-    setContent([]);
     setContentTypes([]);
     setShowListOption(false);
     setShowTypeOptions(false);
@@ -188,9 +131,12 @@ const ShowPoll = () => {
   };
 
   useEffect(() => {
-    if (!isContentTypeValid(contentType)) {
+    if (
+      typeof contentType !== 'undefined' &&
+      !contentTypesUtility.isValid(contentType)
+    ) {
       history.replace(
-        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', 'all')
+        removeQueryParamAndGetNewUrl(location.pathname, queryParams, 'type')
       );
     }
   }, [contentType, history, location, queryParams]);
@@ -204,10 +150,11 @@ const ShowPoll = () => {
       });
       setPoll(pollData);
       setCreatedAt(new Date(pollData.created_at));
-      if (pollData.content_types) {
+      if (pollData && pollData.content_types) {
         setContentTypes(['all', ...pollData.content_types]);
       }
       if (
+        pollData &&
         JSON.stringify(pollData) !== '{}' &&
         pollData.is_active &&
         authenticated
@@ -222,14 +169,17 @@ const ShowPoll = () => {
           setVote(vote);
         }
       }
-      if (JSON.stringify(pollData) !== '{}' && !pollData.is_active) {
-        setContent(pollData.result);
-      }
-      if (pollData.content_list_sharing_option === 'public') {
+      if (
+        pollData &&
+        pollData.content_lists[0] &&
+        pollData.content_lists[0].sharing_option === 'public'
+      ) {
         setShowListOption(true);
       }
       if (
-        pollData.content_list_sharing_option === 'followed_profiles' &&
+        pollData &&
+        pollData.content_lists[0] &&
+        pollData.content_lists[0].sharing_option === 'followed_profiles' &&
         authenticated
       ) {
         try {
@@ -242,7 +192,11 @@ const ShowPoll = () => {
           setShowListOption(isFollower);
         } catch (error) {}
       }
-      if (pollData.content_list_sharing_option === 'private') {
+      if (
+        pollData &&
+        pollData.content_lists[0] &&
+        pollData.content_lists[0].sharing_option === 'private'
+      ) {
         setShowListOption(parseInt(userId) === parseInt(pollData.user_id));
       }
       setLoading(false);
@@ -272,13 +226,12 @@ const ShowPoll = () => {
     };
   }, [getPageData]);
 
-  useEffect(() => {
-    if (JSON.stringify(poll) !== '{}' && poll.is_active) {
-      setContent(
-        getFilteredContent(poll.content, poll.content_types, contentType)
-      );
-    }
-  }, [poll, contentType]);
+  const {
+    loading: loadingContent,
+    error: loadingContentError,
+    content,
+    lastElementRef: lastContentRef,
+  } = useLoadMoreWhenLastElementIsOnScreen(`/polls/${pollId}/content`, params);
 
   const handleActive = async () => {
     if (!authenticated) {
@@ -396,17 +349,20 @@ const ShowPoll = () => {
 
   const handleSelectContentType = (ct) => {
     setShowTypeOptions(false);
-    if (contentType !== ct) {
+    if (
+      ct === contentType ||
+      (ct === 'all' && typeof contentType === 'undefined')
+    )
+      return;
+    if (ct === 'all') {
       history.push(
-        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+        removeQueryParamAndGetNewUrl(location.pathname, queryParams, 'type')
       );
+      return;
     }
-  };
-
-  const handleContentEnterKey = (e, href) => {
-    if (e.key === 'Enter') {
-      window.open(href);
-    }
+    history.push(
+      setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+    );
   };
 
   if (loading) {
@@ -428,7 +384,7 @@ const ShowPoll = () => {
           <HeaderButtons>
             <div>
               {showListOption && (
-                <Link to={`/lists/${poll.content_list_id}`} tabIndex="-1">
+                <Link to={`/lists/${poll.content_lists[0].id}`} tabIndex="-1">
                   <HeaderButton title="Visualizar lista de conteúdo">
                     <IoMdListBox
                       size={'25px'}
@@ -481,11 +437,7 @@ const ShowPoll = () => {
         <ListInfo>
           <CreatedAt>
             <span>Criada em</span>&nbsp;
-            {createdAt
-              ? `${createdAt.getDate()}  de ${getMonth(
-                  createdAt.getMonth()
-                )} de ${createdAt.getFullYear()}`
-              : '-'}
+            {createdAt ? formatCreationDate(createdAt) : '-'}
             &nbsp;
           </CreatedAt>
           <CreatedBy>
@@ -504,54 +456,60 @@ const ShowPoll = () => {
           </CreatedBy>
         </ListInfo>
         <Description>{poll.description}</Description>
-        {poll.is_active && (
-          <Filters>
-            {contentTypes.length > 2 && (
-              <>
-                <label>Tipo</label>
-                <SingleOptionSelect
-                  label={
-                    !contentType ||
-                    !contentTypes.find((ct) => ct === contentType)
-                      ? 'Selecionar'
-                      : contentTypeList.find((e) => e.value === contentType).key
-                  }
-                  dropDownAlign="center"
-                  show={showTypeOptions}
-                  setShow={setShowTypeOptions}
-                  width="85px"
-                  background={colors['background-600']}
-                  hover={colors['background-700']}
-                >
-                  <TypeOptions>
-                    {contentTypes.map((ct, i) => (
-                      <Option
-                        key={`typeFilter${i}`}
-                        onClick={() => handleSelectContentType(ct)}
-                      >
-                        {contentTypeList.find((e) => e.value === ct).key}
-                      </Option>
-                    ))}
-                  </TypeOptions>
-                </SingleOptionSelect>
-              </>
-            )}
-          </Filters>
-        )}
+        <Filters>
+          {contentTypes.length > 2 && (
+            <>
+              <label>Tipo</label>
+              <SingleOptionSelect
+                label={
+                  !contentType || !contentTypes.find((ct) => ct === contentType)
+                    ? 'Todos'
+                    : contentTypesUtility.options.find(
+                        (e) => e.value === contentType
+                      ).key
+                }
+                dropDownAlign="center"
+                show={showTypeOptions}
+                setShow={setShowTypeOptions}
+                width="85px"
+                background={colors['background-600']}
+                hover={colors['background-700']}
+              >
+                <TypeOptions>
+                  {contentTypes.map((ct, i) => (
+                    <Option
+                      key={`typeFilter${i}`}
+                      onClick={() => handleSelectContentType(ct)}
+                    >
+                      {
+                        contentTypesUtility.options.find((e) => e.value === ct)
+                          .key
+                      }
+                    </Option>
+                  ))}
+                </TypeOptions>
+              </SingleOptionSelect>
+            </>
+          )}
+        </Filters>
       </Header>
       <Main>
         {poll.is_active && content.length === 0 && (
-          <Message>
-            Esta votação não apresenta nehum conteúdo do tipo{' '}
-            {contentTypeList
-              .find((e) => e.value === contentType)
-              .key.toLowerCase()}
-            .
-          </Message>
+          <NoContent
+            type={
+              contentType
+                ? contentTypesUtility.options
+                    .find((e) => e.value === contentType)
+                    .key.toLowerCase()
+                : ''
+            }
+          />
         )}
         {poll.is_active && content.length > 0 && (
-          <ContentGrid
+          <InfinityLoadContentGrid
+            error={loadingContentError}
             content={content}
+            lastElementRef={lastContentRef}
             checkbox
             checkboxcheck={(c) =>
               vote.content_id === c.content_id && vote.type === c.type
@@ -560,69 +518,11 @@ const ShowPoll = () => {
           />
         )}
         {!poll.is_active && content.length > 0 && (
-          <ResultContainer>
-            <ResultHeader>
-              <div className="headerPosition">
-                <h2>
-                  <FaHashtag
-                    size={'20px'}
-                    style={{ flexShrink: 0, margin: '0 5px' }}
-                  />
-                </h2>
-              </div>
-              <div className="headerTitle">
-                <h2>Título</h2>
-              </div>
-              <div className="headerVotes">
-                <h2>Votos</h2>
-              </div>
-            </ResultHeader>
-            <ResultBody>
-              {content.map((c, i) => {
-                const src =
-                  c.type === 'game'
-                    ? c.poster_path &&
-                      c.poster_path.replace(
-                        'https://media.rawg.io/media',
-                        'https://media.rawg.io/media/resize/420/-'
-                      )
-                    : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
-                const href = `${getContentBaseUrl(c.type)}/${
-                  c.content_platform_id
-                }`;
-                const votes = formatCount(c.votes);
-                return (
-                  <div
-                    className="row"
-                    key={c.type + c.content_id}
-                    onClick={() => {
-                      window.open(href);
-                    }}
-                  >
-                    <div className="bodyPosition">{i + 1}</div>
-                    <div
-                      className="bodyTitle"
-                      onKeyPress={(e) => handleContentEnterKey(e, href)}
-                      tabIndex="0"
-                    >
-                      <div className="posterWrapper">
-                        <ContentCardSimple src={src} title={c.title} />
-                      </div>
-                      <div className="titleWrapper">
-                        <div className="titleText">{c.title}</div>
-                      </div>
-                    </div>
-                    <div
-                      className="bodyVotes"
-                      title={c.votes !== votes ? c.votes : ''}
-                    >
-                      {votes}
-                    </div>
-                  </div>
-                );
-              })}
-            </ResultBody>
-          </ResultContainer>
+          <Result
+            error={loadingContentError}
+            content={content}
+            lastElementRef={lastContentRef}
+          />
         )}
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
