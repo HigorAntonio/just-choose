@@ -14,14 +14,20 @@ import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../services/justChooseApi';
 import NotFound from '../../components/NotFound';
+import SomethingWentWrong from '../../components/SomethingWentWrong';
+import NoContent from './NoContent';
 import AccessDenied from '../../components/AccessDenied';
-import ContentGrid from '../../components/ContentGrid';
+import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import Skeleton from './Skeleton';
+import contentTypesUtility from '../../utils/contentTypes';
 import formatCount from '../../utils/formatCount';
+import { formatCreationDate } from '../../utils/dataUtility';
+import removeQueryParamAndGetNewUrl from '../../utils/removeQueryParamAndGetNewUrl';
 import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
+import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
 
 import {
   Container,
@@ -40,69 +46,7 @@ import {
   TypeOptions,
   Option,
   Main,
-  Message,
 } from './styles';
-
-const getMonth = (month) => {
-  switch (month) {
-    case 0:
-      return 'janeiro';
-    case 1:
-      return 'fevereiro';
-    case 2:
-      return 'março';
-    case 3:
-      return 'abril';
-    case 4:
-      return 'maio';
-    case 5:
-      return 'junho';
-    case 6:
-      return 'julho';
-    case 7:
-      return 'agosto';
-    case 8:
-      return 'setembro';
-    case 9:
-      return 'outubro';
-    case 10:
-      return 'novembro';
-    case 11:
-      return 'dezembro';
-    default:
-      return '-';
-  }
-};
-
-const contentTypeList = [
-  { key: 'Todos', value: 'all' },
-  { key: 'Filme', value: 'movie' },
-  { key: 'Série', value: 'show' },
-  { key: 'Jogo', value: 'game' },
-];
-
-const isContentTypeValid = (contentType) => {
-  return !!contentTypeList.find((e) => e.value === contentType);
-};
-
-const getFilteredContent = (content, contentTypes, typeFilter) => {
-  if (typeFilter === 'all') {
-    let filteredContent = [];
-    contentTypes.map(
-      (t) => (filteredContent = [...filteredContent, ...content[`${t}s`]])
-    );
-    return filteredContent;
-  }
-  if (typeFilter === 'movie') {
-    return content.movies ? content.movies : [];
-  }
-  if (typeFilter === 'show') {
-    return content.shows ? content.shows : [];
-  }
-  if (typeFilter === 'game') {
-    return content.games ? content.games : [];
-  }
-};
 
 const ShowList = () => {
   const { id: listId } = useParams();
@@ -111,7 +55,7 @@ const ShowList = () => {
     () => queryString.parse(location.search),
     [location]
   );
-  const { type: contentType = 'all' } = queryParams;
+  const { type: contentType } = queryParams;
   const history = useHistory();
 
   const { contentWrapperRef } = useContext(LayoutContext);
@@ -128,16 +72,17 @@ const ShowList = () => {
   } = useContext(AlertContext);
   const { colors } = useContext(ThemeContext);
 
+  const [contentList, setContentList] = useState({});
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
-  const [contentList, setContentList] = useState({});
   const [createdAt, setCreatedAt] = useState();
-  const [content, setContent] = useState([]);
   const [contentTypes, setContentTypes] = useState([]);
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [liked, setLiked] = useState();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [params, setParams] = useState({ page_size: 30, type: contentType });
 
   const mounted = useRef();
   const source = useRef();
@@ -146,12 +91,17 @@ const ShowList = () => {
     contentWrapperRef.current.scrollTo(0, 0);
   }, [contentWrapperRef]);
 
+  useEffect(() => {
+    setParams((prevState) => ({ ...prevState, type: contentType }));
+  }, [contentType]);
+
   const clearState = () => {
-    setLoadingError(false);
-    setDenyAccess(false);
     setContentList({});
+    setLoading(true);
+    setLoadingError(false);
+    setNotFound(false);
+    setDenyAccess(false);
     setCreatedAt(null);
-    setContent([]);
     setContentTypes([]);
     setShowTypeOptions(false);
     setLiked(null);
@@ -159,9 +109,12 @@ const ShowList = () => {
   };
 
   useEffect(() => {
-    if (!isContentTypeValid(contentType)) {
+    if (
+      typeof contentType !== 'undefined' &&
+      !contentTypesUtility.isValid(contentType)
+    ) {
       history.replace(
-        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', 'all')
+        removeQueryParamAndGetNewUrl(location.pathname, queryParams, 'type')
       );
     }
   }, [contentType, history, location, queryParams]);
@@ -172,14 +125,15 @@ const ShowList = () => {
 
     (async () => {
       try {
-        setLoading(true);
         clearState();
         const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
           cancelToken: source.current.token,
         });
         setContentList(data);
         setCreatedAt(new Date(data.created_at));
-        setContentTypes(['all', ...data.content_types]);
+        if (data && data.content_types) {
+          setContentTypes(['all', ...data.content_types]);
+        }
         if (authenticated && isUserActive) {
           const {
             data: { like },
@@ -193,13 +147,14 @@ const ShowList = () => {
         if (axios.isCancel(error)) {
           return;
         }
-        setLoading(false);
         if (error.response && error.response.status === 400) {
+          setNotFound(true);
+        } else if (error.response && error.response.status === 403) {
+          setDenyAccess(true);
+        } else {
           setLoadingError(true);
         }
-        if (error.response && error.response.status === 403) {
-          setDenyAccess(true);
-        }
+        setLoading(false);
       }
     })();
 
@@ -209,17 +164,15 @@ const ShowList = () => {
     };
   }, [listId, authenticated, isUserActive]);
 
-  useEffect(() => {
-    if (JSON.stringify(contentList) !== '{}') {
-      setContent(
-        getFilteredContent(
-          contentList.content,
-          contentList.content_types,
-          contentType
-        )
-      );
-    }
-  }, [contentList, contentType]);
+  const {
+    loading: loadingContent,
+    error: loadingContentError,
+    content,
+    lastElementRef: lastContentRef,
+  } = useLoadMoreWhenLastElementIsOnScreen(
+    `/contentlists/${listId}/content`,
+    params
+  );
 
   const handleLike = async () => {
     if (!authenticated || !isUserActive) {
@@ -306,17 +259,29 @@ const ShowList = () => {
 
   const handleSelectContentType = (ct) => {
     setShowTypeOptions(false);
-    if (contentType !== ct) {
+    if (
+      ct === contentType ||
+      (ct === 'all' && typeof contentType === 'undefined')
+    )
+      return;
+    if (ct === 'all') {
       history.push(
-        setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+        removeQueryParamAndGetNewUrl(location.pathname, queryParams, 'type')
       );
+      return;
     }
+    history.push(
+      setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+    );
   };
 
   if (loading) {
     return <Skeleton />;
   }
   if (loadingError) {
+    return <SomethingWentWrong />;
+  }
+  if (notFound) {
     return <NotFound />;
   }
   if (denyAccess) {
@@ -397,11 +362,7 @@ const ShowList = () => {
         <ListInfo>
           <CreatedAt>
             <span>Criada em</span>&nbsp;
-            {createdAt
-              ? `${createdAt.getDate()}  de ${getMonth(
-                  createdAt.getMonth()
-                )} de ${createdAt.getFullYear()}`
-              : '-'}
+            {createdAt ? formatCreationDate(createdAt) : '-'}
             &nbsp;
           </CreatedAt>
           <CreatedBy>
@@ -427,8 +388,10 @@ const ShowList = () => {
               <SingleOptionSelect
                 label={
                   !contentType || !contentTypes.find((ct) => ct === contentType)
-                    ? 'Selecionar'
-                    : contentTypeList.find((e) => e.value === contentType).key
+                    ? 'Todos'
+                    : contentTypesUtility.options.find(
+                        (e) => e.value === contentType
+                      ).key
                 }
                 dropDownAlign="center"
                 show={showTypeOptions}
@@ -443,7 +406,10 @@ const ShowList = () => {
                       key={`typeFilter${i}`}
                       onClick={() => handleSelectContentType(ct)}
                     >
-                      {contentTypeList.find((e) => e.value === ct).key}
+                      {
+                        contentTypesUtility.options.find((e) => e.value === ct)
+                          .key
+                      }
                     </Option>
                   ))}
                 </TypeOptions>
@@ -454,15 +420,24 @@ const ShowList = () => {
       </Header>
       <Main>
         {content.length === 0 && (
-          <Message>
-            Esta lista não apresenta nehum conteúdo do tipo{' '}
-            {contentTypeList
-              .find((e) => e.value === contentType)
-              .key.toLowerCase()}
-            .
-          </Message>
+          <NoContent
+            type={
+              contentType
+                ? contentTypesUtility.options
+                    .find((e) => e.value === contentType)
+                    .key.toLowerCase()
+                : ''
+            }
+          />
         )}
-        {content.length > 0 && <ContentGrid content={content} />}
+        {content.length > 0 && (
+          <InfinityLoadContentGrid
+            loading={loadingContent}
+            error={loadingContentError}
+            content={content}
+            lastElementRef={lastContentRef}
+          />
+        )}
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog

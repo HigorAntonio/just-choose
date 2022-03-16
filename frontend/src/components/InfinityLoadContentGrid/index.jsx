@@ -7,6 +7,7 @@ import ContentCard from '../ContentCard';
 import { Container, CardWrapper } from './styles';
 
 const InfinityLoadContentGrid = ({
+  loading,
   error,
   content,
   lastElementRef,

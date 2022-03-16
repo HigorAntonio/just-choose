@@ -23,6 +23,7 @@ import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../services/justChooseApi';
 import NotFound from '../../components/NotFound';
+import SomethingWentWrong from '../../components/SomethingWentWrong';
 import NoContent from './NoContent';
 import Result from './Result';
 import AccessDenied from '../../components/AccessDenied';
@@ -54,9 +55,6 @@ import {
   TypeOptions,
   Option,
   Main,
-  ResultContainer,
-  ResultHeader,
-  ResultBody,
 } from './styles';
 
 const ShowPoll = () => {
@@ -86,6 +84,7 @@ const ShowPoll = () => {
   const [poll, setPoll] = useState({});
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
   const [createdAt, setCreatedAt] = useState();
   const [contentTypes, setContentTypes] = useState([]);
@@ -121,6 +120,7 @@ const ShowPoll = () => {
     setPoll({});
     setLoading(true);
     setLoadingError(false);
+    setNotFound(false);
     setDenyAccess(false);
     setCreatedAt(null);
     setContentTypes([]);
@@ -143,7 +143,6 @@ const ShowPoll = () => {
 
   const getPageData = useCallback(async () => {
     try {
-      setLoading(true);
       clearState();
       const { data: pollData } = await justChooseApi.get(`/polls/${pollId}`, {
         cancelToken: source.current.token,
@@ -204,13 +203,14 @@ const ShowPoll = () => {
       if (axios.isCancel(error)) {
         return;
       }
-      setLoading(false);
       if (error.response && error.response.status === 400) {
+        setNotFound(true);
+      } else if (error.response && error.response.status === 403) {
+        setDenyAccess(true);
+      } else {
         setLoadingError(true);
       }
-      if (error.response && error.response.status === 403) {
-        setDenyAccess(true);
-      }
+      setLoading(false);
     }
   }, [pollId, authenticated, userId]);
 
@@ -369,11 +369,15 @@ const ShowPoll = () => {
     return <Skeleton />;
   }
   if (loadingError) {
+    return <SomethingWentWrong />;
+  }
+  if (notFound) {
     return <NotFound />;
   }
   if (denyAccess) {
     return <AccessDenied />;
   }
+
   return (
     <Container>
       <Header>
@@ -507,6 +511,7 @@ const ShowPoll = () => {
         )}
         {poll.is_active && content.length > 0 && (
           <InfinityLoadContentGrid
+            loading={loadingContent}
             error={loadingContentError}
             content={content}
             lastElementRef={lastContentRef}
@@ -515,6 +520,7 @@ const ShowPoll = () => {
               vote.content_id === c.content_id && vote.type === c.type
             }
             checkboxclick={handleVote}
+            tabIndex="-1"
           />
         )}
         {!poll.is_active && content.length > 0 && (

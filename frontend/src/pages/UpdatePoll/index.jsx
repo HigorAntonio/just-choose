@@ -7,10 +7,13 @@ import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import NotFound from '../../components/NotFound';
+import SomethingWentWrong from '../../components/SomethingWentWrong';
 import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
-import ContentGrid from '../../components/ContentGrid';
+import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
 import justChooseApi from '../../services/justChooseApi';
+import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import sharingOptions from '../../utils/sharingOptions';
 
 import {
   Container,
@@ -30,19 +33,6 @@ import {
   CreateButton,
 } from './styles';
 
-const getSharingOption = (type) => {
-  switch (type) {
-    case 'private':
-      return 'Privada';
-    case 'public':
-      return 'Pública';
-    case 'followed_profiles':
-      return 'Perfis seguidos';
-    default:
-      return '';
-  }
-};
-
 const UpdatePoll = () => {
   const { id: pollId } = useParams();
   const history = useHistory();
@@ -58,6 +48,7 @@ const UpdatePoll = () => {
   const { contentWrapperRef } = useContext(LayoutContext);
 
   const [loadingError, setLoadingError] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState('');
@@ -68,11 +59,10 @@ const UpdatePoll = () => {
   const [thumbnail, setThumbnail] = useState();
   const [thumbPreview, setThumbPreview] = useState();
   const [thumbError, setThumbError] = useState('');
-  const [contentListId, setContentListId] = useState('');
-  const [contentList, setContentList] = useState([]);
   const [updating, setUpdating] = useState(false);
   const [errorOnUpdate, setErrorOnUpdate] = useState(false);
   const [updatedSuccessfully, setUpdatedSuccessfully] = useState(false);
+  const [params] = useState({ page_size: 30 });
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
@@ -81,7 +71,9 @@ const UpdatePoll = () => {
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
-    contentListWrapperRef.current.scrollTo(0, 0);
+    if (contentListWrapperRef.current) {
+      contentListWrapperRef.current.scrollTo(0, 0);
+    }
   }, [contentWrapperRef]);
 
   useEffect(() => {
@@ -97,7 +89,7 @@ const UpdatePoll = () => {
   useEffect(() => {
     (async () => {
       try {
-        clearForm();
+        clearState();
         const { data } = await justChooseApi.get(`/polls/${pollId}`, {
           cancelToken: source.current.token,
         });
@@ -109,54 +101,27 @@ const UpdatePoll = () => {
         setDescription(data.description);
         setSharingOption(data.sharing_option);
         setThumbPreview(data.thumbnail);
-        setContentListId(data.content_list_id);
       } catch (error) {
         if (axios.isCancel(error)) {
           return;
         }
         if (error.response && error.response.status === 400) {
-          setLoadingError(true);
-        }
-        if (error.response && error.response.status === 403) {
+          setNotFound(true);
+        } else if (error.response && error.response.status === 403) {
           setDenyAccess(true);
+        } else {
+          setLoadingError(true);
         }
       }
     })();
   }, [pollId, userId]);
 
-  useEffect(() => {
-    (async () => {
-      if (contentListId) {
-        try {
-          const { data } = await justChooseApi.get(
-            `/contentlists/${contentListId}`,
-            {
-              cancelToken: source.current.token,
-            }
-          );
-          if (userId !== data.user_id) {
-            setDenyAccess(true);
-            return;
-          }
-          let content = [];
-          Object.keys(data.content).map(
-            (key) => (content = [...content, ...data.content[key]])
-          );
-          setContentList(content);
-        } catch (error) {
-          if (axios.isCancel(error)) {
-            return;
-          }
-          if (error.response && error.response.status === 400) {
-            setLoadingError(true);
-          }
-          if (error.response && error.response.status === 403) {
-            setDenyAccess(true);
-          }
-        }
-      }
-    })();
-  }, [contentListId, userId]);
+  const {
+    loading: loadingContent,
+    error: loadingContentError,
+    content,
+    lastElementRef: lastContentRef,
+  } = useLoadMoreWhenLastElementIsOnScreen(`/polls/${pollId}/content`, params);
 
   useEffect(() => {
     if (updating) {
@@ -173,15 +138,23 @@ const UpdatePoll = () => {
     }
   }, [updating, errorOnUpdate, updatedSuccessfully, setMessage, setSeverity]);
 
-  const clearForm = () => {
+  const clearState = () => {
+    setLoadingError(false);
+    setNotFound(false);
+    setDenyAccess(false);
     setTitle('');
+    setTitleError('');
     setDescription('');
     setSharingOption('');
+    setShowSharingOption(false);
+    setSharingOptionError(false);
     setThumbnail(null);
     setThumbPreview(null);
-    setContentListId('');
-    thumbInputFileRef.current.value = null;
-    setContentList([]);
+    setThumbError('');
+    thumbInputFileRef.current = null;
+    setUpdating(false);
+    setErrorOnUpdate(false);
+    setUpdatedSuccessfully(false);
   };
 
   const handleTitle = (e) => {
@@ -305,11 +278,15 @@ const UpdatePoll = () => {
   };
 
   if (loadingError) {
+    return <SomethingWentWrong />;
+  }
+  if (notFound) {
     return <NotFound />;
   }
   if (denyAccess) {
     return <AccessDenied />;
   }
+
   return (
     <Container>
       <Header>
@@ -355,7 +332,8 @@ const UpdatePoll = () => {
                 label={
                   !sharingOption
                     ? 'Selecionar'
-                    : getSharingOption(sharingOption)
+                    : sharingOptions.poll.find((e) => e.value === sharingOption)
+                        .key
                 }
                 dropDownAlign="left"
                 show={showSharingOption}
@@ -363,59 +341,28 @@ const UpdatePoll = () => {
                 width="150px"
               >
                 <Options>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('public');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(e, handleSharingOption, 'public')
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Pública</div>
-                      <div>Todos podem pesquisar e ver</div>
-                    </SharingOption>
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('followed_profiles');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(
-                        e,
-                        handleSharingOption,
-                        'followed_profiles'
-                      )
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Perfis seguidos</div>
-                      <div>Apenas perfis seguidos podem pesquisar e ver</div>
-                    </SharingOption>
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('private');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(
-                        e,
-                        handleSharingOption,
-                        'private'
-                      )
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Privada</div>
-                      <div>Só você pode ver</div>
-                    </SharingOption>
-                  </Option>
+                  {sharingOptions.poll.map((o, i) => (
+                    <Option
+                      key={`sharingOption${i}`}
+                      onClick={() => {
+                        handleSharingOption(o.value);
+                      }}
+                      onKeyPress={(e) =>
+                        handleSelectOnPressEnter(
+                          e,
+                          handleSharingOption,
+                          o.value
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
+                    >
+                      <SharingOption>
+                        <div>{o.key}</div>
+                        <div>{o.description}</div>
+                      </SharingOption>
+                    </Option>
+                  ))}
                 </Options>
               </SingleOptionSelect>
               {sharingOptionError && (
@@ -459,7 +406,13 @@ const UpdatePoll = () => {
         <div className="content-list">
           <ContentListContainer>
             <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
-              <ContentGrid content={contentList} tabIndex="-1" />
+              <InfinityLoadContentGrid
+                loading={loadingContent}
+                error={loadingContentError}
+                content={content}
+                lastElementRef={lastContentRef}
+                tabIndex="-1"
+              />
             </ContentListWrapper>
           </ContentListContainer>
           <CreationOptions>

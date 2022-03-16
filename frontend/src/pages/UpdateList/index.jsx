@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { ThemeContext } from 'styled-components';
@@ -10,14 +16,16 @@ import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
 import { AlertContext } from '../../context/AlertContext';
 
+import NotFound from '../../components/NotFound';
+import SomethingWentWrong from '../../components/SomethingWentWrong';
+import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import MovieFilters from '../../components/MovieFilters';
 import ShowFilters from '../../components/ShowFilters';
 import GameFilters from '../../components/GameFilters';
 import ContentList from '../../components/ContentList';
 import justChooseApi from '../../services/justChooseApi';
-import NotFound from '../../components/NotFound';
-import AccessDenied from '../../components/AccessDenied';
+import sharingOptions from '../../utils/sharingOptions';
 
 import mUILightTheme from '../../styles/materialUIThemes/light';
 import mUIDarkTheme from '../../styles/materialUIThemes/dark';
@@ -45,19 +53,6 @@ import {
   CreateButton,
 } from './styles';
 
-const getSharingOption = (type) => {
-  switch (type) {
-    case 'private':
-      return 'Privada';
-    case 'public':
-      return 'Pública';
-    case 'followed_profiles':
-      return 'Perfis seguidos';
-    default:
-      return '';
-  }
-};
-
 const UpdateList = () => {
   const { id: listId } = useParams();
   const history = useHistory();
@@ -75,8 +70,10 @@ const UpdateList = () => {
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState('');
   const [description, setDescription] = useState('');
   const [sharingOption, setSharingOption] = useState('');
   const [showSharingOption, setShowSharingOption] = useState(false);
@@ -89,12 +86,11 @@ const UpdateList = () => {
   const [requestType, setRequestType] = useState('');
   const [params, setParams] = useState({});
   const [contentList, setContentList] = useState([]);
+  const [contentError, setContentError] = useState('');
   const [showListPreview, setShowListPreview] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [errorOnUpdate, setErrorOnUpdate] = useState(false);
   const [updatedSuccessfully, setUpdatedSuccessfully] = useState(false);
-  const [titleError, setTitleError] = useState('');
-  const [contentError, setContentError] = useState('');
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
@@ -105,8 +101,38 @@ const UpdateList = () => {
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
-    contentListWrapperRef.current.scrollTo(0, 0);
+    if (contentListWrapperRef.current) {
+      contentListWrapperRef.current.scrollTo(0, 0);
+    }
   }, [contentWrapperRef]);
+
+  const loadContentListContent = useCallback(async () => {
+    try {
+      for (let page = 1; ; page++) {
+        const { data } = await justChooseApi.get(
+          `/contentlists/${listId}/content`,
+          {
+            cancelToken: source.current.token,
+            params: { page, page_size: 100 },
+          }
+        );
+        setContentList((prevState) => [
+          ...prevState,
+          ...data.results.map((c) => ({
+            content_platform_id: c.content_platform_id,
+            title: c.title,
+            poster_path: c.poster_path,
+            type: c.type,
+          })),
+        ]);
+        if (page === data.total_pages) {
+          break;
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  }, [listId]);
 
   useEffect(() => {
     mounted.current = true;
@@ -114,49 +140,33 @@ const UpdateList = () => {
 
     (async () => {
       try {
-        setLoading(true);
-        clearForm();
+        clearState();
         const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
           cancelToken: source.current.token,
         });
         if (userId !== data.user_id) {
           setDenyAccess(true);
+          setLoading(false);
           return;
         }
         setTitle(data.title);
         setDescription(data.description);
         setSharingOption(data.sharing_option);
         setThumbPreview(data.thumbnail);
-        let content = [];
-        Object.keys(data.content).map(
-          (key) =>
-            (content = [
-              ...content,
-              ...data.content[key].map((c) => ({
-                contentId: c.content_platform_id,
-                poster:
-                  c.type === 'game'
-                    ? c.poster_path
-                    : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`,
-                title: c.title,
-                type: c.type,
-              })),
-            ])
-        );
-        setContentList(content);
+        await loadContentListContent();
         setLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
           return;
         }
         if (error.response && error.response.status === 400) {
-          setLoading(false);
+          setNotFound(true);
+        } else if (error.response && error.response.status === 403) {
+          setDenyAccess(true);
+        } else {
           setLoadingError(true);
         }
-        if (error.response && error.response.status === 403) {
-          setLoading(false);
-          setDenyAccess(true);
-        }
+        setLoading(false);
       }
     })();
 
@@ -164,7 +174,7 @@ const UpdateList = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, userId]);
+  }, [listId, userId, loadContentListContent]);
 
   useEffect(() => {
     setContentError('');
@@ -196,16 +206,30 @@ const UpdateList = () => {
     }
   }, [updating, errorOnUpdate, updatedSuccessfully, setMessage, setSeverity]);
 
-  const clearForm = () => {
+  const clearState = () => {
+    setLoading(true);
+    setLoadingError(false);
+    setNotFound(false);
+    setDenyAccess(false);
     setTitle('');
+    setTitleError('');
     setDescription('');
     setSharingOption('');
+    setShowSharingOption(false);
+    setSharingOptionError(false);
     setThumbnail(null);
     setThumbPreview(null);
-    thumbInputFileRef.current.value = null;
+    setThumbError('');
+    thumbInputFileRef.current = null;
     setContentType('');
+    setShowContent(false);
+    setRequestType('');
     setContentList([]);
+    setContentError('');
     setShowListPreview(true);
+    setUpdating(false);
+    setErrorOnUpdate(false);
+    setUpdatedSuccessfully(false);
   };
 
   const handleTitle = (e) => {
@@ -371,11 +395,15 @@ const UpdateList = () => {
   };
 
   if (loadingError) {
+    return <SomethingWentWrong />;
+  }
+  if (notFound) {
     return <NotFound />;
   }
   if (denyAccess) {
     return <AccessDenied />;
   }
+
   return (
     <Container>
       <Header>
@@ -421,7 +449,9 @@ const UpdateList = () => {
                 label={
                   !sharingOption
                     ? 'Selecionar'
-                    : getSharingOption(sharingOption)
+                    : sharingOptions.contentList.find(
+                        (e) => e.value === sharingOption
+                      ).key
                 }
                 dropDownAlign="left"
                 show={showSharingOption}
@@ -429,59 +459,28 @@ const UpdateList = () => {
                 width="150px"
               >
                 <Options>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('public');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(e, handleSharingOption, 'public')
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Pública</div>
-                      <div>Todos podem pesquisar e ver</div>
-                    </SharingOption>
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('followed_profiles');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(
-                        e,
-                        handleSharingOption,
-                        'followed_profiles'
-                      )
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Perfis seguidos</div>
-                      <div>Apenas perfis seguidos podem pesquisar e ver</div>
-                    </SharingOption>
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('private');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(
-                        e,
-                        handleSharingOption,
-                        'private'
-                      )
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Privada</div>
-                      <div>Só você pode ver</div>
-                    </SharingOption>
-                  </Option>
+                  {sharingOptions.contentList.map((o, i) => (
+                    <Option
+                      key={`sharingOption${i}`}
+                      onClick={() => {
+                        handleSharingOption(o.value);
+                      }}
+                      onKeyPress={(e) =>
+                        handleSelectOnPressEnter(
+                          e,
+                          handleSharingOption,
+                          o.value
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
+                    >
+                      <SharingOption>
+                        <div>{o.key}</div>
+                        <div>{o.description}</div>
+                      </SharingOption>
+                    </Option>
+                  ))}
                 </Options>
               </SingleOptionSelect>
               {sharingOptionError && (

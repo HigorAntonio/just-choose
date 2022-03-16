@@ -9,6 +9,7 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
   const { loading: loadingAuth, authenticated } = useContext(AuthContext);
   const {
     loading: loadingProfile,
+    loadingError: loadingProfileError,
     userProfile: { is_active: isActive },
   } = useContext(ProfileContext);
 
@@ -27,7 +28,12 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
       setShowAlert(true);
       clearTimeout(alertTimeout);
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    } else if (!loadingProfile && requiresUserActivation && !isActive) {
+    } else if (
+      !loadingProfile &&
+      !loadingProfileError &&
+      requiresUserActivation &&
+      !isActive
+    ) {
       setSeverity('info');
       setMessage('Para acessar a página você precisa confirmar seu e-mail.');
       setShowAlert(true);
@@ -40,6 +46,7 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
     loadingAuth,
     authenticated,
     loadingProfile,
+    loadingProfileError,
     isActive,
     setSeverity,
     setMessage,
@@ -54,7 +61,7 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
     return <Redirect to="/" />;
   }
 
-  if (requiresUserActivation && !isActive) {
+  if (requiresUserActivation && !loadingProfileError && !isActive) {
     return <Redirect to="/" />;
   }
 

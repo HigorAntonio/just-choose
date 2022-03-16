@@ -11,6 +11,7 @@ import ShowFilters from '../../components/ShowFilters';
 import GameFilters from '../../components/GameFilters';
 import ContentList from '../../components/ContentList';
 import justChooseApi from '../../services/justChooseApi';
+import sharingOptions from '../../utils/sharingOptions';
 
 import {
   Container,
@@ -33,19 +34,6 @@ import {
   PreviewButton,
   CreateButton,
 } from './styles';
-
-const getSharingOption = (type) => {
-  switch (type) {
-    case 'private':
-      return 'Privada';
-    case 'public':
-      return 'Pública';
-    case 'followed_profiles':
-      return 'Perfis seguidos';
-    default:
-      return '';
-  }
-};
 
 const CreateList = () => {
   const {
@@ -333,7 +321,9 @@ const CreateList = () => {
                 label={
                   !sharingOption
                     ? 'Selecionar'
-                    : getSharingOption(sharingOption)
+                    : sharingOptions.contentList.find(
+                        (e) => e.value === sharingOption
+                      ).key
                 }
                 dropDownAlign="left"
                 show={showSharingOption}
@@ -341,59 +331,28 @@ const CreateList = () => {
                 width="150px"
               >
                 <Options>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('public');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(e, handleSharingOption, 'public')
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Pública</div>
-                      <div>Todos podem pesquisar e ver</div>
-                    </SharingOption>
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('followed_profiles');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(
-                        e,
-                        handleSharingOption,
-                        'followed_profiles'
-                      )
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Perfis seguidos</div>
-                      <div>Apenas perfis seguidos podem pesquisar e ver</div>
-                    </SharingOption>
-                  </Option>
-                  <Option
-                    onClick={() => {
-                      handleSharingOption('private');
-                    }}
-                    onKeyPress={(e) =>
-                      handleSelectOnPressEnter(
-                        e,
-                        handleSharingOption,
-                        'private'
-                      )
-                    }
-                    tabIndex="-1"
-                    data-select-option
-                  >
-                    <SharingOption>
-                      <div>Privada</div>
-                      <div>Só você pode ver</div>
-                    </SharingOption>
-                  </Option>
+                  {sharingOptions.contentList.map((o, i) => (
+                    <Option
+                      key={`sharingOption${i}`}
+                      onClick={() => {
+                        handleSharingOption(o.value);
+                      }}
+                      onKeyPress={(e) =>
+                        handleSelectOnPressEnter(
+                          e,
+                          handleSharingOption,
+                          o.value
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
+                    >
+                      <SharingOption>
+                        <div>{o.key}</div>
+                        <div>{o.description}</div>
+                      </SharingOption>
+                    </Option>
+                  ))}
                 </Options>
               </SingleOptionSelect>
               {sharingOptionError && (

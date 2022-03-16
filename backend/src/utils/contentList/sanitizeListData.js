@@ -13,7 +13,7 @@ module.exports = async (content) => {
       (name) => (contentToInsert[`content_list_${name}s`] = [])
     );
     for (const c of content) {
-      contentToInsert[`content_list_${c.type}s`].push(c.contentId);
+      contentToInsert[`content_list_${c.type}s`].push(c.content_platform_id);
     }
 
     // Removendo ids duplicados e ids de conteúdos que não existem no banco de dados

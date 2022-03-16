@@ -8,10 +8,13 @@ const useProfileData = () => {
 
   const [userProfile, setUserProfile] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadingError, setLoadingError] = useState(false);
 
   const refreshUserProfileData = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadingError(false);
+
       if (userId) {
         const { data } = await justChooseApi.get(`/users/${userId}`);
         setUserProfile(data);
@@ -21,6 +24,9 @@ const useProfileData = () => {
       }
     } catch (error) {
       console.error('Falha ao obter dados do perfil do usuário');
+      if (!error.response) {
+        setLoadingError(true);
+      }
       setLoading(false);
     }
   }, [loadingAuth, userId]);
@@ -33,6 +39,7 @@ const useProfileData = () => {
 
   return {
     loading,
+    loadingError,
     userProfile,
     setUserProfile,
     refreshUserProfileData,

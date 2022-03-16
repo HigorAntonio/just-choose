@@ -3,10 +3,12 @@ import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
+import contentTypes from '../../utils/contentTypes';
 import ContentCard from '../ContentCard';
 import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
 import mUILightTheme from '../../styles/materialUIThemes/light';
 import mUIDarkTheme from '../../styles/materialUIThemes/dark';
+import contentTypesUtility from '../../utils/contentTypes';
 
 import { Container, Message } from './styles';
 
@@ -111,64 +113,80 @@ const ContentList = ({
     wrapperRef.current.scrollTo(0, 0);
   }, [wrapperRef, requestType, params]);
 
-  const addToContentList = (contentId, posterPath, title) => {
-    if (contentList.map((c) => c.contentId).includes(contentId)) {
+  const getPosterPathByContentType = (content) => {
+    if (contentType === 'Filme') {
+      return content.poster_path ? content.poster_path : '';
+    }
+    if (contentType === 'Série') {
+      return content.poster_path ? content.poster_path : '';
+    }
+    if (contentType === 'Jogo') {
+      return content.background_image ? content.background_image : '';
+    }
+    return '';
+  };
+
+  const getPosterUrl = (posterPath) => {
+    if (!posterPath) {
+      return '';
+    }
+    if (contentType === 'Jogo') {
+      return posterPath.replace(
+        'https://media.rawg.io/media',
+        'https://media.rawg.io/media/resize/420/-'
+      );
+    }
+    if (contentType === 'Filme' || contentType === 'Série') {
+      return `${process.env.REACT_APP_TMDB_POSTER_URL}w185${posterPath}`;
+    }
+    return '';
+  };
+
+  const addToContentList = (content) => {
+    const { contentPlatformId, title, posterPath } = content;
+    if (
+      contentList.map((c) => c.content_platform_id).includes(contentPlatformId)
+    ) {
       setContentList((prevState) =>
-        prevState.filter((c) => c.contentId !== contentId)
+        prevState.filter((c) => c.content_platform_id !== contentPlatformId)
       );
     } else {
       setContentList((prevState) => [
         ...prevState,
         {
-          type:
-            contentType === 'Filme'
-              ? 'movie'
-              : contentType === 'Série'
-              ? 'show'
-              : 'game',
-          contentId,
-          poster: posterPath,
+          content_platform_id: contentPlatformId,
           title,
+          poster_path: posterPath,
+          type: contentTypesUtility.options.find((e) => e.key === contentType)
+            .value,
         },
       ]);
     }
   };
 
-  const isInContentList = (contentId) =>
-    contentList.map((c) => c.contentId).includes(contentId);
+  const isInContentList = (contentPlatformId) =>
+    contentList.map((c) => c.content_platform_id).includes(contentPlatformId);
 
   return (
     <Container ref={containerRef} tabIndex="0" data-content-list-container>
       {!showPreview &&
         content.length > 0 &&
         content.map((c, i) => {
-          const src =
-            contentType === 'Jogo'
-              ? c.background_image &&
-                c.background_image.replace(
-                  'https://media.rawg.io/media',
-                  'https://media.rawg.io/media/resize/420/-'
-                )
-              : `${process.env.REACT_APP_TMDB_POSTER_URL}w185${c.poster_path}`;
           const title = contentType === 'Filme' ? c.title : c.name;
-          if (content.length === i + 1) {
-            return (
-              <div ref={lastElementRef} key={c.id} className="cardWrapper">
-                <ContentCard
-                  src={src}
-                  title={title}
-                  click={() => addToContentList(c.id, src, title)}
-                  check={isInContentList(c.id)}
-                />
-              </div>
-            );
-          }
+          const cardWrapperProps =
+            content.length === i + 1 ? { ref: lastElementRef } : {};
           return (
-            <div key={c.id} className="cardWrapper">
+            <div key={c.id} className="cardWrapper" {...cardWrapperProps}>
               <ContentCard
-                src={src}
+                src={getPosterUrl(getPosterPathByContentType(c))}
                 title={title}
-                click={() => addToContentList(c.id, src, title)}
+                click={() =>
+                  addToContentList({
+                    contentPlatformId: c.id,
+                    title: title,
+                    posterPath: getPosterPathByContentType(c),
+                  })
+                }
                 check={isInContentList(c.id)}
               />
             </div>
@@ -176,14 +194,20 @@ const ContentList = ({
         })}
       {showPreview &&
         contentList.length > 0 &&
-        contentList.map((c) => {
+        contentList.map((c, i) => {
           return (
-            <div key={c.contentId} className="cardWrapper">
+            <div key={c.content_platform_id} className="cardWrapper">
               <ContentCard
-                src={c.poster}
+                src={contentTypes.getPosterUrl(c)}
                 title={c.title}
-                click={() => addToContentList(c.contentId, c.poster, c.title)}
-                check={isInContentList(c.contentId)}
+                click={() =>
+                  addToContentList({
+                    contentPlatformId: c.content_platform_id,
+                    title: c.title,
+                    posterPath: c.poster_path,
+                  })
+                }
+                check={isInContentList(c.content_platform_id)}
               />
             </div>
           );
