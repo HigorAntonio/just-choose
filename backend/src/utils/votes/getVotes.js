@@ -9,12 +9,13 @@ module.exports = async (options) => {
         'p.user_id as poll_user_id',
         'u.name as poll_user_name',
         'u.profile_image_url as poll_user_profile_image_url',
-        'poll_id',
+        'votes_union_query.poll_id',
         'p.title as poll_title',
         'p.description as poll_description',
         'p.sharing_option as poll_sharing_option',
         'p.is_active as poll_is_active',
         'p.thumbnail as poll_thumbnail',
+        knex.raw('COALESCE(total_votes, 0) as poll_total_votes'),
         'vote_user_id',
         'vote_content_id',
         'vote_content_platform_id',
@@ -66,7 +67,35 @@ module.exports = async (options) => {
           })
           .as('votes_union_query');
       })
-      .innerJoin('polls as p', 'p.id', 'poll_id')
+      .leftJoin(
+        knex
+          .select('poll_id', knex.raw('SUM(votes) AS total_votes'))
+          .from(function () {
+            this.select()
+              .from(function () {
+                this.select('poll_id', knex.raw('COUNT(id) AS votes'))
+                  .from('movie_votes')
+                  .groupBy('poll_id')
+                  .as('movie_votes_count');
+              })
+              .unionAll(function () {
+                this.select('poll_id', knex.raw('COUNT(id) AS votes'))
+                  .from('show_votes')
+                  .groupBy('poll_id');
+              })
+              .unionAll(function () {
+                this.select('poll_id', knex.raw('COUNT(id) AS votes'))
+                  .from('game_votes')
+                  .groupBy('poll_id');
+              })
+              .as('poll_votes');
+          })
+          .groupBy('poll_id')
+          .as('poll_total_votes'),
+        'poll_total_votes.poll_id',
+        'votes_union_query.poll_id'
+      )
+      .innerJoin('polls as p', 'p.id', 'votes_union_query.poll_id')
       .innerJoin('users as u', 'u.id', 'p.user_id')
       .where('vote_user_id', userId)
       .limit(pageSize)
@@ -106,7 +135,10 @@ module.exports = async (options) => {
       );
     }
 
-    const votes = await votesQuery;
+    const votes = (await votesQuery).map((v) => {
+      v.poll_total_votes = parseInt(v.poll_total_votes);
+      return v;
+    });
     const [{ count }] = await countObj;
 
     return { votes, count: parseInt(count) };

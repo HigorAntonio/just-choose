@@ -3,6 +3,7 @@ import { useHistory, Link } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 
 import { fromNow } from '../../../utils/dataUtility';
+import formatCount from '../../../utils/formatCount';
 
 import {
   Container,
@@ -15,6 +16,7 @@ import {
   Title,
   Meta,
   PollStatus,
+  TotalVotes,
   MetaSeparator,
   ProfileInfo,
   UserName,
@@ -36,6 +38,7 @@ const PollCard = ({ poll }) => {
     description,
     thumbnail,
     is_active: isActive,
+    total_votes: totalVotes,
     updated_at,
   } = poll;
 
@@ -69,6 +72,11 @@ const PollCard = ({ poll }) => {
         </Title>
         <Meta>
           <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
+          <MetaSeparator>•</MetaSeparator>
+          <TotalVotes>
+            {formatCount(totalVotes) + ' '}
+            {totalVotes === 1 ? 'voto' : 'votos'}
+          </TotalVotes>
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
@@ -106,6 +114,11 @@ const PollCard = ({ poll }) => {
             <UserName>{userName}</UserName>
             <MetaSeparator>•</MetaSeparator>
             <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
+            <MetaSeparator>•</MetaSeparator>
+            <TotalVotes>
+              {formatCount(totalVotes) + ' '}
+              {totalVotes === 1 ? 'voto' : 'votos'}
+            </TotalVotes>
           </Meta>
         </Meta>
       </TextWrapperSmallScreen>

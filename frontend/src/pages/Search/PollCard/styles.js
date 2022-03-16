@@ -113,6 +113,10 @@ export const PollStatus = styled.span`
   font-size: 1.5rem;
 `;
 
+export const TotalVotes = styled.span`
+  font-size: 1.5rem;
+`;
+
 export const MetaSeparator = styled.span`
   font-size: 1.5rem;
   margin: 0 4px;
@@ -186,7 +190,7 @@ export const TextWrapperSmallScreen = styled.div`
     height: 48px;
   }
 
-  > ${Meta} ${UserName}, ${Meta} ${PollStatus} {
+  > ${Meta} ${UserName}, ${Meta} ${PollStatus}, ${Meta} ${TotalVotes} {
     display: inline-block;
   }
 

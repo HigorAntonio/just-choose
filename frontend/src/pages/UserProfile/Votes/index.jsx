@@ -165,6 +165,7 @@ const Votes = () => {
               thumbnail: vote.poll_thumbnail,
               title: vote.poll_title,
               is_active: vote.poll_is_active,
+              total_votes: vote.poll_total_votes,
               updated_at: vote.updated_at,
             };
             return content.length === i + 1 ? (

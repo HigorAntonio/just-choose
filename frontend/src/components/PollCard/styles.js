@@ -72,16 +72,29 @@ export const Title = styled.h3`
   word-break: break-word;
   overflow: hidden;
   font-size: 1.6rem;
-  margin-bottom: 3px;
-`;
-
-export const Meta = styled.div``;
-
-export const MetaSeparator = styled.span`
-  font-size: 1.5rem;
-  margin: 0 4px;
 `;
 
 export const PollStatus = styled.span`
   font-size: 1.4rem;
+`;
+
+export const TotalVotes = styled.span`
+  font-size: 1.4rem;
+`;
+
+export const Meta = styled.div`
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  overflow: hidden;
+
+  > ${PollStatus}, ${TotalVotes} {
+    display: inline-block;
+  }
+`;
+
+export const MetaSeparator = styled.span`
+  font-size: 1.5rem;
+  margin: 0 4px;
 `;

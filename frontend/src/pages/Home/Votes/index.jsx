@@ -75,6 +75,7 @@ const Votes = () => {
               thumbnail: content[i].poll_thumbnail,
               title: content[i].poll_title,
               is_active: content[i].poll_is_active,
+              total_votes: content[i].poll_total_votes,
               updated_at: content[i].updated_at,
             };
             return (
