@@ -72,6 +72,9 @@ const Votes = () => {
           if (i < lastContentIndex && content[i]) {
             const poll = {
               id: content[i].poll_id,
+              user_id: content[i].poll_user_id,
+              user_name: content[i].poll_user_name,
+              profile_image_url: content[i].poll_user_profile_image_url,
               thumbnail: content[i].poll_thumbnail,
               title: content[i].poll_title,
               is_active: content[i].poll_is_active,
@@ -80,7 +83,7 @@ const Votes = () => {
             };
             return (
               <div key={`profileStartVote${poll.id}`}>
-                <PollCard poll={poll} />
+                <PollCard poll={poll} showProfile />
               </div>
             );
           }

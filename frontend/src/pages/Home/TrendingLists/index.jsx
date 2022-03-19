@@ -37,7 +37,7 @@ const TrendingLists = ({ content }) => {
           if (i < lastContentIndex && content[i]) {
             return (
               <div key={`trendingList${content[i].id}`}>
-                <ListCard contentList={content[i]} />
+                <ListCard contentList={content[i]} showProfile />
               </div>
             );
           }

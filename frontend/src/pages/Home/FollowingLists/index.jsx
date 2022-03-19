@@ -37,7 +37,7 @@ const FollowingLists = ({ content }) => {
           if (i < lastContentIndex && content[i]) {
             return (
               <div key={`followingList${content[i].id}`}>
-                <ListCard contentList={content[i]} />
+                <ListCard contentList={content[i]} showProfile />
               </div>
             );
           }

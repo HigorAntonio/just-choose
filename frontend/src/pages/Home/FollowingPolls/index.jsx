@@ -37,7 +37,7 @@ const FollowingPolls = ({ content }) => {
           if (i < lastContentIndex && content[i]) {
             return (
               <div key={`trendingPoll${content[i].id}`}>
-                <PollCard poll={content[i]} />
+                <PollCard poll={content[i]} showProfile />
               </div>
             );
           }

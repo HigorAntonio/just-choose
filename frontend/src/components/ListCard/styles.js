@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
   > a {
@@ -59,36 +59,77 @@ export const TimeFromNow = styled.div`
 `;
 
 export const Bottom = styled.div`
-  height: 6.2rem;
   display: flex;
-  flex-direction: column;
-  padding-top: 10px;
+  margin-top: 10px;
 `;
 
-export const Title = styled.h3`
+export const ProfileImageWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--background-700);
+  flex-shrink: 0;
+  margin-right: 10px;
+
+  > a {
+    width: 36px;
+    height: 36px;
+  }
+`;
+
+export const ProfileImage = styled.img`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  ${(props) => props.error && 'display: none;'}
+`;
+
+const textOverflowEllipsis = css`
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   word-break: break-word;
   overflow: hidden;
+`;
+
+export const Title = styled.h3`
+  ${textOverflowEllipsis}
   font-size: 1.6rem;
+  margin-bottom: 3px;
+`;
+
+const metaChield = css`
+  font-size: 1.4rem;
+  margin-bottom: 3px;
+`;
+
+export const UserName = styled.span`
+  ${metaChield}
+  ${textOverflowEllipsis}
+
+  > a {
+    text-decoration: none;
+
+    &:hover {
+      color: var(--primary-400);
+    }
+  }
 `;
 
 export const Likes = styled.span`
-  font-size: 1.4rem;
+  ${metaChield}
 `;
 
 export const Forks = styled.span`
-  font-size: 1.4rem;
+  ${metaChield}
 `;
 
 export const Meta = styled.div`
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  word-break: break-word;
-  overflow: hidden;
-
   > ${Likes}, ${Forks} {
     display: inline-block;
   }

@@ -13,6 +13,9 @@ import {
   Thumbnail,
   TimeFromNow,
   Bottom,
+  ProfileImageWrapper,
+  ProfileImage,
+  UserName,
   Title,
   Meta,
   Likes,
@@ -20,9 +23,12 @@ import {
   Forks,
 } from './styles';
 
-const ListCard = ({ contentList }) => {
+const ListCard = ({ contentList, showProfile = false }) => {
   const {
     id: listId,
+    user_id: userId,
+    user_name: userName,
+    profile_image_url: profileImageUrl,
     thumbnail,
     title,
     likes,
@@ -31,6 +37,7 @@ const ListCard = ({ contentList }) => {
   } = contentList;
 
   const [thumbnailError, setThumbnailError] = useState(false);
+  const [profileImageError, setProfileImageError] = useState(false);
 
   return (
     <Container>
@@ -48,17 +55,35 @@ const ListCard = ({ contentList }) => {
             <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
           </Top>
           <Bottom>
-            <Title title={title}>{title}</Title>
+            {showProfile && (
+              <ProfileImageWrapper>
+                <Link to={`/users/${userId}`}>
+                  <ProfileImage
+                    src={profileImageUrl}
+                    onError={() => setProfileImageError(true)}
+                    error={profileImageError}
+                  />
+                </Link>
+              </ProfileImageWrapper>
+            )}
             <Meta>
-              <Likes>
-                {formatCount(likes) + ' '}
-                {likes === 1 ? 'curtida' : 'curtidas'}
-              </Likes>
-              <MetaSeparator>•</MetaSeparator>
-              <Forks>
-                {formatCount(forks) + ' '}
-                {forks === 1 ? 'fork' : 'forks'}
-              </Forks>
+              <Title title={title}>{title}</Title>
+              {showProfile && (
+                <UserName>
+                  <Link to={`/users/${userId}`}>{userName}</Link>
+                </UserName>
+              )}
+              <Meta>
+                <Likes>
+                  {formatCount(likes) + ' '}
+                  {likes === 1 ? 'curtida' : 'curtidas'}
+                </Likes>
+                <MetaSeparator>•</MetaSeparator>
+                <Forks>
+                  {formatCount(forks) + ' '}
+                  {forks === 1 ? 'fork' : 'forks'}
+                </Forks>
+              </Meta>
             </Meta>
           </Bottom>
         </CardWrapper>
