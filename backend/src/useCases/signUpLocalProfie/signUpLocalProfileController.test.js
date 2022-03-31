@@ -21,14 +21,15 @@ describe('signUpLocalProfileController', () => {
         email: 'victor_darocha@asconinternet.com.br',
         password: 'eFol3JhMmu',
       };
+
       const response = await request(app).post('/signup').send(profile);
+
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('access_token');
       expect(response.body).toHaveProperty('refresh_token');
-      const { id: profileId } = await localProfileRepository.getProfileByName(
-        profile.name
-      );
-      await localProfileRepository.deleteProfile(profileId);
+      const { id: profileId } =
+        await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.deleteLocalProfile(profileId);
       await redisClient.flushdbAsync();
     }
   );
@@ -39,10 +40,16 @@ describe('signUpLocalProfileController', () => {
       email: 'giovanna-santos87@gameecia.com.br',
       password: '15wuGAxzlE',
     };
+
     await request(app).post('/signup').send(profile);
     const response = await request(app).post('/signup').send(profile);
+
     expect(response.status).toBe(409);
     expect(response.body.message).toBe('"name" unavailable');
+    const { id: profileId } =
+      await localProfileRepository.getLocalProfileByName(profile.name);
+    await localProfileRepository.deleteLocalProfile(profileId);
+    await redisClient.flushdbAsync();
   });
 
   it('Should not be able to create a profile with invalid data', async () => {
@@ -117,8 +124,10 @@ describe('signUpLocalProfileController', () => {
         message: '"password" is required',
       },
     ];
-    for (test of tests) {
+
+    for (const test of tests) {
       const response = await request(app).post('/signup').send(test.profile);
+
       expect(response.status).toBe(400);
       expect(response.body.message).toBe(test.message);
     }

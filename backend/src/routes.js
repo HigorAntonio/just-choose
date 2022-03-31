@@ -33,7 +33,10 @@ routes.post(
   '/signup',
   require('./useCases/signUpLocalProfie/signUpLocalProfileController')
 );
-routes.post('/signin', LocalAuthController.signin);
+routes.post(
+  '/signin',
+  require('./useCases/signInLocalProfile/signInLocalProfileController')
+);
 routes.post('/token', LocalAuthController.refreshToken);
 routes.delete('/logout', authorization, LocalAuthController.logout);
 routes.post('/forgotpassword', LocalAuthController.forgotPassword);

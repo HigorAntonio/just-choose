@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const Queue = require('../lib/Queue');
 
@@ -25,4 +26,8 @@ exports.generateAccessToken = (payload) => {
 
 exports.generateRefreshToken = (payload) => {
   return jwt.sign(payload, REFRESH_TOKEN_SECRET);
+};
+
+exports.comparePassword = (password, hashed) => {
+  return bcrypt.compareSync(password, hashed);
 };

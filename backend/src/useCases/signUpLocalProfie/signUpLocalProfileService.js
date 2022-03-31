@@ -14,14 +14,14 @@ const signUpLocalProfileService = async (
     password,
   });
 
-  if (await localProfileRepository.getProfileByName(localProfile.name)) {
+  if (await localProfileRepository.getLocalProfileByName(localProfile.name)) {
     throw new Error('"name" unavailable');
   }
-  if (await localProfileRepository.getProfileByEmail(localProfile.email)) {
+  if (await localProfileRepository.getLocalProfileByEmail(localProfile.email)) {
     throw new Error('"email" unavailable');
   }
 
-  const profileId = await localProfileRepository.saveProfile({
+  const profileId = await localProfileRepository.saveLocalProfile({
     name: localProfile.name,
     email: localProfile.email,
     password: localProfile.password,
