@@ -11,8 +11,8 @@ exports.up = async (knex) =>
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
       table
-        .integer('user_id')
-        .references('users.id')
+        .integer('profile_id')
+        .references('profiles.id')
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');

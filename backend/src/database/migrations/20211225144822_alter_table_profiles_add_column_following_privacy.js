@@ -1,5 +1,5 @@
 exports.up = async (knex) =>
-  knex.schema.table('users', (table) => {
+  knex.schema.table('profiles', (table) => {
     table
       .enu('following_privacy', ['private', 'public', 'followed_profiles'])
       .notNullable()
@@ -7,6 +7,6 @@ exports.up = async (knex) =>
   });
 
 exports.down = async (knex) =>
-  knex.schema.table('users', (table) => {
+  knex.schema.table('profiles', (table) => {
     table.dropColumn('following_privacy');
   });

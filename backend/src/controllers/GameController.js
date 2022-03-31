@@ -3,7 +3,7 @@ const { promisify } = require('util');
 const validateGamesParams = require('../utils/validation/rawgApi/gamesValidation');
 const { rawgApi } = require('../apis');
 const Queue = require('../lib/Queue');
-const { redisClient } = require('../server');
+const redisClient = require('../lib/redisClient');
 
 const getAsync = promisify(redisClient.get).bind(redisClient);
 const setAsync = promisify(redisClient.set).bind(redisClient);

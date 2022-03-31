@@ -2,7 +2,7 @@ const { onUpdateTrigger } = require('../triggers');
 
 exports.up = async (knex) =>
   knex.schema
-    .createTable('users', (table) => {
+    .createTable('profiles', (table) => {
       table.increments('id').primary();
       table.text('name').unique().notNullable(); //TODO: O nome de usúario deve ter entre 4 e 25 caracteres
       table.text('email').unique().notNullable();
@@ -14,7 +14,7 @@ exports.up = async (knex) =>
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
-    .then(() => knex.raw('ALTER TABLE users ADD COLUMN document tsvector;'))
-    .then(() => knex.raw(onUpdateTrigger('users')));
+    .then(() => knex.raw('ALTER TABLE profiles ADD COLUMN document tsvector;'))
+    .then(() => knex.raw(onUpdateTrigger('profiles')));
 
-exports.down = async (knex) => knex.schema.dropTable('users');
+exports.down = async (knex) => knex.schema.dropTable('profiles');

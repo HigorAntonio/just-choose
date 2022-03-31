@@ -1,14 +1,28 @@
 const redis = require('redis');
+const { promisify } = require('util');
 const config = require('../config/redis');
+const logger = require('./logger');
 
 const client = redis.createClient(config);
 
 client.on('connect', () => {
-  console.log('Conectado ao Redis...');
+  logger.info('Connected to Redis');
 });
 
 client.on('error', (err) => {
-  console.log('Redis erro: ' + err);
+  logger.error('Redis error: ' + err);
 });
+
+client.on('end', () => {
+  logger.info('Disconnected from Redis');
+});
+
+client.saddAsync = promisify(client.sadd).bind(client);
+client.sremAsync = promisify(client.srem).bind(client);
+client.sismemberAsync = promisify(client.sismember).bind(client);
+client.smembersAsync = promisify(client.smembers).bind(client);
+client.flushdbAsync = promisify(client.flushdb).bind(client);
+client.flushallAsync = promisify(client.flushall).bind(client);
+client.quitAsync = promisify(client.quit).bind(client);
 
 module.exports = client;

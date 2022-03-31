@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 
 const { tmdbApi } = require('../apis');
-const { redisClient } = require('../server');
+const redisClient = require('../lib/redisClient');
 
 const getAsync = promisify(redisClient.get).bind(redisClient);
 const setAsync = promisify(redisClient.set).bind(redisClient);

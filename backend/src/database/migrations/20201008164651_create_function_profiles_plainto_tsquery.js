@@ -1,5 +1,5 @@
 const UP = `
-CREATE OR REPLACE FUNCTION public.users_plainto_tsquery(source text)
+CREATE OR REPLACE FUNCTION public.profiles_plainto_tsquery(source text)
 RETURNS tsquery
 LANGUAGE sql
 IMMUTABLE
@@ -13,7 +13,7 @@ AS $function$
         SELECT lexeme, word
         FROM
           (VALUES(source)) AS input(source),
-          fts_stats_users s
+          fts_stats_profiles s
         WHERE
           s.word % usr.lexeme
         ORDER BY s.word <-> usr.lexeme
@@ -25,7 +25,7 @@ $function$
 `;
 
 const DOWN = `
-DROP FUNCTION public.users_plainto_tsquery(source text);
+DROP FUNCTION public.profiles_plainto_tsquery(source text);
 `;
 
 exports.up = async (knex) => knex.raw(UP);

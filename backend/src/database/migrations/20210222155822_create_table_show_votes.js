@@ -5,8 +5,8 @@ exports.up = async (knex) =>
     .createTable('show_votes', (table) => {
       table.increments('id').primary();
       table
-        .integer('user_id')
-        .references('users.id')
+        .integer('profile_id')
+        .references('profiles.id')
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');

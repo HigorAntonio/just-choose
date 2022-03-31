@@ -2,11 +2,11 @@ const { onUpdateTrigger } = require('../triggers');
 
 exports.up = async (knex) =>
   knex.schema
-    .createTable('local_users', (table) => {
+    .createTable('local_profiles', (table) => {
       table.increments('id').primary();
       table
-        .integer('user_id')
-        .references('users.id')
+        .integer('profile_id')
+        .references('profiles.id')
         .notNullable()
         .unique()
         .onUpdate('CASCADE')
@@ -17,6 +17,6 @@ exports.up = async (knex) =>
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.timestamp('deleted_at');
     })
-    .then(() => knex.raw(onUpdateTrigger('local_users')));
+    .then(() => knex.raw(onUpdateTrigger('local_profiles')));
 
-exports.down = async (knex) => knex.schema.dropTable('local_users');
+exports.down = async (knex) => knex.schema.dropTable('local_profiles');

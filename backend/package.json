@@ -9,9 +9,14 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "npm-run-all -p dev:*",
-    "dev:server": "nodemon src/server.js",
-    "dev:queue": "nodemon src/queue.js"
+    "dev": "npm-run-all -p dev:* | pino-pretty -c",
+    "dev:server": "nodemon src/server.js --ignore *.test.*",
+    "dev:queue": "nodemon src/queue.js --ignore *.test.*",
+    "db-migrate": "knex migrate:latest",
+    "db-rollback": "knex migrate:rollback --all",
+    "test": "dotenv -e .env.test -- jest --watchAll",
+    "test-db-migrate": "dotenv -e .env.test knex migrate:latest",
+    "test-db-rollback": "dotenv -e .env.test -- knex migrate:rollback --all"
   },
   "engines": {
     "node": ">= 14.16.0",
@@ -26,6 +31,7 @@
     "dayjs": "^1.10.7",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.5",
     "multer": "^1.4.2",
@@ -33,11 +39,16 @@
     "nodemailer": "^6.4.18",
     "nodemailer-express-handlebars": "^4.0.0",
     "pg": "^8.3.3",
+    "pino": "^7.9.2",
     "redis": "^3.0.2",
     "ua-parser-js": "^0.7.24"
   },
   "devDependencies": {
+    "dotenv-cli": "^5.1.0",
+    "jest": "^27.5.1",
     "nodemon": "^2.0.4",
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "pino-pretty": "^7.6.0",
+    "supertest": "^6.2.2"
   }
 }

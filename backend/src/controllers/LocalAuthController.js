@@ -5,7 +5,7 @@ const { promisify } = require('util');
 const uaParser = require('ua-parser-js');
 
 const Queue = require('../lib/Queue');
-const { redisClient } = require('../server');
+const redisClient = require('../lib/redisClient');
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRATION_TIME = process.env.ACCESS_TOKEN_EXPIRATION_TIME;

@@ -1,10 +1,11 @@
 const Queue = require('bull');
 const redisConfig = require('../config/redis');
+const logger = require('./logger');
 
 const jobs = require('../jobs');
 
 const queues = Object.values(jobs).map((job) => ({
-  bull: new Queue(job.key, redisConfig),
+  bull: new Queue(job.key, { redis: redisConfig }),
   name: job.key,
   handle: job.handle,
 }));
@@ -21,9 +22,13 @@ module.exports = {
       queue.bull.process(queue.handle);
 
       queue.bull.on('failed', (job, err) => {
-        console.log('Job failed', queue.key, job.data);
-        console.log(err);
+        logger.error('Job failed', queue.key, job.data, err);
       });
+    });
+  },
+  close() {
+    return this.queues.forEach((queue) => {
+      queue.bull.close();
     });
   },
 };

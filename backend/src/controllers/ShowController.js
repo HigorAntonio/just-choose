@@ -4,7 +4,7 @@ const validateDiscoverShowParams = require('../utils/validation/tmdbApi/discover
 const validateSearchShowParams = require('../utils/validation/tmdbApi/searchShowValidation');
 const { tmdbApi } = require('../apis');
 const Queue = require('../lib/Queue');
-const { redisClient } = require('../server');
+const redisClient = require('../lib/redisClient');
 
 const getAsync = promisify(redisClient.get).bind(redisClient);
 const setAsync = promisify(redisClient.set).bind(redisClient);

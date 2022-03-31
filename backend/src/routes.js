@@ -29,7 +29,10 @@ const ConfigurationController = require('./controllers/ConfigurationController')
 const routes = express.Router();
 
 // LocalAuthController
-routes.post('/signup', LocalAuthController.signup);
+routes.post(
+  '/signup',
+  require('./useCases/signUpLocalProfie/signUpLocalProfileController')
+);
 routes.post('/signin', LocalAuthController.signin);
 routes.post('/token', LocalAuthController.refreshToken);
 routes.delete('/logout', authorization, LocalAuthController.logout);
