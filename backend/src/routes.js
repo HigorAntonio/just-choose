@@ -37,7 +37,10 @@ routes.post(
   '/signin',
   require('./useCases/signInLocalProfile/signInLocalProfileController')
 );
-routes.post('/token', LocalAuthController.refreshToken);
+routes.post(
+  '/token',
+  require('./useCases/refreshAuthTokenLocalProfile/refreshAuthTokenLocalProfileController')
+);
 routes.delete('/logout', authorization, LocalAuthController.logout);
 routes.post('/forgotpassword', LocalAuthController.forgotPassword);
 routes.post('/resetpassword', LocalAuthController.resetPassword);

@@ -80,6 +80,78 @@ describe('signUpLocalProfileController', () => {
       },
       {
         profile: {
+          name: 1234,
+          email: 'giovanna-santos87@gameecia.com.br',
+          password: '15wuGAxzlE',
+        },
+        message: '"name" must be a string',
+      },
+      {
+        profile: {
+          name: true,
+          email: 'giovanna-santos87@gameecia.com.br',
+          password: '15wuGAxzlE',
+        },
+        message: '"name" must be a string',
+      },
+      {
+        profile: {
+          name: false,
+          email: 'giovanna-santos87@gameecia.com.br',
+          password: '15wuGAxzlE',
+        },
+        message: '"name" must be a string',
+      },
+      {
+        profile: {
+          name: 'GiovannaIsabel',
+          email: 9876,
+          password: '15wuGAxzlE',
+        },
+        message: '"email" must be a string',
+      },
+      {
+        profile: {
+          name: 'GiovannaIsabel',
+          email: true,
+          password: '15wuGAxzlE',
+        },
+        message: '"email" must be a string',
+      },
+      {
+        profile: {
+          name: 'GiovannaIsabel',
+          email: false,
+          password: '15wuGAxzlE',
+        },
+        message: '"email" must be a string',
+      },
+      {
+        profile: {
+          name: 'GiovannaIsabel',
+          email: 'giovanna-santos87@gameecia.com.br',
+          password: 1516,
+        },
+        message: '"password" must be a string',
+      },
+      {
+        profile: {
+          name: 'GiovannaIsabel',
+          email: 'giovanna-santos87@gameecia.com.br',
+          password: true,
+        },
+        message: '"password" must be a string',
+      },
+      {
+        profile: {
+          name: 'GiovannaIsabel',
+          email: 'giovanna-santos87@gameecia.com.br',
+          password: false,
+        },
+        message: '"password" must be a string',
+      },
+      {
+        profile: {
           name: '',
           email: 'giovanna-santos87@gameecia.com.br',
           password: '15wuGAxzlE',

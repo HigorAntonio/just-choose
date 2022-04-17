@@ -103,6 +103,30 @@ describe('signInLocalProfileController', () => {
       },
       {
         profile: {
+          email: 2526,
+          password: 'YhF73aIRj0',
+        },
+        status: 400,
+        message: '"email" must be a string',
+      },
+      {
+        profile: {
+          email: true,
+          password: 'YhF73aIRj0',
+        },
+        status: 400,
+        message: '"email" must be a string',
+      },
+      {
+        profile: {
+          email: false,
+          password: 'YhF73aIRj0',
+        },
+        status: 400,
+        message: '"email" must be a string',
+      },
+      {
+        profile: {
           email: 'mirelladeboracardos',
           password: 'YhF73aIRj0',
         },
@@ -197,6 +221,30 @@ describe('signInLocalProfileController', () => {
         },
         status: 400,
         message: '"password" is not allowed to be empty',
+      },
+      {
+        profile: {
+          email: 'thales_kevin_sales@carreiradasilva.com',
+          password: 8990,
+        },
+        status: 400,
+        message: '"password" must be a string',
+      },
+      {
+        profile: {
+          email: 'thales_kevin_sales@carreiradasilva.com',
+          password: true,
+        },
+        status: 400,
+        message: '"password" must be a string',
+      },
+      {
+        profile: {
+          email: 'thales_kevin_sales@carreiradasilva.com',
+          password: false,
+        },
+        status: 400,
+        message: '"password" must be a string',
       },
       {
         profile: {

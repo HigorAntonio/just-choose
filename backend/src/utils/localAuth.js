@@ -31,3 +31,7 @@ exports.generateRefreshToken = (payload) => {
 exports.comparePassword = (password, hashed) => {
   return bcrypt.compareSync(password, hashed);
 };
+
+exports.verifyRefreshToken = (refreshToken) => {
+  return jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+};
