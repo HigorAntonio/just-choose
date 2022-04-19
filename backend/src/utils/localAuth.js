@@ -33,5 +33,9 @@ exports.comparePassword = (password, hashed) => {
 };
 
 exports.verifyRefreshToken = (refreshToken) => {
-  return jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+  try {
+    return jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+  } catch (error) {
+    throw new Error('invalid "refresh_token"');
+  }
 };

@@ -9,23 +9,19 @@ const refreshAuthTokenLocalProfileService = async (refreshToken) => {
     }
   );
 
-  try {
-    const decoded = localAuthUtils.verifyRefreshToken(data.refreshToken);
-    if (
-      (await redisClient.sismemberAsync(
-        `refreshTokensProfile${decoded.id}`,
-        refreshToken
-      )) !== 1
-    ) {
-      throw new Error('invalid "refresh_token"');
-    }
-
-    delete decoded.iat;
-    const accessToken = localAuthUtils.generateAccessToken(decoded);
-    return accessToken;
-  } catch (error) {
-    throw new Error('invalid "refresh_token"');
+  const decoded = localAuthUtils.verifyRefreshToken(data.refreshToken);
+  if (
+    (await redisClient.sismemberAsync(
+      `refreshTokensProfile${decoded.id}`,
+      refreshToken
+    )) !== 1
+  ) {
+    throw new Error('"refresh_token" not found');
   }
+
+  delete decoded.iat;
+  const accessToken = localAuthUtils.generateAccessToken(decoded);
+  return accessToken;
 };
 
 module.exports = refreshAuthTokenLocalProfileService;

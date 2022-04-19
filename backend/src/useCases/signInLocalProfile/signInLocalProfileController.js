@@ -19,8 +19,9 @@ const signInLocalProfileController = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
     if (
-      error.message === 'profile does not exist' ||
-      error.message === 'incorrect password'
+      ['profile does not exist', 'incorrect password'].find(
+        (message) => message === error.message
+      )
     ) {
       return res.status(400).json({ message: error.message });
     }

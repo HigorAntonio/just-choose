@@ -40,7 +40,7 @@ describe('refreshAuthTokenLocalProfileController', () => {
 
   it(
     'Should not be able to create and return a new accessToken ' +
-      ' upon receiving a invalid refreshToken',
+      'upon receiving a invalid refreshToken',
     async () => {
       const tests = [
         { body: {}, status: 400, message: '"refreshToken" is required' },
@@ -86,7 +86,7 @@ describe('refreshAuthTokenLocalProfileController', () => {
 
   it(
     'Should not be able to create and return a new accessToken ' +
-      ' upon receiving a refreshToken that is not whitelisted',
+      'upon receiving a refreshToken that is not whitelisted',
     async () => {
       const profile = {
         name: 'EmanuelBarros',
@@ -107,8 +107,8 @@ describe('refreshAuthTokenLocalProfileController', () => {
         .post('/token')
         .send({ refresh_token: refreshToken });
 
-      expect(response.status).toBe(401);
-      expect(response.body.message).toBe('invalid "refresh_token"');
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('"refresh_token" not found');
       await localProfileRepository.deleteLocalProfile(profileId);
       await redisClient.flushdbAsync();
     }

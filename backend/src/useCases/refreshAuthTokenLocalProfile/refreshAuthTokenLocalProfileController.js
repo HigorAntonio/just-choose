@@ -15,6 +15,9 @@ const refreshAuthTokenLocalProfileController = async (req, res) => {
     if (error.message === 'invalid "refresh_token"') {
       return res.status(401).json({ message: error.message });
     }
+    if (error.message === '"refresh_token" not found') {
+      return res.status(403).json({ message: error.message });
+    }
     logger.error(error);
     return res.sendStatus(500);
   }

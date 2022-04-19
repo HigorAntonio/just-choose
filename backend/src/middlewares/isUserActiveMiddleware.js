@@ -2,18 +2,21 @@ const knex = require('../database');
 
 module.exports = async (req, res, next) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
+    const profileId = req.profileId;
+    if (!profileId) {
       return res.sendStatus(401);
     }
 
-    const user = await knex('users').select().where({ id: userId }).first();
+    const profile = await knex('profiles')
+      .select()
+      .where({ id: profileId })
+      .first();
 
-    if (!user) {
+    if (!profile) {
       return res.status(400).json({ erro: 'Usuário não encontrado' });
     }
 
-    if (!user.is_active) {
+    if (!profile.is_active) {
       return res.status(403).json({ erro: 'Usuário não confirmou seu e-mail' });
     }
 

@@ -22,8 +22,9 @@ const signUpLocalProfileController = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
     if (
-      error.message === '"name" unavailable' ||
-      error.message === '"email" unavailable'
+      ['"name" unavailable', '"email" unavailable'].find(
+        (message) => message === error.message
+      )
     ) {
       return res.status(409).json({ message: error.message });
     }

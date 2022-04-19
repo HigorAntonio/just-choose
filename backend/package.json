@@ -14,9 +14,11 @@
     "dev:queue": "nodemon src/queue.js --ignore *.test.*",
     "db-migrate": "knex migrate:latest",
     "db-rollback": "knex migrate:rollback --all",
+    "db-seed": "knex seed:run",
     "test": "dotenv -e .env.test -- jest --watchAll",
     "test-db-migrate": "dotenv -e .env.test knex migrate:latest",
-    "test-db-rollback": "dotenv -e .env.test -- knex migrate:rollback --all"
+    "test-db-rollback": "dotenv -e .env.test -- knex migrate:rollback --all",
+    "test-db-seed": "dotenv -e .env.test knex seed:run"
   },
   "engines": {
     "node": ">= 14.16.0",
