@@ -3,6 +3,7 @@ const redisClient = require('../../lib/redisClient');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const signUpLocalProfileValidationSchema = require('./signUpLocalProfileValidationSchema');
 const localAuthUtils = require('../../utils/localAuth');
+const Queue = require('../../lib/Queue');
 
 const signUpLocalProfileService = async (
   { name, email, password },
@@ -27,7 +28,11 @@ const signUpLocalProfileService = async (
     password: localProfile.password,
   });
 
-  await localAuthUtils.sendEmailConfimation(profileId, localProfile.email);
+  await localAuthUtils.sendEmailConfirmation(
+    profileId,
+    localProfile.email,
+    Queue
+  );
 
   const ua = uaParser(uastring);
   // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
