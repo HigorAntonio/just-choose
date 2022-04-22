@@ -189,8 +189,8 @@ describe('logoutLocalProfileController', () => {
           .set('Authorization', `Bearer ${accessToken}`);
         tests[i].isRefreshTokenWhitelisted =
           (await redisClient.sismemberAsync(
-            `refreshTokensProfile${tests[i].profileId}`,
-            tests[i].refreshToken
+            `refreshTokensProfile${test.profileId}`,
+            test.refreshToken
           )) === 1;
       }
 

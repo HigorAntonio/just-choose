@@ -57,7 +57,7 @@ describe('authorizationMiddleware', () => {
         req: { headers: { authorization: '' } },
       },
     ];
-    for (test of tests) {
+    for (const test of tests) {
       next.mockReset();
       const req = test.req;
       const res = new Response();
@@ -105,7 +105,7 @@ describe('authorizationMiddleware', () => {
         { req: { headers: { authorization: 'askldfjalksdfaskldfja' } } },
         { req: { headers: { authorization: 'Bearer' } } },
       ];
-      for (test of tests) {
+      for (const test of tests) {
         next.mockReset();
         const req = test.req;
         const res = new Response();
@@ -131,7 +131,7 @@ describe('authorizationMiddleware', () => {
         { req: { headers: { authorization: 'sdasdfd askdjfaklsdas' } } },
         { req: { headers: { authorization: 'adfdfdf lkjasdfkjakjb' } } },
       ];
-      for (test of tests) {
+      for (const test of tests) {
         next.mockReset();
         const req = test.req;
         const res = new Response();
@@ -200,7 +200,7 @@ describe('authorizationMiddleware', () => {
           },
         },
       ];
-      for (test of tests) {
+      for (const test of tests) {
         next.mockReset();
         const req = test.req;
         const res = new Response();

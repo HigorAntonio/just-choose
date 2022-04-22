@@ -46,7 +46,10 @@ routes.delete(
   authorization,
   require('./useCases/logoutLocalProfile/logoutLocalProfileController')
 );
-routes.post('/forgotpassword', LocalAuthController.forgotPassword);
+routes.post(
+  '/forgotpassword',
+  require('./useCases/forgotPasswordLocalProfile/forgotPasswordLocalProfileController')
+);
 routes.post('/resetpassword', LocalAuthController.resetPassword);
 routes.get('/devices', authorization, LocalAuthController.userDevices);
 routes.delete('/devices', authorization, LocalAuthController.exitDevice);
