@@ -16,7 +16,7 @@ const logoutLocalProfileController = async (req, res) => {
     if (
       [
         'invalid "refresh_token"',
-        'invalid profile',
+        'invalid "profile_id"',
         '"refresh_token" not found',
       ].find((message) => message === error.message)
     ) {

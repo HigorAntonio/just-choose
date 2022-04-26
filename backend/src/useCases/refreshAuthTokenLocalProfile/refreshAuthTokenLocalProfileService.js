@@ -13,7 +13,7 @@ const refreshAuthTokenLocalProfileService = async (refreshToken) => {
   if (
     (await redisClient.sismemberAsync(
       `refreshTokensProfile${decoded.id}`,
-      refreshToken
+      data.refreshToken
     )) !== 1
   ) {
     throw new Error('"refresh_token" not found');

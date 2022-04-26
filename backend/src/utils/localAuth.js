@@ -9,6 +9,15 @@ const FORGOT_PASSWORD_TOKEN_SECRET = process.env.FORGOT_PASSWORD_TOKEN_SECRET;
 const FORGOT_PASSWORD_TOKEN_EXPIRATION_TIME =
   process.env.FORGOT_PASSWORD_TOKEN_EXPIRATION_TIME;
 
+exports.encryptPassword = (password) => {
+  const salt = bcrypt.genSaltSync(10);
+  return bcrypt.hashSync(password, salt);
+};
+
+exports.comparePassword = (password, hashed) => {
+  return bcrypt.compareSync(password, hashed);
+};
+
 exports.sendEmailConfirmation = async (profileId, email, Queue) => {
   const emailConfirmationToken = jwt.sign(
     { id: profileId },
@@ -35,14 +44,18 @@ exports.generateForgotPasswordToken = (payload) => {
   });
 };
 
-exports.comparePassword = (password, hashed) => {
-  return bcrypt.compareSync(password, hashed);
-};
-
 exports.verifyRefreshToken = (refreshToken) => {
   try {
     return jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
   } catch (error) {
     throw new Error('invalid "refresh_token"');
+  }
+};
+
+exports.verifyForgotPasswordToken = (forgotPasswordToken) => {
+  try {
+    return jwt.verify(forgotPasswordToken, FORGOT_PASSWORD_TOKEN_SECRET);
+  } catch (error) {
+    throw new Error('invalid "forgot_password_token"');
   }
 };

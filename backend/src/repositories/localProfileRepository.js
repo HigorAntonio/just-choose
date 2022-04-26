@@ -1,5 +1,5 @@
-const bcrypt = require('bcryptjs');
 const knex = require('../database');
+const localAuthUtils = require('../utils/localAuth');
 
 const getProfile = async (tableKey, tableValue) => {
   const profile = await knex
@@ -18,11 +18,6 @@ const getProfile = async (tableKey, tableValue) => {
     .first();
 
   return profile;
-};
-
-const encryptPassword = (password) => {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(password, salt);
 };
 
 exports.getLocalProfileById = (profileId) => {
@@ -46,11 +41,17 @@ exports.saveLocalProfile = ({ name, email, password }) => {
 
     await trx('local_profiles').insert({
       profile_id: profileId,
-      password: encryptPassword(password),
+      password: localAuthUtils.encryptPassword(password),
     });
 
     return profileId;
   });
+};
+
+exports.updatePasswordLocalProfile = (profileId, newPassword) => {
+  return knex('local_profiles')
+    .update({ password: localAuthUtils.encryptPassword(newPassword) })
+    .where({ profile_id: profileId });
 };
 
 exports.deleteLocalProfile = (profileId) => {

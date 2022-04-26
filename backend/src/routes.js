@@ -31,7 +31,7 @@ const routes = express.Router();
 // LocalAuthController
 routes.post(
   '/signup',
-  require('./useCases/signUpLocalProfie/signUpLocalProfileController')
+  require('./useCases/signUpLocalProfile/signUpLocalProfileController')
 );
 routes.post(
   '/signin',
@@ -50,7 +50,10 @@ routes.post(
   '/forgotpassword',
   require('./useCases/forgotPasswordLocalProfile/forgotPasswordLocalProfileController')
 );
-routes.post('/resetpassword', LocalAuthController.resetPassword);
+routes.patch(
+  '/resetpassword',
+  require('./useCases/resetPasswordLocalProfile/resetPasswordLocalProfileController')
+);
 routes.get('/devices', authorization, LocalAuthController.userDevices);
 routes.delete('/devices', authorization, LocalAuthController.exitDevice);
 routes.patch('/confirmation/:token', LocalAuthController.confirmEmail);

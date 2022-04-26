@@ -56,26 +56,26 @@ describe('logoutLocalProfileController', () => {
         password: '7Xp5UYWY1H',
       };
       const tests = [
-        { body: {}, status: 400, message: '"refreshToken" is required' },
+        { body: {}, status: 400, message: '"refresh_token" is required' },
         {
           body: { refresh_token: '' },
           status: 400,
-          message: '"refreshToken" is not allowed to be empty',
+          message: '"refresh_token" is not allowed to be empty',
         },
         {
           body: { refresh_token: 53434 },
           status: 400,
-          message: '"refreshToken" must be a string',
+          message: '"refresh_token" must be a string',
         },
         {
           body: { refresh_token: true },
           status: 400,
-          message: '"refreshToken" must be a string',
+          message: '"refresh_token" must be a string',
         },
         {
           body: { refresh_token: false },
           status: 400,
-          message: '"refreshToken" must be a string',
+          message: '"refresh_token" must be a string',
         },
         {
           body: {
@@ -196,7 +196,7 @@ describe('logoutLocalProfileController', () => {
 
       for (const test of tests) {
         expect(test.response.status).toBe(403);
-        expect(test.response.body.message).toBe('invalid profile');
+        expect(test.response.body.message).toBe('invalid "profile_id"');
         expect(test.isRefreshTokenWhitelisted).toBeTruthy();
         await localProfileRepository.deleteLocalProfile(test.profileId);
       }

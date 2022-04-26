@@ -43,26 +43,26 @@ describe('refreshAuthTokenLocalProfileController', () => {
       'upon receiving a invalid refreshToken',
     async () => {
       const tests = [
-        { body: {}, status: 400, message: '"refreshToken" is required' },
+        { body: {}, status: 400, message: '"refresh_token" is required' },
         {
           body: { refresh_token: '' },
           status: 400,
-          message: '"refreshToken" is not allowed to be empty',
+          message: '"refresh_token" is not allowed to be empty',
         },
         {
           body: { refresh_token: 53434 },
           status: 400,
-          message: '"refreshToken" must be a string',
+          message: '"refresh_token" must be a string',
         },
         {
           body: { refresh_token: true },
           status: 400,
-          message: '"refreshToken" must be a string',
+          message: '"refresh_token" must be a string',
         },
         {
           body: { refresh_token: false },
           status: 400,
-          message: '"refreshToken" must be a string',
+          message: '"refresh_token" must be a string',
         },
         {
           body: {
