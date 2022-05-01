@@ -1,4 +1,5 @@
 const authorization = require('./authorizationMiddleware');
+const redisClient = require('../lib/redisClient');
 const localAuthUtils = require('../utils/localAuth');
 
 class Response {
@@ -18,6 +19,10 @@ class Response {
   }
 }
 const next = jest.fn();
+
+afterAll(async () => {
+  await redisClient.quitAsync();
+});
 
 describe('authorizationMiddleware', () => {
   beforeEach(() => {

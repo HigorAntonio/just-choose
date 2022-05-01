@@ -4,9 +4,11 @@ const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
 const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
+const localAuthUtils = require('../../utils/localAuth');
 
 afterAll(async () => {
   Queue.close();
+  await redisClient.delKeysAsync('bull:*');
   await redisClient.quitAsync();
   await knex.destroy();
 });
@@ -17,63 +19,33 @@ describe('forgotPasswordLocalProfileController', () => {
       'password when the email informed belongs ' +
       'to a profile registered in the system',
     async () => {
-      const tests = [
-        {
-          profile: {
-            name: 'LuanCavalcanti',
-            email: 'luan_cavalcanti@rafaeladson.com',
-            password: 'TlnkWUFND7',
-          },
-        },
-        {
-          profile: {
-            name: 'Hugo_Pereira',
-            email: 'hugoenzopereira@riscao.com.br',
-            password: 'B5qi73aFTU',
-          },
-        },
-        {
-          profile: {
-            name: 'AuroraSilveira',
-            email: 'aurora_tatiane_silveira@hlt.arq.br',
-            password: 'kzg4B4ja4F',
-          },
-        },
-        {
-          profile: {
-            name: 'Amanda_Moraes',
-            email: 'amandamarcelamoraes@clinicasilhouette.com.br',
-            password: '3aloKnczQp',
-          },
-        },
-        {
-          profile: {
-            name: 'CristianeJesus',
-            email: 'cristiane.daniela.jesus@pig.com.br',
-            password: 'a2DeOu9asL',
-          },
-        },
-      ];
+      const profile = {
+        name: 'LuanCavalcanti',
+        email: 'luan_cavalcanti@rafaeladson.com',
+        password: 'TlnkWUFND7',
+      };
+      const signUpResponse = await request(app).post('/signup').send(profile);
 
-      for (const [i, test] of tests.entries()) {
-        await request(app).post('/signup').send(test.profile);
-        tests[i].profileId = (
-          await localProfileRepository.getLocalProfileByEmail(
-            test.profile.email
-          )
-        ).id;
-      }
-      for (const test of tests) {
-        const response = await request(app)
-          .post('/forgotpassword')
-          .send({ email: test.profile.email });
+      const response = await request(app)
+        .post('/forgotpassword')
+        .send({ email: profile.email });
 
-        expect(response.status).toBe(200);
-      }
-      for (const test of tests) {
-        await localProfileRepository.deleteLocalProfile(test.profileId);
-      }
-      await redisClient.flushdbAsync();
+      expect(response.status).toBe(200);
+      profile.id = (
+        await localProfileRepository.getLocalProfileByEmail(profile.email)
+      ).id;
+      profile.forgotPasswordToken = (
+        await localAuthUtils.getForgotPasswordTokensFromStorage(profile.id)
+      )[0];
+      await localProfileRepository.deleteLocalProfile(profile.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profile.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profile.id,
+        profile.forgotPasswordToken
+      );
     }
   );
 

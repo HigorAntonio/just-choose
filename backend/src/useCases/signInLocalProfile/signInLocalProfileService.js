@@ -1,5 +1,4 @@
 const uaParser = require('ua-parser-js');
-const redisClient = require('../../lib/redisClient');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const signInLocalProfileValidationSchema = require('./signInLocalProfileValidationSchema');
 const localAuthUtils = require('../../utils/localAuth');
@@ -32,10 +31,7 @@ const signInLocalProfileService = async ({ email, password }, uastring) => {
     browser: ua.browser.name,
   });
 
-  await redisClient.saddAsync(
-    `refreshTokensProfile${localProfile.id}`,
-    refreshToken
-  );
+  await localAuthUtils.storeRefreshToken(localProfile.id, refreshToken);
 
   return { accessToken, refreshToken };
 };

@@ -4,9 +4,11 @@ const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
 const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
+const localAuthUtils = require('../../utils/localAuth');
 
 afterAll(async () => {
   Queue.close();
+  await redisClient.delKeysAsync('bull:*');
   await redisClient.quitAsync();
   await knex.destroy();
 });
@@ -19,7 +21,7 @@ describe('signInLocalProfileController', () => {
       password: 'kSpXbHA1DO',
     };
 
-    await request(app).post('/signup').send(profile);
+    const signUpResponse = await request(app).post('/signup').send(profile);
     const response = await request(app).post('/signin').send({
       email: profile.email,
       password: profile.password,
@@ -31,7 +33,14 @@ describe('signInLocalProfileController', () => {
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByName(profile.name);
     await localProfileRepository.deleteLocalProfile(profileId);
-    await redisClient.flushdbAsync();
+    await localAuthUtils.removeRefreshTokenFromStorage(
+      profileId,
+      signUpResponse.body.refresh_token
+    );
+    await localAuthUtils.removeRefreshTokenFromStorage(
+      profileId,
+      response.body.refresh_token
+    );
   });
 
   it('Should not be able to sign in with a non-existent profile', async () => {
@@ -69,7 +78,8 @@ describe('signInLocalProfileController', () => {
       password: 'bDKSN9oMm8',
     };
 
-    await request(app).post('/signup').send(profile);
+    const signInResponse = await request(app).post('/signup').send(profile);
+    let signUpResponse;
     for (const [i, email] of emails.entries()) {
       const response = await request(app).post('/signin').send({
         email,
@@ -77,6 +87,7 @@ describe('signInLocalProfileController', () => {
       });
 
       if (i === emails.length - 1) {
+        signUpResponse = response;
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('access_token');
         expect(response.body).toHaveProperty('refresh_token');
@@ -88,7 +99,14 @@ describe('signInLocalProfileController', () => {
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByName(profile.name);
     await localProfileRepository.deleteLocalProfile(profileId);
-    await redisClient.flushdbAsync();
+    await localAuthUtils.removeRefreshTokenFromStorage(
+      profileId,
+      signUpResponse.body.refresh_token
+    );
+    await localAuthUtils.removeRefreshTokenFromStorage(
+      profileId,
+      signInResponse.body.refresh_token
+    );
   });
 
   it('Should not be able to sign in with invalid email', async () => {
@@ -151,7 +169,9 @@ describe('signInLocalProfileController', () => {
     ];
     const { profile } = tests[tests.length - 1];
 
-    await request(app).post('/signup').send(profile);
+    const refreshTokens = [];
+    const signUpResponse = await request(app).post('/signup').send(profile);
+    refreshTokens.push(signUpResponse.body.refresh_token);
     for (const test of tests) {
       const response = await request(app).post('/signin').send(test.profile);
 
@@ -160,6 +180,7 @@ describe('signInLocalProfileController', () => {
         expect(response.body.message).toBe(test.message);
       }
       if (test.status === 200) {
+        refreshTokens.push(response.body.refresh_token);
         expect(response.body).toHaveProperty('access_token');
         expect(response.body).toHaveProperty('refresh_token');
       }
@@ -167,7 +188,12 @@ describe('signInLocalProfileController', () => {
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByName(profile.name);
     await localProfileRepository.deleteLocalProfile(profileId);
-    await redisClient.flushdbAsync();
+    for (const refreshToken of refreshTokens) {
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        refreshToken
+      );
+    }
   });
 
   it('Should not be able to sign in with wrong password', async () => {
@@ -183,14 +209,14 @@ describe('signInLocalProfileController', () => {
       'p474Up1EYm',
       '2KW4B6msms',
     ];
-
     const profile = {
       name: 'Andrea_Pires',
       email: 'andrea.ayla.pires@fernandesfilpi.com.br',
       password: passwords[passwords.length - 1],
     };
-
-    await request(app).post('/signup').send(profile);
+    const refreshTokens = [];
+    const signUpResponse = await request(app).post('/signup').send(profile);
+    refreshTokens.push(signUpResponse.body.refresh_token);
     for (const [i, password] of passwords.entries()) {
       const response = await request(app).post('/signin').send({
         email: profile.email,
@@ -198,6 +224,7 @@ describe('signInLocalProfileController', () => {
       });
 
       if (i === passwords.length - 1) {
+        refreshTokens.push(response.body.refresh_token);
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('access_token');
         expect(response.body).toHaveProperty('refresh_token');
@@ -209,7 +236,12 @@ describe('signInLocalProfileController', () => {
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByName(profile.name);
     await localProfileRepository.deleteLocalProfile(profileId);
-    await redisClient.flushdbAsync();
+    for (const refreshToken of refreshTokens) {
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        refreshToken
+      );
+    }
   });
 
   it('Should not be able to sign in with invalid password', async () => {
@@ -263,8 +295,9 @@ describe('signInLocalProfileController', () => {
       },
     ];
     const { profile } = tests[tests.length - 1];
-
-    await request(app).post('/signup').send(profile);
+    const refreshTokens = [];
+    const signUpResponse = await request(app).post('/signup').send(profile);
+    refreshTokens.push(signUpResponse.body.refresh_token);
     for (const test of tests) {
       const response = await request(app).post('/signin').send(test.profile);
 
@@ -273,6 +306,7 @@ describe('signInLocalProfileController', () => {
         expect(response.body.message).toBe(test.message);
       }
       if (test.status === 200) {
+        refreshTokens.push(response.body.refresh_token);
         expect(response.body).toHaveProperty('access_token');
         expect(response.body).toHaveProperty('refresh_token');
       }
@@ -280,6 +314,11 @@ describe('signInLocalProfileController', () => {
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByName(profile.name);
     await localProfileRepository.deleteLocalProfile(profileId);
-    await redisClient.flushdbAsync();
+    for (const refreshToken of refreshTokens) {
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        refreshToken
+      );
+    }
   });
 });

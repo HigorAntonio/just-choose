@@ -1,4 +1,3 @@
-const redisClient = require('../../lib/redisClient');
 const Queue = require('../../lib/Queue');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const forgotPasswordLocalProfileValidationSchema = require('./forgotPasswordLocalProfileValidationSchema');
@@ -19,7 +18,10 @@ const forgotPasswordLocalProfileService = async (email) => {
   const forgotPasswordToken = localAuthUtils.generateForgotPasswordToken({
     id: profile.id,
   });
-  await redisClient.saddAsync('forgotPasswordTokens', forgotPasswordToken);
+  await localAuthUtils.storeForgotPasswordToken(
+    profile.id,
+    forgotPasswordToken
+  );
 
   await Queue.add('ForgotPasswordMail', {
     email: data.email,

@@ -1,4 +1,5 @@
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
 const Queue = require('../../lib/Queue');
 const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
@@ -6,146 +7,621 @@ const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const localAuthUtils = require('../../utils/localAuth');
 
-const createForgotPasswordToken = async (profileId) => {
-  const forgotPasswordToken = localAuthUtils.generateForgotPasswordToken({
-    id: profileId,
+const createForgotPasswordToken = async (profileId, options = {}) => {
+  const {
+    secret = process.env.FORGOT_PASSWORD_TOKEN_SECRET,
+    expiresIn = process.env.FORGOT_PASSWORD_TOKEN_EXPIRATION_TIME,
+  } = options;
+  const payload = { id: profileId };
+  const forgotPasswordToken = jwt.sign(payload, secret, {
+    expiresIn,
   });
-  await redisClient.saddAsync('forgotPasswordTokens', forgotPasswordToken);
+  await localAuthUtils.storeForgotPasswordToken(profileId, forgotPasswordToken);
   return forgotPasswordToken;
 };
 
 afterAll(async () => {
   Queue.close();
+  await redisClient.delKeysAsync('bull:*');
   await redisClient.quitAsync();
   await knex.destroy();
 });
 
 describe('resetPasswordLocalProfileController', () => {
   it('Should be able to update the profile password', async () => {
-    const tests = [
-      {
-        profile: {
-          name: 'MirellaRodrigues',
-          email: 'mirella_lorena_rodrigues@policiapenal.com',
-          password: '6jtlpt9lW5',
-        },
-        newPassword: 'PLDcsKJK7o',
-      },
-      {
-        profile: {
-          name: 'Anderson_Cruz',
-          email: 'anderson_nicolas_dacruz@agenciaph.com',
-          password: 'DyF4HW7Up9',
-        },
-        newPassword: '5TzQHexEWQ',
-      },
-      {
-        profile: {
-          name: 'SebastiaoCastro',
-          email: 'sebastiaoluiscastro@construtorastaizabel.com.br',
-          password: 'ELZIDhOwJd',
-        },
-        newPassword: '7E1zCxyfh2',
-      },
-      {
-        profile: {
-          name: 'Lucca_Jesus',
-          email: 'lucca_jesus@julianacaran.com.br',
-          password: 'nXsaWzqS2o',
-        },
-        newPassword: '1xRtxBb0h8',
-      },
-      {
-        profile: {
-          name: 'MarcosNascimento',
-          email: 'marcos.eduardo.nascimento@officetectecnologia.com.br',
-          password: 'YZpfbcKcJi',
-        },
-        newPassword: 'Ru5eXHpX6N',
-      },
-      {
-        profile: {
-          name: 'Sara_Ribeiro',
-          email: 'sara.giovana.ribeiro@doublesp.com.br',
-          password: 'sZ3maEAbNy',
-        },
-        newPassword: 'JWUaf0FxAH',
-      },
-      {
-        profile: {
-          name: 'FranciscaNascimento',
-          email: 'francisca_evelyn_nascimento@danzarin.com.br',
-          password: '7Yzfl2pidS',
-        },
-        newPassword: 'RBwe6LBQHY',
-      },
-    ];
-    for (const [i, test] of tests.entries()) {
-      await request(app).post('/signup').send(test.profile);
-      const profile = await localProfileRepository.getLocalProfileByEmail(
-        test.profile.email
-      );
-      tests[i].profileId = profile.id;
-      const forgotPasswordToken = await createForgotPasswordToken(profile.id);
+    const profile = {
+      name: 'MirellaRodrigues',
+      email: 'mirella_lorena_rodrigues@policiapenal.com',
+      password: '6jtlpt9lW5',
+    };
+    const newPassword = 'PLDcsKJK7o';
+    const signUpResponse = await request(app).post('/signup').send(profile);
+    const initialProfileData =
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
+    const forgotPasswordToken = await createForgotPasswordToken(
+      initialProfileData.id
+    );
 
-      const response = await request(app).patch('/resetpassword').send({
-        email: test.profile.email,
-        forgot_password_token: forgotPasswordToken,
-        new_password: test.newPassword,
-      });
-      const updatedProfile =
-        await localProfileRepository.getLocalProfileByEmail(test.profile.email);
+    const response = await request(app).patch('/resetpassword').send({
+      email: profile.email,
+      forgot_password_token: forgotPasswordToken,
+      new_password: newPassword,
+    });
+    const updatedProfileData =
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
 
-      expect(response.status).toBe(200);
-      expect(
-        localAuthUtils.comparePassword(test.profile.password, profile.password)
-      ).toBeTruthy();
-      expect(
-        localAuthUtils.comparePassword(
-          test.newPassword,
-          updatedProfile.password
-        )
-      ).toBeTruthy();
-    }
-    for (const test of tests) {
-      await localProfileRepository.deleteLocalProfile(test.profileId);
-    }
-    await redisClient.flushdbAsync();
+    expect(response.status).toBe(200);
+    expect(
+      localAuthUtils.comparePassword(
+        profile.password,
+        initialProfileData.password
+      )
+    ).toBeTruthy();
+    expect(
+      localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
+    ).toBeTruthy();
+    await localProfileRepository.deleteLocalProfile(initialProfileData.id);
+    await localAuthUtils.removeRefreshTokenFromStorage(
+      initialProfileData.id,
+      signUpResponse.body.refresh_token
+    );
+    await localAuthUtils.removeForgotPasswordTokenFromStorage(
+      initialProfileData.id,
+      forgotPasswordToken
+    );
   });
 
   it(
     'Should not update profile password if the data in request body is ' +
       'not correct',
-    async () => {}
+    async () => {
+      const profile = {
+        name: 'FabianaGiovanna',
+        email: 'fabianagiovannadaconceicao@hotelruby.com.br',
+        password: 'yKIKgolHf8',
+      };
+      const signUpResponse = await request(app).post('/signup').send(profile);
+      profile.id = (
+        await localProfileRepository.getLocalProfileByEmail(profile.email)
+      ).id;
+      const forgotPasswordToken = await createForgotPasswordToken(profile.id);
+      const tests = [
+        {
+          data: {
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" is required',
+        },
+        {
+          data: {
+            email: '',
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" is not allowed to be empty',
+        },
+        {
+          data: {
+            email: 123,
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" must be a string',
+        },
+        {
+          data: {
+            email: true,
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" must be a string',
+        },
+        {
+          data: {
+            email: false,
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" must be a string',
+        },
+        {
+          data: {
+            email: null,
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" must be a string',
+        },
+        {
+          data: {
+            email: undefined,
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" is required',
+        },
+        {
+          data: {
+            email: {},
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" must be a string',
+        },
+        {
+          data: {
+            email: [],
+            forgot_password_token: forgotPasswordToken,
+            new_password: profile.password,
+          },
+          message: '"email" must be a string',
+        },
+        {
+          data: { email: profile.email, new_password: profile.password },
+          message: '"forgot_password_token" is required',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: '',
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" is not allowed to be empty',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: 23467,
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: true,
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: false,
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: null,
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: undefined,
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" is required',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: {},
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: [],
+            new_password: profile.password,
+          },
+          message: '"forgot_password_token" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+          },
+          message: '"new_password" is required',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: '',
+          },
+          message: '"new_password" is not allowed to be empty',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: 4562,
+          },
+          message: '"new_password" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: true,
+          },
+          message: '"new_password" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: false,
+          },
+          message: '"new_password" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: null,
+          },
+          message: '"new_password" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: undefined,
+          },
+          message: '"new_password" is required',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: {},
+          },
+          message: '"new_password" must be a string',
+        },
+        {
+          data: {
+            email: profile.email,
+            forgot_password_token: forgotPasswordToken,
+            new_password: [],
+          },
+          message: '"new_password" must be a string',
+        },
+      ];
+
+      for (const test of tests) {
+        const response = await request(app)
+          .patch('/resetpassword')
+          .send(test.data);
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toBe(test.message);
+      }
+      await localProfileRepository.deleteLocalProfile(profile.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profile.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profile.id,
+        forgotPasswordToken
+      );
+    }
   );
 
   it(
     'Should not update the profile password if there is no profile registered ' +
       'with the email provided',
-    async () => {}
+    async () => {
+      const profiles = [
+        {
+          name: 'Geraldo_Dias',
+          email: 'geraldo.danilo.dias@fernandaleal.com.br',
+          password: 'KfmadSoupJ',
+        },
+        {
+          name: 'NairViana',
+          email: 'nair-viana90@tanby.com.br',
+          password: 'fFgr13X74x',
+        },
+      ];
+      const signUpResponse = await request(app)
+        .post('/signup')
+        .send(profiles[0]);
+      const registeredProfile =
+        await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
+      const forgotPasswordToken = await createForgotPasswordToken(
+        registeredProfile.id
+      );
+
+      const response = await request(app).patch('/resetpassword').send({
+        email: profiles[1].email,
+        forgot_password_token: forgotPasswordToken,
+        new_password: profiles[1].password,
+      });
+      const updatedRegisteredProfile =
+        await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe('profile not found');
+      expect(registeredProfile.password).toEqual(
+        updatedRegisteredProfile.password
+      );
+      expect(
+        localAuthUtils.comparePassword(
+          profiles[0].password,
+          updatedRegisteredProfile.password
+        )
+      ).toBeTruthy();
+      expect(
+        localAuthUtils.comparePassword(
+          profiles[1].password,
+          updatedRegisteredProfile.password
+        )
+      ).toBeFalsy();
+      await localProfileRepository.deleteLocalProfile(registeredProfile.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        registeredProfile.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        registeredProfile.id,
+        forgotPasswordToken
+      );
+    }
   );
 
   it(
-    'Should not update profile password if "forgetPasswordToken" ' +
+    'Should not update profile password if "forgotPasswordToken" ' +
       'is not whitelisted',
-    async () => {}
+    async () => {
+      const profile = {
+        name: 'AndreiaFernandes',
+        email: 'andreia.isis.fernandes@purkyt.com',
+        password: 'PknDKuHIGi',
+      };
+      const newPassword = 'SofYaRk4bm';
+      const signUpResponse = await request(app).post('/signup').send(profile);
+      const profileData = await localProfileRepository.getLocalProfileByEmail(
+        profile.email
+      );
+      const forgotPasswordToken = await createForgotPasswordToken(
+        profileData.id
+      );
+      localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profileData.id,
+        forgotPasswordToken
+      );
+
+      const response = await request(app).patch('/resetpassword').send({
+        email: profile.email,
+        forgot_password_token: forgotPasswordToken,
+        new_password: newPassword,
+      });
+      const updatedProfileData =
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
+
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('invalid "forgot_password_token"');
+      expect(profileData.password).toEqual(updatedProfileData.password);
+      expect(
+        localAuthUtils.comparePassword(
+          profile.password,
+          updatedProfileData.password
+        )
+      ).toBeTruthy();
+      expect(
+        localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
+      ).toBeFalsy();
+      await localProfileRepository.deleteLocalProfile(profileData.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileData.id,
+        signUpResponse.body.refresh_token
+      );
+    }
   );
 
   it(
-    'Should not update profile password if "forgetPasswordToken" ' +
+    'Should not update profile password if "forgotPasswordToken" ' +
       'is expired',
-    async () => {}
+    async () => {
+      const profile = {
+        name: 'Felipe_Santos',
+        email: 'felipe.manoel.santos@gruposimoes.com.br',
+        password: 'C71cFwON2u',
+      };
+      const newPassword = 'zc0Hq7zyp1';
+      const signUpResponse = await request(app).post('/signup').send(profile);
+      const profileData = await localProfileRepository.getLocalProfileByEmail(
+        profile.email
+      );
+      const forgotPasswordToken = await createForgotPasswordToken(
+        profileData.id,
+        { expiresIn: '10' }
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      const response = await request(app).patch('/resetpassword').send({
+        email: profile.email,
+        forgot_password_token: forgotPasswordToken,
+        new_password: newPassword,
+      });
+      const updatedProfileData =
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
+
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('invalid "forgot_password_token"');
+      expect(profileData.password).toEqual(updatedProfileData.password);
+      expect(
+        localAuthUtils.comparePassword(
+          profile.password,
+          updatedProfileData.password
+        )
+      ).toBeTruthy();
+      expect(
+        localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
+      ).toBeFalsy();
+      await localProfileRepository.deleteLocalProfile(profileData.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileData.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profileData.id,
+        forgotPasswordToken
+      );
+    }
   );
 
   it(
-    'Should not update profile password if "forgetPasswordToken" ' +
+    'Should not update profile password if "forgotPasswordToken" ' +
       'does not have a valid signature',
-    async () => {}
+    async () => {
+      const profile = {
+        name: 'Mariah_Ribeiro',
+        email: 'mariah_ribeiro@eletrovip.com',
+        password: 'Qq0Ye6aWi8',
+      };
+      const newPassword = 'gBxZFLULKz';
+      const signUpResponse = await request(app).post('/signup').send(profile);
+      const profileData = await localProfileRepository.getLocalProfileByEmail(
+        profile.email
+      );
+      const forgotPasswordToken = await createForgotPasswordToken(
+        profileData.id,
+        {
+          secret:
+            '80ed5dee82c93fe7afdb09e9c472bb3fb736daca1d88c1deea9b6a5737772574',
+        }
+      );
+
+      const response = await request(app).patch('/resetpassword').send({
+        email: profile.email,
+        forgot_password_token: forgotPasswordToken,
+        new_password: newPassword,
+      });
+      const updatedProfileData =
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
+
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('invalid "forgot_password_token"');
+      expect(profileData.password).toEqual(updatedProfileData.password);
+      expect(
+        localAuthUtils.comparePassword(
+          profile.password,
+          updatedProfileData.password
+        )
+      ).toBeTruthy();
+      expect(
+        localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
+      ).toBeFalsy();
+      await localProfileRepository.deleteLocalProfile(profileData.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileData.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profileData.id,
+        forgotPasswordToken
+      );
+    }
   );
 
   it(
-    'Should not update the profile password if the "forgot Password Token" ' +
+    'Should not update the profile password if the "forgotPasswordToken" ' +
       'does not belong to the profile of the email provided',
-    async () => {}
+    async () => {
+      const profiles = [
+        {
+          name: 'CarolinaSilva',
+          email: 'carolina.marlene.dasilva@heineken.com.br',
+          password: 'yOwb8RGUbH',
+        },
+        {
+          name: 'Sophie_Mata',
+          email: 'sophiejuliadamata@signa.net.br',
+          password: 'sj53DarXbe',
+        },
+      ];
+      const newPassword = 'xqMlrTNwAW';
+      const signUpResponses = [];
+      signUpResponses[0] = await request(app).post('/signup').send(profiles[0]);
+      signUpResponses[1] = await request(app).post('/signup').send(profiles[1]);
+      profiles[0].data = await localProfileRepository.getLocalProfileByEmail(
+        profiles[0].email
+      );
+      profiles[1].data = await localProfileRepository.getLocalProfileByEmail(
+        profiles[1].email
+      );
+      const forgotPasswordToken = await createForgotPasswordToken(
+        profiles[1].data.id
+      );
+
+      const response = await request(app).patch('/resetpassword').send({
+        email: profiles[0].email,
+        forgot_password_token: forgotPasswordToken,
+        new_password: newPassword,
+      });
+      profiles[0].updatedData =
+        await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
+      profiles[1].updatedData =
+        await localProfileRepository.getLocalProfileByEmail(profiles[1].email);
+
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('invalid "email"');
+      expect(profiles[0].data.password).toEqual(
+        profiles[0].updatedData.password
+      );
+      expect(profiles[1].data.password).toEqual(
+        profiles[1].updatedData.password
+      );
+      expect(
+        localAuthUtils.comparePassword(
+          profiles[0].password,
+          profiles[0].updatedData.password
+        )
+      ).toBeTruthy();
+      expect(
+        localAuthUtils.comparePassword(
+          profiles[1].password,
+          profiles[1].updatedData.password
+        )
+      ).toBeTruthy();
+      expect(
+        localAuthUtils.comparePassword(
+          newPassword,
+          profiles[0].updatedData.password
+        )
+      ).toBeFalsy();
+      expect(
+        localAuthUtils.comparePassword(
+          newPassword,
+          profiles[1].updatedData.password
+        )
+      ).toBeFalsy();
+      await localProfileRepository.deleteLocalProfile(profiles[0].data.id);
+      await localProfileRepository.deleteLocalProfile(profiles[1].data.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profiles[0].data.id,
+        signUpResponses[0].body.refresh_token
+      );
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profiles[1].data.id,
+        signUpResponses[1].body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profiles[1].data.id,
+        forgotPasswordToken
+      );
+    }
   );
 });

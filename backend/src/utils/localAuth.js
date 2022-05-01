@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const redisClient = require('../lib/redisClient');
 
 const CONFIRM_EMAIL_TOKEN_SECRET = process.env.CONFIRM_EMAIL_TOKEN_SECRET;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
@@ -58,4 +59,64 @@ exports.verifyForgotPasswordToken = (forgotPasswordToken) => {
   } catch (error) {
     throw new Error('invalid "forgot_password_token"');
   }
+};
+
+const storeInMemory = async (key, value) => {
+  return await redisClient.saddAsync(key, value);
+};
+
+const isInMemory = async (key, value) => {
+  return (await redisClient.sismemberAsync(key, value)) === 1;
+};
+
+const removeFromMemory = async (key, value) => {
+  return (await redisClient.sremAsync(key, value)) !== 0;
+};
+
+const getSetMembersFromMemory = async (key) => {
+  return await redisClient.smembersAsync(key);
+};
+
+exports.storeRefreshToken = (profileId, refreshToken) => {
+  return storeInMemory(`localAuth:refreshTokens:${profileId}`, refreshToken);
+};
+
+exports.isRefreshTokenInStorage = (profileId, refreshToken) => {
+  return isInMemory(`localAuth:refreshTokens:${profileId}`, refreshToken);
+};
+
+exports.getRefreshTokensFromStorage = (profileId) => {
+  return getSetMembersFromMemory(`localAuth:refreshTokens:${profileId}`);
+};
+
+exports.removeRefreshTokenFromStorage = (profileId, refreshToken) => {
+  return removeFromMemory(`localAuth:refreshTokens:${profileId}`, refreshToken);
+};
+
+exports.storeForgotPasswordToken = (profileId, forgotPasswordToken) => {
+  return storeInMemory(
+    `localAuth:forgotPasswordTokens:${profileId}`,
+    forgotPasswordToken
+  );
+};
+
+exports.isForgotPasswordTokenInStorage = (profileId, forgotPasswordToken) => {
+  return isInMemory(
+    `localAuth:forgotPasswordTokens:${profileId}`,
+    forgotPasswordToken
+  );
+};
+
+exports.getForgotPasswordTokensFromStorage = (profileId) => {
+  return getSetMembersFromMemory(`localAuth:forgotPasswordTokens:${profileId}`);
+};
+
+exports.removeForgotPasswordTokenFromStorage = (
+  profileId,
+  forgotPasswordToken
+) => {
+  return removeFromMemory(
+    `localAuth:forgotPasswordTokens:${profileId}`,
+    forgotPasswordToken
+  );
 };

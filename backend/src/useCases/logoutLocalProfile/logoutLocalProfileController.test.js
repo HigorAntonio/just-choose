@@ -4,9 +4,11 @@ const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
 const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
+const localAuthUtils = require('../../utils/localAuth');
 
 afterAll(async () => {
   Queue.close();
+  await redisClient.delKeysAsync('bull:*');
   await redisClient.quitAsync();
   await knex.destroy();
 });
@@ -25,25 +27,18 @@ describe('logoutLocalProfileController', () => {
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByName(profile.name);
     const isRefreshTokenWhitelisted =
-      (await redisClient.sismemberAsync(
-        `refreshTokensProfile${profileId}`,
-        refreshToken
-      )) === 1;
+      await localAuthUtils.isRefreshTokenInStorage(profileId, refreshToken);
     const response = await request(app)
       .delete('/logout')
       .send({ refresh_token: refreshToken })
       .set('Authorization', `Bearer ${accessToken}`);
     const isRefreshTokenDeleted =
-      (await redisClient.sismemberAsync(
-        `refreshTokensProfile${profileId}`,
-        refreshToken
-      )) === 0;
+      !(await localAuthUtils.isRefreshTokenInStorage(profileId, refreshToken));
 
     expect(isRefreshTokenWhitelisted).toBeTruthy();
     expect(response.status).toBe(204);
     expect(isRefreshTokenDeleted).toBeTruthy();
     await localProfileRepository.deleteLocalProfile(profileId);
-    await redisClient.flushdbAsync();
   });
 
   it(
@@ -90,7 +85,7 @@ describe('logoutLocalProfileController', () => {
       ];
 
       const {
-        body: { access_token: accessToken },
+        body: { access_token: accessToken, refresh_token: refreshToken },
       } = await request(app).post('/signup').send(profile);
       for (const test of tests) {
         const response = await request(app)
@@ -104,7 +99,10 @@ describe('logoutLocalProfileController', () => {
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
       await localProfileRepository.deleteLocalProfile(profileId);
-      await redisClient.flushdbAsync();
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        refreshToken
+      );
     }
   );
 
@@ -123,8 +121,8 @@ describe('logoutLocalProfileController', () => {
       } = await request(app).post('/signup').send(profile);
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
-      await redisClient.sremAsync(
-        `refreshTokensProfile${profileId}`,
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
         refreshToken
       );
       const response = await request(app)
@@ -135,7 +133,10 @@ describe('logoutLocalProfileController', () => {
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('"refresh_token" not found');
       await localProfileRepository.deleteLocalProfile(profileId);
-      await redisClient.flushdbAsync();
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        refreshToken
+      );
     }
   );
 
@@ -188,10 +189,10 @@ describe('logoutLocalProfileController', () => {
           .send({ refresh_token: test.refreshToken })
           .set('Authorization', `Bearer ${accessToken}`);
         tests[i].isRefreshTokenWhitelisted =
-          (await redisClient.sismemberAsync(
-            `refreshTokensProfile${test.profileId}`,
+          await localAuthUtils.isRefreshTokenInStorage(
+            test.profileId,
             test.refreshToken
-          )) === 1;
+          );
       }
 
       for (const test of tests) {
@@ -199,8 +200,11 @@ describe('logoutLocalProfileController', () => {
         expect(test.response.body.message).toBe('invalid "profile_id"');
         expect(test.isRefreshTokenWhitelisted).toBeTruthy();
         await localProfileRepository.deleteLocalProfile(test.profileId);
+        await localAuthUtils.removeRefreshTokenFromStorage(
+          test.profileId,
+          test.refreshToken
+        );
       }
-      await redisClient.flushdbAsync();
     }
   );
 });

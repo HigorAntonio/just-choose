@@ -4,9 +4,11 @@ const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
 const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
+const localAuthUtils = require('../../utils/localAuth');
 
 afterAll(async () => {
   Queue.close();
+  await redisClient.delKeysAsync('bull:*');
   await redisClient.quitAsync();
   await knex.destroy();
 });
@@ -30,26 +32,48 @@ describe('signUpLocalProfileController', () => {
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
       await localProfileRepository.deleteLocalProfile(profileId);
-      await redisClient.flushdbAsync();
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        response.body.refresh_token
+      );
     }
   );
 
   it('Should not be able to create an existing profile', async () => {
-    const profile = {
-      name: 'GiovannaIsabel',
-      email: 'giovanna-santos87@gameecia.com.br',
-      password: '15wuGAxzlE',
-    };
+    const profiles = [
+      {
+        name: 'GiovannaIsabel',
+        email: 'giovanna-santos87@gameecia.com.br',
+        password: '15wuGAxzlE',
+      },
+      {
+        name: 'GiovannaIsabel',
+        email: 'giovanna-santos88@gameecia.com.br',
+        password: '15wuGAxzlE',
+      },
+      {
+        name: 'GiIsabel',
+        email: 'giovanna-santos87@gameecia.com.br',
+        password: '15wuGAxzlE',
+      },
+    ];
 
-    await request(app).post('/signup').send(profile);
-    const response = await request(app).post('/signup').send(profile);
+    const responses = [];
+    responses[0] = await request(app).post('/signup').send(profiles[0]);
+    responses[1] = await request(app).post('/signup').send(profiles[1]);
+    responses[2] = await request(app).post('/signup').send(profiles[2]);
 
-    expect(response.status).toBe(409);
-    expect(response.body.message).toBe('"name" unavailable');
+    expect(responses[1].status).toBe(409);
+    expect(responses[1].body.message).toBe('"name" unavailable');
+    expect(responses[2].status).toBe(409);
+    expect(responses[2].body.message).toBe('"email" unavailable');
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByName(profiles[0].name);
     await localProfileRepository.deleteLocalProfile(profileId);
-    await redisClient.flushdbAsync();
+    await localAuthUtils.removeRefreshTokenFromStorage(
+      profileId,
+      responses[0].body.refresh_token
+    );
   });
 
   it('Should not be able to create a profile with invalid data', async () => {

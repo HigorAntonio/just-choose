@@ -4,9 +4,11 @@ const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
 const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
+const localAuthUtils = require('../../utils/localAuth');
 
 afterAll(async () => {
   Queue.close();
+  await redisClient.delKeysAsync('bull:*');
   await redisClient.quitAsync();
   await knex.destroy();
 });
@@ -34,7 +36,10 @@ describe('refreshAuthTokenLocalProfileController', () => {
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
       await localProfileRepository.deleteLocalProfile(profileId);
-      await redisClient.flushdbAsync();
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        refreshToken
+      );
     }
   );
 
@@ -99,8 +104,8 @@ describe('refreshAuthTokenLocalProfileController', () => {
       } = await request(app).post('/signup').send(profile);
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
-      await redisClient.sremAsync(
-        `refreshTokensProfile${profileId}`,
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
         refreshToken
       );
       const response = await request(app)
@@ -110,7 +115,10 @@ describe('refreshAuthTokenLocalProfileController', () => {
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('"refresh_token" not found');
       await localProfileRepository.deleteLocalProfile(profileId);
-      await redisClient.flushdbAsync();
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        refreshToken
+      );
     }
   );
 });

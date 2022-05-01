@@ -1,4 +1,3 @@
-const redisClient = require('../../lib/redisClient');
 const refreshAuthTokenLocalProfileValidationSchema = require('./refreshAuthTokenLocalProfileValidationSchema');
 const localAuthUtils = require('../../utils/localAuth');
 
@@ -11,10 +10,10 @@ const refreshAuthTokenLocalProfileService = async (refreshToken) => {
 
   const decoded = localAuthUtils.verifyRefreshToken(data.refreshToken);
   if (
-    (await redisClient.sismemberAsync(
-      `refreshTokensProfile${decoded.id}`,
+    !(await localAuthUtils.isRefreshTokenInStorage(
+      decoded.id,
       data.refreshToken
-    )) !== 1
+    ))
   ) {
     throw new Error('"refresh_token" not found');
   }
