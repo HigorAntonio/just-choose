@@ -26,9 +26,6 @@ describe('signUpLocalProfileController', () => {
 
       const response = await request(app).post('/signup').send(profile);
 
-      expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('access_token');
-      expect(response.body).toHaveProperty('refresh_token');
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
       await localProfileRepository.deleteLocalProfile(profileId);
@@ -36,6 +33,9 @@ describe('signUpLocalProfileController', () => {
         profileId,
         response.body.refresh_token
       );
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('access_token');
+      expect(response.body).toHaveProperty('refresh_token');
     }
   );
 
@@ -63,10 +63,6 @@ describe('signUpLocalProfileController', () => {
     responses[1] = await request(app).post('/signup').send(profiles[1]);
     responses[2] = await request(app).post('/signup').send(profiles[2]);
 
-    expect(responses[1].status).toBe(409);
-    expect(responses[1].body.message).toBe('"name" unavailable');
-    expect(responses[2].status).toBe(409);
-    expect(responses[2].body.message).toBe('"email" unavailable');
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByName(profiles[0].name);
     await localProfileRepository.deleteLocalProfile(profileId);
@@ -74,6 +70,10 @@ describe('signUpLocalProfileController', () => {
       profileId,
       responses[0].body.refresh_token
     );
+    expect(responses[1].status).toBe(409);
+    expect(responses[1].body.message).toBe('"name" unavailable');
+    expect(responses[2].status).toBe(409);
+    expect(responses[2].body.message).toBe('"email" unavailable');
   });
 
   it('Should not be able to create a profile with invalid data', async () => {

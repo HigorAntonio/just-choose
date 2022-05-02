@@ -3,11 +3,12 @@ const localAuthUtils = require('../../utils/localAuth');
 
 const logoutLocalProfileService = async ({ profileId, refreshToken }) => {
   const data = await logoutLocalProfileValidationSchema.validateAsync({
+    profileId,
     refreshToken,
   });
 
   const decoded = localAuthUtils.verifyRefreshToken(data.refreshToken);
-  if (decoded.id !== profileId) {
+  if (decoded.id !== data.profileId) {
     throw new Error('invalid "profile_id"');
   }
 

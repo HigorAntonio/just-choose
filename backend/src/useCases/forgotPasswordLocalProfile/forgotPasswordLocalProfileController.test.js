@@ -30,7 +30,6 @@ describe('forgotPasswordLocalProfileController', () => {
         .post('/forgotpassword')
         .send({ email: profile.email });
 
-      expect(response.status).toBe(200);
       profile.id = (
         await localProfileRepository.getLocalProfileByEmail(profile.email)
       ).id;
@@ -46,6 +45,7 @@ describe('forgotPasswordLocalProfileController', () => {
         profile.id,
         profile.forgotPasswordToken
       );
+      expect(response.status).toBe(200);
     }
   );
 
@@ -78,6 +78,7 @@ describe('forgotPasswordLocalProfileController', () => {
           message: 'profile not found',
         },
       ];
+
       for (const test of tests) {
         const response = await request(app)
           .post('/forgotpassword')

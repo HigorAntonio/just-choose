@@ -20,7 +20,6 @@ describe('logoutLocalProfileController', () => {
       email: 'felipeaugustobrito@doucedoce.com.br',
       password: 'CZEDq1Nc1Z',
     };
-
     const {
       body: { access_token: accessToken, refresh_token: refreshToken },
     } = await request(app).post('/signup').send(profile);
@@ -28,17 +27,18 @@ describe('logoutLocalProfileController', () => {
       await localProfileRepository.getLocalProfileByName(profile.name);
     const isRefreshTokenWhitelisted =
       await localAuthUtils.isRefreshTokenInStorage(profileId, refreshToken);
+
     const response = await request(app)
       .delete('/logout')
       .send({ refresh_token: refreshToken })
       .set('Authorization', `Bearer ${accessToken}`);
+
     const isRefreshTokenDeleted =
       !(await localAuthUtils.isRefreshTokenInStorage(profileId, refreshToken));
-
+    await localProfileRepository.deleteLocalProfile(profileId);
     expect(isRefreshTokenWhitelisted).toBeTruthy();
     expect(response.status).toBe(204);
     expect(isRefreshTokenDeleted).toBeTruthy();
-    await localProfileRepository.deleteLocalProfile(profileId);
   });
 
   it(
@@ -83,19 +83,17 @@ describe('logoutLocalProfileController', () => {
           message: 'invalid "refresh_token"',
         },
       ];
-
       const {
         body: { access_token: accessToken, refresh_token: refreshToken },
       } = await request(app).post('/signup').send(profile);
-      for (const test of tests) {
-        const response = await request(app)
+
+      for (const [i, test] of tests.entries()) {
+        tests[i].response = await request(app)
           .delete('/logout')
           .send(test.body)
           .set('Authorization', `Bearer ${accessToken}`);
-
-        expect(response.status).toBe(test.status);
-        expect(response.body.message).toBe(test.message);
       }
+
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
       await localProfileRepository.deleteLocalProfile(profileId);
@@ -103,6 +101,10 @@ describe('logoutLocalProfileController', () => {
         profileId,
         refreshToken
       );
+      for (const test of tests) {
+        expect(test.response.status).toBe(test.status);
+        expect(test.response.body.message).toBe(test.message);
+      }
     }
   );
 
@@ -115,7 +117,6 @@ describe('logoutLocalProfileController', () => {
         email: 'vitoria.claudia.viana@reconciliare.com.br',
         password: '0UPWZjUU7p',
       };
-
       const {
         body: { access_token: accessToken, refresh_token: refreshToken },
       } = await request(app).post('/signup').send(profile);
@@ -125,18 +126,19 @@ describe('logoutLocalProfileController', () => {
         profileId,
         refreshToken
       );
+
       const response = await request(app)
         .delete('/logout')
         .send({ refresh_token: refreshToken })
         .set('Authorization', `Bearer ${accessToken}`);
 
-      expect(response.status).toBe(403);
-      expect(response.body.message).toBe('"refresh_token" not found');
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
         refreshToken
       );
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('"refresh_token" not found');
     }
   );
 
@@ -167,7 +169,6 @@ describe('logoutLocalProfileController', () => {
           },
         },
       ];
-
       for (const [i, test] of tests.entries()) {
         const {
           body: { access_token: accessToken, refresh_token: refreshToken },
@@ -178,32 +179,34 @@ describe('logoutLocalProfileController', () => {
         tests[i].refreshToken = refreshToken;
         tests[i].profileId = profileId;
       }
-
       for (const [i, test] of tests.entries()) {
         const accessToken =
           i === tests.length - 1
             ? tests[0].accessToken
             : tests[i + 1].accessToken;
+
         tests[i].response = await request(app)
           .delete('/logout')
           .send({ refresh_token: test.refreshToken })
           .set('Authorization', `Bearer ${accessToken}`);
+
         tests[i].isRefreshTokenWhitelisted =
           await localAuthUtils.isRefreshTokenInStorage(
             test.profileId,
             test.refreshToken
           );
       }
-
       for (const test of tests) {
-        expect(test.response.status).toBe(403);
-        expect(test.response.body.message).toBe('invalid "profile_id"');
-        expect(test.isRefreshTokenWhitelisted).toBeTruthy();
         await localProfileRepository.deleteLocalProfile(test.profileId);
         await localAuthUtils.removeRefreshTokenFromStorage(
           test.profileId,
           test.refreshToken
         );
+      }
+      for (const test of tests) {
+        expect(test.response.status).toBe(403);
+        expect(test.response.body.message).toBe('invalid "profile_id"');
+        expect(test.isRefreshTokenWhitelisted).toBeTruthy();
       }
     }
   );

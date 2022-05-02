@@ -47,9 +47,18 @@ describe('resetPasswordLocalProfileController', () => {
       forgot_password_token: forgotPasswordToken,
       new_password: newPassword,
     });
+
     const updatedProfileData =
       await localProfileRepository.getLocalProfileByEmail(profile.email);
-
+    await localProfileRepository.deleteLocalProfile(initialProfileData.id);
+    await localAuthUtils.removeRefreshTokenFromStorage(
+      initialProfileData.id,
+      signUpResponse.body.refresh_token
+    );
+    await localAuthUtils.removeForgotPasswordTokenFromStorage(
+      initialProfileData.id,
+      forgotPasswordToken
+    );
     expect(response.status).toBe(200);
     expect(
       localAuthUtils.comparePassword(
@@ -60,15 +69,6 @@ describe('resetPasswordLocalProfileController', () => {
     expect(
       localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
     ).toBeTruthy();
-    await localProfileRepository.deleteLocalProfile(initialProfileData.id);
-    await localAuthUtils.removeRefreshTokenFromStorage(
-      initialProfileData.id,
-      signUpResponse.body.refresh_token
-    );
-    await localAuthUtils.removeForgotPasswordTokenFromStorage(
-      initialProfileData.id,
-      forgotPasswordToken
-    );
   });
 
   it(
@@ -298,14 +298,12 @@ describe('resetPasswordLocalProfileController', () => {
         },
       ];
 
-      for (const test of tests) {
-        const response = await request(app)
+      for (const [i, test] of tests.entries()) {
+        tests[i].response = await request(app)
           .patch('/resetpassword')
           .send(test.data);
-
-        expect(response.status).toBe(400);
-        expect(response.body.message).toBe(test.message);
       }
+
       await localProfileRepository.deleteLocalProfile(profile.id);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profile.id,
@@ -315,6 +313,10 @@ describe('resetPasswordLocalProfileController', () => {
         profile.id,
         forgotPasswordToken
       );
+      for (const test of tests) {
+        expect(test.response.status).toBe(400);
+        expect(test.response.body.message).toBe(test.message);
+      }
     }
   );
 
@@ -348,9 +350,18 @@ describe('resetPasswordLocalProfileController', () => {
         forgot_password_token: forgotPasswordToken,
         new_password: profiles[1].password,
       });
+
       const updatedRegisteredProfile =
         await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
-
+      await localProfileRepository.deleteLocalProfile(registeredProfile.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        registeredProfile.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        registeredProfile.id,
+        forgotPasswordToken
+      );
       expect(response.status).toBe(400);
       expect(response.body.message).toBe('profile not found');
       expect(registeredProfile.password).toEqual(
@@ -368,15 +379,6 @@ describe('resetPasswordLocalProfileController', () => {
           updatedRegisteredProfile.password
         )
       ).toBeFalsy();
-      await localProfileRepository.deleteLocalProfile(registeredProfile.id);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        registeredProfile.id,
-        signUpResponse.body.refresh_token
-      );
-      await localAuthUtils.removeForgotPasswordTokenFromStorage(
-        registeredProfile.id,
-        forgotPasswordToken
-      );
     }
   );
 
@@ -407,9 +409,14 @@ describe('resetPasswordLocalProfileController', () => {
         forgot_password_token: forgotPasswordToken,
         new_password: newPassword,
       });
+
       const updatedProfileData =
         await localProfileRepository.getLocalProfileByEmail(profile.email);
-
+      await localProfileRepository.deleteLocalProfile(profileData.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileData.id,
+        signUpResponse.body.refresh_token
+      );
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('invalid "forgot_password_token"');
       expect(profileData.password).toEqual(updatedProfileData.password);
@@ -422,11 +429,6 @@ describe('resetPasswordLocalProfileController', () => {
       expect(
         localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
       ).toBeFalsy();
-      await localProfileRepository.deleteLocalProfile(profileData.id);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profileData.id,
-        signUpResponse.body.refresh_token
-      );
     }
   );
 
@@ -448,16 +450,25 @@ describe('resetPasswordLocalProfileController', () => {
         profileData.id,
         { expiresIn: '10' }
       );
-
       await new Promise((resolve) => setTimeout(resolve, 20));
+
       const response = await request(app).patch('/resetpassword').send({
         email: profile.email,
         forgot_password_token: forgotPasswordToken,
         new_password: newPassword,
       });
+
       const updatedProfileData =
         await localProfileRepository.getLocalProfileByEmail(profile.email);
-
+      await localProfileRepository.deleteLocalProfile(profileData.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileData.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profileData.id,
+        forgotPasswordToken
+      );
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('invalid "forgot_password_token"');
       expect(profileData.password).toEqual(updatedProfileData.password);
@@ -470,15 +481,6 @@ describe('resetPasswordLocalProfileController', () => {
       expect(
         localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
       ).toBeFalsy();
-      await localProfileRepository.deleteLocalProfile(profileData.id);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profileData.id,
-        signUpResponse.body.refresh_token
-      );
-      await localAuthUtils.removeForgotPasswordTokenFromStorage(
-        profileData.id,
-        forgotPasswordToken
-      );
     }
   );
 
@@ -509,9 +511,18 @@ describe('resetPasswordLocalProfileController', () => {
         forgot_password_token: forgotPasswordToken,
         new_password: newPassword,
       });
+
       const updatedProfileData =
         await localProfileRepository.getLocalProfileByEmail(profile.email);
-
+      await localProfileRepository.deleteLocalProfile(profileData.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileData.id,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profileData.id,
+        forgotPasswordToken
+      );
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('invalid "forgot_password_token"');
       expect(profileData.password).toEqual(updatedProfileData.password);
@@ -524,15 +535,6 @@ describe('resetPasswordLocalProfileController', () => {
       expect(
         localAuthUtils.comparePassword(newPassword, updatedProfileData.password)
       ).toBeFalsy();
-      await localProfileRepository.deleteLocalProfile(profileData.id);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profileData.id,
-        signUpResponse.body.refresh_token
-      );
-      await localAuthUtils.removeForgotPasswordTokenFromStorage(
-        profileData.id,
-        forgotPasswordToken
-      );
     }
   );
 
@@ -571,11 +573,25 @@ describe('resetPasswordLocalProfileController', () => {
         forgot_password_token: forgotPasswordToken,
         new_password: newPassword,
       });
+
       profiles[0].updatedData =
         await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
       profiles[1].updatedData =
         await localProfileRepository.getLocalProfileByEmail(profiles[1].email);
-
+      await localProfileRepository.deleteLocalProfile(profiles[0].data.id);
+      await localProfileRepository.deleteLocalProfile(profiles[1].data.id);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profiles[0].data.id,
+        signUpResponses[0].body.refresh_token
+      );
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profiles[1].data.id,
+        signUpResponses[1].body.refresh_token
+      );
+      await localAuthUtils.removeForgotPasswordTokenFromStorage(
+        profiles[1].data.id,
+        forgotPasswordToken
+      );
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('invalid "email"');
       expect(profiles[0].data.password).toEqual(
@@ -608,20 +624,6 @@ describe('resetPasswordLocalProfileController', () => {
           profiles[1].updatedData.password
         )
       ).toBeFalsy();
-      await localProfileRepository.deleteLocalProfile(profiles[0].data.id);
-      await localProfileRepository.deleteLocalProfile(profiles[1].data.id);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profiles[0].data.id,
-        signUpResponses[0].body.refresh_token
-      );
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profiles[1].data.id,
-        signUpResponses[1].body.refresh_token
-      );
-      await localAuthUtils.removeForgotPasswordTokenFromStorage(
-        profiles[1].data.id,
-        forgotPasswordToken
-      );
     }
   );
 });

@@ -23,16 +23,14 @@ describe('refreshAuthTokenLocalProfileController', () => {
         email: 'luanvictormoraes@outlock.com.br',
         password: 'RYIWOxtwuk',
       };
-
       const {
         body: { refresh_token: refreshToken },
       } = await request(app).post('/signup').send(profile);
+
       const response = await request(app)
         .post('/token')
         .send({ refresh_token: refreshToken });
 
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('access_token');
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
       await localProfileRepository.deleteLocalProfile(profileId);
@@ -40,6 +38,8 @@ describe('refreshAuthTokenLocalProfileController', () => {
         profileId,
         refreshToken
       );
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('access_token');
     }
   );
 
@@ -98,7 +98,6 @@ describe('refreshAuthTokenLocalProfileController', () => {
         email: 'emanuelnoahbarros@ruilacos.com.br',
         password: 'm6pdPzmBaY',
       };
-
       const {
         body: { refresh_token: refreshToken },
       } = await request(app).post('/signup').send(profile);
@@ -108,17 +107,18 @@ describe('refreshAuthTokenLocalProfileController', () => {
         profileId,
         refreshToken
       );
+
       const response = await request(app)
         .post('/token')
         .send({ refresh_token: refreshToken });
 
-      expect(response.status).toBe(403);
-      expect(response.body.message).toBe('"refresh_token" not found');
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
         refreshToken
       );
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe('"refresh_token" not found');
     }
   );
 });
