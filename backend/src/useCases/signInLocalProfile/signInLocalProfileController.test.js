@@ -8,8 +8,8 @@ const localAuthUtils = require('../../utils/localAuth');
 
 afterAll(async () => {
   Queue.close();
-  await redisClient.delKeysAsync('bull:*');
-  await redisClient.quitAsync();
+  await redisClient.delKeys('bull:*');
+  await redisClient.quit();
   await knex.destroy();
 });
 

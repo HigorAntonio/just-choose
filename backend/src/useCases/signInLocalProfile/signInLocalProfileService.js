@@ -12,11 +12,10 @@ const signInLocalProfileService = async ({ email, password }, uastring) => {
   const localProfile = await localProfileRepository.getLocalProfileByEmail(
     data.email
   );
-
   if (!localProfile) {
     throw new Error('profile does not exist');
   }
-  if (!localAuthUtils.comparePassword(password, localProfile.password)) {
+  if (!localAuthUtils.comparePassword(data.password, localProfile.password)) {
     throw new Error('incorrect password');
   }
 

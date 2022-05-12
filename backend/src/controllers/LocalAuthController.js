@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const knex = require('../database');
-const { promisify } = require('util');
 const uaParser = require('ua-parser-js');
 
 const Queue = require('../lib/Queue');
@@ -13,10 +12,10 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 const CONFIRM_EMAIL_TOKEN_SECRET = process.env.CONFIRM_EMAIL_TOKEN_SECRET;
 const FORGOT_PASSWORD_TOKEN_SECRET = process.env.FORGOT_PASSWORD_TOKEN_SECRET;
 
-const saddAsync = promisify(redisClient.sadd).bind(redisClient);
-const sremAsync = promisify(redisClient.srem).bind(redisClient);
-const sismemberAsync = promisify(redisClient.sismember).bind(redisClient);
-const smembersAsync = promisify(redisClient.smembers).bind(redisClient);
+const saddAsync = redisClient.sadd;
+const sremAsync = redisClient.srem;
+const sismemberAsync = redisClient.sismember;
+const smembersAsync = redisClient.smembers;
 
 const encryptPassword = (password) => {
   const salt = bcrypt.genSaltSync(10);

@@ -1,13 +1,8 @@
-const { promisify } = require('util');
-
 const validateDiscoverShowParams = require('../utils/validation/tmdbApi/discoverShowValidation');
 const validateSearchShowParams = require('../utils/validation/tmdbApi/searchShowValidation');
 const { tmdbApi } = require('../apis');
 const Queue = require('../lib/Queue');
 const redisClient = require('../lib/redisClient');
-
-const getAsync = promisify(redisClient.get).bind(redisClient);
-const setAsync = promisify(redisClient.set).bind(redisClient);
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const API_CACHE_EXPIRATION_TIME = process.env.API_CACHE_EXPIRATION_TIME;
@@ -29,13 +24,13 @@ module.exports = {
       params.language = 'pt-BR';
       params.watch_region = 'BR';
 
-      const responseData = await getAsync(key);
+      const responseData = await redisClient.get(key);
       if (!responseData) {
         const { data } = await tmdbApi.get(url, { params });
 
         await Queue.add('InsertShowsOnDatabase', data);
 
-        await setAsync(
+        await redisClient.set(
           key,
           JSON.stringify(data),
           'EX',
@@ -66,13 +61,13 @@ module.exports = {
       params.language = 'pt-BR';
       params.include_adult = false;
 
-      const responseData = await getAsync(key);
+      const responseData = await redisClient.get(key);
       if (!responseData) {
         const { data } = await tmdbApi.get(url, { params });
 
         await Queue.add('InsertShowsOnDatabase', data);
 
-        await setAsync(
+        await redisClient.set(
           key,
           JSON.stringify(data),
           'EX',
@@ -94,11 +89,11 @@ module.exports = {
       const key = url;
       const params = { api_key: TMDB_API_KEY, language: 'pt-BR' };
 
-      const responseData = await getAsync(key);
+      const responseData = await redisClient.get(key);
       if (!responseData) {
         const { data } = await tmdbApi.get(url, { params });
 
-        await setAsync(
+        await redisClient.set(
           key,
           JSON.stringify(data),
           'EX',

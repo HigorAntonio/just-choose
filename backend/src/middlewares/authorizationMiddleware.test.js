@@ -21,7 +21,7 @@ class Response {
 const next = jest.fn();
 
 afterAll(async () => {
-  await redisClient.quitAsync();
+  await redisClient.quit();
 });
 
 describe('authorizationMiddleware', () => {

@@ -1,12 +1,7 @@
-const { promisify } = require('util');
-
 const validateGamesParams = require('../utils/validation/rawgApi/gamesValidation');
 const { rawgApi } = require('../apis');
 const Queue = require('../lib/Queue');
 const redisClient = require('../lib/redisClient');
-
-const getAsync = promisify(redisClient.get).bind(redisClient);
-const setAsync = promisify(redisClient.set).bind(redisClient);
 
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
 const API_CACHE_EXPIRATION_TIME = process.env.API_CACHE_EXPIRATION_TIME;
@@ -26,7 +21,7 @@ module.exports = {
 
       params.key = RAWG_API_KEY;
 
-      const responseData = await getAsync(key);
+      const responseData = await redisClient.get(key);
       if (!responseData) {
         const { data } = await rawgApi.get(url, { params });
         data.next = !!data.next; // As urls (strings) em next e previous contém
@@ -34,7 +29,7 @@ module.exports = {
 
         await Queue.add('InsertGamesOnDatabase', data);
 
-        await setAsync(
+        await redisClient.set(
           key,
           JSON.stringify(data),
           'EX',
@@ -55,7 +50,7 @@ module.exports = {
       const key = url;
       const params = { key: RAWG_API_KEY, page: 1 };
 
-      const responseData = await getAsync(key);
+      const responseData = await redisClient.get(key);
       if (!responseData) {
         const data = { platforms: [] };
         while (true) {
@@ -68,7 +63,7 @@ module.exports = {
           params.page = params.page + 1;
         }
 
-        await setAsync(
+        await redisClient.set(
           key,
           JSON.stringify(data),
           'EX',
@@ -89,7 +84,7 @@ module.exports = {
       const key = url;
       const params = { key: RAWG_API_KEY, ordering: 'name', page: 1 };
 
-      const responseData = await getAsync(key);
+      const responseData = await redisClient.get(key);
       if (!responseData) {
         const data = { genres: [] };
         while (true) {
@@ -102,7 +97,7 @@ module.exports = {
           params.page = params.page + 1;
         }
 
-        await setAsync(
+        await redisClient.set(
           key,
           JSON.stringify(data),
           'EX',

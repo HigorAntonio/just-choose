@@ -62,19 +62,19 @@ exports.verifyForgotPasswordToken = (forgotPasswordToken) => {
 };
 
 const storeInMemory = async (key, value) => {
-  return await redisClient.saddAsync(key, value);
+  return await redisClient.sadd(key, value);
 };
 
 const isInMemory = async (key, value) => {
-  return (await redisClient.sismemberAsync(key, value)) === 1;
+  return await redisClient.sismember(key, value);
 };
 
 const removeFromMemory = async (key, value) => {
-  return (await redisClient.sremAsync(key, value)) !== 0;
+  return (await redisClient.srem(key, value)) !== 0;
 };
 
 const getSetMembersFromMemory = async (key) => {
-  return await redisClient.smembersAsync(key);
+  return await redisClient.smembers(key);
 };
 
 exports.storeRefreshToken = (profileId, refreshToken) => {
