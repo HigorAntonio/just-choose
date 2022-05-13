@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
+
 const redisClient = require('../lib/redisClient');
 
 const CONFIRM_EMAIL_TOKEN_SECRET = process.env.CONFIRM_EMAIL_TOKEN_SECRET;
@@ -61,15 +63,20 @@ exports.verifyForgotPasswordToken = (forgotPasswordToken) => {
   }
 };
 
-const storeInMemory = async (key, value) => {
+const storeInSetInMemory = async (key, value) => {
   return await redisClient.sadd(key, value);
 };
 
-const isInMemory = async (key, value) => {
+const isInSetInMemory = async (key, value) => {
   return await redisClient.sismember(key, value);
 };
 
-const removeFromMemory = async (key, value) => {
+const isInHashInMemory = async (key, value) => {
+  const vals = await redisClient.hvals(key);
+  return vals.includes(value);
+};
+
+const removeFromSetInMemory = async (key, value) => {
   return (await redisClient.srem(key, value)) !== 0;
 };
 
@@ -77,46 +84,102 @@ const getSetMembersFromMemory = async (key) => {
   return await redisClient.smembers(key);
 };
 
-exports.storeRefreshToken = (profileId, refreshToken) => {
-  return storeInMemory(`localAuth:refreshTokens:${profileId}`, refreshToken);
+const getHashMembersFromMemory = async (key) => {
+  return await redisClient.hgetall(key);
+};
+
+exports.storeRefreshToken = async (profileId, refreshToken, device) => {
+  const fieldId = uuidv4();
+  const [[, setRefreshTokenStatus], [, setDeviceStatus]] = await redisClient
+    .multi()
+    .hset(
+      `localAuth:profile:${profileId}`,
+      `refreshToken:${fieldId}`,
+      refreshToken
+    )
+    .hset(
+      `localAuth:profile:${profileId}`,
+      `device:${fieldId}`,
+      JSON.stringify(device)
+    )
+    .exec();
+  return !!(setRefreshTokenStatus && setDeviceStatus);
 };
 
 exports.isRefreshTokenInStorage = (profileId, refreshToken) => {
-  return isInMemory(`localAuth:refreshTokens:${profileId}`, refreshToken);
+  return isInHashInMemory(`localAuth:profile:${profileId}`, refreshToken);
 };
 
-exports.getRefreshTokensFromStorage = (profileId) => {
-  return getSetMembersFromMemory(`localAuth:refreshTokens:${profileId}`);
+exports.getRefreshTokenFromStorage = async (profileId, deviceId) => {
+  const hashMembers = await getHashMembersFromMemory(
+    `localAuth:profile:${profileId}`
+  );
+  return Object.keys(hashMembers)
+    .filter((key) => key.includes('refreshToken'))
+    .map((key) => {
+      const [, id] = key.split(':');
+      return { id, refreshToken: hashMembers[key] };
+    })
+    .find((refreshToken) => refreshToken.id === deviceId);
 };
 
-exports.removeRefreshTokenFromStorage = (profileId, refreshToken) => {
-  return removeFromMemory(`localAuth:refreshTokens:${profileId}`, refreshToken);
+exports.getDevicesFromStorage = async (profileId) => {
+  const hashMembers = await getHashMembersFromMemory(
+    `localAuth:profile:${profileId}`
+  );
+  return Object.keys(hashMembers)
+    .filter((key) => key.includes('device'))
+    .map((key) => {
+      const [, id] = key.split(':');
+      return { id, device: JSON.parse(hashMembers[key]) };
+    });
+};
+
+exports.removeRefreshTokenFromStorage = async (profileId, refreshToken) => {
+  const refreshTokens = await getHashMembersFromMemory(
+    `localAuth:profile:${profileId}`
+  );
+  const hashField = Object.keys(refreshTokens).find(
+    (key) => refreshTokens[key] === refreshToken
+  );
+  const [, fieldId] = hashField ? hashField.split(':') : [];
+  if (!fieldId) {
+    return false;
+  }
+  const [[, delRefreshTokenStatus], [, delDeviceStatus]] = await redisClient
+    .multi()
+    .hdel(`localAuth:profile:${profileId}`, `refreshToken:${fieldId}`)
+    .hdel(`localAuth:profile:${profileId}`, `device:${fieldId}`)
+    .exec();
+  return !!(delRefreshTokenStatus && delDeviceStatus);
 };
 
 exports.storeForgotPasswordToken = (profileId, forgotPasswordToken) => {
-  return storeInMemory(
-    `localAuth:forgotPasswordTokens:${profileId}`,
+  return storeInSetInMemory(
+    `localAuth:profile:${profileId}:forgotPasswordTokens`,
     forgotPasswordToken
   );
 };
 
 exports.isForgotPasswordTokenInStorage = (profileId, forgotPasswordToken) => {
-  return isInMemory(
-    `localAuth:forgotPasswordTokens:${profileId}`,
+  return isInSetInMemory(
+    `localAuth:profile:${profileId}:forgotPasswordTokens`,
     forgotPasswordToken
   );
 };
 
 exports.getForgotPasswordTokensFromStorage = (profileId) => {
-  return getSetMembersFromMemory(`localAuth:forgotPasswordTokens:${profileId}`);
+  return getSetMembersFromMemory(
+    `localAuth:profile:${profileId}:forgotPasswordTokens`
+  );
 };
 
 exports.removeForgotPasswordTokenFromStorage = (
   profileId,
   forgotPasswordToken
 ) => {
-  return removeFromMemory(
-    `localAuth:forgotPasswordTokens:${profileId}`,
+  return removeFromSetInMemory(
+    `localAuth:profile:${profileId}:forgotPasswordTokens`,
     forgotPasswordToken
   );
 };

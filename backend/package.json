@@ -43,7 +43,8 @@
     "nodemailer-express-handlebars": "^4.0.0",
     "pg": "^8.3.3",
     "pino": "^7.9.2",
-    "ua-parser-js": "^0.7.24"
+    "ua-parser-js": "^0.7.24",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "dotenv-cli": "^5.1.0",

@@ -33,16 +33,18 @@ const signUpLocalProfileService = async (
     Queue
   );
 
-  const ua = uaParser(uastring);
-  // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
   const accessToken = localAuthUtils.generateAccessToken({ id: profileId });
   const refreshToken = localAuthUtils.generateRefreshToken({
     id: profileId,
+  });
+  const ua = uaParser(uastring);
+  // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
+  const device = {
     os: ua.os.name,
     browser: ua.browser.name,
-  });
+  };
 
-  await localAuthUtils.storeRefreshToken(profileId, refreshToken);
+  await localAuthUtils.storeRefreshToken(profileId, refreshToken, device);
 
   return { accessToken, refreshToken };
 };
