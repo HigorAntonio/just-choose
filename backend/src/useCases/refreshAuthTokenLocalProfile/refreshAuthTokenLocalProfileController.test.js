@@ -1,10 +1,33 @@
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
+const { randomUUID } = require('crypto');
 const Queue = require('../../lib/Queue');
 const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
 const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const localAuthUtils = require('../../utils/localAuth');
+
+const createRefreshToken = async (profileId, options = {}) => {
+  const {
+    secret = process.env.REFRESH_TOKEN_SECRET,
+    expiresIn = process.env.REFRESH_TOKEN_EXPIRATION_TIME,
+  } = options;
+  const payload = {
+    iss: process.env.APP_URL,
+    sub: profileId,
+    jti: randomUUID(),
+  };
+  const refreshToken = jwt.sign(payload, secret, {
+    expiresIn,
+  });
+  const device = {
+    os: 'test_os',
+    browser: 'test_browser',
+  };
+  await localAuthUtils.storeRefreshToken(profileId, refreshToken, device);
+  return refreshToken;
+};
 
 afterAll(async () => {
   Queue.close();
@@ -16,30 +39,48 @@ afterAll(async () => {
 describe('refreshAuthTokenLocalProfileController', () => {
   it(
     'Should be able to create and return a new accessToken ' +
-      'upon receiving a valid refreshToken',
+      'and a new refreshToken upon receiving a valid refreshToken',
     async () => {
       const profile = {
         name: 'LuanBenicio',
         email: 'luanvictormoraes@outlock.com.br',
         password: 'RYIWOxtwuk',
       };
-      const {
-        body: { refresh_token: refreshToken },
-      } = await request(app).post('/signup').send(profile);
+      const signUpResponse = await request(app).post('/signup').send(profile);
 
       const response = await request(app)
         .post('/token')
-        .send({ refresh_token: refreshToken });
+        .send({ refresh_token: signUpResponse.body.refresh_token });
 
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
+      const isRefreshTokenWhitelisted =
+        await localAuthUtils.isRefreshTokenInStorage(
+          profileId,
+          signUpResponse.body.refresh_token
+        );
+      const isNewRefreshTokenWhitelisted =
+        await localAuthUtils.isRefreshTokenInStorage(
+          profileId,
+          response.body.refresh_token
+        );
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
-        refreshToken
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        response.body.refresh_token
       );
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('access_token');
+      expect(response.body).toHaveProperty('refresh_token');
+      expect(signUpResponse.body.refresh_token).not.toEqual(
+        response.body.refresh_token
+      );
+      expect(isRefreshTokenWhitelisted).toBeFalsy();
+      expect(isNewRefreshTokenWhitelisted).toBeTruthy();
     }
   );
 
@@ -91,22 +132,20 @@ describe('refreshAuthTokenLocalProfileController', () => {
 
   it(
     'Should not be able to create and return a new accessToken ' +
-      'upon receiving a refreshToken that is not whitelisted',
+      'upon receiving a expired refreshToken',
     async () => {
       const profile = {
-        name: 'EmanuelBarros',
-        email: 'emanuelnoahbarros@ruilacos.com.br',
-        password: 'm6pdPzmBaY',
+        name: 'Mirella_Fabiana',
+        email: 'mirella_fabiana_cortereal@ipek.net.br',
+        password: 'x8eiIEMBt5',
       };
-      const {
-        body: { refresh_token: refreshToken },
-      } = await request(app).post('/signup').send(profile);
+      const signUpResponse = await request(app).post('/signup').send(profile);
       const { id: profileId } =
         await localProfileRepository.getLocalProfileByName(profile.name);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profileId,
-        refreshToken
-      );
+      const refreshToken = await createRefreshToken(profileId, {
+        expiresIn: '10',
+      });
+      await new Promise((resolve) => setTimeout(resolve, 20));
 
       const response = await request(app)
         .post('/token')
@@ -115,7 +154,42 @@ describe('refreshAuthTokenLocalProfileController', () => {
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
+        signUpResponse.body.refresh_token
+      );
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
         refreshToken
+      );
+      expect(response.status).toBe(401);
+      expect(response.body.message).toBe('invalid "refresh_token"');
+    }
+  );
+
+  it(
+    'Should not be able to create and return a new accessToken ' +
+      'upon receiving a refreshToken that is not whitelisted',
+    async () => {
+      const profile = {
+        name: 'EmanuelBarros',
+        email: 'emanuelnoahbarros@ruilacos.com.br',
+        password: 'm6pdPzmBaY',
+      };
+      const signUpResponse = await request(app).post('/signup').send(profile);
+      const { id: profileId } =
+        await localProfileRepository.getLocalProfileByName(profile.name);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        signUpResponse.body.refresh_token
+      );
+
+      const response = await request(app)
+        .post('/token')
+        .send({ refresh_token: signUpResponse.body.refresh_token });
+
+      await localProfileRepository.deleteLocalProfile(profileId);
+      await localAuthUtils.removeRefreshTokenFromStorage(
+        profileId,
+        signUpResponse.body.refresh_token
       );
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('"refresh_token" not found');

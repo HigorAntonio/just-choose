@@ -8,13 +8,13 @@ const logoutLocalProfileService = async ({ profileId, refreshToken }) => {
   });
 
   const decoded = localAuthUtils.verifyRefreshToken(data.refreshToken);
-  if (decoded.id !== data.profileId) {
+  if (decoded.sub !== data.profileId) {
     throw new Error('invalid "profile_id"');
   }
 
   if (
     !(await localAuthUtils.removeRefreshTokenFromStorage(
-      decoded.id,
+      decoded.sub,
       refreshToken
     ))
   ) {

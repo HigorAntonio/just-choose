@@ -38,9 +38,9 @@ describe('authorizationMiddleware', () => {
         const profileId = Math.floor(Math.random() * 999999);
         const req = {
           headers: {
-            authorization: `Bearer ${localAuthUtils.generateAccessToken({
-              id: profileId,
-            })}`,
+            authorization: `Bearer ${localAuthUtils.generateAccessToken(
+              profileId
+            )}`,
           },
         };
         const res = new Response();

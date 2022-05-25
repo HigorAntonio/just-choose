@@ -23,7 +23,7 @@ const resetPasswordLocalProfileService = async ({
   const decoded = localAuthUtils.verifyForgotPasswordToken(
     data.forgotPasswordToken
   );
-  if (decoded.id !== profile.id) {
+  if (decoded.sub !== profile.id) {
     throw new Error('invalid "email"');
   }
 
@@ -36,10 +36,14 @@ const resetPasswordLocalProfileService = async ({
     throw new Error('invalid "forgot_password_token"');
   }
 
-  await localAuthUtils.removeForgotPasswordTokenFromStorage(
-    profile.id,
-    data.forgotPasswordToken
-  );
+  if (
+    !(await localAuthUtils.removeForgotPasswordTokenFromStorage(
+      profile.id,
+      data.forgotPasswordToken
+    ))
+  ) {
+    throw new Error('error removing forgot password token from storage');
+  }
 
   await localProfileRepository.updatePasswordLocalProfile(
     profile.id,

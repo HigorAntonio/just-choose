@@ -15,13 +15,17 @@ const forgotPasswordLocalProfileService = async (email) => {
     throw new Error('profile not found');
   }
 
-  const forgotPasswordToken = localAuthUtils.generateForgotPasswordToken({
-    id: profile.id,
-  });
-  await localAuthUtils.storeForgotPasswordToken(
-    profile.id,
-    forgotPasswordToken
+  const forgotPasswordToken = localAuthUtils.generateForgotPasswordToken(
+    profile.id
   );
+  if (
+    !(await localAuthUtils.storeForgotPasswordToken(
+      profile.id,
+      forgotPasswordToken
+    ))
+  ) {
+    throw new Error('error storing forgot password token');
+  }
 
   await Queue.add('ForgotPasswordMail', {
     email: data.email,

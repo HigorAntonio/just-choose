@@ -33,10 +33,8 @@ const signUpLocalProfileService = async (
     Queue
   );
 
-  const accessToken = localAuthUtils.generateAccessToken({ id: profileId });
-  const refreshToken = localAuthUtils.generateRefreshToken({
-    id: profileId,
-  });
+  const accessToken = localAuthUtils.generateAccessToken(profileId);
+  const refreshToken = localAuthUtils.generateRefreshToken(profileId);
   const ua = uaParser(uastring);
   // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
   const device = {
@@ -44,7 +42,11 @@ const signUpLocalProfileService = async (
     browser: ua.browser.name,
   };
 
-  await localAuthUtils.storeRefreshToken(profileId, refreshToken, device);
+  if (
+    !(await localAuthUtils.storeRefreshToken(profileId, refreshToken, device))
+  ) {
+    throw new Error('error storing refresh token');
+  }
 
   return { accessToken, refreshToken };
 };

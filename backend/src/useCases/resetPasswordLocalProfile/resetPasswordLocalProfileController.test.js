@@ -1,5 +1,6 @@
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
+const { randomUUID } = require('crypto');
 const Queue = require('../../lib/Queue');
 const redisClient = require('../../lib/redisClient');
 const knex = require('../../database');
@@ -12,7 +13,11 @@ const createForgotPasswordToken = async (profileId, options = {}) => {
     secret = process.env.FORGOT_PASSWORD_TOKEN_SECRET,
     expiresIn = process.env.FORGOT_PASSWORD_TOKEN_EXPIRATION_TIME,
   } = options;
-  const payload = { id: profileId };
+  const payload = {
+    iss: process.env.APP_URL,
+    sub: profileId,
+    jti: randomUUID(),
+  };
   const forgotPasswordToken = jwt.sign(payload, secret, {
     expiresIn,
   });

@@ -19,7 +19,7 @@ module.exports = (req, res, next) => {
   jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ message: 'invalid "access_token"' });
 
-    req.profileId = decoded.id;
+    req.profileId = decoded.sub;
 
     return next();
   });

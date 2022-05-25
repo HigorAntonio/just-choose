@@ -5,9 +5,16 @@ const refreshAuthTokenLocalProfileController = async (req, res) => {
   const { refresh_token: refreshToken } = req.body;
 
   try {
-    const accessToken = await refreshAuthTokenLocalProfileService(refreshToken);
+    const { accessToken, refreshToken: newRefreshToken } =
+      await refreshAuthTokenLocalProfileService(
+        refreshToken,
+        req.headers['user-agent']
+      );
 
-    return res.json({ access_token: accessToken });
+    return res.json({
+      access_token: accessToken,
+      refresh_token: newRefreshToken,
+    });
   } catch (error) {
     if (error.isJoi === true) {
       return res.status(400).json({ message: error.details[0].message });
