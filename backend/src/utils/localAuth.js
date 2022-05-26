@@ -207,6 +207,32 @@ exports.updateRefreshTokenInStorage = async (
   );
 };
 
+exports.clearExpiredRefreshTokensFromStorage = async (profileId) => {
+  const hashMembers = await getHashMembersFromMemory(
+    `localAuth:profile:${profileId}`
+  );
+  const fieldIds = [
+    ...new Set(Object.keys(hashMembers).map((key) => key.split(':')[1])),
+  ];
+  for (const fieldId of fieldIds) {
+    try {
+      jwt.verify(hashMembers[`refreshToken:${fieldId}`], REFRESH_TOKEN_SECRET);
+    } catch (error) {
+      if (error.message === 'jwt expired') {
+        const [[, delRefreshTokenStatus], [, delDeviceStatus]] =
+          await redisClient
+            .multi()
+            .hdel(`localAuth:profile:${profileId}`, `refreshToken:${fieldId}`)
+            .hdel(`localAuth:profile:${profileId}`, `device:${fieldId}`)
+            .exec();
+        if (!(delRefreshTokenStatus && delDeviceStatus)) {
+          throw new Error('error removing expired refresh tokens from storage');
+        }
+      }
+    }
+  }
+};
+
 exports.removeRefreshTokenFromStorage = async (profileId, refreshToken) => {
   const fieldId = await getHashFieldId(
     `localAuth:profile:${profileId}`,

@@ -54,7 +54,11 @@ routes.patch(
   '/resetpassword',
   require('./useCases/resetPasswordLocalProfile/resetPasswordLocalProfileController')
 );
-routes.get('/devices', authorization, LocalAuthController.userDevices);
+routes.get(
+  '/devices',
+  authorization,
+  require('./useCases/devicesLocalProfile/devicesLocalProfileController')
+);
 routes.delete('/devices', authorization, LocalAuthController.exitDevice);
 routes.patch('/confirmation/:token', LocalAuthController.confirmEmail);
 routes.get(
