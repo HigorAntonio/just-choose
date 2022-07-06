@@ -59,7 +59,11 @@ routes.get(
   authorization,
   require('./useCases/devicesLocalProfile/devicesLocalProfileController')
 );
-routes.delete('/devices', authorization, LocalAuthController.exitDevice);
+routes.delete(
+  '/devices',
+  authorization,
+  require('./useCases/exitDeviceLocalProfile/exitDeviceLocalProfileController')
+);
 routes.patch('/confirmation/:token', LocalAuthController.confirmEmail);
 routes.get(
   '/confirmation',

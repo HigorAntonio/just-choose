@@ -15,7 +15,7 @@ const logoutLocalProfileService = async ({ profileId, refreshToken }) => {
   if (
     !(await localAuthUtils.removeRefreshTokenFromStorage(
       decoded.sub,
-      refreshToken
+      data.refreshToken
     ))
   ) {
     throw new Error('"refresh_token" not found');
