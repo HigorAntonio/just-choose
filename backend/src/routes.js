@@ -71,7 +71,7 @@ routes.patch(
 routes.get(
   '/confirmation',
   authorization,
-  LocalAuthController.resendConfirmEmail
+  require('./useCases/resendConfirmEmailLocalProfile/resendConfirmEmailLocalProfileController')
 );
 routes.put(
   '/updatepassword',
