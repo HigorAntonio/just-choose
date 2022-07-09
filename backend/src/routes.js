@@ -6,7 +6,6 @@ const multerConfig = require('./config/multer');
 const authorization = require('./middlewares/authorizationMiddleware');
 const isUserActive = require('./middlewares/isUserActiveMiddleware');
 const getLoggedUserId = require('./middlewares/getLoggedUserId');
-const LocalAuthController = require('./controllers/LocalAuthController');
 const UserController = require('./controllers/UserController');
 const FollowUsersController = require('./controllers/FollowUsersController');
 const UserFollowingController = require('./controllers/UserFollowingController');
@@ -28,7 +27,7 @@ const ConfigurationController = require('./controllers/ConfigurationController')
 
 const routes = express.Router();
 
-// LocalAuthController
+// LocalAuth
 routes.post(
   '/signup',
   require('./useCases/signUpLocalProfile/signUpLocalProfileController')
@@ -73,10 +72,10 @@ routes.get(
   authorization,
   require('./useCases/resendConfirmEmailLocalProfile/resendConfirmEmailLocalProfileController')
 );
-routes.put(
+routes.patch(
   '/updatepassword',
   authorization,
-  LocalAuthController.updatePassword
+  require('./useCases/updatePasswordLocalProfile/updatePasswordLocalProfileController')
 );
 
 // UserController
