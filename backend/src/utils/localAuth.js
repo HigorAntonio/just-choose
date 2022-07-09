@@ -6,6 +6,8 @@ const redisClient = require('../lib/redisClient');
 
 const APP_URL = process.env.APP_URL;
 const CONFIRM_EMAIL_TOKEN_SECRET = process.env.CONFIRM_EMAIL_TOKEN_SECRET;
+const CONFIRM_EMAIL_TOKEN_EXPIRATION_TIME =
+  process.env.CONFIRM_EMAIL_TOKEN_EXPIRATION_TIME;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRATION_TIME = process.env.ACCESS_TOKEN_EXPIRATION_TIME;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
@@ -30,7 +32,7 @@ exports.sendEmailConfirmation = async (profileId, email, Queue) => {
     jti: randomUUID(),
   };
   const emailConfirmationToken = jwt.sign(payload, CONFIRM_EMAIL_TOKEN_SECRET, {
-    expiresIn: '15m',
+    expiresIn: CONFIRM_EMAIL_TOKEN_EXPIRATION_TIME,
   });
 
   await Queue.add('ConfirmationMail', { email, emailConfirmationToken });
@@ -82,6 +84,14 @@ exports.verifyForgotPasswordToken = (forgotPasswordToken) => {
     return jwt.verify(forgotPasswordToken, FORGOT_PASSWORD_TOKEN_SECRET);
   } catch (error) {
     throw new Error('invalid "forgot_password_token"');
+  }
+};
+
+exports.verifyConfirmEmailToken = (confirmEmailToken) => {
+  try {
+    return jwt.verify(confirmEmailToken, CONFIRM_EMAIL_TOKEN_SECRET);
+  } catch (error) {
+    throw new Error('invalid "confirm_email_token"');
   }
 };
 

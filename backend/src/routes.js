@@ -64,7 +64,10 @@ routes.delete(
   authorization,
   require('./useCases/exitDeviceLocalProfile/exitDeviceLocalProfileController')
 );
-routes.patch('/confirmation/:token', LocalAuthController.confirmEmail);
+routes.patch(
+  '/confirmation/:token',
+  require('./useCases/confirmEmailLocalProfile/confirmEmailLocalProfileController')
+);
 routes.get(
   '/confirmation',
   authorization,

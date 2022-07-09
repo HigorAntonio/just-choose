@@ -54,6 +54,12 @@ exports.updatePasswordLocalProfile = (profileId, newPassword) => {
     .where({ profile_id: profileId });
 };
 
+exports.updateIsActiveLocalProfile = (profileId, isActive) => {
+  return knex('profiles')
+    .update({ is_active: isActive })
+    .where({ 'profiles.id': profileId });
+};
+
 exports.deleteLocalProfile = (profileId) => {
   return knex('profiles').where({ id: profileId }).del();
 };
