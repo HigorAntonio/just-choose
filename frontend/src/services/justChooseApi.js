@@ -22,10 +22,11 @@ justChooseApi.interceptors.response.use(
         const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
         const {
-          data: { accessToken },
-        } = await justChooseApi.post('/token', { refreshToken });
+          data: { access_token: accessToken, refresh_token: newRefreshToken },
+        } = await justChooseApi.post('/token', { refresh_token: refreshToken });
 
         localStorage.setItem('accessToken', JSON.stringify(accessToken));
+        localStorage.setItem('refreshToken', JSON.stringify(newRefreshToken));
 
         justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
 

@@ -5,7 +5,7 @@ import justChooseApi from '../services/justChooseApi';
 
 const useAuth = () => {
   const [authenticated, setAuthenticated] = useState(false);
-  const [userId, setUserId] = useState();
+  const [profileId, setProfileId] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const useAuth = () => {
         accessToken
       )}`;
       const decoded = jwt_decode(accessToken);
-      setUserId(decoded.id);
+      setProfileId(decoded.sub);
       setAuthenticated(true);
     }
 
@@ -26,7 +26,7 @@ const useAuth = () => {
   const handleRegistration = async (body) => {
     try {
       const {
-        data: { accessToken, refreshToken },
+        data: { access_token: accessToken, refresh_token: refreshToken },
       } = await justChooseApi.post('/signup', body);
 
       localStorage.setItem('accessToken', JSON.stringify(accessToken));
@@ -34,7 +34,7 @@ const useAuth = () => {
 
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
       const decoded = jwt_decode(accessToken);
-      setUserId(decoded.id);
+      setProfileId(decoded.sub);
       setAuthenticated(true);
     } catch (error) {
       throw error;
@@ -44,7 +44,7 @@ const useAuth = () => {
   const handleLogin = async (body) => {
     try {
       const {
-        data: { accessToken, refreshToken },
+        data: { access_token: accessToken, refresh_token: refreshToken },
       } = await justChooseApi.post('/signin', body);
 
       localStorage.setItem('accessToken', JSON.stringify(accessToken));
@@ -52,7 +52,7 @@ const useAuth = () => {
 
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
       const decoded = jwt_decode(accessToken);
-      setUserId(decoded.id);
+      setProfileId(decoded.sub);
       setAuthenticated(true);
     } catch (error) {
       throw error;
@@ -62,11 +62,11 @@ const useAuth = () => {
   const handleLogout = async () => {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
-      const body = { refreshToken: JSON.parse(refreshToken) };
+      const body = { refresh_token: JSON.parse(refreshToken) };
       await justChooseApi.delete('/logout', { data: body });
 
       setAuthenticated(false);
-      setUserId(null);
+      setProfileId(null);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 
@@ -78,7 +78,7 @@ const useAuth = () => {
 
   return {
     loading,
-    userId,
+    profileId,
     authenticated,
     handleRegistration,
     handleLogin,

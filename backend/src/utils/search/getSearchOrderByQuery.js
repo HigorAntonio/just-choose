@@ -1,10 +1,10 @@
-const getUserOrderByQuery = require('../users/getUserOrderByQuery');
+const getProfileOrderByQuery = require('../profiles/getProfileOrderByQuery');
 const getPollOrderByQuery = require('../polls/getPollOrderByQuery');
 const getListOrderByQuery = require('../contentList/getListOrderByQuery');
 
 module.exports = (type, sortBy) => {
   if (type === 'profile') {
-    return getUserOrderByQuery(sortBy);
+    return getProfileOrderByQuery(sortBy);
   }
   if (type === 'poll') {
     return getPollOrderByQuery(sortBy);

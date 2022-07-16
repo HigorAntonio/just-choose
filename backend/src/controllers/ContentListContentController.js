@@ -1,12 +1,13 @@
 const getContentOrderByQuery = require('../utils/contentList/getContentOrderByQuery');
 const getContentList = require('../utils/contentList/getContentList');
-const isUserFollowing = require('../utils/users/isUserFollowing');
+const isProfileFollowing = require('../utils/profiles/isProfileFollowing');
 const getContent = require('../utils/contentList/getContent');
+const logger = require('../lib/logger');
 
 module.exports = {
   async index(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const contentListId = req.params.id;
 
@@ -64,9 +65,9 @@ module.exports = {
 
       if (
         (contentList.sharing_option === 'private' &&
-          contentList.user_id !== userId) ||
+          contentList.profile_id !== profileId) ||
         (contentList.sharing_option === 'followed_profiles' &&
-          !(await isUserFollowing(contentList.user_id, userId)))
+          !(await isProfileFollowing(contentList.profile_id, profileId)))
       ) {
         return res.sendStatus(403);
       }
@@ -88,6 +89,7 @@ module.exports = {
         results: content,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

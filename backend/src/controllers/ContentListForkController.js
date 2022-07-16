@@ -1,13 +1,14 @@
 const knex = require('../database');
 const copyFile = require('../utils/copyFile');
 const deleteFile = require('../utils/deleteFile');
-const isUserFollowing = require('../utils/users/isUserFollowing');
+const isProfileFollowing = require('../utils/profiles/isProfileFollowing');
+const logger = require('../lib/logger');
 
 module.exports = {
   async create(req, res) {
     let thumbnail;
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const originalListId = req.params.id;
       if (!originalListId) {
@@ -35,9 +36,9 @@ module.exports = {
 
       if (
         (originalList.sharing_option === 'private' &&
-          originalList.user_id !== userId) ||
+          originalList.profile_id !== profileId) ||
         (originalList.sharing_option === 'followed_profiles' &&
-          !(await isUserFollowing(originalList.user_id, userId)))
+          !(await isProfileFollowing(originalList.profile_id, profileId)))
       ) {
         return res.sendStatus(403);
       }
@@ -57,7 +58,7 @@ module.exports = {
       const forkedListId = await knex.transaction(async (trx) => {
         const [{ id: contentListId }] = await trx('content_lists')
           .insert({
-            user_id: userId,
+            profile_id: profileId,
             title: originalList.title,
             description: originalList.description,
             thumbnail,
@@ -98,6 +99,7 @@ module.exports = {
       try {
         await deleteFile(thumbnail);
       } catch (error) {}
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

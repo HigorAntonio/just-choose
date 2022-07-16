@@ -33,13 +33,13 @@ const Profile = () => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { userProfile, refreshUserProfileData } = useContext(ProfileContext);
+  const { profile, refreshProfileData } = useContext(ProfileContext);
 
   const [profileImagePreview, setProfileImagePreview] = useState();
   const [profileImage, setProfileImage] = useState();
   const [profileImageError, setProfileImageError] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userNameError, setUserNameError] = useState('');
+  const [profileName, setProfileName] = useState('');
+  const [profileNameError, setProfileNameError] = useState('');
   const [profileSettingsChange, setProfileSettingsChange] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [errorOnUpdate, setErrorOnUpdate] = useState(false);
@@ -49,11 +49,11 @@ const Profile = () => {
   const mounted = useRef();
 
   const setInitialFormData = useCallback(() => {
-    userProfile.profile_image_url &&
-      setProfileImagePreview(userProfile.profile_image_url);
-    userProfile.name && setUserName(userProfile.name);
+    profile.profile_image_url &&
+      setProfileImagePreview(profile.profile_image_url);
+    profile.name && setProfileName(profile.name);
     setProfileSettingsChange(false);
-  }, [userProfile]);
+  }, [profile]);
 
   useEffect(() => {
     mounted.current = true;
@@ -109,18 +109,18 @@ const Profile = () => {
     }
   };
 
-  const validateUserName = (userName) => {
-    setUserNameError('');
-    if (userName.length < 4 || userName.length > 25) {
-      setUserNameError(
+  const validateProfileName = (profileName) => {
+    setProfileNameError('');
+    if (profileName.length < 4 || profileName.length > 25) {
+      setProfileNameError(
         'Os nomes de usuário devem ter entre 4 e 25 caracteres.'
       );
     }
   };
 
-  const handleUserName = (e) => {
-    setUserName(e.target.value);
-    validateUserName(e.target.value);
+  const handleProfileName = (e) => {
+    setProfileName(e.target.value);
+    validateProfileName(e.target.value);
     setProfileSettingsChange(true);
   };
 
@@ -133,8 +133,8 @@ const Profile = () => {
 
     let successfulyUpdated = true;
     const data = {};
-    if (userName !== userProfile.name) {
-      data.name = userName;
+    if (profileName !== profile.name) {
+      data.name = profileName;
     }
 
     const formData = new FormData();
@@ -144,7 +144,7 @@ const Profile = () => {
     formData.append('data', JSON.stringify(data));
     try {
       await justChooseApi({
-        url: `/users`,
+        url: `/profiles`,
         method: 'PUT',
         data: formData,
       });
@@ -160,7 +160,7 @@ const Profile = () => {
         error.response.status === 400 &&
         error.response.data.erro === 'Nome de usuário indisponível'
       ) {
-        setUserNameError('Nome de usuário indisponível');
+        setProfileNameError('Nome de usuário indisponível');
       }
     }
 
@@ -172,14 +172,16 @@ const Profile = () => {
       if (mounted.current) {
         setUpdatedSuccessfully(true);
       }
-      refreshUserProfileData();
+      refreshProfileData();
     }
     contentWrapperRef.current.scrollTo(0, 0);
   };
 
   const isDisabledUpdateProfileButton = () => {
     return (
-      !profileSettingsChange || userName.length < 4 || userName.length > 25
+      !profileSettingsChange ||
+      profileName.length < 4 ||
+      profileName.length > 25
     );
   };
 
@@ -229,11 +231,11 @@ const Profile = () => {
               spellCheck={false}
               type="text"
               id="name"
-              value={userName}
-              onChange={handleUserName}
-              validationError={userNameError}
+              value={profileName}
+              onChange={handleProfileName}
+              validationError={profileNameError}
             />
-            {userNameError && <p className="error">{userNameError}</p>}
+            {profileNameError && <p className="error">{profileNameError}</p>}
           </div>
         </InputWrapper>
         <ButtonWrapper>

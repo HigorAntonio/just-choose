@@ -1,14 +1,15 @@
 const isTypeValid = require('../utils/search/isTypeValid');
 const getSearchOrderByQuery = require('../utils/search/getSearchOrderByQuery');
-const getUserFollowersIds = require('../utils/userFollowers/getUserFollowersIds');
-const getUsers = require('../utils/users/getUsers');
+const getProfileFollowersIds = require('../utils/profileFollowers/getProfileFollowersIds');
+const getProfiles = require('../utils/profiles/getProfiles');
 const getPolls = require('../utils/polls/getPolls');
 const getContentLists = require('../utils/contentList/getContentLists');
+const logger = require('../lib/logger');
 
 module.exports = {
   async index(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const {
         page = 1,
@@ -57,9 +58,9 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const { users, count: usersCount } =
+      const { profiles, count: profilesCount } =
         !type || type === 'profile'
-          ? await getUsers({
+          ? await getProfiles({
               pageSize,
               page,
               query,
@@ -67,9 +68,9 @@ module.exports = {
                 ? getSearchOrderByQuery(type, sortBy)
                 : 'followers_count DESC',
             })
-          : { users: [], count: 0 };
+          : { profiles: [], count: 0 };
 
-      const followersIds = await getUserFollowersIds(userId);
+      const followersIds = await getProfileFollowersIds(profileId);
 
       const { polls, count: pollsCount } =
         !type || type === 'poll'
@@ -101,8 +102,8 @@ module.exports = {
 
       if (!type) {
         results.profiles = {
-          total_results: usersCount,
-          results: users,
+          total_results: profilesCount,
+          results: profiles,
         };
         results.polls = {
           total_results: pollsCount,
@@ -114,7 +115,7 @@ module.exports = {
         };
       }
       if (type === 'profile') {
-        results.push(...users);
+        results.push(...profiles);
       }
       if (type === 'content_list') {
         results.push(...contentLists);
@@ -123,9 +124,9 @@ module.exports = {
         results.push(...polls);
       }
 
-      const totalResults = usersCount + pollsCount + contentListsCount;
+      const totalResults = profilesCount + pollsCount + contentListsCount;
       const totalPages = Math.ceil(
-        Math.max(usersCount, pollsCount, contentListsCount) / pageSize
+        Math.max(profilesCount, pollsCount, contentListsCount) / pageSize
       );
       return res.json({
         page: parseInt(page),
@@ -135,6 +136,7 @@ module.exports = {
         results,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

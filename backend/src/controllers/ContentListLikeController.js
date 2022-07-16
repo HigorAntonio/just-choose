@@ -1,10 +1,11 @@
 const knex = require('../database');
-const isUserFollowing = require('../utils/users/isUserFollowing');
+const isProfileFollowing = require('../utils/profiles/isProfileFollowing');
+const logger = require('../lib/logger');
 
 module.exports = {
   async create(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const contentListId = req.params.id;
       if (!contentListId) {
@@ -32,9 +33,9 @@ module.exports = {
 
       if (
         (contentList.sharing_option === 'private' &&
-          contentList.user_id !== userId) ||
+          contentList.profile_id !== profileId) ||
         (contentList.sharing_option === 'followed_profiles' &&
-          !(await isUserFollowing(contentList.user_id, userId)))
+          !(await isProfileFollowing(contentList.profile_id, profileId)))
       ) {
         return res.sendStatus(403);
       }
@@ -42,7 +43,7 @@ module.exports = {
       const like = await knex
         .select()
         .from('content_list_likes')
-        .where({ content_list_id: contentListId, user_id: userId })
+        .where({ content_list_id: contentListId, profile_id: profileId })
         .first();
       if (like) {
         return res.status(403).json({ erro: 'Like existente' });
@@ -50,18 +51,19 @@ module.exports = {
 
       await knex('content_list_likes').insert({
         content_list_id: contentListId,
-        user_id: userId,
+        profile_id: profileId,
       });
 
       return res.sendStatus(201);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async show(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const contentListId = req.params.id;
       if (!contentListId) {
@@ -90,18 +92,19 @@ module.exports = {
       const like = await knex
         .select()
         .from('content_list_likes')
-        .where({ content_list_id: contentListId, user_id: userId })
+        .where({ content_list_id: contentListId, profile_id: profileId })
         .first();
 
       return res.json({ like: !!like });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async delete(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const contentListId = req.params.id;
       if (!contentListId) {
@@ -130,7 +133,7 @@ module.exports = {
       const like = await knex
         .select()
         .from('content_list_likes')
-        .where({ content_list_id: contentListId, user_id: userId })
+        .where({ content_list_id: contentListId, profile_id: profileId })
         .first();
       if (!like) {
         return res.status(400).json({ erro: 'Like não encontrado' });
@@ -138,11 +141,12 @@ module.exports = {
 
       await knex('content_list_likes').del().where({
         content_list_id: contentListId,
-        user_id: userId,
+        profile_id: profileId,
       });
 
       return res.sendStatus(200);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

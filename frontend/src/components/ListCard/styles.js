@@ -108,7 +108,7 @@ const metaChield = css`
   margin-bottom: 3px;
 `;
 
-export const UserName = styled.span`
+export const ProfileName = styled.span`
   ${metaChield}
   ${textOverflowEllipsis}
 

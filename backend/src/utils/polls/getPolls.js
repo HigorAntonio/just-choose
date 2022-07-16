@@ -2,7 +2,7 @@ const knex = require('../../database');
 
 module.exports = async (options) => {
   const {
-    userId,
+    profileId,
     getPrivate = false,
     followersIds = [],
     followingIds,
@@ -12,16 +12,16 @@ module.exports = async (options) => {
     sortBy,
   } = options;
 
-  if (getPrivate && !userId) {
-    throw new Error('Can not get private data without a valid user id');
+  if (getPrivate && !profileId) {
+    throw new Error('Can not get private data without a valid profile id');
   }
 
   try {
     const pollsQuery = knex
       .select(
         'pq.id',
-        'pq.user_id',
-        'pq.user_name',
+        'pq.profile_id',
+        'pq.profile_name',
         'pq.profile_image_url',
         'pq.title',
         'pq.description',
@@ -35,63 +35,63 @@ module.exports = async (options) => {
       )
       .from(function () {
         this.select(
-          'p.id',
-          'p.user_id',
-          'u.name as user_name',
-          'u.profile_image_url',
-          'p.title',
-          'p.description',
-          'p.sharing_option',
-          'p.is_active',
-          'p.thumbnail',
-          'p.created_at',
-          'p.updated_at',
-          'p.document'
+          'po.id',
+          'po.profile_id',
+          'pr.name as profile_name',
+          'pr.profile_image_url',
+          'po.title',
+          'po.description',
+          'po.sharing_option',
+          'po.is_active',
+          'po.thumbnail',
+          'po.created_at',
+          'po.updated_at',
+          'po.document'
         )
-          .from('polls as p')
+          .from('polls as po')
           .where({ sharing_option: 'public' })
-          .innerJoin('users as u', 'user_id', 'u.id')
+          .innerJoin('profiles as pr', 'profile_id', 'pr.id')
           .union(function () {
             this.select(
-              'p.id',
-              'p.user_id',
-              'u.name as user_name',
-              'u.profile_image_url',
-              'p.title',
-              'p.description',
-              'p.sharing_option',
-              'p.is_active',
-              'p.thumbnail',
-              'p.created_at',
-              'p.updated_at',
-              'p.document'
+              'po.id',
+              'po.profile_id',
+              'pr.name as profile_name',
+              'pr.profile_image_url',
+              'po.title',
+              'po.description',
+              'po.sharing_option',
+              'po.is_active',
+              'po.thumbnail',
+              'po.created_at',
+              'po.updated_at',
+              'po.document'
             )
-              .from('polls as p')
+              .from('polls as po')
               .where({ sharing_option: 'followed_profiles' })
-              .innerJoin('users as u', 'user_id', 'u.id')
-              .whereIn('u.id', followersIds);
+              .innerJoin('profiles as pr', 'profile_id', 'pr.id')
+              .whereIn('pr.id', followersIds);
           })
           .as('pq');
         if (getPrivate) {
           this.union(function () {
             this.select(
-              'p.id',
-              'p.user_id',
-              'u.name as user_name',
-              'u.profile_image_url',
-              'p.title',
-              'p.description',
-              'p.sharing_option',
-              'p.is_active',
-              'p.thumbnail',
-              'p.created_at',
-              'p.updated_at',
-              'p.document'
+              'po.id',
+              'po.profile_id',
+              'pr.name as profile_name',
+              'pr.profile_image_url',
+              'po.title',
+              'po.description',
+              'po.sharing_option',
+              'po.is_active',
+              'po.thumbnail',
+              'po.created_at',
+              'po.updated_at',
+              'po.document'
             )
-              .from('polls as p')
+              .from('polls as po')
               .where({ sharing_option: 'private' })
-              .innerJoin('users as u', 'user_id', 'u.id')
-              .where({ 'u.id': userId });
+              .innerJoin('profiles as pr', 'profile_id', 'pr.id')
+              .where({ 'pr.id': profileId });
           });
         }
       })
@@ -155,33 +155,33 @@ module.exports = async (options) => {
 
     const countObj = knex.count().from(function () {
       this.select()
-        .from('polls as p')
+        .from('polls as po')
         .where({ sharing_option: 'public' })
         .union(function () {
           this.select()
-            .from('polls as p')
+            .from('polls as po')
             .where({ sharing_option: 'followed_profiles' })
-            .whereIn('p.user_id', followersIds);
+            .whereIn('po.profile_id', followersIds);
         })
         .as('count_query');
       if (getPrivate) {
         this.union(function () {
           this.select()
-            .from('polls as p')
+            .from('polls as po')
             .where({ sharing_option: 'private' })
-            .andWhere({ 'p.user_id': userId });
+            .andWhere({ 'po.profile_id': profileId });
         });
       }
     });
 
     if (followingIds) {
-      pollsQuery.whereIn('user_id', followingIds);
-      countObj.whereIn('user_id', followingIds);
+      pollsQuery.whereIn('profile_id', followingIds);
+      countObj.whereIn('profile_id', followingIds);
     }
 
-    if (userId) {
-      pollsQuery.where({ user_id: userId });
-      countObj.where({ user_id: userId });
+    if (profileId) {
+      pollsQuery.where({ profile_id: profileId });
+      countObj.where({ profile_id: profileId });
     }
 
     if (query) {
@@ -193,9 +193,9 @@ module.exports = async (options) => {
       );
     }
 
-    const polls = (await pollsQuery).map((p) => {
-      p.total_votes = parseInt(p.total_votes);
-      return p;
+    const polls = (await pollsQuery).map((poll) => {
+      poll.total_votes = parseInt(poll.total_votes);
+      return poll;
     });
     const [{ count }] = await countObj;
 

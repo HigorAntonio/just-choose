@@ -37,7 +37,7 @@ const CreatePoll = () => {
   const { id: listId } = useParams();
   const history = useHistory();
 
-  const { userId } = useContext(AuthContext);
+  const { profileId } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -86,7 +86,7 @@ const CreatePoll = () => {
         const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
           cancelToken: source.current.token,
         });
-        if (userId !== data.user_id) {
+        if (profileId !== data.profile_id) {
           setDenyAccess(true);
           return;
         }
@@ -108,7 +108,7 @@ const CreatePoll = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, userId]);
+  }, [listId, profileId]);
 
   const {
     loading: loadingContent,

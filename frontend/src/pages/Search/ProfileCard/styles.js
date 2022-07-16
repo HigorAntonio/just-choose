@@ -46,7 +46,7 @@ export const TextWrapper = styled.div`
   flex: 1;
 `;
 
-export const UserName = styled.h3`
+export const ProfileName = styled.h3`
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

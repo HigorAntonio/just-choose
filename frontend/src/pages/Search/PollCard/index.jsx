@@ -19,7 +19,7 @@ import {
   TotalVotes,
   MetaSeparator,
   ProfileInfo,
-  UserName,
+  ProfileName,
   ProfileImageWrapper,
   ProfileImage,
   DescriptionWrapper,
@@ -31,8 +31,8 @@ const PollCard = ({ poll }) => {
 
   const {
     id: pollId,
-    user_id: userId,
-    user_name: userName,
+    profile_id: profileId,
+    profile_name: profileName,
     profile_image_url: profileImageUrl,
     title,
     description,
@@ -80,7 +80,7 @@ const PollCard = ({ poll }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <Link to={`/users/${userId}`}>
+            <Link to={`/profiles/${profileId}`}>
               <ProfileImage
                 src={profileImageUrl}
                 onError={() => setProfileImageError(true)}
@@ -88,9 +88,9 @@ const PollCard = ({ poll }) => {
               />
             </Link>
           </ProfileImageWrapper>
-          <UserName>
-            <Link to={`/users/${userId}`}>{userName}</Link>
-          </UserName>
+          <ProfileName>
+            <Link to={`/profiles/${profileId}`}>{profileName}</Link>
+          </ProfileName>
         </ProfileInfo>
         <DescriptionWrapper>
           <Description>{description}</Description>
@@ -98,7 +98,7 @@ const PollCard = ({ poll }) => {
       </TextWrapperLargeScreen>
       <TextWrapperSmallScreen>
         <ProfileImageWrapper>
-          <Link to={`/users/${userId}`}>
+          <Link to={`/profiles/${profileId}`}>
             <ProfileImage
               src={profileImageUrl}
               onError={() => setProfileImageError(true)}
@@ -111,7 +111,7 @@ const PollCard = ({ poll }) => {
             <Link to={`/polls/${pollId}`}>{title}</Link>
           </Title>
           <Meta>
-            <UserName>{userName}</UserName>
+            <ProfileName>{profileName}</ProfileName>
             <MetaSeparator>•</MetaSeparator>
             <PollStatus>{isActive ? 'Aberta' : 'Fechada'}</PollStatus>
             <MetaSeparator>•</MetaSeparator>

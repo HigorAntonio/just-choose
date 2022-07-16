@@ -58,7 +58,7 @@ const UpdateList = () => {
   const history = useHistory();
 
   const { contentWrapperRef } = useContext(LayoutContext);
-  const { userId } = useContext(AuthContext);
+  const { profileId } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -144,7 +144,7 @@ const UpdateList = () => {
         const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
           cancelToken: source.current.token,
         });
-        if (userId !== data.user_id) {
+        if (profileId !== data.profile_id) {
           setDenyAccess(true);
           setLoading(false);
           return;
@@ -174,7 +174,7 @@ const UpdateList = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, userId, loadContentListContent]);
+  }, [listId, profileId, loadContentListContent]);
 
   useEffect(() => {
     setContentError('');

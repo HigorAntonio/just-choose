@@ -1,22 +1,22 @@
 const knex = require('../../database');
 
 module.exports = async (options) => {
-  const { userId, pageSize, page, query, sortBy } = options;
+  const { profileId, pageSize, page, query, sortBy } = options;
 
   try {
     const votesQuery = knex
       .select(
-        'p.user_id as poll_user_id',
-        'u.name as poll_user_name',
-        'u.profile_image_url as poll_user_profile_image_url',
+        'po.profile_id as poll_profile_id',
+        'pr.name as poll_profile_name',
+        'pr.profile_image_url as poll_profile_profile_image_url',
         'votes_union_query.poll_id',
-        'p.title as poll_title',
-        'p.description as poll_description',
-        'p.sharing_option as poll_sharing_option',
-        'p.is_active as poll_is_active',
-        'p.thumbnail as poll_thumbnail',
+        'po.title as poll_title',
+        'po.description as poll_description',
+        'po.sharing_option as poll_sharing_option',
+        'po.is_active as poll_is_active',
+        'po.thumbnail as poll_thumbnail',
         knex.raw('COALESCE(total_votes, 0) as poll_total_votes'),
-        'vote_user_id',
+        'vote_profile_id',
         'vote_content_id',
         'vote_content_platform_id',
         'vote_content_title',
@@ -27,7 +27,7 @@ module.exports = async (options) => {
       .from(function () {
         this.select(
           'mv.poll_id',
-          'mv.user_id as vote_user_id',
+          'mv.profile_id as vote_profile_id',
           'mv.movie_id AS vote_content_id',
           'm.tmdb_id as vote_content_platform_id',
           'm.title AS vote_content_title',
@@ -40,7 +40,7 @@ module.exports = async (options) => {
           .union(function () {
             this.select(
               'sv.poll_id',
-              'sv.user_id as vote_user_id',
+              'sv.profile_id as vote_profile_id',
               'sv.show_id AS vote_content_id',
               's.tmdb_id as vote_content_platform_id',
               's.name AS vote_content_title',
@@ -54,7 +54,7 @@ module.exports = async (options) => {
           .union(function () {
             this.select(
               'gv.poll_id',
-              'gv.user_id as vote_user_id',
+              'gv.profile_id as vote_profile_id',
               'gv.game_id AS vote_content_id',
               'g.rawg_id as vote_content_platform_id',
               'g.name AS vote_content_title',
@@ -95,9 +95,9 @@ module.exports = async (options) => {
         'poll_total_votes.poll_id',
         'votes_union_query.poll_id'
       )
-      .innerJoin('polls as p', 'p.id', 'votes_union_query.poll_id')
-      .innerJoin('users as u', 'u.id', 'p.user_id')
-      .where('vote_user_id', userId)
+      .innerJoin('polls as po', 'po.id', 'votes_union_query.poll_id')
+      .innerJoin('profiles as pr', 'pr.id', 'po.profile_id')
+      .where('vote_profile_id', profileId)
       .limit(pageSize)
       .offset((page - 1) * pageSize);
 
@@ -106,29 +106,29 @@ module.exports = async (options) => {
     }
 
     const countObj = knex.count().from(function () {
-      this.select('vote_user_id', 'poll_id', 'p.document as poll_document')
+      this.select('vote_profile_id', 'poll_id', 'po.document as poll_document')
         .from(function () {
-          this.select('user_id as vote_user_id', 'poll_id')
+          this.select('profile_id as vote_profile_id', 'poll_id')
             .from('movie_votes as mv')
             .union(function () {
-              this.select('user_id as vote_user_id', 'poll_id')
+              this.select('profile_id as vote_profile_id', 'poll_id')
                 .from('show_votes as sv')
                 .union(function () {
-                  this.select('user_id as vote_user_id', 'poll_id').from(
+                  this.select('profile_id as vote_profile_id', 'poll_id').from(
                     'game_votes as gv'
                   );
                 });
             })
             .as('count_votes_union_query');
         })
-        .innerJoin('polls as p', 'p.id', 'count_votes_union_query.poll_id')
-        .where('count_votes_union_query.vote_user_id', userId)
+        .innerJoin('polls as po', 'po.id', 'count_votes_union_query.poll_id')
+        .where('count_votes_union_query.vote_profile_id', profileId)
         .as('count_votes_query');
     });
 
     if (query) {
       votesQuery.where(
-        knex.raw('p.document @@ polls_plainto_tsquery(:query)', { query })
+        knex.raw('po.document @@ polls_plainto_tsquery(:query)', { query })
       );
       countObj.where(
         knex.raw('poll_document @@ polls_plainto_tsquery(:query)', { query })

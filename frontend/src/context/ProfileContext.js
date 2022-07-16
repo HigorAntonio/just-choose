@@ -5,22 +5,17 @@ import useProfileData from '../hooks/useProfileData';
 export const ProfileContext = createContext();
 
 export const ProfileContextProvider = ({ children }) => {
-  const {
-    loading,
-    loadingError,
-    userProfile,
-    setUserProfile,
-    refreshUserProfileData,
-  } = useProfileData();
+  const { loading, loadingError, profile, setProfile, refreshProfileData } =
+    useProfileData();
 
   return (
     <ProfileContext.Provider
       value={{
         loading,
         loadingError,
-        userProfile,
-        setUserProfile,
-        refreshUserProfileData,
+        profile,
+        setProfile,
+        refreshProfileData,
       }}
     >
       {children}

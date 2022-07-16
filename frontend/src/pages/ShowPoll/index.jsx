@@ -67,9 +67,9 @@ const ShowPoll = () => {
   const { type: contentType } = queryParams;
   const history = useHistory();
 
-  const { userId, authenticated } = useContext(AuthContext);
+  const { profileId, authenticated } = useContext(AuthContext);
   const {
-    userProfile: { is_active: isUserActive },
+    profile: { is_active: isProfileActive },
   } = useContext(ProfileContext);
   const {
     setMessage,
@@ -183,7 +183,7 @@ const ShowPoll = () => {
       ) {
         try {
           const isFollower = await justChooseApi.get(
-            `/users/followers/${pollData.user_id}`,
+            `/profiles/followers/${pollData.profile_id}`,
             {
               cancelToken: source.current.token,
             }
@@ -196,7 +196,9 @@ const ShowPoll = () => {
         pollData.content_lists[0] &&
         pollData.content_lists[0].sharing_option === 'private'
       ) {
-        setShowListOption(parseInt(userId) === parseInt(pollData.user_id));
+        setShowListOption(
+          parseInt(profileId) === parseInt(pollData.profile_id)
+        );
       }
       setLoading(false);
     } catch (error) {
@@ -212,7 +214,7 @@ const ShowPoll = () => {
       }
       setLoading(false);
     }
-  }, [pollId, authenticated, userId]);
+  }, [pollId, authenticated, profileId]);
 
   useEffect(() => {
     mounted.current = true;
@@ -314,7 +316,7 @@ const ShowPoll = () => {
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       return;
     }
-    if (!isUserActive) {
+    if (!isProfileActive) {
       setShowDeleteDialog(false);
       clearTimeout(alertTimeout);
       setMessage('Confirme seu e-mail para poder votar.');
@@ -397,7 +399,7 @@ const ShowPoll = () => {
                   </HeaderButton>
                 </Link>
               )}
-              {userId === poll.user_id && (
+              {profileId === poll.profile_id && (
                 <>
                   <HeaderButton
                     title={poll.is_active ? 'Fechar votação' : 'Abrir votação'}
@@ -446,7 +448,7 @@ const ShowPoll = () => {
           </CreatedAt>
           <CreatedBy>
             <span>por</span>&nbsp;
-            <Link to={`/users/${poll.user_id}`}>
+            <Link to={`/profiles/${poll.profile_id}`}>
               <ProfileImageWrapper>
                 <img
                   src={poll.profile_image_url}
@@ -455,7 +457,7 @@ const ShowPoll = () => {
                 />
               </ProfileImageWrapper>
               &nbsp;
-              {poll.user_name}&nbsp;
+              {poll.profile_name}&nbsp;
             </Link>
           </CreatedBy>
         </ListInfo>
@@ -533,7 +535,7 @@ const ShowPoll = () => {
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog
-          createdBy={poll.user_name}
+          createdBy={poll.profile_name}
           pollTitle={poll.title}
           handleDelete={handleDelete}
         />

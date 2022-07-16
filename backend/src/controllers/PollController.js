@@ -1,17 +1,19 @@
 const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
-const getUserFollowersIds = require('../utils/userFollowers/getUserFollowersIds');
-const isUserFollowing = require('../utils/users/isUserFollowing');
+const getProfileFollowersIds = require('../utils/profileFollowers/getProfileFollowersIds');
+const isProfileFollowing = require('../utils/profiles/isProfileFollowing');
 const getPollOrderByQuery = require('../utils/polls/getPollOrderByQuery');
 const getPolls = require('../utils/polls/getPolls');
 const getPoll = require('../utils/polls/getPoll');
+const logger = require('../lib/logger');
+// TODO: Remover imports não utilizados
 const getContentList = require('../utils/contentList/getContentList');
 const getPollResult = require('../utils/polls/getPollResult');
 
 module.exports = {
   async create(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const { data } = req.body;
       if (!data) {
@@ -76,7 +78,7 @@ module.exports = {
       // O usuário só pode criar votações a partir de listas criadas pelo próprio usuário.
       // O usuário pode fazer um fork de uma lista de outro usuário. A lista fork poderá
       // ser usada para criar uma votação.
-      if (contentList.user_id !== userId) {
+      if (contentList.profile_id !== profileId) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
@@ -91,7 +93,7 @@ module.exports = {
       const pollId = await knex.transaction(async (trx) => {
         const [{ id: pollId }] = await trx('polls')
           .insert({
-            user_id: userId,
+            profile_id: profileId,
             title,
             description,
             sharing_option: sharingOption,
@@ -112,16 +114,17 @@ module.exports = {
       try {
         await deleteFile(req.file.key);
       } catch (error) {}
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async index(req, res) {
     try {
-      const authUserId = req.userId;
+      const authProfileId = req.profileId;
 
       const {
-        user_id: reqUserId,
+        profile_id: reqProfileId,
         query,
         page = 1,
         page_size: pageSize = 30,
@@ -130,11 +133,13 @@ module.exports = {
 
       const errors = [];
 
-      if (reqUserId && isNaN(reqUserId)) {
-        errors.push('O parâmetro user_id deve ser um número');
-      } else if (reqUserId) {
-        const user = await knex('users').where({ id: reqUserId }).first();
-        if (!user) {
+      if (reqProfileId && isNaN(reqProfileId)) {
+        errors.push('O parâmetro profile_id deve ser um número');
+      } else if (reqProfileId) {
+        const profile = await knex('profiles')
+          .where({ id: reqProfileId })
+          .first();
+        if (!profile) {
           errors.push('Usuário não encontrado');
         }
       }
@@ -162,11 +167,11 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const followersIds = await getUserFollowersIds(authUserId);
+      const followersIds = await getProfileFollowersIds(authProfileId);
 
       const { polls, count } = await getPolls({
-        userId: reqUserId,
-        getPrivate: parseInt(authUserId) === parseInt(reqUserId),
+        profileId: reqProfileId,
+        getPrivate: parseInt(authProfileId) === parseInt(reqProfileId),
         followersIds,
         pageSize,
         page,
@@ -183,13 +188,14 @@ module.exports = {
         results: polls,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async show(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const pollId = req.params.id;
 
@@ -204,22 +210,23 @@ module.exports = {
       }
 
       if (
-        (poll.sharing_option === 'private' && poll.user_id !== userId) ||
+        (poll.sharing_option === 'private' && poll.profile_id !== profileId) ||
         (poll.sharing_option === 'followed_profiles' &&
-          !(await isUserFollowing(poll.user_id, userId)))
+          !(await isProfileFollowing(poll.profile_id, profileId)))
       ) {
         return res.sendStatus(403);
       }
 
       return res.json(poll);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async update(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const pollId = req.params.id;
 
@@ -243,7 +250,7 @@ module.exports = {
         return res.status(400).json({ erro: 'Votação não encontrada' });
       }
 
-      if (poll.user_id !== userId) {
+      if (poll.profile_id !== profileId) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
@@ -316,13 +323,14 @@ module.exports = {
       try {
         await deleteFile(req.file.key);
       } catch (error) {}
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async delete(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const pollId = req.params.id;
 
@@ -340,7 +348,7 @@ module.exports = {
         return res.status(400).json({ erro: 'Votação não encontrada' });
       }
 
-      if (poll.user_id !== userId) {
+      if (poll.profile_id !== profileId) {
         return res.status(403).json({ erro: 'Usuário inválido' });
       }
 
@@ -352,6 +360,7 @@ module.exports = {
 
       return res.sendStatus(200);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

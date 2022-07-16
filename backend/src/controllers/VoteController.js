@@ -1,12 +1,13 @@
 const knex = require('../database');
-const isUserFollowing = require('../utils/users/isUserFollowing');
+const isProfileFollowing = require('../utils/profiles/isProfileFollowing');
 const getVotes = require('../utils/votes/getVotes');
 const getVoteOrderByQuery = require('../utils/votes/getVoteOrderByQuery');
+const logger = require('../lib/logger');
 
 module.exports = {
   async create(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const { contentId, type } = req.body;
       const pollId = req.params.id;
@@ -36,9 +37,9 @@ module.exports = {
         return res.status(400).json({ erro: 'Votação não encontrada' });
       }
       if (
-        (poll.sharing_option === 'private' && poll.user_id !== userId) ||
+        (poll.sharing_option === 'private' && poll.profile_id !== profileId) ||
         (poll.sharing_option === 'followed_profiles' &&
-          !(await isUserFollowing(poll.user_id, userId)))
+          !(await isProfileFollowing(poll.profile_id, profileId)))
       ) {
         return res.sendStatus(403);
       }
@@ -57,7 +58,7 @@ module.exports = {
 
       for (const name of contentTypes) {
         const vote = await knex(`${name}_votes`)
-          .where({ user_id: userId, poll_id: pollId })
+          .where({ profile_id: profileId, poll_id: pollId })
           .first();
         if (vote) {
           return res.status(403).json({ erro: 'Número de votos excedido' });
@@ -81,21 +82,22 @@ module.exports = {
       }
 
       await knex(`${type}_votes`).insert({
-        user_id: userId,
+        profile_id: profileId,
         [`${type}_id`]: contentId,
         poll_id: pollId,
       });
 
       return res.sendStatus(201);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async index(req, res) {
     try {
-      const userId = req.userId;
-      const profileId = req.params.id;
+      const profileId = req.profileId;
+      const profileToShowId = req.params.id;
 
       const {
         page = 1,
@@ -130,12 +132,12 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      if (parseInt(userId) !== parseInt(profileId)) {
+      if (parseInt(profileId) !== parseInt(profileToShowId)) {
         return res.sendStatus(403);
       }
 
       const { votes, count } = await getVotes({
-        userId: profileId,
+        profileId: profileToShowId,
         pageSize,
         page,
         query,
@@ -151,13 +153,14 @@ module.exports = {
         results: votes,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async show(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const pollId = req.params.id;
       if (isNaN(pollId)) {
@@ -179,7 +182,7 @@ module.exports = {
         vote = await knex
           .select(
             'v.id',
-            'v.user_id',
+            'v.profile_id',
             `v.${name}_id as content_id`,
             `c.${platform}_id as content_platform_id`,
             knex.raw(`'${name}' as type`),
@@ -189,7 +192,7 @@ module.exports = {
           )
           .from(`${name}_votes as v`)
           .innerJoin(`${name}s as c`, 'c.id', `v.${name}_id`)
-          .where({ 'v.user_id': userId, 'v.poll_id': pollId })
+          .where({ 'v.profile_id': profileId, 'v.poll_id': pollId })
           .first();
         if (vote) {
           break;
@@ -198,13 +201,14 @@ module.exports = {
 
       return res.json(vote);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async delete(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const pollId = req.params.id;
       if (isNaN(pollId)) {
@@ -227,7 +231,7 @@ module.exports = {
       for (const name of contentTypes) {
         contentType = name;
         vote = await knex(`${name}_votes`)
-          .where({ user_id: userId, poll_id: pollId })
+          .where({ profile_id: profileId, poll_id: pollId })
           .first();
         if (vote) {
           break;
@@ -239,10 +243,11 @@ module.exports = {
 
       await knex(`${contentType}_votes`)
         .del()
-        .where({ user_id: userId, poll_id: pollId });
+        .where({ profile_id: profileId, poll_id: pollId });
 
       return res.sendStatus(200);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

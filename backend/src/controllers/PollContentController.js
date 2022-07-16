@@ -1,12 +1,13 @@
 const getContentOrderByQuery = require('../utils/polls/getContentOrderByQuery');
 const getPoll = require('../utils/polls/getPoll');
-const isUserFollowing = require('../utils/users/isUserFollowing');
+const isProfileFollowing = require('../utils/profiles/isProfileFollowing');
 const getContent = require('../utils/polls/getContent');
+const logger = require('../lib/logger');
 
 module.exports = {
   async index(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const pollId = req.params.id;
 
@@ -61,9 +62,9 @@ module.exports = {
       }
 
       if (
-        (poll.sharing_option === 'private' && poll.user_id !== userId) ||
+        (poll.sharing_option === 'private' && poll.profile_id !== profileId) ||
         (poll.sharing_option === 'followed_profiles' &&
-          !(await isUserFollowing(poll.user_id, userId)))
+          !(await isProfileFollowing(poll.profile_id, profileId)))
       ) {
         return res.sendStatus(403);
       }
@@ -85,6 +86,7 @@ module.exports = {
         results: content,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

@@ -2,7 +2,7 @@ const knex = require('../../database');
 const sanitizeListData = require('./sanitizeListData');
 
 module.exports = async (contentList) => {
-  const { userId, title, description, sharingOption, thumbnail, content } =
+  const { profileId, title, description, sharingOption, thumbnail, content } =
     contentList;
 
   try {
@@ -11,7 +11,7 @@ module.exports = async (contentList) => {
     const contentListId = await knex.transaction(async (trx) => {
       const [{ id: contentListId }] = await trx('content_lists')
         .insert({
-          user_id: userId,
+          profile_id: profileId,
           title,
           description,
           sharing_option: sharingOption,

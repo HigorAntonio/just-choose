@@ -36,7 +36,7 @@ describe('resendConfirmEmailLocalProfileController', () => {
     expect(response.status).toBe(200);
   });
 
-  it('Should not resend confirm email if user is invalid', async () => {
+  it('Should not resend confirm email if profile is invalid', async () => {
     const profile = {
       name: 'Martin_Rodrigues',
       email: 'martin_thiago_rodrigues@policiacivil.sp.gov.br',

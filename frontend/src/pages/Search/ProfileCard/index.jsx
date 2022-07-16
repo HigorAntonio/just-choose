@@ -8,7 +8,7 @@ import {
   ProfileImageWrapper,
   ProfileImage,
   TextWrapper,
-  UserName,
+  ProfileName,
   Meta,
   FollowersCount,
   DescriptionWrapper,
@@ -18,7 +18,7 @@ import {
 const ProfileCard = ({ profile }) => {
   const {
     id: profileId,
-    name: userName,
+    name: profileName,
     followers_count: followersCount,
   } = profile;
   const profileImageUrl = profile.profile_image_url
@@ -29,7 +29,7 @@ const ProfileCard = ({ profile }) => {
 
   return (
     <Container>
-      <Link to={`users/${profileId}`}>
+      <Link to={`profiles/${profileId}`}>
         <ProfileImageWrapper>
           <ProfileImage
             src={profileImageUrl}
@@ -38,7 +38,7 @@ const ProfileCard = ({ profile }) => {
           />
         </ProfileImageWrapper>
         <TextWrapper>
-          <UserName>{userName}</UserName>
+          <ProfileName>{profileName}</ProfileName>
           <Meta>
             <FollowersCount>
               {formatCount(followersCount)}

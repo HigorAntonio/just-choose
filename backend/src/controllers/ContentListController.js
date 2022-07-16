@@ -2,17 +2,18 @@ const knex = require('../database');
 const deleteFile = require('../utils/deleteFile');
 const createContentList = require('../utils/contentList/createContentList');
 const updateContentList = require('../utils/contentList/updateContentList');
-const getUserFollowersIds = require('../utils/userFollowers/getUserFollowersIds');
-const isUserFollowing = require('../utils/users/isUserFollowing');
+const getProfileFollowersIds = require('../utils/profileFollowers/getProfileFollowersIds');
+const isProfileFollowing = require('../utils/profiles/isProfileFollowing');
 const getContentLists = require('../utils/contentList/getContentLists');
 const getListOrderByQuery = require('../utils/contentList/getListOrderByQuery');
 const getContentList = require('../utils/contentList/getContentList');
 const deleteContentList = require('../utils/contentList/deleteContentList');
+const logger = require('../lib/logger');
 
 module.exports = {
   async create(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const { data } = req.body;
       if (!data) {
@@ -68,7 +69,7 @@ module.exports = {
       const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
 
       const contentListId = await createContentList({
-        userId,
+        profileId,
         title,
         description,
         sharingOption,
@@ -81,16 +82,17 @@ module.exports = {
       try {
         await deleteFile(req.file.key);
       } catch (error) {}
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async index(req, res) {
     try {
-      const authUserId = req.userId;
+      const authProfileId = req.profileId;
 
       const {
-        user_id: reqUserId,
+        profile_id: reqProfileId,
         query,
         page = 1,
         page_size: pageSize = 30,
@@ -99,11 +101,13 @@ module.exports = {
 
       const errors = [];
 
-      if (reqUserId && isNaN(reqUserId)) {
-        errors.push('O parâmetro user_id deve ser um número');
-      } else if (reqUserId) {
-        const user = await knex('users').where({ id: reqUserId }).first();
-        if (!user) {
+      if (reqProfileId && isNaN(reqProfileId)) {
+        errors.push('O parâmetro profile_id deve ser um número');
+      } else if (reqProfileId) {
+        const profile = await knex('profiles')
+          .where({ id: reqProfileId })
+          .first();
+        if (!profile) {
           errors.push('Usuário não encontrado');
         }
       }
@@ -131,11 +135,11 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const followersIds = await getUserFollowersIds(authUserId);
+      const followersIds = await getProfileFollowersIds(authProfileId);
 
       const { contentLists, count } = await getContentLists({
-        userId: reqUserId,
-        getPrivate: parseInt(authUserId) === parseInt(reqUserId),
+        profileId: reqProfileId,
+        getPrivate: parseInt(authProfileId) === parseInt(reqProfileId),
         followersIds,
         pageSize,
         page,
@@ -152,13 +156,14 @@ module.exports = {
         results: contentLists,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async show(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const contentListId = req.params.id;
 
@@ -178,22 +183,23 @@ module.exports = {
 
       if (
         (contentList.sharing_option === 'private' &&
-          contentList.user_id !== userId) ||
+          contentList.profile_id !== profileId) ||
         (contentList.sharing_option === 'followed_profiles' &&
-          !(await isUserFollowing(contentList.user_id, userId)))
+          !(await isProfileFollowing(contentList.profile_id, profileId)))
       ) {
         return res.sendStatus(403);
       }
 
       return res.json(contentList);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async update(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const contentListId = req.params.id;
 
@@ -221,7 +227,7 @@ module.exports = {
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
 
-      if (contentList.user_id !== userId) {
+      if (contentList.profile_id !== profileId) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
@@ -300,13 +306,14 @@ module.exports = {
       try {
         await deleteFile(req.file.key);
       } catch (error) {}
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
 
   async delete(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const contentListId = req.params.id;
 
@@ -328,7 +335,7 @@ module.exports = {
           .json({ erro: 'Lista de conteúdo não encontrada' });
       }
 
-      if (contentList.user_id !== userId) {
+      if (contentList.profile_id !== profileId) {
         return res.status(403).json({ erro: 'Usuário inválido' });
       }
 
@@ -340,6 +347,7 @@ module.exports = {
 
       return res.sendStatus(200);
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

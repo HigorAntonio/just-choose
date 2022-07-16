@@ -183,7 +183,7 @@ export const BottomSide = styled.div`
   border-top: 1px solid var(--background-700);
 `;
 
-export const SearchUser = styled.div`
+export const SearchProfile = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -195,7 +195,7 @@ export const SearchUser = styled.div`
   }
 `;
 
-export const SearchUserInput = styled.input`
+export const SearchProfileInput = styled.input`
   width: 100%;
   height: 30px;
 

@@ -5,12 +5,12 @@ import { AuthContext } from '../../context/AuthContext';
 import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
 
-const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
+const CustomRoute = ({ isPrivate, requiresProfileActivation, ...rest }) => {
   const { loading: loadingAuth, authenticated } = useContext(AuthContext);
   const {
     loading: loadingProfile,
     loadingError: loadingProfileError,
-    userProfile: { is_active: isActive },
+    profile: { is_active: isActive },
   } = useContext(ProfileContext);
 
   const {
@@ -31,7 +31,7 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
     } else if (
       !loadingProfile &&
       !loadingProfileError &&
-      requiresUserActivation &&
+      requiresProfileActivation &&
       !isActive
     ) {
       setSeverity('info');
@@ -42,7 +42,7 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
     }
   }, [
     isPrivate,
-    requiresUserActivation,
+    requiresProfileActivation,
     loadingAuth,
     authenticated,
     loadingProfile,
@@ -61,7 +61,7 @@ const CustomRoute = ({ isPrivate, requiresUserActivation, ...rest }) => {
     return <Redirect to="/" />;
   }
 
-  if (requiresUserActivation && !loadingProfileError && !isActive) {
+  if (requiresProfileActivation && !loadingProfileError && !isActive) {
     return <Redirect to="/" />;
   }
 

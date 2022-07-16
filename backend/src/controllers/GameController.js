@@ -2,6 +2,7 @@ const validateGamesParams = require('../utils/validation/rawgApi/gamesValidation
 const { rawgApi } = require('../apis');
 const Queue = require('../lib/Queue');
 const redisClient = require('../lib/redisClient');
+const logger = require('../lib/logger');
 
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
 const API_CACHE_EXPIRATION_TIME = process.env.API_CACHE_EXPIRATION_TIME;
@@ -40,6 +41,7 @@ module.exports = {
 
       return res.json(JSON.parse(responseData));
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
@@ -74,6 +76,7 @@ module.exports = {
 
       return res.json(JSON.parse(responseData));
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },
@@ -108,6 +111,7 @@ module.exports = {
 
       return res.json(JSON.parse(responseData));
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

@@ -1,6 +1,7 @@
 const isTypeValid = require('../utils/trending/isTypeValid');
 const getContentLists = require('../utils/contentList/getContentLists');
 const getPolls = require('../utils/polls/getPolls');
+const logger = require('../lib/logger');
 
 module.exports = {
   async index(req, res) {
@@ -77,6 +78,7 @@ module.exports = {
         results,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

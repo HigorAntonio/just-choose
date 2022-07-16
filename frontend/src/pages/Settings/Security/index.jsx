@@ -27,7 +27,7 @@ const Security = () => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { userProfile } = useContext(ProfileContext);
+  const { profile } = useContext(ProfileContext);
 
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -231,9 +231,9 @@ const Security = () => {
           <div className="column">
             <div className="row">
               <EmailWrapper>
-                <Email>{userProfile.email}</Email>
+                <Email>{profile.email}</Email>
               </EmailWrapper>
-              {!userProfile.is_active && (
+              {!profile.is_active && (
                 <ResendEmailButton
                   disabled={resendingConfirmationEmail}
                   onClick={handleResendConfirmationEmail}
@@ -243,13 +243,13 @@ const Security = () => {
               )}
             </div>
             <EmailStatus>
-              {userProfile.is_active ? (
+              {profile.is_active ? (
                 <span>Verificado.</span>
               ) : (
                 <span>Não verificado.</span>
               )}
               &nbsp;
-              {userProfile.is_active
+              {profile.is_active
                 ? `Agradecemos por verificar o seu e-mail.`
                 : `Verifique sua caixa de entrada.`}
             </EmailStatus>

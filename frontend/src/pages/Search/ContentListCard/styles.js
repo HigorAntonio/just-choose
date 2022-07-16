@@ -128,7 +128,7 @@ export const ProfileInfo = styled.div`
   padding: 12px 0;
 `;
 
-export const UserName = styled.p`
+export const ProfileName = styled.p`
   font-size: 1.5rem;
 
   > a {
@@ -190,7 +190,7 @@ export const TextWrapperSmallScreen = styled.div`
     height: 48px;
   }
 
-  > ${Meta} ${UserName}, ${Meta} ${Likes}, ${Meta} ${Forks} {
+  > ${Meta} ${ProfileName}, ${Meta} ${Likes}, ${Meta} ${Forks} {
     display: inline-block;
   }
 

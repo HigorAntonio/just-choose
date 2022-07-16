@@ -29,8 +29,8 @@ import {
   ProfileImage,
   ProfileData,
   BottomSide,
-  SearchUser,
-  SearchUserInput,
+  SearchProfile,
+  SearchProfileInput,
   NoResults,
 } from './styles';
 
@@ -39,8 +39,8 @@ const NavBar = () => {
   const { width } = useContext(ViewportContext);
   const { following, lastFollowRef } = useContext(FollowingProfilesContext);
 
-  const [usersParams, setUsersParams] = useState({});
-  const [usersPageNumber, setUsersPageNumber] = useState(1);
+  const [profilesParams, setProfilesParams] = useState({});
+  const [profilesPageNumber, setProfilesPageNumber] = useState(1);
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 
@@ -52,10 +52,10 @@ const NavBar = () => {
   }, [wrapperRef, showSearch]);
 
   const {
-    data: users,
-    hasMore: usersHasMore,
-    loading: usersLoading,
-  } = useAuthenticatedRequest('/users', usersParams, usersPageNumber);
+    data: profiles,
+    hasMore: profilesHasMore,
+    loading: profilesLoading,
+  } = useAuthenticatedRequest('/profiles', profilesParams, profilesPageNumber);
 
   useEffect(() => {
     if (search === '') {
@@ -72,30 +72,30 @@ const NavBar = () => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && e.target.value) {
       setShowSearch(true);
-      setUsersParams({ query: e.target.value });
-      setUsersPageNumber(1);
+      setProfilesParams({ query: e.target.value });
+      setProfilesPageNumber(1);
     }
   };
 
-  const usersObserver = useRef();
-  const lastUserRef = useCallback(
+  const profilesObserver = useRef();
+  const lastProfileRef = useCallback(
     (node) => {
-      if (usersLoading) {
+      if (profilesLoading) {
         return;
       }
-      if (usersObserver.current) {
-        usersObserver.current.disconnect();
+      if (profilesObserver.current) {
+        profilesObserver.current.disconnect();
       }
-      usersObserver.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && usersHasMore) {
-          setUsersPageNumber((prevState) => prevState + 1);
+      profilesObserver.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && profilesHasMore) {
+          setProfilesPageNumber((prevState) => prevState + 1);
         }
       });
       if (node) {
-        usersObserver.current.observe(node);
+        profilesObserver.current.observe(node);
       }
     },
-    [usersLoading, usersHasMore, setUsersPageNumber]
+    [profilesLoading, profilesHasMore, setProfilesPageNumber]
   );
 
   return (
@@ -132,7 +132,7 @@ const NavBar = () => {
               {following.map((p, i) => {
                 if (following.length === i + 1) {
                   return (
-                    <Link key={p.id} to={`/users/${p.id}`}>
+                    <Link key={p.id} to={`/profiles/${p.id}`}>
                       <Profile ref={lastFollowRef} title={p.name}>
                         <ProfileImage src={p.profile_image_url} />
                         <ProfileData>
@@ -143,7 +143,7 @@ const NavBar = () => {
                   );
                 }
                 return (
-                  <Link key={p.id} to={`/users/${p.id}`}>
+                  <Link key={p.id} to={`/profiles/${p.id}`}>
                     <Profile title={p.name}>
                       <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
@@ -162,11 +162,11 @@ const NavBar = () => {
               <h5>Resultados</h5>
             </Header>
             <Profiles>
-              {users.map((p, i) => {
-                if (users.length === i + 1) {
+              {profiles.map((p, i) => {
+                if (profiles.length === i + 1) {
                   return (
-                    <Link key={p.id} to={`/users/${p.id}`}>
-                      <Profile ref={lastUserRef} title={p.name}>
+                    <Link key={p.id} to={`/profiles/${p.id}`}>
+                      <Profile ref={lastProfileRef} title={p.name}>
                         <ProfileImage src={p.profile_image_url} />
                         <ProfileData>
                           <span>{p.name}</span>
@@ -176,7 +176,7 @@ const NavBar = () => {
                   );
                 }
                 return (
-                  <Link key={p.id} to={`/users/${p.id}`}>
+                  <Link key={p.id} to={`/profiles/${p.id}`}>
                     <Profile title={p.name}>
                       <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
@@ -187,10 +187,10 @@ const NavBar = () => {
                 );
               })}
             </Profiles>
-            {!usersLoading && !users.length && (
+            {!profilesLoading && !profiles.length && (
               <NoResults>
                 Infelizmente, não encontramos ninguém chamado "
-                {usersParams.query}"
+                {profilesParams.query}"
               </NoResults>
             )}
           </Following>
@@ -198,16 +198,16 @@ const NavBar = () => {
       </TopSide>
       {authenticated && width > breakpoints.getInt(breakpoints.size1) && (
         <BottomSide>
-          <SearchUser>
+          <SearchProfile>
             <GoSearch size={15} style={{ flexShrink: 0 }} />
-            <SearchUserInput
+            <SearchProfileInput
               type="text"
               placeholder="Adicionar amigos"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyPress={handleKeyPress}
             />
-          </SearchUser>
+          </SearchProfile>
         </BottomSide>
       )}
     </Container>

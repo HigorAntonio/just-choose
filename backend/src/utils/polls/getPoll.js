@@ -4,23 +4,23 @@ module.exports = async (pollId) => {
   try {
     const poll = await knex
       .select(
-        'p.id',
-        'p.user_id',
-        'u.name as user_name',
-        'u.profile_image_url',
-        'p.title',
-        'p.description',
-        'p.sharing_option',
-        'p.is_active',
-        'p.thumbnail',
+        'po.id',
+        'po.profile_id',
+        'pr.name as profile_name',
+        'pr.profile_image_url',
+        'po.title',
+        'po.description',
+        'po.sharing_option',
+        'po.is_active',
+        'po.thumbnail',
         'cli.content_lists',
         'pct.content_types',
         knex.raw('COALESCE(total_votes, 0) as total_votes'),
-        'p.created_at',
-        'p.updated_at'
+        'po.created_at',
+        'po.updated_at'
       )
-      .from('polls as p')
-      .innerJoin('users as u', 'p.user_id', 'u.id')
+      .from('polls as po')
+      .innerJoin('profiles as pr', 'po.profile_id', 'pr.id')
       .innerJoin(
         knex
           .select(
@@ -42,7 +42,7 @@ module.exports = async (pollId) => {
           })
           .groupBy('poll_id')
           .as('cli'),
-        'p.id',
+        'po.id',
         'cli.poll_id'
       )
       .innerJoin(
@@ -62,7 +62,7 @@ module.exports = async (pollId) => {
           })
           .groupBy('poll_id')
           .as('pct'),
-        'p.id',
+        'po.id',
         'pct.poll_id'
       )
       .leftJoin(
@@ -91,10 +91,10 @@ module.exports = async (pollId) => {
           .groupBy('poll_id')
           .as('poll_total_votes'),
         'poll_total_votes.poll_id',
-        'p.id'
+        'po.id'
       )
       .where({
-        'p.id': pollId,
+        'po.id': pollId,
       })
       .first();
 

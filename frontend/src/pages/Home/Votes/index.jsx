@@ -11,7 +11,7 @@ import { Container } from './styles';
 
 const Votes = () => {
   const { width } = useContext(ViewportContext);
-  const { userId } = useContext(AuthContext);
+  const { profileId } = useContext(AuthContext);
 
   const [lastContentIndex, setLastContentIndex] = useState(0);
   const [content, setContent] = useState([]);
@@ -21,17 +21,20 @@ const Votes = () => {
     setLoading(true);
     let source = axios.CancelToken.source();
 
-    userId &&
+    profileId &&
       (async () => {
         try {
-          const { data } = await justChooseApi.get(`/users/${userId}/votes`, {
-            params: {
-              page: 1,
-              page_size: 6,
-              sort_by: 'updated.desc',
-            },
-            cancelToken: source.token,
-          });
+          const { data } = await justChooseApi.get(
+            `/profiles/${profileId}/votes`,
+            {
+              params: {
+                page: 1,
+                page_size: 6,
+                sort_by: 'updated.desc',
+              },
+              cancelToken: source.token,
+            }
+          );
           setContent(data.results);
           setLoading(false);
         } catch (error) {
@@ -45,7 +48,7 @@ const Votes = () => {
     return () => {
       source.cancel();
     };
-  }, [userId]);
+  }, [profileId]);
 
   useEffect(() => {
     if (width < 547) {
@@ -72,9 +75,9 @@ const Votes = () => {
           if (i < lastContentIndex && content[i]) {
             const poll = {
               id: content[i].poll_id,
-              user_id: content[i].poll_user_id,
-              user_name: content[i].poll_user_name,
-              profile_image_url: content[i].poll_user_profile_image_url,
+              profile_id: content[i].poll_profile_id,
+              profile_name: content[i].poll_profile_name,
+              profile_image_url: content[i].poll_profile_profile_image_url,
               thumbnail: content[i].poll_thumbnail,
               title: content[i].poll_title,
               is_active: content[i].poll_is_active,

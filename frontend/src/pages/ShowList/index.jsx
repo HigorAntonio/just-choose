@@ -59,9 +59,9 @@ const ShowList = () => {
   const history = useHistory();
 
   const { contentWrapperRef } = useContext(LayoutContext);
-  const { userId, authenticated } = useContext(AuthContext);
+  const { profileId, authenticated } = useContext(AuthContext);
   const {
-    userProfile: { is_active: isUserActive },
+    profile: { is_active: isProfileActive },
   } = useContext(ProfileContext);
   const {
     setMessage,
@@ -134,7 +134,7 @@ const ShowList = () => {
         if (data && data.content_types) {
           setContentTypes(['all', ...data.content_types]);
         }
-        if (authenticated && isUserActive) {
+        if (authenticated && isProfileActive) {
           const {
             data: { like },
           } = await justChooseApi.get(`/contentlists/${listId}/like`, {
@@ -162,7 +162,7 @@ const ShowList = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, authenticated, isUserActive]);
+  }, [listId, authenticated, isProfileActive]);
 
   const {
     loading: loadingContent,
@@ -175,7 +175,7 @@ const ShowList = () => {
   );
 
   const handleLike = async () => {
-    if (!authenticated || !isUserActive) {
+    if (!authenticated || !isProfileActive) {
       return;
     }
     try {
@@ -204,7 +204,7 @@ const ShowList = () => {
   };
 
   const handleFork = async () => {
-    if (!authenticated || !isUserActive) {
+    if (!authenticated || !isProfileActive) {
       return;
     }
     try {
@@ -234,7 +234,7 @@ const ShowList = () => {
   };
 
   const handleDelete = async () => {
-    if (!authenticated || !isUserActive) {
+    if (!authenticated || !isProfileActive) {
       return;
     }
     try {
@@ -299,7 +299,7 @@ const ShowList = () => {
               <HeaderButton
                 title={
                   authenticated
-                    ? isUserActive
+                    ? isProfileActive
                       ? liked
                         ? 'Não gostei'
                         : 'Gostei'
@@ -317,7 +317,7 @@ const ShowList = () => {
               <HeaderButton
                 title={
                   authenticated
-                    ? isUserActive
+                    ? isProfileActive
                       ? 'Criar uma cópia da lista para sua conta'
                       : 'Confirme seu e-mail para criar uma cópia da lista'
                     : 'Faça login para criar uma cópia da lista'
@@ -328,7 +328,7 @@ const ShowList = () => {
                 <span>{formatCount(contentList.forks)}</span>
               </HeaderButton>
             </div>
-            {userId === contentList.user_id && (
+            {profileId === contentList.profile_id && (
               <div>
                 <Link to={`/lists/${listId}/poll`} tabIndex="-1">
                   <HeaderButton title="Criar uma votação a partir da lista">
@@ -367,7 +367,7 @@ const ShowList = () => {
           </CreatedAt>
           <CreatedBy>
             <span>por</span>&nbsp;
-            <Link to={`/users/${contentList.user_id}`}>
+            <Link to={`/profiles/${contentList.profile_id}`}>
               <ProfileImageWrapper>
                 <img
                   src={contentList.profile_image_url}
@@ -376,7 +376,7 @@ const ShowList = () => {
                 />
               </ProfileImageWrapper>
               &nbsp;
-              {contentList.user_name}&nbsp;
+              {contentList.profile_name}&nbsp;
             </Link>
           </CreatedBy>
         </ListInfo>
@@ -441,7 +441,7 @@ const ShowList = () => {
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog
-          createdBy={contentList.user_name}
+          createdBy={contentList.profile_name}
           listTitle={contentList.title}
           handleDelete={handleDelete}
         />

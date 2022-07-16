@@ -3,7 +3,7 @@ const getTimeWindowStartTime = require('../getTimeWindowStartTime');
 
 module.exports = async (options) => {
   const {
-    userId,
+    profileId,
     getPrivate = false,
     followersIds = [],
     followingIds,
@@ -14,16 +14,16 @@ module.exports = async (options) => {
     timeWindowUnit,
   } = options;
 
-  if (getPrivate && !userId) {
-    throw new Error('Can not get private data without a valid user id');
+  if (getPrivate && !profileId) {
+    throw new Error('Can not get private data without a valid profile id');
   }
 
   try {
     const contentListsQuery = knex
       .select(
         'clsq.id',
-        'clsq.user_id',
-        'clsq.user_name',
+        'clsq.profile_id',
+        'clsq.profile_name',
         'clsq.profile_image_url',
         'clsq.title',
         'clsq.description',
@@ -38,9 +38,9 @@ module.exports = async (options) => {
       .from(function () {
         this.select(
           'cl.id',
-          'cl.user_id',
-          'u.name as user_name',
-          'u.profile_image_url',
+          'cl.profile_id',
+          'p.name as profile_name',
+          'p.profile_image_url',
           'cl.title',
           'cl.description',
           'cl.sharing_option',
@@ -51,13 +51,13 @@ module.exports = async (options) => {
         )
           .from('content_lists as cl')
           .where({ sharing_option: 'public' })
-          .innerJoin('users as u', 'cl.user_id', 'u.id')
+          .innerJoin('profiles as p', 'cl.profile_id', 'p.id')
           .union(function () {
             this.select(
               'cl.id',
-              'cl.user_id',
-              'u.name as user_name',
-              'u.profile_image_url',
+              'cl.profile_id',
+              'p.name as profile_name',
+              'p.profile_image_url',
               'cl.title',
               'cl.description',
               'cl.sharing_option',
@@ -68,17 +68,17 @@ module.exports = async (options) => {
             )
               .from('content_lists as cl')
               .where({ sharing_option: 'followed_profiles' })
-              .innerJoin('users as u', 'cl.user_id', 'u.id')
-              .whereIn('u.id', followersIds);
+              .innerJoin('profiles as p', 'cl.profile_id', 'p.id')
+              .whereIn('p.id', followersIds);
           })
           .as('clsq');
         if (getPrivate) {
           this.union(function () {
             this.select(
               'cl.id',
-              'cl.user_id',
-              'u.name as user_name',
-              'u.profile_image_url',
+              'cl.profile_id',
+              'p.name as profile_name',
+              'p.profile_image_url',
               'cl.title',
               'cl.description',
               'cl.sharing_option',
@@ -89,8 +89,8 @@ module.exports = async (options) => {
             )
               .from('content_lists as cl')
               .where({ sharing_option: 'private' })
-              .innerJoin('users as u', 'cl.user_id', 'u.id')
-              .where({ 'u.id': userId });
+              .innerJoin('profiles as p', 'cl.profile_id', 'p.id')
+              .where({ 'p.id': profileId });
           });
         }
       })
@@ -135,36 +135,36 @@ module.exports = async (options) => {
     const countObj = knex.count().from(function () {
       this.select()
         .from(function () {
-          this.select('cl.id', 'cl.user_id', 'cl.document', 'cl.created_at')
+          this.select('cl.id', 'cl.profile_id', 'cl.document', 'cl.created_at')
             .from('content_lists as cl')
             .where({ sharing_option: 'public' })
             .as('public_lists');
         })
         .union(function () {
-          this.select('cl.id', 'cl.user_id', 'cl.document', 'cl.created_at')
+          this.select('cl.id', 'cl.profile_id', 'cl.document', 'cl.created_at')
             .from('content_lists as cl')
             .where({ sharing_option: 'followed_profiles' })
-            .whereIn('cl.user_id', followersIds);
+            .whereIn('cl.profile_id', followersIds);
         })
         .as('count_query');
       if (getPrivate) {
         this.union(function () {
-          this.select('cl.id', 'cl.user_id', 'cl.document', 'cl.created_at')
+          this.select('cl.id', 'cl.profile_id', 'cl.document', 'cl.created_at')
             .from('content_lists as cl')
             .where({ sharing_option: 'private' })
-            .where('cl.user_id', userId);
+            .where('cl.profile_id', profileId);
         });
       }
     });
 
     if (followingIds) {
-      contentListsQuery.whereIn('user_id', followingIds);
-      countObj.whereIn('user_id', followingIds);
+      contentListsQuery.whereIn('profile_id', followingIds);
+      countObj.whereIn('profile_id', followingIds);
     }
 
-    if (userId) {
-      contentListsQuery.where({ user_id: userId });
-      countObj.where({ user_id: userId });
+    if (profileId) {
+      contentListsQuery.where({ profile_id: profileId });
+      countObj.where({ profile_id: profileId });
     }
 
     if (query) {

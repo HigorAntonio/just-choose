@@ -1,13 +1,14 @@
 const isTypeValid = require('../utils/followedProfilePost/isTypeValid');
-const getUserFollowersIds = require('../utils/userFollowers/getUserFollowersIds');
-const getUserFollowingIds = require('../utils/userFollowing/getUserFollowingIds');
+const getProfileFollowersIds = require('../utils/profileFollowers/getProfileFollowersIds');
+const getProfileFollowingIds = require('../utils/profileFollowing/getProfileFollowingIds');
 const getContentLists = require('../utils/contentList/getContentLists');
 const getPolls = require('../utils/polls/getPolls');
+const logger = require('../lib/logger');
 
 module.exports = {
   async index(req, res) {
     try {
-      const userId = req.userId;
+      const profileId = req.profileId;
 
       const { page = 1, page_size: pageSize = 15, type } = req.query;
 
@@ -34,8 +35,8 @@ module.exports = {
         return res.status(400).json({ erros: errors });
       }
 
-      const followersIds = await getUserFollowersIds(userId);
-      const followingIds = await getUserFollowingIds(userId);
+      const followersIds = await getProfileFollowersIds(profileId);
+      const followingIds = await getProfileFollowingIds(profileId);
 
       const { polls, count: pollsCount } =
         !type || type === 'poll'
@@ -90,6 +91,7 @@ module.exports = {
         results,
       });
     } catch (error) {
+      logger.error(error);
       return res.sendStatus(500);
     }
   },

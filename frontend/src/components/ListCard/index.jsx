@@ -15,7 +15,7 @@ import {
   Bottom,
   ProfileImageWrapper,
   ProfileImage,
-  UserName,
+  ProfileName,
   Title,
   Meta,
   Likes,
@@ -26,8 +26,8 @@ import {
 const ListCard = ({ contentList, showProfile = false }) => {
   const {
     id: listId,
-    user_id: userId,
-    user_name: userName,
+    profile_id: profileId,
+    profile_name: profileName,
     profile_image_url: profileImageUrl,
     thumbnail,
     title,
@@ -57,7 +57,7 @@ const ListCard = ({ contentList, showProfile = false }) => {
           <Bottom>
             {showProfile && (
               <ProfileImageWrapper>
-                <Link to={`/users/${userId}`}>
+                <Link to={`/profiles/${profileId}`}>
                   <ProfileImage
                     src={profileImageUrl}
                     onError={() => setProfileImageError(true)}
@@ -69,9 +69,9 @@ const ListCard = ({ contentList, showProfile = false }) => {
             <Meta>
               <Title title={title}>{title}</Title>
               {showProfile && (
-                <UserName>
-                  <Link to={`/users/${userId}`}>{userName}</Link>
-                </UserName>
+                <ProfileName>
+                  <Link to={`/profiles/${profileId}`}>{profileName}</Link>
+                </ProfileName>
               )}
               <Meta>
                 <Likes>

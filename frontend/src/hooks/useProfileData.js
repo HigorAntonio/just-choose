@@ -4,20 +4,20 @@ import justChooseApi from '../services/justChooseApi';
 import { AuthContext } from '../context/AuthContext';
 
 const useProfileData = () => {
-  const { loading: loadingAuth, userId } = useContext(AuthContext);
+  const { loading: loadingAuth, profileId } = useContext(AuthContext);
 
-  const [userProfile, setUserProfile] = useState({});
+  const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
 
-  const refreshUserProfileData = useCallback(async () => {
+  const refreshProfileData = useCallback(async () => {
     try {
       setLoading(true);
       setLoadingError(false);
 
-      if (userId) {
-        const { data } = await justChooseApi.get(`/users/${userId}`);
-        setUserProfile(data);
+      if (profileId) {
+        const { data } = await justChooseApi.get(`/profiles/${profileId}`);
+        setProfile(data);
       }
       if (!loadingAuth) {
         setLoading(false);
@@ -29,20 +29,20 @@ const useProfileData = () => {
       }
       setLoading(false);
     }
-  }, [loadingAuth, userId]);
+  }, [loadingAuth, profileId]);
 
   useEffect(() => {
     (async () => {
-      await refreshUserProfileData();
+      await refreshProfileData();
     })();
-  }, [refreshUserProfileData, userId]);
+  }, [refreshProfileData, profileId]);
 
   return {
     loading,
     loadingError,
-    userProfile,
-    setUserProfile,
-    refreshUserProfileData,
+    profile,
+    setProfile,
+    refreshProfileData,
   };
 };
 

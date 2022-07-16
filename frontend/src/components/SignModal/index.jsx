@@ -39,7 +39,10 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
     setSignUpErrors((prevState) =>
       prevState.filter(
         (error) =>
-          error !== 'Os nomes de usuário devem ter entre 4 e 25 caracteres.'
+          error !== 'Os nomes de usuário devem ter entre 4 e 25 caracteres.' &&
+          error !==
+            'Nomes de usuário devem conter apenas caracteres alfanuméricos.' &&
+          error !== '"name" unavailable'
       )
     );
     if (signUpName.length < 4 || signUpName.length > 25) {
@@ -47,19 +50,31 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
         ...prevState,
         'Os nomes de usuário devem ter entre 4 e 25 caracteres.',
       ]);
+    } else if (!/^[a-z0-9]+[a-z0-9_]*$/i.test(signUpName)) {
+      setSignUpErrors((prevState) => [
+        ...prevState,
+        'Nomes de usuário devem conter apenas caracteres alfanuméricos.',
+      ]);
     }
   };
 
   const validateSignUpPassword = (password) => {
     setSignUpErrors((prevState) =>
       prevState.filter(
-        (error) => error !== 'A senha deve ter no mínimo 8 caracteres.'
+        (error) =>
+          error !== 'A senha deve ter no mínimo 8 caracteres.' &&
+          error !== 'A senha deve ter no máximo 64 caracteres.'
       )
     );
     if (password.length < 8) {
       setSignUpErrors((prevState) => [
         ...prevState,
         'A senha deve ter no mínimo 8 caracteres.',
+      ]);
+    } else if (password.length > 64) {
+      setSignUpErrors((prevState) => [
+        ...prevState,
+        'A senha deve ter no máximo 64 caracteres.',
       ]);
     }
   };
@@ -74,6 +89,23 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
       setSignUpErrors((prevState) => [
         ...prevState,
         'As senhas não conferem. Tente outra vez.',
+      ]);
+    }
+  };
+
+  const validateSignUpEmail = (signUpEmail) => {
+    setSignUpErrors((prevState) =>
+      prevState.filter(
+        (error) =>
+          error !== 'Informe um email válido.' &&
+          error !== '"email" must be a valid email' &&
+          error !== '"email" unavailable'
+      )
+    );
+    if (!/\S+@\S+\.\S+/.test(signUpEmail)) {
+      setSignUpErrors((prevState) => [
+        ...prevState,
+        'Informe um email válido.',
       ]);
     }
   };
@@ -96,6 +128,11 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
     validateSignUpConfirmPassword(signUpPassword, e.target.value);
   };
 
+  const handleSignUpEmailInput = (e) => {
+    setSignUpEmail(e.target.value);
+    validateSignUpEmail(e.target.value);
+  };
+
   const handleSignUp = async (e) => {
     try {
       e.preventDefault();
@@ -108,9 +145,9 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
       setShow(false);
     } catch (error) {
       if (error.response) {
-        const errors = error.response.data.erros
-          ? error.response.data.erros
-          : [error.response.data.erro];
+        const errors = error.response.data.messages
+          ? error.response.data.messages
+          : [error.response.data.message];
         if (errors) {
           setSignUpErrors([...errors]);
         }
@@ -126,14 +163,27 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
       setShow(false);
     } catch (error) {
       if (error.response) {
-        const errors = error.response.data.erros
-          ? error.response.data.erros
-          : [error.response.data.erro];
+        const errors = error.response.data.messages
+          ? error.response.data.messages
+          : [error.response.data.message];
         if (errors) {
           setSignInErrors([...errors]);
         }
       }
     }
+  };
+
+  const translateErrorMessage = (errorMessage) => {
+    const errorMessages = {
+      'profile does not exist': 'Este nome de usuário não existe.',
+      '"email" must be a valid email': 'Informe um email válido.',
+      'incorrect password': 'A senha estava incorreta. Tente novamente.',
+      '"name" unavailable': 'Este nome de usuário está indisponível.',
+      '"email" unavailable': 'Este email está indisponível.',
+    };
+    return errorMessages[errorMessage]
+      ? errorMessages[errorMessage]
+      : errorMessage;
   };
 
   const clearForm = () => {
@@ -186,7 +236,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
             {signInErrors.length > 0 && (
               <FormErrors>
                 {signInErrors.map((err, i) => (
-                  <p key={`sife${i}`}>{err}</p>
+                  <p key={`sife${i}`}>{translateErrorMessage(err)}</p>
                 ))}
               </FormErrors>
             )}
@@ -223,7 +273,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
             {signUpErrors.length > 0 && (
               <FormErrors>
                 {signUpErrors.map((err, i) => (
-                  <p key={`sife${i}`}>{err}</p>
+                  <p key={`sufe${i}`}>{translateErrorMessage(err)}</p>
                 ))}
               </FormErrors>
             )}
@@ -259,7 +309,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
                 type="email"
                 id="email"
                 value={signUpEmail}
-                onChange={(e) => setSignUpEmail(e.target.value)}
+                onChange={handleSignUpEmailInput}
               />
             </InputWithLabel>
             <SignFormButton

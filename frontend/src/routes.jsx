@@ -12,7 +12,7 @@ import ShowPoll from './pages/ShowPoll';
 import Search from './pages/Search';
 import UpdatePoll from './pages/UpdatePoll';
 import Settings from './pages/Settings';
-import UserProfile from './pages/UserProfile';
+import Profile from './pages/Profile';
 import NotFound from './components/NotFound';
 
 const Routes = () => {
@@ -22,7 +22,7 @@ const Routes = () => {
       <CustomRoute exact path="/search" component={() => <Search />} />
       <CustomRoute
         isPrivate
-        requiresUserActivation
+        requiresProfileActivation
         exact
         path="/list"
         component={() => <CreateList />}
@@ -30,14 +30,14 @@ const Routes = () => {
       <CustomRoute exact path="/lists/:id" component={() => <ShowList />} />
       <CustomRoute
         isPrivate
-        requiresUserActivation
+        requiresProfileActivation
         exact
         path="/lists/:id/update"
         component={() => <UpdateList />}
       />
       <CustomRoute
         isPrivate
-        requiresUserActivation
+        requiresProfileActivation
         exact
         path="/lists/:id/poll"
         component={() => <CreatePoll />}
@@ -45,13 +45,13 @@ const Routes = () => {
       <CustomRoute exact path="/polls/:id" component={() => <ShowPoll />} />
       <CustomRoute
         isPrivate
-        requiresUserActivation
+        requiresProfileActivation
         exact
         path="/polls/:id/update"
         component={() => <UpdatePoll />}
       />
       <CustomRoute isPrivate path="/settings" component={() => <Settings />} />
-      <CustomRoute path="/users/:id" component={() => <UserProfile />} />
+      <CustomRoute path="/profiles/:id" component={() => <Profile />} />
       <Route component={NotFound} />
     </Switch>
   );

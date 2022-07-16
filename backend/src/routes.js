@@ -4,12 +4,12 @@ const multer = require('multer');
 const multerConfig = require('./config/multer');
 
 const authorization = require('./middlewares/authorizationMiddleware');
-const isUserActive = require('./middlewares/isUserActiveMiddleware');
-const getLoggedUserId = require('./middlewares/getLoggedUserId');
-const UserController = require('./controllers/UserController');
-const FollowUsersController = require('./controllers/FollowUsersController');
-const UserFollowingController = require('./controllers/UserFollowingController');
-const UserFollowersController = require('./controllers/UserFollowersController');
+const isProfileActive = require('./middlewares/isProfileActiveMiddleware');
+const getLoggedProfileId = require('./middlewares/getLoggedProfileIdMiddleware');
+const ProfileController = require('./controllers/ProfileController');
+const FollowProfilesController = require('./controllers/FollowProfilesController');
+const ProfileFollowingController = require('./controllers/ProfileFollowingController');
+const ProfileFollowersController = require('./controllers/ProfileFollowersController');
 const PollController = require('./controllers/PollController');
 const PollContentController = require('./controllers/PollContentController');
 const ContentListController = require('./controllers/ContentListController');
@@ -78,79 +78,83 @@ routes.patch(
   require('./useCases/updatePasswordLocalProfile/updatePasswordLocalProfileController')
 );
 
-// UserController
-routes.get('/users', getLoggedUserId, UserController.index);
-routes.get('/users/:id', getLoggedUserId, UserController.show);
+// ProfileController
+routes.get('/profiles', getLoggedProfileId, ProfileController.index);
+routes.get('/profiles/:id', getLoggedProfileId, ProfileController.show);
 routes.put(
-  '/users',
+  '/profiles',
   authorization,
   multer(multerConfig).single('profile_image'),
-  UserController.update
+  ProfileController.update
 );
 
-// FollowUsersController
+// FollowProfilesController
 routes.post(
-  '/users/follow',
+  '/profiles/follow',
   authorization,
-  isUserActive,
-  FollowUsersController.create
+  isProfileActive,
+  FollowProfilesController.create
 );
 routes.delete(
-  '/users/follow',
+  '/profiles/follow',
   authorization,
-  isUserActive,
-  FollowUsersController.delete
+  isProfileActive,
+  FollowProfilesController.delete
 );
 
-// UserFollowingController
+// ProfileFollowingController
 routes.get(
-  '/users/:id/following',
-  getLoggedUserId,
-  UserFollowingController.index
+  '/profiles/:id/following',
+  getLoggedProfileId,
+  ProfileFollowingController.index
 );
 routes.get(
-  '/users/following/:id',
+  '/profiles/following/:id',
   authorization,
-  isUserActive,
-  UserFollowingController.show
+  isProfileActive,
+  ProfileFollowingController.show
 );
 
-// UserFollowersController
+// ProfileFollowersController
 routes.get(
-  '/users/:id/followers',
-  getLoggedUserId,
-  UserFollowersController.index
+  '/profiles/:id/followers',
+  getLoggedProfileId,
+  ProfileFollowersController.index
 );
-routes.get('/users/followers/:id', authorization, UserFollowersController.show);
+routes.get(
+  '/profiles/followers/:id',
+  authorization,
+  ProfileFollowersController.show
+);
 
 // ContentListController
 routes.post(
   '/contentlists',
   authorization,
-  isUserActive,
+  isProfileActive,
   multer(multerConfig).single('thumbnail'),
   ContentListController.create
 );
-routes.get('/contentlists', getLoggedUserId, ContentListController.index);
-routes.get('/contentlists/:id', getLoggedUserId, ContentListController.show);
+routes.get('/contentlists', getLoggedProfileId, ContentListController.index);
+routes.get('/contentlists/:id', getLoggedProfileId, ContentListController.show);
 routes.put(
   '/contentlists/:id',
   authorization,
-  isUserActive,
+  isProfileActive,
   multer(multerConfig).single('thumbnail'),
   ContentListController.update
 );
 routes.delete(
   '/contentlists/:id',
   authorization,
-  isUserActive,
+  isProfileActive,
   ContentListController.delete
 );
 
 // ContentListContentController
 routes.get(
   '/contentlists/:id/content',
-  getLoggedUserId,
+  getLoggedProfileId,
   ContentListContentController.index
 );
 
@@ -158,7 +162,7 @@ routes.get(
 routes.post(
   '/contentlists/:id/like',
   authorization,
-  isUserActive,
+  isProfileActive,
   ContentListLikeController.create
 );
 routes.get(
@@ -169,7 +173,7 @@ routes.get(
 routes.delete(
   '/contentlists/:id/like',
   authorization,
-  isUserActive,
+  isProfileActive,
   ContentListLikeController.delete
 );
 
@@ -177,7 +181,7 @@ routes.delete(
 routes.post(
   '/contentlists/:id/fork',
   authorization,
-  isUserActive,
+  isProfileActive,
   ContentListForkController.create
 );
 
@@ -185,90 +189,114 @@ routes.post(
 routes.post(
   '/polls',
   authorization,
-  isUserActive,
+  isProfileActive,
   multer(multerConfig).single('thumbnail'),
   PollController.create
 );
-routes.get('/polls', getLoggedUserId, PollController.index);
-routes.get('/polls/:id', getLoggedUserId, PollController.show);
+routes.get('/polls', getLoggedProfileId, PollController.index);
+routes.get('/polls/:id', getLoggedProfileId, PollController.show);
 routes.put(
   '/polls/:id',
   authorization,
-  isUserActive,
+  isProfileActive,
   multer(multerConfig).single('thumbnail'),
   PollController.update
 );
-routes.delete('/polls/:id', authorization, isUserActive, PollController.delete);
+routes.delete(
+  '/polls/:id',
+  authorization,
+  isProfileActive,
+  PollController.delete
+);
 
 // PollContentController
-routes.get('/polls/:id/content', getLoggedUserId, PollContentController.index);
+routes.get(
+  '/polls/:id/content',
+  getLoggedProfileId,
+  PollContentController.index
+);
 
 // VoteController
 routes.post(
   '/polls/:id/votes',
   authorization,
-  isUserActive,
+  isProfileActive,
   VoteController.create
 );
-routes.get('/users/:id/votes', getLoggedUserId, VoteController.index);
+routes.get('/profiles/:id/votes', getLoggedProfileId, VoteController.index);
 routes.get('/polls/:id/votes', authorization, VoteController.show);
 routes.delete(
   '/polls/:id/votes',
   authorization,
-  isUserActive,
+  isProfileActive,
   VoteController.delete
 );
 
 // MovieController
-routes.get('/movies', authorization, isUserActive, MovieController.index);
+routes.get('/movies', authorization, isProfileActive, MovieController.index);
 routes.get(
   '/movies/search',
   authorization,
-  isUserActive,
+  isProfileActive,
   MovieController.search
 );
 routes.get(
   '/movies/certifications',
   authorization,
-  isUserActive,
+  isProfileActive,
   MovieController.certifications
 );
 routes.get(
   '/movies/genres',
   authorization,
-  isUserActive,
+  isProfileActive,
   MovieController.genres
 );
 routes.get(
   '/movies/watch_providers',
   authorization,
-  isUserActive,
+  isProfileActive,
   MovieController.watchProviders
 );
 
 // ShowController
-routes.get('/shows', authorization, isUserActive, ShowController.index);
-routes.get('/shows/search', authorization, isUserActive, ShowController.search);
-routes.get('/shows/genres', authorization, isUserActive, ShowController.genres);
+routes.get('/shows', authorization, isProfileActive, ShowController.index);
+routes.get(
+  '/shows/search',
+  authorization,
+  isProfileActive,
+  ShowController.search
+);
+routes.get(
+  '/shows/genres',
+  authorization,
+  isProfileActive,
+  ShowController.genres
+);
 routes.get(
   '/shows/watch_providers',
   authorization,
-  isUserActive,
+  isProfileActive,
   ShowController.watchProviders
 );
 
 // GameController
-routes.get('/games', authorization, isUserActive, GameController.index);
+routes.get('/games', authorization, isProfileActive, GameController.index);
 routes.get(
   '/games/platforms',
   authorization,
-  isUserActive,
+  isProfileActive,
   GameController.platforms
 );
-routes.get('/games/genres', authorization, isUserActive, GameController.genres);
+routes.get(
+  '/games/genres',
+  authorization,
+  isProfileActive,
+  GameController.genres
+);
 
 // SearchController
-routes.get('/search', getLoggedUserId, SearchController.index);
+routes.get('/search', getLoggedProfileId, SearchController.index);
 
 // TrendingController
 routes.get('/trending', TrendingController.index);
@@ -277,7 +305,7 @@ routes.get('/trending', TrendingController.index);
 routes.get(
   '/following',
   authorization,
-  isUserActive,
+  isProfileActive,
   FollowedProfilePostController.index
 );
 

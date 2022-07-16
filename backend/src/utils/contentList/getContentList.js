@@ -5,9 +5,9 @@ module.exports = async (contentListId) => {
     const contentList = await knex
       .select(
         'cl.id',
-        'cl.user_id',
-        'users.name as user_name',
-        'users.profile_image_url',
+        'cl.profile_id',
+        'profiles.name as profile_name',
+        'profiles.profile_image_url',
         'cl.title',
         'cl.description',
         'cl.sharing_option',
@@ -22,7 +22,7 @@ module.exports = async (contentListId) => {
       .where({
         'cl.id': contentListId,
       })
-      .innerJoin('users', 'cl.user_id', 'users.id')
+      .innerJoin('profiles', 'cl.profile_id', 'profiles.id')
       .leftJoin(
         knex
           .select(

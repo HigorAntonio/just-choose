@@ -19,7 +19,7 @@ import {
   Forks,
   MetaSeparator,
   ProfileInfo,
-  UserName,
+  ProfileName,
   ProfileImageWrapper,
   ProfileImage,
   DescriptionWrapper,
@@ -31,8 +31,8 @@ const ContentListCard = ({ contentList }) => {
 
   const {
     id: listId,
-    user_id: userId,
-    user_name: userName,
+    profile_id: profileId,
+    profile_name: profileName,
     profile_image_url: profileImageUrl,
     title,
     description,
@@ -83,7 +83,7 @@ const ContentListCard = ({ contentList }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <Link to={`/users/${userId}`}>
+            <Link to={`/profiles/${profileId}`}>
               <ProfileImage
                 src={profileImageUrl}
                 onError={() => setProfileImageError(true)}
@@ -91,9 +91,9 @@ const ContentListCard = ({ contentList }) => {
               />
             </Link>
           </ProfileImageWrapper>
-          <UserName>
-            <Link to={`/users/${userId}`}>{userName}</Link>
-          </UserName>
+          <ProfileName>
+            <Link to={`/profiles/${profileId}`}>{profileName}</Link>
+          </ProfileName>
         </ProfileInfo>
         <DescriptionWrapper>
           <Description>{description}</Description>
@@ -101,7 +101,7 @@ const ContentListCard = ({ contentList }) => {
       </TextWrapperLargeScreen>
       <TextWrapperSmallScreen>
         <ProfileImageWrapper>
-          <Link to={`/users/${userId}`}>
+          <Link to={`/profiles/${profileId}`}>
             <ProfileImage
               src={profileImageUrl}
               onError={() => setProfileImageError(true)}
@@ -114,7 +114,7 @@ const ContentListCard = ({ contentList }) => {
             <Link to={`/lists/${listId}`}>{title}</Link>
           </Title>
           <Meta>
-            <UserName>{userName}</UserName>
+            <ProfileName>{profileName}</ProfileName>
             <MetaSeparator>•</MetaSeparator>
             <Likes>
               {formatCount(likes) + ' '}

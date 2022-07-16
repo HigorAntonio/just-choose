@@ -49,7 +49,7 @@ function Header() {
   const { title: theme, colors } = useContext(ThemeContext);
   const { theme: appTheme, toggleTheme } = useContext(AppThemeContext);
   const { loading, authenticated, handleLogout } = useContext(AuthContext);
-  const { userProfile, setUserProfile } = useContext(ProfileContext);
+  const { profile, setProfile } = useContext(ProfileContext);
 
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
@@ -73,19 +73,19 @@ function Header() {
     setNavOption('signUp');
   };
 
-  const handleUserExit = async () => {
+  const handleProfileExit = async () => {
     try {
       history.push('/');
       await handleLogout();
-      setUserProfile({});
+      setProfile({});
       setShowProfileDropDown(false);
     } catch (error) {}
   };
 
-  const handleUserExitOnKeyPress = async (e) => {
+  const handleProfileExitOnKeyPress = async (e) => {
     if (e.key === 'Enter') {
       try {
-        await handleUserExit();
+        await handleProfileExit();
       } catch (error) {}
     }
   };
@@ -210,7 +210,7 @@ function Header() {
             >
               <div>
                 <Profile
-                  src={userProfile.profile_image_url}
+                  src={profile.profile_image_url}
                   onClick={() =>
                     setShowProfileDropDown((prevState) => !prevState)
                   }
@@ -227,10 +227,10 @@ function Header() {
                           onClick={() => setShowProfileDropDown(false)}
                           tabIndex="-1"
                         >
-                          <ProfileImage src={userProfile.profile_image_url} />
+                          <ProfileImage src={profile.profile_image_url} />
                         </Link>
                         <ProfileData>
-                          <span>{userProfile.name}</span>
+                          <span>{profile.name}</span>
                         </ProfileData>
                       </ProfileOption>
                       <DropDownSeparator />
@@ -281,8 +281,8 @@ function Header() {
                       <DropDownSeparator />
                       <DropDownOption
                         className="hover"
-                        onClick={handleUserExit}
-                        onKeyPress={handleUserExitOnKeyPress}
+                        onClick={handleProfileExit}
+                        onKeyPress={handleProfileExitOnKeyPress}
                         tabIndex="0"
                       >
                         <div className="align-left">

@@ -39,7 +39,6 @@ export const Navigation = styled.div`
     display: flex;
     align-items: center;
     font-size: 1.6rem;
-    user-select: none;
     font-weight: 400;
     text-decoration: none;
     user-select: none;

@@ -37,7 +37,7 @@ const UpdatePoll = () => {
   const { id: pollId } = useParams();
   const history = useHistory();
 
-  const { userId } = useContext(AuthContext);
+  const { profileId } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -93,7 +93,7 @@ const UpdatePoll = () => {
         const { data } = await justChooseApi.get(`/polls/${pollId}`, {
           cancelToken: source.current.token,
         });
-        if (userId !== data.user_id) {
+        if (profileId !== data.profile_id) {
           setDenyAccess(true);
           return;
         }
@@ -114,7 +114,7 @@ const UpdatePoll = () => {
         }
       }
     })();
-  }, [pollId, userId]);
+  }, [pollId, profileId]);
 
   const {
     loading: loadingContent,
