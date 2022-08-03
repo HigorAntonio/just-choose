@@ -3,6 +3,8 @@ import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import MuiSkeleton from '@material-ui/lab/Skeleton';
 
+import { ViewportContext } from '../../../context/ViewportContext';
+
 import mUILightTheme from '../../../styles/materialUIThemes/light';
 import mUIDarkTheme from '../../../styles/materialUIThemes/dark';
 
@@ -18,14 +20,23 @@ import {
 
 const Skeleton = () => {
   const { title: theme } = useContext(ThemeContext);
+  const { width } = useContext(ViewportContext);
 
   return (
     <ThemeProvider theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}>
       <Container>
         <Header>
           <HeaderRow>
-            <MuiSkeleton variant="rect" width={'50%'} height={'85px'} />
-            <MuiSkeleton variant="rect" width={'20%'} height={'51px'} />
+            <MuiSkeleton
+              variant="rect"
+              width={width > 1024 ? '50%' : '80%'}
+              height={width > 1024 ? '85px' : '50px'}
+            />
+            <MuiSkeleton
+              variant="rect"
+              width={width > 1024 ? '20%' : '50%'}
+              height={'51px'}
+            />
           </HeaderRow>
           <ListInfo>
             <MuiSkeleton variant="rect" width={'25%'} height={'19px'} />

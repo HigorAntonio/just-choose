@@ -14,8 +14,8 @@ export const Container = styled.div`
 
   background: var(--background-100);
 
-  -webkit-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 0.5rem 0.1rem rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0.5rem 0.1rem rgba(0, 0, 0, 0.5);
 `;
 
 export const LogoWrapper = styled.div`
@@ -71,36 +71,46 @@ export const SearchBar = styled.div`
   display: flex;
   width: 100%;
   max-width: 39rem;
-  margin: 0 20px;
-
-  &.searchbar-small-screen {
-    display: none;
-  }
+  margin: 0 2rem;
 
   @media (max-width: 768px) {
     display: none;
-
-    &.searchbar-small-screen {
-      ${(props) => (props.show ? 'display: flex;' : 'display: none;')}
-      background: var(--background-100);
-      padding: 5px;
-      min-width: 39rem;
-      margin: 0;
-      border-radius: 5px;
-      position: absolute;
-      top: 4.5rem;
-      right: 0;
-      transform: translateX(20%);
-
-      -webkit-box-shadow: 0px 2px 10px 1px rgba(0, 0, 0, 0.25);
-      box-shadow: 0px 2px 10px 1px rgba(0, 0, 0, 0.25);
-    }
   }
 
-  @media (max-width: 475px) {
-    &.searchbar-small-screen {
+  &.searchbar-small-screen {
+    display: none;
+    background: var(--background-100);
+    padding: 0.5rem;
+    min-width: 39rem;
+    margin: 0;
+    border-radius: 5px;
+    position: absolute;
+    top: 4.5rem;
+    right: 0;
+    transform: translateX(20%);
+
+    -webkit-box-shadow: 0 0.2rem 1rem 0.1rem rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0.2rem 1rem 0.1rem rgba(0, 0, 0, 0.25);
+
+    @media (max-width: 768px) {
+      ${(props) => (props.show ? 'display: flex;' : 'display: none;')}
+    }
+
+    @media (max-width: 670px) {
+      transform: translateX(40%);
+    }
+
+    @media (max-width: 530px) {
       min-width: 85vw;
-      transform: translateX(26%);
+      transform: translateX(50%);
+    }
+
+    @media (max-width: 470px) {
+      transform: translateX(10%);
+    }
+
+    @media (max-width: 370px) {
+      transform: translateX(15%);
     }
   }
 `;
@@ -109,9 +119,9 @@ export const SearchInput = styled.input`
   width: 90%;
   height: 3.6rem;
   font-size: 1.4rem;
-  padding: 5px 10px;
+  padding: 0.5rem 1rem;
   border-radius: 5px 0 0 5px;
-  border: 2px solid var(--background-400);
+  border: 0.2rem solid var(--background-400);
   background: var(--background-400);
   text-overflow: ellipsis;
 
@@ -122,11 +132,11 @@ export const SearchInput = styled.input`
   outline: 0;
 
   &:hover {
-    border: 2px solid var(--gray);
+    border: 0.2rem solid var(--gray);
   }
 
   &:focus {
-    border: 2px solid var(--primary-400);
+    border: 0.2rem solid var(--primary-400);
   }
 
   transition: border 0.3s;
@@ -136,9 +146,9 @@ export const SearchButton = styled.button`
   width: 10%;
   height: 3.6rem;
   min-width: 3rem;
-  padding: 5px;
+  padding: 0.5rem;
   border-radius: 0 5px 5px 0;
-  margin-left: 1px;
+  margin-left: 0.1rem;
   background: var(--background-300);
 
   &.squared {
@@ -237,6 +247,10 @@ const signButton = css`
   border-radius: 5px;
   white-space: nowrap;
   outline: none;
+
+  @media (max-width: 470px) {
+    display: none;
+  }
 `;
 
 export const SignIn = styled.button`
@@ -261,6 +275,10 @@ export const SignUp = styled.button`
 
 export const ProfileWrapper = styled.div`
   position: relative;
+
+  @media (max-width: 470px) {
+    margin-left: 1rem;
+  }
 `;
 
 export const Profile = styled.div`
@@ -278,6 +296,10 @@ export const Profile = styled.div`
   &:hover {
     cursor: pointer;
   }
+
+  > svg {
+    transform: translate(0.75rem, 0.75rem);
+  }
 `;
 
 export const ProfileDropDown = styled.div`
@@ -286,12 +308,12 @@ export const ProfileDropDown = styled.div`
   padding: 1rem;
   border-radius: 5px;
   position: absolute;
-  bottom: -5px;
+  bottom: -0.5rem;
   right: 0;
   transform: translateY(100%);
 
-  -webkit-box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+  -webkit-box-shadow: 0 0.4rem 1rem 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0.4rem 1rem 0 rgba(0, 0, 0, 0.25);
 
   ${(props) =>
     props.show
@@ -321,8 +343,8 @@ export const ProfileOption = styled.div`
 `;
 
 export const ProfileImage = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
   background-image: url('${(props) => props.src}');
   background-repeat: no-repeat;
@@ -340,33 +362,33 @@ export const ProfileData = styled.div`
   overflow: hidden;
 
   > span {
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    margin-left: 10px;
+    margin-left: 1rem;
   }
 `;
 
 export const DropDownSeparator = styled.div`
-  margin-top: 10px;
-  border-top: 1px solid var(--background-700);
-  padding-bottom: 10px;
+  margin-top: 1rem;
+  border-top: 0.1rem solid var(--background-700);
+  padding-bottom: 1rem;
 `;
 
 export const DropDownOption = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 5px;
+  padding: 0.5rem;
   border-radius: 2.5px;
 
   .align-left {
     flex: 0;
     display: flex;
     align-items: center;
-    margin-right: 5px;
+    margin-right: 0.5rem;
   }
 
   .align-right {

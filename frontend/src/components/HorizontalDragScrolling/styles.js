@@ -17,7 +17,7 @@ export const SliderButton = styled.button`
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 1rem;
 
   &:hover {
     cursor: pointer;

@@ -3,16 +3,27 @@ import styled from 'styled-components';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
+  margin: 0 3rem;
 `;
 
 export const Header = styled.header`
-  padding: 30px;
+  width: 100%;
+  max-width: 200rem;
+  margin: 0 auto;
+  padding: 3rem 0;
 `;
 
 export const HeaderRow = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    > span + span {
+      margin-top: 1.5rem;
+    }
+  }
 `;
 
 export const ListInfo = styled.div`
@@ -27,9 +38,12 @@ export const Description = styled.div`
 `;
 
 export const Main = styled.main`
+  width: 100%;
+  max-width: 200rem;
   display: flex;
   flex-direction: column;
-  padding: 30px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
 `;
 
 export const ContentListContainer = styled.div`

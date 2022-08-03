@@ -6,19 +6,19 @@ export const Container = styled.div`
   align-items: center;
   opacity: 0;
   pointer-events: none;
-  width: ${(props) => props.width || '120px'};
+  width: ${(props) => props.width || '12rem'};
   background-color: var(--tooltip);
   border-radius: 6px;
-  padding: 5px;
+  padding: 0.5rem;
   position: absolute;
   z-index: 1;
   ${(props) =>
     props.position === 'top'
       ? `bottom: ${
-          props.spacing ? `calc(100% + ${props.spacing})` : `calc(100% + 10px)`
+          props.spacing ? `calc(100% + ${props.spacing})` : `calc(100% + 1rem)`
         };`
       : `top: ${
-          props.spacing ? `calc(100% + ${props.spacing})` : `calc(100% + 10px)`
+          props.spacing ? `calc(100% + ${props.spacing})` : `calc(100% + 1rem)`
         };`}
   left: 50%;
   margin-left: ${(props) =>
@@ -27,7 +27,7 @@ export const Container = styled.div`
           `${parseFloat(props.width)}`,
           ''
         )}`
-      : '-60px'};
+      : '-6rem'};
   font-weight: bold;
   white-space: nowrap;
 
@@ -35,8 +35,8 @@ export const Container = styled.div`
     content: '';
     position: absolute;
     left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
+    margin-left: -0.5rem;
+    border-width: 0.5rem;
     border-style: solid;
     border-color: ${(props) =>
       props.position === 'top'

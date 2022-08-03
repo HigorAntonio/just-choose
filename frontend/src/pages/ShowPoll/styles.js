@@ -3,13 +3,21 @@ import styled from 'styled-components';
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
+  margin: 0 3rem;
+
+  @media (max-width: 768px) {
+    margin: 0 2rem;
+  }
 `;
 
 export const Header = styled.header`
-  padding: 30px;
+  width: 100%;
+  max-width: 200rem;
+  margin: 0 auto;
+  padding: 3rem 0;
 
   @media (max-width: 768px) {
-    padding: 20px 15px;
+    padding: 1.5rem 0;
   }
 `;
 
@@ -242,11 +250,14 @@ export const Option = styled.div`
 `;
 
 export const Main = styled.main`
+  width: 100%;
+  max-width: 200rem;
   display: flex;
   flex-direction: column;
-  padding: 0 30px 30px 30px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
 
   @media (max-width: 768px) {
-    padding: 0 15px 20px 15px;
+    padding-bottom: 2rem;
   }
 `;

@@ -5,18 +5,18 @@ export const Container = styled.div`
   flex-shrink: 0;
 
   > button {
-    font-size: 16px;
-    padding: 6px 30px 6px 10px;
+    font-size: 1.6rem;
+    padding: 0.6rem 3rem 0.6rem 1rem;
     background: var(--background-400);
     border-radius: 5px;
     position: relative;
     outline: none;
 
     > svg {
-      height: 15px;
+      height: 1.5rem;
       position: absolute;
-      top: 7px;
-      right: 10px;
+      top: 0.7rem;
+      right: 1rem;
       flex-shrink: 0;
     }
 
@@ -31,18 +31,18 @@ export const SelectMenu = styled.div`
   display: flex;
   flex-direction: column;
   background: var(--background-100);
-  border: 0.1px solid var(--background-600);
+  border: 0.01rem solid var(--background-600);
   border-radius: 5px;
   position: absolute;
-  top: 35px;
-  max-height: 550px;
+  top: 3.5rem;
+  max-height: 55rem;
   overflow: auto;
 
   ${(props) => props.align === 'left' && `left: 0;`};
   ${(props) => props.align === 'right' && `right: 0;`};
   ${(props) =>
     props.align === 'center' &&
-    `left: 50%; transform: translate(-50%, -10px);`};
+    `left: 50%; transform: translate(-50%, -1rem);`};
   z-index: 200;
 
   ${(props) =>
@@ -51,8 +51,8 @@ export const SelectMenu = styled.div`
         ? 'opacity: 1; pointer-events: initial; transform: translate(-50%, 0);'
         : 'opacity: 1; pointer-events: initial; transform: translateY(0);'
       : props.align === 'center'
-      ? 'opacity: 0; pointer-events: none; transform: translate(-50%, -10px);'
-      : 'opacity: 0; pointer-events: none; transform: translateY(-10px);'}
+      ? 'opacity: 0; pointer-events: none; transform: translate(-50%, -1rem);'
+      : 'opacity: 0; pointer-events: none; transform: translateY(-1rem);'}
 
   /* Faz com que as opções do select que tenham a propriedade
   tabindex="0" por padrão (input, button, .etc) se tornem não 'focaveis'

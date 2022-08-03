@@ -2,9 +2,9 @@ import styled, { css } from 'styled-components';
 
 const labelCss = css`
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: bold;
-  margin-right: 15px;
+  margin-right: 1.5rem;
 `;
 
 export const Container = styled.div`
@@ -13,55 +13,55 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.header`
-  padding: 30px;
+  padding: 3rem;
 
   > h1 {
-    font-size: 36px;
+    font-size: 3.6rem;
   }
 
   @media (max-width: 768px) {
-    padding: 20px 15px;
+    padding: 2rem 1.5rem;
   }
 `;
 
 export const InputWrapper = styled.div`
   display: flex;
-  padding: 20px;
+  padding: 2rem;
 
   > .column {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 680px;
+    max-width: 68rem;
 
     > .error {
       color: var(--white);
       background: var(--error);
-      padding: 7px 20px;
-      border-radius: 5px;
-      font-size: 14px;
+      padding: 0.7rem 2rem;
+      border-radius: 0.5rem;
+      font-size: 1.4rem;
       font-weight: bold;
-      margin-top: 5px;
+      margin-top: 0.5rem;
     }
   }
 
   > textarea {
-    font-size: 14px;
+    font-size: 1.4rem;
     width: 100%;
-    max-width: 680px;
-    max-height: 50px;
+    max-width: 68rem;
+    max-height: 5rem;
     resize: none;
-    padding: 5px 10px;
-    border: 2px solid var(--background-400);
-    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    border: 0.2rem solid var(--background-400);
+    border-radius: 0.5rem;
     background: var(--background-400);
     outline: none;
 
     &:hover {
-      border: 2px solid var(--gray);
+      border: 0.2rem solid var(--gray);
     }
     &:focus {
-      border: 2px solid var(--primary-400);
+      border: 0.2rem solid var(--primary-400);
     }
 
     transition: border 0.3s;
@@ -78,23 +78,23 @@ export const InputWrapper = styled.div`
 `;
 
 export const TitleInput = styled.input`
-  font-size: 14px;
+  font-size: 1.4rem;
   width: 100%;
-  max-width: 680px;
-  padding: 5px 10px;
-  border-radius: 5px;
+  max-width: 68rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   background: var(--background-400);
   outline: none;
   ${(props) =>
     props.validationError
-      ? `border: 2px solid var(--error);`
-      : `border: 2px solid var(--background-400);`}
+      ? `border: 0.2rem solid var(--error);`
+      : `border: 0.2rem solid var(--background-400);`}
 
   &:hover {
-    border: 2px solid var(--gray);
+    border: 0.2rem solid var(--gray);
   }
   &:focus {
-    border: 2px solid var(--primary-400);
+    border: 0.2rem solid var(--primary-400);
   }
 
   transition: border 0.3s;
@@ -107,7 +107,7 @@ export const TitleInput = styled.input`
 export const ThumbnailWrapper = styled.div`
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 2rem;
 
   > div.column {
     display: flex;
@@ -124,9 +124,9 @@ export const ThumbnailWrapper = styled.div`
 
       > label {
         ${labelCss}
-        padding: 7px 20px;
+        padding: 0.7rem 2rem;
         background: var(--background-400);
-        border-radius: 5px;
+        border-radius: 0.5rem;
 
         &:hover,
         &:focus {
@@ -135,23 +135,23 @@ export const ThumbnailWrapper = styled.div`
         }
 
         &:focus {
-          outline: 2px solid var(--primary-400);
+          outline: 0.2rem solid var(--primary-400);
         }
       }
     }
 
     > p {
-      margin-top: 10px;
-      font-size: 14px;
+      margin-top: 1rem;
+      font-size: 1.4rem;
     }
 
     > p.thumb-error {
       width: 100%;
       color: var(--white);
       background: var(--error);
-      padding: 7px 20px;
-      border-radius: 5px;
-      font-size: 14px;
+      padding: 0.7rem 2rem;
+      border-radius: 0.5rem;
+      font-size: 1.4rem;
       font-weight: bold;
     }
   }
@@ -167,10 +167,10 @@ export const ThumbnailWrapper = styled.div`
 `;
 
 export const ThumbPreview = styled.div`
-  width: 170px;
+  width: 17rem;
   background: var(--background-400);
   display: flex;
-  margin-right: 20px;
+  margin-right: 2rem;
 
   &:before {
     content: '';
@@ -187,27 +187,27 @@ export const ThumbPreview = styled.div`
 
   @media (max-width: 640px) {
     margin-right: 0;
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
   }
 `;
 
 export const Main = styled.main`
   display: flex;
   flex-direction: column;
-  padding: 0 30px 30px 30px;
+  padding: 0 3rem 3rem 3rem;
 
   > h3 {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
   }
 
   > div {
     display: flex;
     flex-direction: column;
     width: 90%;
-    max-width: 900px;
+    max-width: 90rem;
     background: var(--background-100);
-    border: 0.1px solid var(--background-600);
-    border-radius: 5px;
+    border: 0.01rem solid var(--background-600);
+    border-radius: 0.5rem;
 
     @media (max-width: 1130px) {
       width: 100%;
@@ -215,7 +215,7 @@ export const Main = styled.main`
   }
 
   > div + h3 {
-    margin-top: 40px;
+    margin-top: 4rem;
   }
 
   > .content-list {
@@ -224,35 +224,35 @@ export const Main = styled.main`
   }
 
   & ${InputWrapper} + ${InputWrapper} {
-    border-top: 0.1px solid var(--background-600);
+    border-top: 0.01rem solid var(--background-600);
   }
 
   > .error {
     color: var(--white);
     background: var(--error);
-    padding: 7px 20px;
-    border-radius: 5px;
-    font-size: 14px;
+    padding: 0.7rem 2rem;
+    border-radius: 0.5rem;
+    font-size: 1.4rem;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 0.5rem;
   }
 
   @media (max-width: 768px) {
-    padding: 0 15px 20px 15px;
+    padding: 0 1.5rem 2rem 1.5rem;
   }
 `;
 
 export const LabelWrapper = styled.div`
   display: inline-block;
-  width: 180px;
+  width: 18rem;
 
   > label {
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: bold;
   }
 
   @media (max-width: 1027px) {
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
   }
 `;
 
@@ -264,7 +264,7 @@ export const ContentListContainer = styled.div`
 export const ContentListHeader = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 2rem;
 
   .wrapper {
     display: flex;
@@ -276,7 +276,7 @@ export const ContentListHeader = styled.div`
 
       @media (max-width: 399px) {
         margin-right: 0;
-        margin-bottom: 15px;
+        margin-bottom: 1.5rem;
       }
     }
 
@@ -292,7 +292,7 @@ export const ContentListHeader = styled.div`
 
       > div + div,
       button + button {
-        margin-left: 15px;
+        margin-left: 1.5rem;
       }
 
       > label {
@@ -301,7 +301,7 @@ export const ContentListHeader = styled.div`
     }
 
     > div + div {
-      margin-left: 15px;
+      margin-left: 1.5rem;
     } */
 
     @media (max-width: 775px) {
@@ -311,7 +311,7 @@ export const ContentListHeader = styled.div`
   }
 
   > .wrapper + .wrapper {
-    margin-top: 15px;
+    margin-top: 1.5rem;
   }
 
   .content-type-wrapper {
@@ -331,15 +331,15 @@ export const Options = styled.div`
   flex-direction: column;
 
   > div + div {
-    margin-top: 10px;
+    margin-top: 1rem;
   }
 `;
 
 export const Option = styled.div`
   width: 100%;
   background: var(--background-400);
-  padding: 10px;
-  border-radius: 5px;
+  padding: 1rem;
+  border-radius: 0.5rem;
 
   &:hover,
   &:focus {
@@ -348,7 +348,7 @@ export const Option = styled.div`
   }
 
   &:focus {
-    outline: 2px solid var(--primary-400);
+    outline: 0.2rem solid var(--primary-400);
   }
 `;
 
@@ -357,7 +357,7 @@ export const SharingOption = styled.div`
   flex-direction: column;
 
   > div + div {
-    font-size: 13px;
+    font-size: 1.3rem;
   }
 `;
 
@@ -365,28 +365,28 @@ export const SearchWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-left: 15px;
+  margin-left: 1.5rem;
   position: relative;
 
   > svg {
     position: absolute;
-    left: 8.5px;
+    left: 0.85rem;
   }
 
   > input {
-    font-size: 14px;
-    width: 350px;
-    padding: 5px 10px 5px 30px;
-    border: 2px solid var(--background-400);
-    border-radius: 5px;
+    font-size: 1.4rem;
+    width: 35rem;
+    padding: 0.5rem 1rem 0.5rem 3rem;
+    border: 0.2rem solid var(--background-400);
+    border-radius: 0.5rem;
     background: var(--background-400);
     outline: none;
 
     &:hover {
-      border: 2px solid var(--gray);
+      border: 0.2rem solid var(--gray);
     }
     &:focus {
-      border: 2px solid var(--primary-400);
+      border: 0.2rem solid var(--primary-400);
     }
 
     transition: border 0.3s;
@@ -400,13 +400,13 @@ export const SearchWrapper = styled.div`
     width: 100%;
     order: -1;
     margin-left: 0;
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
   }
 `;
 
 export const ContentListWrapper = styled.div`
-  max-height: 550px;
-  border-top: 0.1px solid var(--background-600);
+  max-height: 55rem;
+  border-top: 0.01rem solid var(--background-600);
   overflow-y: scroll;
 
   /* Scrollbar on Firefox */
@@ -421,13 +421,13 @@ export const ContentListWrapper = styled.div`
 export const CreationOptions = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 20px;
-  border-top: 0.1px solid var(--background-600);
+  padding: 2rem;
+  border-top: 0.01rem solid var(--background-600);
 
   > div {
     display: flex;
     > button + button {
-      margin-left: 15px;
+      margin-left: 1.5rem;
     }
   }
 
@@ -435,7 +435,7 @@ export const CreationOptions = styled.div`
     flex-direction: column;
 
     > div + div {
-      margin-top: 15px;
+      margin-top: 1.5rem;
     }
   }
 `;
@@ -444,10 +444,10 @@ const buttonCss = css`
   display: flex;
   align-items: center;
   font-weight: bold;
-  font-size: 14px;
-  height: 31px;
-  padding: 10px;
-  border-radius: 5px;
+  font-size: 1.4rem;
+  height: 3.1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
   white-space: nowrap;
   outline: none;
 
@@ -466,7 +466,7 @@ export const ClearButton = styled.button`
   }
 
   &:focus {
-    outline: 2px solid var(--primary-400);
+    outline: 0.2rem solid var(--primary-400);
   }
 `;
 
@@ -480,7 +480,7 @@ export const PreviewButton = styled.button`
   }
 
   &:focus {
-    outline: 2px solid var(--primary-400);
+    outline: 0.2rem solid var(--primary-400);
   }
 `;
 
@@ -495,6 +495,6 @@ export const CreateButton = styled.button`
   }
 
   &:focus {
-    outline: 2px solid var(--primary-400);
+    outline: 0.2rem solid var(--primary-400);
   }
 `;

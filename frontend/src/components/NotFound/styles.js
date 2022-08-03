@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  padding: 30px;
+  padding: 3rem;
 
   > h1 {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
   }
 `;

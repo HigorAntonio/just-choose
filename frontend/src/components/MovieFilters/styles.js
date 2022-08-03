@@ -32,11 +32,11 @@ export const FilterWrapper = styled.div`
   }
 
   & + & {
-    margin-left: 15px;
+    margin-left: 1.5rem;
 
     @media (max-width: ${breakpoints.size2}) {
       margin-left: 0;
-      margin-top: 15px;
+      margin-top: 1.5rem;
     }
   }
 
@@ -49,7 +49,7 @@ export const FilterWrapper = styled.div`
 export const FilterGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(6, auto);
-  grid-gap: 15px;
+  grid-gap: 1.5rem;
 
   @media (max-width: 1586px) {
     grid-template-columns: repeat(3, auto);
@@ -80,10 +80,10 @@ export const FilterGrid = styled.div`
 export const ButtonsWrapper = styled.div`
   display: flex;
   justify-self: flex-end;
-  margin-left: 15px;
+  margin-left: 1.5rem;
 
   > button + button {
-    margin-left: 15px;
+    margin-left: 1.5rem;
   }
 
   @media (max-width: 1586px) {
@@ -92,7 +92,7 @@ export const ButtonsWrapper = styled.div`
 
   @media (max-width: 850px) {
     margin-left: 0;
-    margin-top: 15px;
+    margin-top: 1.5rem;
   }
 `;
 
@@ -101,37 +101,37 @@ export const LabelWrapper = styled.span`
   align-items: center;
 
   @media (max-width: 1586px) {
-    height: 31px;
+    height: 3.1rem;
     align-self: flex-start;
   }
 `;
 
 export const Label = styled.label`
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: bold;
-  margin-right: 15px;
+  margin-right: 1.5rem;
 
   @media (max-width: 399px) {
     margin-right: 0;
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
   }
 `;
 
 export const OrderByOptions = styled.div`
-  width: 200px;
+  width: 20rem;
   display: flex;
   align-items: center;
   flex-direction: column;
   > div + div {
-    margin-top: 10px;
+    margin-top: 1rem;
   }
 `;
 
 export const Option = styled.div`
   width: 100%;
   background: var(--background-400);
-  padding: 10px;
+  padding: 1rem;
   border-radius: 5px;
 
   &:hover {
@@ -143,8 +143,8 @@ export const Option = styled.div`
 export const Providers = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 10px;
-  padding: 10px;
+  grid-gap: 1rem;
+  padding: 1rem;
 
   @media (max-width: ${breakpoints.size3}) {
     grid-template-columns: 1fr;
@@ -152,23 +152,23 @@ export const Providers = styled.div`
 `;
 
 export const Genres = styled.div`
-  width: 400px;
+  width: 40rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 10px;
-  padding: 10px;
+  grid-gap: 1rem;
+  padding: 1rem;
 
   @media (max-width: ${breakpoints.size3}) {
     grid-template-columns: 1fr;
-    width: 200px;
+    width: 20rem;
   }
 `;
 
 export const ReleaseDate = styled.div`
-  width: 200px;
+  width: 20rem;
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 1rem;
 
   > div {
     display: flex;
@@ -178,48 +178,48 @@ export const ReleaseDate = styled.div`
   }
 
   > div + div {
-    margin-top: 10px;
+    margin-top: 1rem;
   }
 `;
 
 export const DataPickerWrapper = styled.div`
-  width: 150px;
+  width: 15rem;
 `;
 
 export const RangeWrapper = styled.div`
-  padding: 10px;
+  padding: 1rem;
 
   > div {
     display: flex;
     align-items: center;
     background: var(--background-400);
-    padding: 0 10px;
+    padding: 0 1rem;
     border-radius: 5px;
 
     > .label-left {
-      margin-right: 20px;
+      margin-right: 2rem;
     }
 
     > .label-right {
-      margin-left: 20px;
+      margin-left: 2rem;
     }
   }
 
   @media (max-width: 500px) {
-    width: 200px;
+    width: 20rem;
   }
 `;
 
 export const Certification = styled.div`
-  width: 300px;
+  width: 30rem;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 10px;
-  padding: 10px;
+  grid-gap: 1rem;
+  padding: 1rem;
 
   @media (max-width: ${breakpoints.size3}) {
     grid-template-columns: 1fr 1fr;
-    width: 200px;
+    width: 20rem;
   }
 `;
 
@@ -227,9 +227,9 @@ const buttonCss = css`
   display: flex;
   align-items: center;
   font-weight: bold;
-  font-size: 14px;
-  height: 31px;
-  padding: 10px;
+  font-size: 1.4rem;
+  height: 3.1rem;
+  padding: 1rem;
   border-radius: 5px;
   white-space: nowrap;
   outline: none;

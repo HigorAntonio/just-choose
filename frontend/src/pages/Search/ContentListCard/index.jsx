@@ -46,30 +46,36 @@ const ContentListCard = ({ contentList }) => {
   const [thumbnailError, setThumbnailError] = useState(false);
 
   const handleContainerClick = (e) => {
-    if (!['A', 'svg', 'path', 'IMG'].includes(e.target.tagName)) {
+    if (!e.target.hasAttribute('data-prevent-container-click')) {
       history.push(`/lists/${listId}`);
     }
   };
 
+  const handleContainerOnKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleContainerClick(e);
+    }
+  };
+
   return (
-    <Container onClick={handleContainerClick}>
+    <Container
+      onClick={handleContainerClick}
+      onKeyPress={handleContainerOnKeyPress}
+      tabIndex="0"
+    >
       <ThumbnailContainer>
         <ThumbnailWrapper>
-          <Link to={`/lists/${listId}`}>
-            <Thumbnail
-              src={thumbnail}
-              onError={() => setThumbnailError(true)}
-              error={thumbnailError}
-            />
-            {thumbnailError && <BsImage />}
-            <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
-          </Link>
+          <Thumbnail
+            src={thumbnail}
+            onError={() => setThumbnailError(true)}
+            error={thumbnailError}
+          />
+          {thumbnailError && <BsImage />}
+          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
         </ThumbnailWrapper>
       </ThumbnailContainer>
       <TextWrapperLargeScreen>
-        <Title title={title}>
-          <Link to={`/lists/${listId}`}>{title}</Link>
-        </Title>
+        <Title title={title}>{title}</Title>
         <Meta>
           <Likes>
             {formatCount(likes) + ' '}
@@ -83,16 +89,19 @@ const ContentListCard = ({ contentList }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <Link to={`/profiles/${profileId}`}>
+            <Link to={`/profiles/${profileId}`} data-prevent-container-click>
               <ProfileImage
                 src={profileImageUrl}
                 onError={() => setProfileImageError(true)}
                 error={profileImageError}
+                data-prevent-container-click
               />
             </Link>
           </ProfileImageWrapper>
           <ProfileName>
-            <Link to={`/profiles/${profileId}`}>{profileName}</Link>
+            <Link to={`/profiles/${profileId}`} data-prevent-container-click>
+              {profileName}
+            </Link>
           </ProfileName>
         </ProfileInfo>
         <DescriptionWrapper>
@@ -101,20 +110,23 @@ const ContentListCard = ({ contentList }) => {
       </TextWrapperLargeScreen>
       <TextWrapperSmallScreen>
         <ProfileImageWrapper>
-          <Link to={`/profiles/${profileId}`}>
+          <Link to={`/profiles/${profileId}`} data-prevent-container-click>
             <ProfileImage
               src={profileImageUrl}
               onError={() => setProfileImageError(true)}
               error={profileImageError}
+              data-prevent-container-click
             />
           </Link>
         </ProfileImageWrapper>
         <Meta>
-          <Title title={title}>
-            <Link to={`/lists/${listId}`}>{title}</Link>
-          </Title>
+          <Title title={title}>{title}</Title>
           <Meta>
-            <ProfileName>{profileName}</ProfileName>
+            <ProfileName>
+              <Link to={`/profiles/${profileId}`} data-prevent-container-click>
+                {profileName}
+              </Link>
+            </ProfileName>
             <MetaSeparator>•</MetaSeparator>
             <Likes>
               {formatCount(likes) + ' '}

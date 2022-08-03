@@ -4,13 +4,13 @@ export const Container = styled.div`
   width: 100%;
   position: sticky;
   top: 0;
-  padding: 10px;
+  padding: 1rem;
   display: flex;
   justify-content: center;
   align-items: center;
   transform: translateY(-50%);
   color: var(--white);
-  font-size: 16px;
+  font-size: 1.6rem;
   font-weight: bold;
   z-index: 1000;
   ${(props) =>

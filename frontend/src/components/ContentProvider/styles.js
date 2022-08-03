@@ -6,10 +6,10 @@ export const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 250px;
+  width: 25rem;
   background: var(--background-400);
   border-radius: 5px;
-  padding: 10px;
+  padding: 1rem;
 
   &:hover {
     background: var(--background-500);
@@ -21,14 +21,14 @@ export const Container = styled.div`
     align-items: center;
 
     > span {
-      margin-left: 10px;
+      margin-left: 1rem;
     }
   }
 `;
 
 export const Logo = styled.div`
-  width: 35px;
-  height: 35px;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 5px;
   background: var(--gray);
   background-image: url('${(props) => contentProviders[`${props.src}`]}');

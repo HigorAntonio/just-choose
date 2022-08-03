@@ -14,14 +14,14 @@ export const Container = styled.div`
 `;
 
 export const ModalWrapper = styled.div`
-  /* width: min(420px, 90%); */
+  /* width: min(42rem, 90%); */
   max-height: 100%;
-  padding: 20px 0 20px 0;
+  padding: 2rem 0 2rem 0;
 
   &::after {
     content: '';
     display: block;
-    height: 20px;
+    height: 2rem;
   }
 `;
 
@@ -32,20 +32,20 @@ export const ModalContent = styled.div`
   flex-direction: column;
   align-items: center;
   position: relative;
-  transform: translateX(-10px);
+  transform: translateX(-1rem);
   z-index: 4000;
 `;
 
 export const CloseModal = styled.button`
-  width: 30px;
-  height: 30px;
+  width: 3rem;
+  height: 3rem;
   border-radius: 5px;
   position: absolute;
   top: 0;
-  right: -35px;
+  right: -3.5rem;
   color: var(--white);
   font-weight: bold;
-  font-size: 20px;
+  font-size: 2rem;
   outline: none;
 
   &:hover {

@@ -19,7 +19,7 @@ export const TopSide = styled.div`
   display: flex;
   flex-direction: column;
 
-  padding-right: 10px;
+  padding-right: 1rem;
   overflow-y: hidden;
 
   &:hover {
@@ -41,8 +41,8 @@ export const Navigation = styled.div`
   display: flex;
   flex-direction: column;
 
-  padding: 10px 0;
-  border-bottom: 1px solid var(--background-700);
+  padding: 1rem 0;
+  border-bottom: 0.1rem solid var(--background-700);
 
   > a {
     text-decoration: none;
@@ -54,15 +54,15 @@ export const Following = styled.div`
   display: flex;
   flex-direction: column;
 
-  padding: 10px 0;
+  padding: 1rem 0;
 `;
 
 export const NavOption = styled.div`
   display: flex;
   justify-content: flex-start;
-  height: 42px;
+  height: 4.2rem;
 
-  padding: 5px 10px;
+  padding: 0.5rem 1rem;
 
   &:hover {
     background: var(--background-600);
@@ -78,10 +78,10 @@ export const NavOption = styled.div`
   }
 
   > div span {
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: 500;
 
-    margin-left: 10px;
+    margin-left: 1rem;
 
     overflow: hidden;
     text-overflow: ellipsis;
@@ -102,10 +102,10 @@ export const Header = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  margin: 10px;
+  margin: 1rem;
 
   > h5 {
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: 500;
   }
 
@@ -127,9 +127,9 @@ export const Profiles = styled.div`
 export const Profile = styled.div`
   display: flex;
   justify-content: flex-start;
-  height: 42px;
+  height: 4.2rem;
 
-  padding: 5px 10px;
+  padding: 0.5rem 1rem;
 
   &:hover {
     background: var(--background-600);
@@ -144,8 +144,8 @@ export const Profile = styled.div`
 `;
 
 export const ProfileImage = styled.div`
-  width: 30px;
-  height: 30px;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
   background-image: url('${(props) => props.src}');
   background-repeat: no-repeat;
@@ -163,12 +163,12 @@ export const ProfileData = styled.div`
   overflow: hidden;
 
   > span {
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    margin-left: 10px;
+    margin-left: 1rem;
   }
 
   @media (max-width: ${breakpoints.size1}) {
@@ -178,9 +178,9 @@ export const ProfileData = styled.div`
 
 export const BottomSide = styled.div`
   width: 100%;
-  padding: 10px;
+  padding: 1rem;
 
-  border-top: 1px solid var(--background-700);
+  border-top: 0.1rem solid var(--background-700);
 `;
 
 export const SearchProfile = styled.div`
@@ -191,26 +191,26 @@ export const SearchProfile = styled.div`
 
   > svg {
     position: absolute;
-    left: 8.5px;
+    left: 0.85rem;
   }
 `;
 
 export const SearchProfileInput = styled.input`
   width: 100%;
-  height: 30px;
+  height: 3rem;
 
-  border: 2px solid var(--background-700);
+  border: 0.2rem solid var(--background-700);
   border-radius: 3px;
-  padding: 5px 10px 5px 30px;
+  padding: 0.5rem 1rem 0.5rem 3rem;
 
   outline: 0;
 
   &:hover {
-    border: 2px solid var(--gray);
+    border: 0.2rem solid var(--gray);
   }
 
   &:focus {
-    border: 2px solid var(--primary-400);
+    border: 0.2rem solid var(--primary-400);
   }
 
   transition: border 0.3s;
@@ -219,7 +219,7 @@ export const SearchProfileInput = styled.input`
 `;
 
 export const NoResults = styled.span`
-  padding: 10px;
-  font-size: 15px;
+  padding: 1rem;
+  font-size: 1.5rem;
   color: var(--dark-gray);
 `;

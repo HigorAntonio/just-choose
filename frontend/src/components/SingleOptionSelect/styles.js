@@ -4,8 +4,8 @@ export const Container = styled.div`
   position: relative;
 
   > button {
-    font-size: 16px;
-    padding: 6px 30px 6px 10px;
+    font-size: 1.6rem;
+    padding: 0.6rem 3rem 0.6rem 1rem;
     background: ${(props) =>
       props.background ? props.background : `var(--background-400)`};
     border-radius: 5px;
@@ -13,10 +13,10 @@ export const Container = styled.div`
     outline: none;
 
     > svg {
-      height: 15px;
+      height: 1.5rem;
       position: absolute;
-      top: 7px;
-      right: 10px;
+      top: 0.7rem;
+      right: 1rem;
       flex-shrink: 0;
     }
 
@@ -28,7 +28,7 @@ export const Container = styled.div`
     }
 
     &:focus {
-      outline: 2px solid var(--primary-400);
+      outline: 0.2rem solid var(--primary-400);
     }
 
     > div {
@@ -42,17 +42,17 @@ export const SelectMenu = styled.div`
   display: flex;
   flex-direction: column;
   background: var(--background-100);
-  border: 0.1px solid var(--background-600);
+  border: 0.01rem solid var(--background-600);
   border-radius: 5px;
-  padding: 10px;
+  padding: 1rem;
   position: absolute;
-  top: 35px;
+  top: 3.5rem;
 
   ${(props) => props.align === 'left' && 'left: 0;'};
   ${(props) => props.align === 'right' && 'right: 0;'};
   ${(props) =>
     props.align === 'center' &&
-    'left: 50%; transform: translate(-50%, -10px);'};
+    'left: 50%; transform: translate(-50%, -1rem);'};
   z-index: 200;
 
   ${(props) =>
@@ -61,7 +61,7 @@ export const SelectMenu = styled.div`
         ? 'opacity: 1; pointer-events: all; transform: translate(-50%, 0);'
         : 'opacity: 1; pointer-events: all; transform: translateY(0);'
       : props.align === 'center'
-      ? 'opacity: 0; pointer-events: none; transform: translate(-50%, -10px);'
-      : 'opacity: 0; pointer-events: none; transform: translateY(-10px);'}
+      ? 'opacity: 0; pointer-events: none; transform: translate(-50%, -1rem);'
+      : 'opacity: 0; pointer-events: none; transform: translateY(-1rem);'}
   transition: opacity 0.4s ease, transform 0.4s ease;
 `;

@@ -1,6 +1,10 @@
 import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
+  &:hover {
+    cursor: pointer;
+  }
+
   > a {
     text-decoration: none;
   }
@@ -35,9 +39,8 @@ export const ThumbWrapper = styled.div`
 `;
 
 export const Thumbnail = styled.img`
-  width: auto;
-  max-width: 100%;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   flex-shrink: 0;
   position: absolute;
@@ -47,42 +50,42 @@ export const Thumbnail = styled.img`
   ${(props) => props.error && 'display: none;'}
 `;
 
-export const TimeFromNow = styled.div`
+export const TimeFromNow = styled.span`
   background: rgba(0, 0, 0, 0.6);
   font-size: 1.4rem;
   color: var(--white);
-  padding: 2px 4px;
+  padding: 0.2rem 0.4rem;
   border-radius: 2px;
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 1rem;
+  bottom: 1rem;
 `;
 
 export const Bottom = styled.div`
   display: flex;
-  margin-top: 10px;
+  margin-top: 1rem;
 `;
 
 export const ProfileImageWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 36px;
-  height: 36px;
+  width: 3.6rem;
+  height: 3.6rem;
   border-radius: 50%;
   background-color: var(--background-700);
   flex-shrink: 0;
-  margin-right: 10px;
+  margin-right: 1rem;
 
   > a {
-    width: 36px;
-    height: 36px;
+    width: 3.6rem;
+    height: 3.6rem;
   }
 `;
 
 export const ProfileImage = styled.img`
-  width: 36px;
-  height: 36px;
+  width: 3.6rem;
+  height: 3.6rem;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -100,12 +103,12 @@ const textOverflowEllipsis = css`
 export const Title = styled.h3`
   ${textOverflowEllipsis}
   font-size: 1.6rem;
-  margin-bottom: 3px;
+  margin-bottom: 0.3rem;
 `;
 
 const metaChield = css`
   font-size: 1.4rem;
-  margin-bottom: 3px;
+  margin-bottom: 0.3rem;
 `;
 
 export const ProfileName = styled.span`
@@ -137,5 +140,5 @@ export const Meta = styled.div`
 
 export const MetaSeparator = styled.span`
   font-size: 1.5rem;
-  margin: 0 4px;
+  margin: 0 0.4rem;
 `;

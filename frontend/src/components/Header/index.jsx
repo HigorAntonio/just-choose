@@ -2,9 +2,8 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useLocation, useHistory, Link } from 'react-router-dom';
 import { ClickAwayListener } from '@material-ui/core';
 import { ThemeContext } from 'styled-components';
-import { BiCog, BiLogOut } from 'react-icons/bi';
-import { HiOutlineMoon } from 'react-icons/hi';
-import { HiDocumentAdd } from 'react-icons/hi';
+import { BiCog, BiLogIn, BiLogOut, BiUser } from 'react-icons/bi';
+import { HiOutlineMoon, HiDocumentAdd } from 'react-icons/hi';
 import { FiSearch } from 'react-icons/fi';
 import queryString from 'query-string';
 
@@ -68,6 +67,14 @@ function Header() {
     setNavOption('signIn');
   };
 
+  const handleSignInOnKeyPress = async (e) => {
+    if (e.key === 'Enter') {
+      try {
+        await handleSignIn();
+      } catch (error) {}
+    }
+  };
+
   const handleSignUp = () => {
     setShowSignModal(true);
     setNavOption('signUp');
@@ -75,10 +82,12 @@ function Header() {
 
   const handleProfileExit = async () => {
     try {
-      history.push('/');
       await handleLogout();
       setProfile({});
       setShowProfileDropDown(false);
+      if (location.pathname !== '/') {
+        history.push('/');
+      }
     } catch (error) {}
   };
 
@@ -217,7 +226,11 @@ function Header() {
                   onKeyPress={handleProfileImageOnKeyPress}
                   tabIndex="0"
                   data-profile-image
-                />
+                >
+                  {!authenticated && (
+                    <BiUser size={20} style={{ flexShrink: 0 }} />
+                  )}
+                </Profile>
                 <ProfileDropDown show={showProfileDropDown}>
                   {authenticated && (
                     <>
@@ -276,6 +289,22 @@ function Header() {
                       />
                     </div>
                   </DropDownOption>
+                  {!authenticated && (
+                    <>
+                      <DropDownSeparator />
+                      <DropDownOption
+                        className="hover"
+                        onClick={handleSignIn}
+                        onKeyPress={handleSignInOnKeyPress}
+                        tabIndex="0"
+                      >
+                        <div className="align-left">
+                          <BiLogIn size={20} style={{ flexShrink: 0 }} />{' '}
+                        </div>
+                        <div className="align-right">Entrar</div>
+                      </DropDownOption>
+                    </>
+                  )}
                   {authenticated && (
                     <>
                       <DropDownSeparator />
