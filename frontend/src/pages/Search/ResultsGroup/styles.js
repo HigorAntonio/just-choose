@@ -7,12 +7,12 @@ export const Header = styled.div``;
 export const Title = styled.h2`
   font-size: 1.9rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 `;
 
 export const Main = styled.div`
   > div {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
   }
 `;
 
@@ -21,13 +21,13 @@ export const Footer = styled.div``;
 export const BottomLineWrapper = styled.div`
   display: flex;
   align-items: center;
-  padding-top: 10px;
-  margin-bottom: 20px;
+  padding-top: 1rem;
+  margin-bottom: 2rem;
 `;
 
 export const BottomLine = styled.div`
   flex: 1;
-  border-bottom: 1px solid var(--background-700);
+  border-bottom: 0.1rem solid var(--background-700);
 `;
 
 export const BottomLineButtonWrapper = styled.div`
@@ -35,13 +35,13 @@ export const BottomLineButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 1rem;
 `;
 
 export const BottomLineButton = styled.button`
   width: 100%;
   height: 100%;
-  border-radius: 5px;
+  border-radius: 0.5rem;
 
   &:hover {
     background: var(--background-700);
@@ -49,7 +49,7 @@ export const BottomLineButton = styled.button`
 `;
 
 export const BottomLineButtonLabel = styled.div`
-  padding: 0 10px;
+  padding: 0 1rem;
 `;
 
 export const BottomLineIconWrapper = styled.div`
@@ -59,20 +59,20 @@ export const BottomLineIconWrapper = styled.div`
 `;
 
 export const BottomLineIcon = styled.figure`
-  width: 20px;
-  height: 20px;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
 
   > svg {
-    width: 12.5px;
+    width: 1.25rem;
     fill: var(--primary-400);
   }
 `;
 
 export const BottomLineTextWrapper = styled.div`
-  margin-right: 5px;
+  margin-right: 0.5rem;
 `;
 
 export const BottomLineText = styled.p`

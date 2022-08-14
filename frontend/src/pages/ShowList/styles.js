@@ -37,30 +37,30 @@ export const TitleWrapper = styled.div`
   max-width: 100%;
 
   > h1 {
-    font-size: 72px;
+    font-size: 7.2rem;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-right: 30px;
+    margin-right: 3rem;
 
     @media (max-width: 1440px) {
-      font-size: 54px;
+      font-size: 5.4rem;
     }
 
     @media (max-width: 1024px) {
       margin-right: 0;
-      margin-bottom: 15px;
+      margin-bottom: 1.5rem;
     }
 
     @media (max-width: 768px) {
-      font-size: 46px;
+      font-size: 4.6rem;
     }
 
     @media (max-width: 580px) {
-      font-size: 36px;
+      font-size: 3.6rem;
     }
 
     @media (max-width: 320px) {
-      font-size: 30px;
+      font-size: 3rem;
     }
   }
 
@@ -80,12 +80,12 @@ export const HeaderButtons = styled.div`
     a + button,
     button + a,
     a + a {
-      margin-left: 10px;
+      margin-left: 1rem;
     }
   }
 
   > div + div {
-    margin-left: 10px;
+    margin-left: 1rem;
   }
 
   > a {
@@ -103,7 +103,7 @@ export const HeaderButtons = styled.div`
 
     > div + div {
       margin-left: 0;
-      margin-top: 10px;
+      margin-top: 1rem;
     }
   }
 `;
@@ -113,13 +113,13 @@ export const HeaderButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 0.5rem;
+  padding: 1rem;
   background: var(--background-600);
 
   > span {
-    margin-left: 10px;
-    font-size: 25px;
+    margin-left: 1rem;
+    font-size: 2.5rem;
   }
 
   &:hover {
@@ -140,8 +140,8 @@ export const HeaderDeleteButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 0.5rem;
+  padding: 1rem;
   background: var(--background-600);
 
   > svg {
@@ -149,8 +149,8 @@ export const HeaderDeleteButton = styled.button`
   }
 
   > span {
-    margin-left: 10px;
-    font-size: 25px;
+    margin-left: 1rem;
+    font-size: 2.5rem;
   }
 
   &:hover {
@@ -164,7 +164,7 @@ export const HeaderDeleteButton = styled.button`
 `;
 
 export const ListInfo = styled.div`
-  margin: 30px 0;
+  margin: 3rem 0;
   display: flex;
 
   @media (max-width: 768px) {
@@ -173,7 +173,7 @@ export const ListInfo = styled.div`
 `;
 
 export const CreatedAt = styled.div`
-  font-size: 16px;
+  font-size: 1.6rem;
 
   > span {
     color: var(--dark-gray);
@@ -181,7 +181,7 @@ export const CreatedAt = styled.div`
 `;
 
 export const CreatedBy = styled.div`
-  font-size: 16px;
+  font-size: 1.6rem;
   display: flex;
   align-items: center;
 
@@ -206,42 +206,43 @@ export const ProfileImageWrapper = styled.div`
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
+    object-fit: cover;
   }
 `;
 
 export const Description = styled.div`
   width: 100%;
-  max-width: 650px;
-  font-size: 16px;
+  max-width: 65rem;
+  font-size: 1.6rem;
 `;
 
 export const Filters = styled.div`
   display: flex;
-  margin-top: 30px;
+  margin-top: 3rem;
   align-items: center;
 
   > label {
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: bold;
-    margin-right: 15px;
+    margin-right: 1.5rem;
   }
 `;
 
 export const TypeOptions = styled.div`
-  width: 100px;
+  width: 10rem;
   display: flex;
   align-items: center;
   flex-direction: column;
   > div + div {
-    margin-top: 10px;
+    margin-top: 1rem;
   }
 `;
 
 export const Option = styled.div`
   width: 100%;
   background: var(--background-400);
-  padding: 10px;
-  border-radius: 5px;
+  padding: 1rem;
+  border-radius: 0.5rem;
 
   &:hover {
     background: var(--background-500);

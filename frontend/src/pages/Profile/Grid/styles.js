@@ -7,5 +7,5 @@ export const Container = styled.div`
     minmax(${(props) => (props.minWidth ? props.minWidth : '1fr')}, 1fr)
   );
   grid-template-rows: 1fr;
-  grid-gap: ${(props) => (props.gridGap ? props.gridGap : '15px')};
+  grid-gap: ${(props) => (props.gridGap ? props.gridGap : '1.5rem')};
 `;

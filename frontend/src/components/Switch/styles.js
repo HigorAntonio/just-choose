@@ -14,7 +14,7 @@ export const Container = styled.div`
   ${(props) =>
     props.borderRadius
       ? `border-radius: ${props.borderRadius};`
-      : `border-radius: ${props.height / 2}px`};
+      : `border-radius: ${props.height / 2}rem`};
   display: flex;
   justify-content: center;
   align-items: center;

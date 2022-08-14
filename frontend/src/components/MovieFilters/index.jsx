@@ -171,7 +171,6 @@ const MovieFilters = ({ setParams, setRequestType, setShowListPreview }) => {
           dropDownAlign="center"
           show={showSortOptions}
           setShow={setShowSortOptions}
-          width="155px"
         >
           <OrderByOptions>
             {sortByList.map((sb, i) => (

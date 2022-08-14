@@ -340,7 +340,6 @@ const CreatePoll = () => {
                 dropDownAlign="left"
                 show={showSharingOption}
                 setShow={setShowSharingOption}
-                width="150px"
               >
                 <Options>
                   {sharingOptions.poll.map((o, i) => (

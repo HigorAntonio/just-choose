@@ -28,6 +28,7 @@ import {
   Option,
   SharingOption,
   SearchWrapper,
+  SearchInput,
   ContentListWrapper,
   CreationOptions,
   ClearButton,
@@ -328,7 +329,6 @@ const CreateList = () => {
                 dropDownAlign="left"
                 show={showSharingOption}
                 setShow={setShowSharingOption}
-                width="150px"
               >
                 <Options>
                   {sharingOptions.contentList.map((o, i) => (
@@ -402,12 +402,11 @@ const CreateList = () => {
                   <label>Tipo de conteúdo</label>
                   <SingleOptionSelect
                     label={!contentType ? 'Selecionar' : contentType}
-                    dropDownAlign="center"
+                    dropDownAlign="left"
                     show={showContent}
                     setShow={setShowContent}
-                    width="75px"
                   >
-                    <Options width={'120px'}>
+                    <Options minWidth={'120px'}>
                       {contentTypesList.map((ct, i) => (
                         <Option
                           key={`contentTypesList${i}`}
@@ -428,13 +427,15 @@ const CreateList = () => {
                 </div>
                 {contentType && (
                   <SearchWrapper>
-                    <GoSearch size={15} style={{ flexShrink: 0 }} />
-                    <input
-                      type="search"
-                      id="search"
-                      placeholder="Buscar"
-                      onKeyPress={handleContentInputEnterKey}
-                    />
+                    <SearchInput>
+                      <GoSearch size={'1.5rem'} style={{ flexShrink: 0 }} />
+                      <input
+                        type="search"
+                        id="search"
+                        placeholder="Buscar"
+                        onKeyPress={handleContentInputEnterKey}
+                      />
+                    </SearchInput>
                   </SearchWrapper>
                 )}
               </div>

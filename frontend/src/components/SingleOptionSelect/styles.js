@@ -8,7 +8,7 @@ export const Container = styled.div`
     padding: 0.6rem 3rem 0.6rem 1rem;
     background: ${(props) =>
       props.background ? props.background : `var(--background-400)`};
-    border-radius: 5px;
+    border-radius: 0.5rem;
     position: relative;
     outline: none;
 
@@ -43,7 +43,7 @@ export const SelectMenu = styled.div`
   flex-direction: column;
   background: var(--background-100);
   border: 0.01rem solid var(--background-600);
-  border-radius: 5px;
+  border-radius: 0.5rem;
   padding: 1rem;
   position: absolute;
   top: 3.5rem;

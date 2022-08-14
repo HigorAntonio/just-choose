@@ -7,7 +7,7 @@ export const Container = styled.div`
   align-items: center;
   padding: 1rem;
   background: var(--background-400);
-  border-radius: 5px;
+  border-radius: 0.5rem;
 
   &:hover {
     background: var(--background-500);

@@ -7,12 +7,12 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 30px;
-  padding-top: 90px;
+  margin: 3rem;
+  padding-top: 9rem;
 
   > h3 {
     font-size: 2.4rem;
-    margin-bottom: 10px;
+    margin-bottom: 1rem;
     text-align: center;
   }
 
@@ -26,6 +26,6 @@ export const Logo = styled.img.attrs((props) => ({
   src: JustChooseLogo,
   alt: 'JustChoose Logo',
 }))`
-  height: 135px;
-  margin-bottom: 20px;
+  height: 13.5rem;
+  margin-bottom: 2rem;
 `;

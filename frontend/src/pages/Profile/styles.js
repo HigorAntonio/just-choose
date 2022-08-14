@@ -32,7 +32,7 @@ export const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 
   @media (max-width: 650px) {
     flex-direction: column;
@@ -51,8 +51,8 @@ export const ProfileWrapper = styled.div`
 `;
 
 export const ProfileImageWrapper = styled.div`
-  width: 72px;
-  height: 72px;
+  width: 7.2rem;
+  height: 7.2rem;
   background: var(--background-700);
   display: flex;
   flex-shrink: 0;
@@ -117,14 +117,14 @@ const buttonCss = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 0.5rem;
+  padding: 1rem;
   background: var(--background-600);
   outline: none;
 
   > span {
-    margin-left: 10px;
-    font-size: 16px;
+    margin-left: 1rem;
+    font-size: 1.6rem;
   }
 
   &:hover {
@@ -189,7 +189,7 @@ export const Navigation = styled.div`
     }
 
     &.active {
-      border-bottom: 2px solid var(--primary-400);
+      border-bottom: 0.2rem solid var(--primary-400);
     }
   }
 
@@ -202,7 +202,7 @@ export const Main = styled.div`
   width: calc(100% - 8rem);
   max-width: 200rem;
   margin: 0 auto;
-  padding-top: 20px;
+  padding-top: 2rem;
 
   @media (max-width: 768px) {
     width: calc(100% - 3rem);

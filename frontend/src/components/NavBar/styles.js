@@ -199,8 +199,9 @@ export const SearchProfileInput = styled.input`
   width: 100%;
   height: 3rem;
 
+  font-size: 1.4rem;
   border: 0.2rem solid var(--background-700);
-  border-radius: 3px;
+  border-radius: 0.3rem;
   padding: 0.5rem 1rem 0.5rem 3rem;
 
   outline: 0;

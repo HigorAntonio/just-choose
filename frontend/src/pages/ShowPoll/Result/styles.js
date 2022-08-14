@@ -4,18 +4,18 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 900px;
+  max-width: 90rem;
   background: var(--background-100);
-  border: 0.1px solid var(--background-600);
-  border-radius: 5px;
+  border: 0.01rem solid var(--background-600);
+  border-radius: 0.5rem;
 `;
 
 export const Header = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 20px;
-  border-bottom: 0.1px solid var(--background-600);
+  padding: 2rem;
+  border-bottom: 0.01rem solid var(--background-600);
 
   > div h2 {
     font-size: 2rem;
@@ -23,7 +23,7 @@ export const Header = styled.div`
 
   .headerPosition {
     width: 15%;
-    min-width: 40px;
+    min-width: 4rem;
     text-align: center;
   }
 
@@ -34,12 +34,12 @@ export const Header = styled.div`
 
   .headerVotes {
     width: 20%;
-    min-width: 40px;
+    min-width: 4rem;
     text-align: center;
   }
 
   @media (max-width: 500px) {
-    padding: 10px;
+    padding: 1rem;
   }
 `;
 
@@ -47,10 +47,10 @@ export const Body = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 2rem;
 
   @media (max-width: 500px) {
-    padding: 10px;
+    padding: 1rem;
   }
 
   .row {
@@ -58,10 +58,10 @@ export const Body = styled.div`
     justify-content: space-between;
 
     & + .row {
-      margin-top: 15px;
+      margin-top: 1.5rem;
 
       @media (max-width: 500px) {
-        margin-top: 5px;
+        margin-top: 0.5rem;
       }
     }
 
@@ -76,27 +76,27 @@ export const Body = styled.div`
 
   .bodyPosition {
     width: 15%;
-    min-width: 40px;
+    min-width: 4rem;
     display: flex;
     justify-content: center;
     align-items: center;
     background: var(--background-500);
-    border-radius: 5px 0 0 5px;
+    border-radius: 0.5rem 0 0 0.5rem;
     font-weight: bold;
-    font-size: 40px;
+    font-size: 4rem;
   }
 
   .bodyTitle {
     width: 65%;
     display: flex;
     background: var(--background-500);
-    margin: 0 15px;
+    margin: 0 1.5rem;
     overflow: hidden;
 
     > .titleWrapper {
       display: flex;
       align-items: center;
-      padding: 15px;
+      padding: 1.5rem;
       overflow: hidden;
 
       > .titleText {
@@ -114,48 +114,48 @@ export const Body = styled.div`
     }
 
     @media (max-width: 500px) {
-      margin: 0 5px;
+      margin: 0 0.5rem;
     }
   }
 
   .bodyVotes {
     width: 20%;
-    min-width: 40px;
+    min-width: 4rem;
     display: flex;
     justify-content: center;
     align-items: center;
     background: var(--background-500);
-    border-radius: 0 5px 5px 0;
+    border-radius: 0 0.5rem 0.5rem 0;
     font-weight: bold;
-    font-size: 40px;
+    font-size: 4rem;
   }
 
   .bodyPosition,
   .bodyVotes {
     @media (max-width: 768px) {
-      font-size: 28px;
+      font-size: 2.8rem;
     }
 
     @media (max-width: 580px) {
-      font-size: 20px;
+      font-size: 2rem;
     }
 
     @media (max-width: 320px) {
-      font-size: 16px;
+      font-size: 1.6rem;
     }
   }
 
   .posterWrapper {
     flex-shrink: 0;
     display: flex;
-    width: 70px;
+    width: 7rem;
 
     &:hover {
       cursor: pointer;
     }
 
     @media (max-width: 640px) {
-      width: 40px;
+      width: 4rem;
     }
   }
 

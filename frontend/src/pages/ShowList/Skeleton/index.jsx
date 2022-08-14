@@ -30,19 +30,19 @@ const Skeleton = () => {
             <MuiSkeleton
               variant="rect"
               width={width > 1024 ? '50%' : '80%'}
-              height={width > 1024 ? '85px' : '50px'}
+              height={width > 1024 ? '8.5rem' : '5rem'}
             />
             <MuiSkeleton
               variant="rect"
               width={width > 1024 ? '20%' : '50%'}
-              height={'51px'}
+              height={'5.1rem'}
             />
           </HeaderRow>
           <ListInfo>
-            <MuiSkeleton variant="rect" width={'25%'} height={'19px'} />
+            <MuiSkeleton variant="rect" width={'25%'} height={'1.9rem'} />
           </ListInfo>
           <Description>
-            <MuiSkeleton variant="rect" width={'100%'} height={'75px'} />
+            <MuiSkeleton variant="rect" width={'100%'} height={'7.5rem'} />
           </Description>
         </Header>
         <Main>

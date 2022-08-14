@@ -309,9 +309,9 @@ const ShowList = () => {
                 onClick={handleLike}
               >
                 {!liked && (
-                  <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />
+                  <FaRegHeart size={'2.5rem'} style={{ flexShrink: 0 }} />
                 )}
-                {liked && <FaHeart size={'25px'} style={{ flexShrink: 0 }} />}
+                {liked && <FaHeart size={'2.5rem'} style={{ flexShrink: 0 }} />}
                 <span>{formatCount(contentList.likes)}</span>
               </HeaderButton>
               <HeaderButton
@@ -324,7 +324,7 @@ const ShowList = () => {
                 }
                 onClick={handleFork}
               >
-                <BiGitRepoForked size={'25px'} style={{ flexShrink: 0 }} />
+                <BiGitRepoForked size={'2.5rem'} style={{ flexShrink: 0 }} />
                 <span>{formatCount(contentList.forks)}</span>
               </HeaderButton>
             </div>
@@ -333,16 +333,16 @@ const ShowList = () => {
                 <Link to={`/lists/${listId}/poll`} tabIndex="-1">
                   <HeaderButton title="Criar uma votação a partir da lista">
                     <FaVoteYea
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
+                      size={'2.5rem'}
+                      style={{ flexShrink: 0, margin: '0 0.5rem' }}
                     />
                   </HeaderButton>
                 </Link>
                 <Link to={`/lists/${listId}/update`} tabIndex="-1">
                   <HeaderButton title="Editar lista">
                     <MdSettings
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
+                      size={'2.5rem'}
+                      style={{ flexShrink: 0, margin: '0 0.5rem' }}
                     />
                   </HeaderButton>
                 </Link>
@@ -351,8 +351,8 @@ const ShowList = () => {
                   onClick={() => setShowDeleteDialog(true)}
                 >
                   <FaTrash
-                    size={'25px'}
-                    style={{ flexShrink: 0, margin: '0 5px' }}
+                    size={'2.5rem'}
+                    style={{ flexShrink: 0, margin: '0 0.5rem' }}
                   />
                 </HeaderDeleteButton>
               </div>
@@ -396,7 +396,6 @@ const ShowList = () => {
                 dropDownAlign="center"
                 show={showTypeOptions}
                 setShow={setShowTypeOptions}
-                width="85px"
                 background={colors['background-600']}
                 hover={colors['background-700']}
               >

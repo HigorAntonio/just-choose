@@ -8,7 +8,7 @@ export const Input = styled.div`
   height: 3rem;
   display: flex;
   align-items: center;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   background: var(--background-400);
   ${(props) =>
     props.validationError
@@ -34,7 +34,7 @@ export const Input = styled.div`
     padding: 0.5rem 3.7rem 0.5rem 1rem;
     background: var(--background-400);
     outline: none;
-    border-radius: 5px 0 0 5px;
+    border-radius: 0.5rem 0 0 0.5rem;
   }
 
   > label {
@@ -44,7 +44,7 @@ export const Input = styled.div`
     align-items: center;
     background: var(--background-400);
     padding-right: 0.2rem;
-    border-radius: 0 5px 5px 0;
+    border-radius: 0 0.5rem 0.5rem 0;
   }
 
   @media (max-width: 1027px) {
@@ -58,7 +58,7 @@ export const ToggleVisibility = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 2px;
+  border-radius: 0.2rem;
 
   &:hover {
     background: var(--background-500);

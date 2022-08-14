@@ -8,7 +8,7 @@ export const Container = styled.div`
   pointer-events: none;
   width: ${(props) => props.width || '12rem'};
   background-color: var(--tooltip);
-  border-radius: 6px;
+  border-radius: 0.6rem;
   padding: 0.5rem;
   position: absolute;
   z-index: 1;

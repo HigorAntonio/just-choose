@@ -5,11 +5,11 @@ export const Container = styled.div`
   flex-direction: column;
 
   > h3 {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
   }
 
   > div + h3 {
-    margin-top: 40px;
+    margin-top: 4rem;
   }
 `;
 
@@ -17,17 +17,17 @@ export const LayoutBox = styled.div`
   display: flex;
   flex-direction: column;
   width: 90%;
-  max-width: 900px;
+  max-width: 90rem;
   background: var(--background-100);
-  border: 0.1px solid var(--background-600);
-  border-radius: 5px;
+  border: 0.01rem solid var(--background-600);
+  border-radius: 0.5rem;
 
   > div {
-    padding: 20px;
+    padding: 2rem;
   }
 
   > div + div {
-    border-top: 1px solid var(--background-600);
+    border-top: 0.1rem solid var(--background-600);
   }
 
   @media (max-width: 1130px) {
@@ -37,13 +37,13 @@ export const LayoutBox = styled.div`
 
 export const InputWrapper = styled.div`
   display: flex;
-  padding: 20px;
+  padding: 2rem;
 
   > .column {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 680px;
+    max-width: 68rem;
 
     > .row {
       display: flex;
@@ -53,11 +53,11 @@ export const InputWrapper = styled.div`
     > .error {
       color: var(--white);
       background: var(--error);
-      padding: 7px 20px;
-      border-radius: 5px;
-      font-size: 14px;
+      padding: 0.7rem 2rem;
+      border-radius: 0.5rem;
+      font-size: 1.4rem;
       font-weight: bold;
-      margin-top: 5px;
+      margin-top: 0.5rem;
     }
 
     > span {
@@ -81,22 +81,22 @@ export const InputWrapper = styled.div`
   }
 
   > textarea {
-    font-size: 14px;
+    font-size: 1.4rem;
     width: 100%;
-    max-width: 680px;
-    max-height: 50px;
+    max-width: 68rem;
+    max-height: 5rem;
     resize: none;
-    padding: 5px 10px;
-    border: 2px solid var(--background-400);
-    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    border: 0.2rem solid var(--background-400);
+    border-radius: 0.5rem;
     background: var(--background-400);
     outline: none;
 
     &:hover {
-      border: 2px solid var(--gray);
+      border: 0.2rem solid var(--gray);
     }
     &:focus {
-      border: 2px solid var(--primary-400);
+      border: 0.2rem solid var(--primary-400);
     }
 
     transition: border 0.3s;
@@ -114,36 +114,36 @@ export const InputWrapper = styled.div`
 
 export const LabelWrapper = styled.div`
   display: inline-block;
-  width: 180px;
+  width: 18rem;
 
   > label {
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: bold;
   }
 
   @media (max-width: 1027px) {
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
   }
 `;
 
 export const Input = styled.input`
-  font-size: 14px;
+  font-size: 1.4rem;
   width: 100%;
-  max-width: 680px;
-  padding: 5px 10px;
-  border-radius: 5px;
+  max-width: 68rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   background: var(--background-400);
   outline: none;
   ${(props) =>
     props.validationError
-      ? `border: 2px solid var(--error);`
-      : `border: 2px solid var(--background-400);`}
+      ? `border: 0.2rem solid var(--error);`
+      : `border: 0.2rem solid var(--background-400);`}
 
   &:hover {
-    border: 2px solid var(--gray);
+    border: 0.2rem solid var(--gray);
   }
   &:focus {
-    border: 2px solid var(--primary-400);
+    border: 0.2rem solid var(--primary-400);
   }
 
   transition: border 0.3s;
@@ -163,10 +163,10 @@ export const ChangePasswordButton = styled.div`
   display: flex;
   align-items: center;
   font-weight: bold;
-  font-size: 14px;
-  height: 31px;
-  padding: 10px;
-  border-radius: 5px;
+  font-size: 1.4rem;
+  height: 3.1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
   white-space: nowrap;
   outline: none;
   color: ${(props) => (props.disabled ? `var(--gray)` : `var(--white)`)};
@@ -195,7 +195,7 @@ export const Email = styled.p`
 
 export const EmailStatus = styled.p`
   font-size: 1.4rem;
-  margin-top: 10px;
+  margin-top: 1rem;
 
   > span {
     font-weight: bold;
@@ -206,8 +206,8 @@ export const ResendEmailButton = styled.button`
   font-size: 1.4rem;
   font-weight: bold;
   background: var(--background-400);
-  padding: 5px 8px;
-  margin-left: 20px;
+  padding: 0.5rem 0.8rem;
+  margin-left: 2rem;
 
   &:hover {
     background: var(--background-500);

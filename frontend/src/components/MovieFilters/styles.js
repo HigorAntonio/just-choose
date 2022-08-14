@@ -14,6 +14,7 @@ export const Container = styled.div`
 
 export const FilterWrapper = styled.div`
   display: flex;
+  flex-shrink: 0;
   align-items: center;
 
   &.space-beetween {
@@ -132,7 +133,7 @@ export const Option = styled.div`
   width: 100%;
   background: var(--background-400);
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
 
   &:hover {
     background: var(--background-500);
@@ -194,7 +195,7 @@ export const RangeWrapper = styled.div`
     align-items: center;
     background: var(--background-400);
     padding: 0 1rem;
-    border-radius: 5px;
+    border-radius: 0.5rem;
 
     > .label-left {
       margin-right: 2rem;
@@ -230,7 +231,7 @@ const buttonCss = css`
   font-size: 1.4rem;
   height: 3.1rem;
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   white-space: nowrap;
   outline: none;
 `;

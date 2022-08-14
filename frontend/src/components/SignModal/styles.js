@@ -22,7 +22,7 @@ export const Container = styled.div`
   max-width: 90vw;
   max-height: 90%;
   background: var(--background-100);
-  border-radius: 5px;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -95,7 +95,7 @@ export const Input = styled.input`
   background: var(--background-500);
   padding: 0.5rem 1rem;
   border: 0.2rem solid var(--background-500);
-  border-radius: 5px;
+  border-radius: 0.5rem;
   outline: none;
 
   &:hover {
@@ -112,7 +112,7 @@ export const SignFormButton = styled.button`
   margin-top: 2rem;
   width: 100%;
   padding: 0.7rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   color: var(--white);
   background: var(--primary-400);
   outline: none;
@@ -137,7 +137,7 @@ export const SignUpForm = styled.form``;
 export const FormErrors = styled.div`
   margin: 2.5rem 0;
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   background: var(--error);
 
   > p {

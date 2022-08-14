@@ -55,7 +55,7 @@ export const TimeFromNow = styled.span`
   font-size: 1.4rem;
   color: var(--white);
   padding: 0.2rem 0.4rem;
-  border-radius: 2px;
+  border-radius: 0.2rem;
   position: absolute;
   right: 1rem;
   bottom: 1rem;

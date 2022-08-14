@@ -27,14 +27,14 @@ export const HeaderRow = styled.div`
 `;
 
 export const ListInfo = styled.div`
-  font-size: 16px;
+  font-size: 1.6rem;
   color: var(--dark-gray);
-  margin: 30px 0;
+  margin: 3rem 0;
 `;
 
 export const Description = styled.div`
   max-width: 40%;
-  font-size: 16px;
+  font-size: 1.6rem;
 `;
 
 export const Main = styled.main`
@@ -48,9 +48,9 @@ export const Main = styled.main`
 
 export const ContentListContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   grid-template-rows: 1fr;
-  grid-gap: 10px;
+  grid-gap: 1rem;
 
   .cardWrapper {
     display: flex;

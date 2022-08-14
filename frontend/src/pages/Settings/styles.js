@@ -11,16 +11,16 @@ export const StickyWrapper = styled.div`
   background: var(--background-410);
   position: sticky;
   top: 0;
-  padding: 30px 30px 0 30px;
+  padding: 3rem 3rem 0 3rem;
 
   @media (max-width: 768px) {
-    padding: 20px 15px 0 15px;
+    padding: 2rem 1.5rem 0 1.5rem;
   }
 `;
 
 export const Header = styled.header`
   > h1 {
-    font-size: 36px;
+    font-size: 3.6rem;
   }
 `;
 
@@ -28,7 +28,7 @@ export const NavigationWrapper = styled.div`
   height: 4rem;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--background-700);
+  border-bottom: 0.1rem solid var(--background-700);
 `;
 
 export const Navigation = styled.div`
@@ -52,7 +52,7 @@ export const Navigation = styled.div`
     }
 
     &.active {
-      border-bottom: 2px solid var(--primary-400);
+      border-bottom: 0.2rem solid var(--primary-400);
     }
   }
 
@@ -64,17 +64,17 @@ export const Navigation = styled.div`
 export const Main = styled.main`
   display: flex;
   flex-direction: column;
-  padding: 20px 30px 30px 30px;
+  padding: 2rem 3rem 3rem 3rem;
 
   > h3 {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
   }
 
   > div + h3 {
-    margin-top: 40px;
+    margin-top: 4rem;
   }
 
   @media (max-width: 768px) {
-    padding: 20px 15px;
+    padding: 2rem 1.5rem;
   }
 `;

@@ -245,6 +245,7 @@ export const Main = styled.main`
 export const LabelWrapper = styled.div`
   display: inline-block;
   width: 18rem;
+  padding-right: 2rem;
 
   > label {
     font-size: 1.4rem;
@@ -257,11 +258,13 @@ export const LabelWrapper = styled.div`
 `;
 
 export const ContentListContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
 `;
 
 export const ContentListHeader = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 2rem;
@@ -316,8 +319,8 @@ export const ContentListHeader = styled.div`
 
   .content-type-wrapper {
     display: flex;
+    flex-shrink: 0;
     flex-direction: row;
-    align-items: center;
 
     @media (max-width: 399px) {
       flex-direction: column;
@@ -326,7 +329,7 @@ export const ContentListHeader = styled.div`
 `;
 
 export const Options = styled.div`
-  ${(props) => props.width && `width: ${props.width};`};
+  ${(props) => props.minWidth && `min-width: ${props.minWidth};`};
   display: flex;
   flex-direction: column;
 
@@ -363,9 +366,24 @@ export const SharingOption = styled.div`
 
 export const SearchWrapper = styled.div`
   display: flex;
+  justify-content: flex-end;
+  flex: 1;
+  margin-left: 1.5rem;
+
+  @media (max-width: 775px) {
+    width: 100%;
+    order: -1;
+    margin-left: 0;
+    margin-bottom: 1.5rem;
+  }
+`;
+
+export const SearchInput = styled.div`
+  width: 100%;
+  max-width: 35rem;
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-left: 1.5rem;
   position: relative;
 
   > svg {
@@ -374,8 +392,8 @@ export const SearchWrapper = styled.div`
   }
 
   > input {
+    width: 100%;
     font-size: 1.4rem;
-    width: 35rem;
     padding: 0.5rem 1rem 0.5rem 3rem;
     border: 0.2rem solid var(--background-400);
     border-radius: 0.5rem;
@@ -397,10 +415,7 @@ export const SearchWrapper = styled.div`
   }
 
   @media (max-width: 775px) {
-    width: 100%;
-    order: -1;
-    margin-left: 0;
-    margin-bottom: 1.5rem;
+    max-width: 100%;
   }
 `;
 

@@ -1,59 +1,59 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  width: 500px;
-  max-width: calc(95vw - 40px);
+  width: 50rem;
+  max-width: calc(95vw - 4rem);
 `;
 
 export const Header = styled.div`
   background: var(--background-100);
-  font-size: 10px;
-  padding: 20px;
+  font-size: 1rem;
+  padding: 2rem;
   position: relative;
-  border-radius: 5px 5px 0 0;
+  border-radius: 0.5rem 0.5rem 0 0;
   z-index: 5000;
 
-  -webkit-box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 0.5rem 0.1rem rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0.5rem 0.1rem rgba(0, 0, 0, 0.5);
 `;
 
 export const Main = styled.div`
   background: var(--background-100);
-  padding: 20px;
-  border-radius: 0 0 5px 5px;
+  padding: 2rem;
+  border-radius: 0 0 0.5rem 0.5rem;
 
   > div + div {
-    margin-top: 20px;
+    margin-top: 2rem;
   }
 
   > input {
     width: 100%;
     background: var(--background-400);
-    padding: 5px 10px;
-    border: 2px solid var(--background-400);
-    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    border: 0.2rem solid var(--background-400);
+    border-radius: 0.5rem;
     outline: none;
-    margin-top: 20px;
+    margin-top: 2rem;
 
     &:hover {
-      border: 2px solid var(--gray);
+      border: 0.2rem solid var(--gray);
     }
     &:focus {
-      border: 2px solid var(--error);
+      border: 0.2rem solid var(--error);
     }
 
     transition: border 0.3s;
   }
 
   > button {
-    margin-top: 20px;
+    margin-top: 2rem;
     width: 100%;
-    padding: 7px;
-    border-radius: 5px;
+    padding: 0.7rem;
+    border-radius: 0.5rem;
     background: var(--background-400);
     outline: none;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 1.6rem;
 
     &:hover {
       cursor: pointer;

@@ -233,12 +233,12 @@ const Profile = () => {
                 {parseInt(profileId) !== parseInt(profileToShowId) &&
                   (!following ? (
                     <FollowButton following={following} onClick={handleFollow}>
-                      <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
+                      <FaRegHeart size={'1.6rem'} style={{ flexShrink: 0 }} />
                       <span>Seguir</span>
                     </FollowButton>
                   ) : (
                     <FollowButton following={following} onClick={handleFollow}>
-                      <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
+                      <FaHeart size={'1.6rem'} style={{ flexShrink: 0 }} />
                       <span>Seguindo</span>
                     </FollowButton>
                   ))}

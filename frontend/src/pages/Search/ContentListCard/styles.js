@@ -15,7 +15,7 @@ export const Container = styled.div`
 export const ThumbnailContainer = styled.div`
   width: 50%;
   max-width: 36rem;
-  margin-right: 20px;
+  margin-right: 2rem;
 
   @media (max-width: 1024px) {
     width: 35%;
@@ -25,7 +25,7 @@ export const ThumbnailContainer = styled.div`
     width: 100%;
     max-width: 100%;
     margin-right: 0;
-    margin-bottom: 10px;
+    margin-bottom: 1rem;
   }
 `;
 
@@ -67,11 +67,11 @@ export const TimeFromNow = styled.div`
   background: rgba(0, 0, 0, 0.6);
   font-size: 1.4rem;
   color: var(--white);
-  padding: 2px 4px;
-  border-radius: 2px;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.2rem;
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 1rem;
+  bottom: 1rem;
 `;
 
 export const TextWrapperLargeScreen = styled.div`
@@ -113,13 +113,13 @@ export const Forks = styled.span`
 
 export const MetaSeparator = styled.span`
   font-size: 1.5rem;
-  margin: 0 4px;
+  margin: 0 0.4rem;
 `;
 
 export const ProfileInfo = styled.div`
   display: flex;
   align-items: center;
-  padding: 12px 0;
+  padding: 1.2rem 0;
 `;
 
 export const ProfileName = styled.p`
@@ -138,22 +138,22 @@ export const ProfileImageWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 24px;
-  height: 24px;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   background-color: var(--background-700);
   flex-shrink: 0;
-  margin-right: 8px;
+  margin-right: 0.8rem;
 
   > a {
-    width: 24px;
-    height: 24px;
+    width: 2.4rem;
+    height: 2.4rem;
   }
 `;
 
 export const ProfileImage = styled.img`
-  width: 24px;
-  height: 24px;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -161,8 +161,8 @@ export const ProfileImage = styled.img`
 `;
 
 export const DescriptionWrapper = styled.div`
-  padding-right: 20px;
-  margin-bottom: 8px;
+  padding-right: 2rem;
+  margin-bottom: 0.8rem;
 `;
 
 export const Description = styled.p`
@@ -176,12 +176,12 @@ export const Description = styled.p`
 
 export const TextWrapperSmallScreen = styled.div`
   display: none;
-  padding-bottom: 5px;
+  padding-bottom: 0.5rem;
 
   > ${ProfileImageWrapper}, ${ProfileImageWrapper} a,
   ${ProfileImage} {
-    width: 48px;
-    height: 48px;
+    width: 4.8rem;
+    height: 4.8rem;
   }
 
   > ${Meta} ${ProfileName}, ${Meta} ${Likes}, ${Meta} ${Forks} {

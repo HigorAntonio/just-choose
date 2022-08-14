@@ -16,18 +16,18 @@ export const Container = styled.div`
 `;
 
 export const ProfileImageWrapper = styled.div`
-  width: 136px;
-  height: 136px;
+  width: 13.6rem;
+  height: 13.6rem;
   background: var(--background-600);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 20px;
+  margin-right: 2rem;
   border-radius: 50%;
 
   @media (max-width: 768px) {
-    width: 76px;
-    height: 76px;
+    width: 7.6rem;
+    height: 7.6rem;
   }
 `;
 
@@ -68,13 +68,13 @@ export const FollowersCount = styled.span`
 
 export const MetaSeparator = styled.span`
   font-size: 1.5rem;
-  margin: 0 4px;
+  margin: 0 0.4rem;
 `;
 
 export const DescriptionWrapper = styled.div`
-  padding-right: 20px;
-  margin-bottom: 8px;
-  margin-top: 10px;
+  padding-right: 2rem;
+  margin-bottom: 0.8rem;
+  margin-top: 1rem;
 `;
 
 export const Description = styled.p`

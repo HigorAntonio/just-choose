@@ -119,7 +119,7 @@ const Lists = () => {
         <AlignLeftFilters>
           <Label>Filtrar por</Label>
           <SearchWrapper>
-            <GoSearch size={15} style={{ flexShrink: 0 }} />
+            <GoSearch size={'1.5rem'} style={{ flexShrink: 0 }} />
             <input
               type="search"
               id="search"
@@ -139,7 +139,6 @@ const Lists = () => {
             dropDownAlign="center"
             show={showSortOptions}
             setShow={setShowSortOptions}
-            width="155px"
           >
             <OrderByOptions>
               {sortByList.map((sb, i) => (

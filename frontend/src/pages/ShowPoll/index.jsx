@@ -393,8 +393,8 @@ const ShowPoll = () => {
                 <Link to={`/lists/${poll.content_lists[0].id}`} tabIndex="-1">
                   <HeaderButton title="Visualizar lista de conteúdo">
                     <IoMdListBox
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
+                      size={'2.5rem'}
+                      style={{ flexShrink: 0, margin: '0 0.5rem' }}
                     />
                   </HeaderButton>
                 </Link>
@@ -407,22 +407,22 @@ const ShowPoll = () => {
                   >
                     {!poll.is_active && (
                       <FaPlay
-                        size={'25px'}
-                        style={{ flexShrink: 0, margin: '0 5px' }}
+                        size={'2.5rem'}
+                        style={{ flexShrink: 0, margin: '0 0.5rem' }}
                       />
                     )}
                     {poll.is_active && (
                       <FaStop
-                        size={'25px'}
-                        style={{ flexShrink: 0, margin: '0 5px' }}
+                        size={'2.5rem'}
+                        style={{ flexShrink: 0, margin: '0 0.5rem' }}
                       />
                     )}
                   </HeaderButton>
                   <Link to={`/polls/${pollId}/update`} tabIndex="-1">
                     <HeaderButton title="Editar votação">
                       <MdSettings
-                        size={'25px'}
-                        style={{ flexShrink: 0, margin: '0 5px' }}
+                        size={'2.5rem'}
+                        style={{ flexShrink: 0, margin: '0 0.5rem' }}
                       />
                     </HeaderButton>
                   </Link>
@@ -431,8 +431,8 @@ const ShowPoll = () => {
                     onClick={() => setShowDeleteDialog(true)}
                   >
                     <FaTrash
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
+                      size={'2.5rem'}
+                      style={{ flexShrink: 0, margin: '0 0.5rem' }}
                     />
                   </HeaderDeleteButton>
                 </>
@@ -477,7 +477,6 @@ const ShowPoll = () => {
                 dropDownAlign="center"
                 show={showTypeOptions}
                 setShow={setShowTypeOptions}
-                width="85px"
                 background={colors['background-600']}
                 hover={colors['background-700']}
               >

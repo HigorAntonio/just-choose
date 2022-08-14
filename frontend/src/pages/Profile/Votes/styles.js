@@ -13,7 +13,7 @@ export const Filters = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 10px;
+  padding-bottom: 1rem;
 
   @media (max-width: 880px) {
     flex-direction: column;
@@ -23,8 +23,9 @@ export const Filters = styled.div`
 
 export const AlignLeftFilters = styled.div`
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  padding: 0 10px 10px 0;
+  padding: 0 1rem 1rem 0;
 
   @media (max-width: 880px) {
     width: 100%;
@@ -33,8 +34,9 @@ export const AlignLeftFilters = styled.div`
 
 export const AlignRightFilters = styled.div`
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
 
   > div button {
     background: var(--background-600);
@@ -49,7 +51,7 @@ export const AlignRightFilters = styled.div`
     align-items: flex-start;
 
     > label {
-      margin-bottom: 5px;
+      margin-bottom: 0.5rem;
     }
   }
 `;
@@ -62,30 +64,30 @@ export const SearchWrapper = styled.div`
 
   > svg {
     position: absolute;
-    left: 8.5px;
+    left: 0.85rem;
   }
 
   > input {
-    font-size: 14px;
-    width: 350px;
-    padding: 5px 10px 5px 30px;
-    border: 2px solid var(--background-600);
-    border-radius: 5px;
+    font-size: 1.4rem;
+    width: 35rem;
+    padding: 0.5rem 1rem 0.5rem 3rem;
+    border: 0.2rem solid var(--background-600);
+    border-radius: 0.5rem;
     background: var(--background-600);
     outline: none;
 
     &:hover {
-      border: 2px solid var(--gray);
+      border: 0.2rem solid var(--gray);
     }
     &:focus {
-      border: 2px solid var(--primary-400);
+      border: 0.2rem solid var(--primary-400);
     }
 
     transition: border 0.3s;
 
     @media (max-width: 880px) {
       width: 100%;
-      max-width: 350px;
+      max-width: 35rem;
     }
   }
 
@@ -95,20 +97,20 @@ export const SearchWrapper = styled.div`
 `;
 
 export const OrderByOptions = styled.div`
-  width: 200px;
+  width: 20rem;
   display: flex;
   align-items: center;
   flex-direction: column;
   > div + div {
-    margin-top: 10px;
+    margin-top: 1rem;
   }
 `;
 
 export const Option = styled.div`
   width: 100%;
   background: var(--background-400);
-  padding: 10px;
-  border-radius: 5px;
+  padding: 1rem;
+  border-radius: 0.5rem;
 
   &:hover {
     background: var(--background-500);
@@ -118,9 +120,9 @@ export const Option = styled.div`
 
 export const Label = styled.label`
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: bold;
-  margin-right: 15px;
+  margin-right: 1.5rem;
 `;
 
 export const NotFound = styled.span`

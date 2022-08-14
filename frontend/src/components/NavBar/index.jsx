@@ -104,20 +104,20 @@ const NavBar = () => {
         <Navigation>
           <Link to="/">
             <NavOption title="Início">
-              <AiFillHome size={30} style={{ flexShrink: 0 }} />
+              <AiFillHome size={'3rem'} style={{ flexShrink: 0 }} />
               <div>
                 <span>Início</span>
               </div>
             </NavOption>
           </Link>
           <NavOption title="Populares">
-            <AiFillFire size={30} style={{ flexShrink: 0 }} />
+            <AiFillFire size={'3rem'} style={{ flexShrink: 0 }} />
             <div>
               <span>Populares</span>
             </div>
           </NavOption>
           <NavOption title="Seguindo">
-            <BsFillPeopleFill size={30} style={{ flexShrink: 0 }} />
+            <BsFillPeopleFill size={'3rem'} style={{ flexShrink: 0 }} />
             <div>
               <span>Seguindo</span>
             </div>
@@ -199,7 +199,7 @@ const NavBar = () => {
       {authenticated && width > breakpoints.getInt(breakpoints.size1) && (
         <BottomSide>
           <SearchProfile>
-            <GoSearch size={15} style={{ flexShrink: 0 }} />
+            <GoSearch size={'1.5rem'} style={{ flexShrink: 0 }} />
             <SearchProfileInput
               type="text"
               placeholder="Adicionar amigos"

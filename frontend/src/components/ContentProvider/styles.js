@@ -8,7 +8,7 @@ export const Container = styled.div`
   align-items: center;
   width: 25rem;
   background: var(--background-400);
-  border-radius: 5px;
+  border-radius: 0.5rem;
   padding: 1rem;
 
   &:hover {
@@ -29,7 +29,7 @@ export const Container = styled.div`
 export const Logo = styled.div`
   width: 3.5rem;
   height: 3.5rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   background: var(--gray);
   background-image: url('${(props) => contentProviders[`${props.src}`]}');
   background-repeat: no-repeat;

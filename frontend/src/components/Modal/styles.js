@@ -27,7 +27,7 @@ export const ModalWrapper = styled.div`
 
 export const ModalContent = styled.div`
   background: var(--primary);
-  border-radius: 5px;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,7 +39,7 @@ export const ModalContent = styled.div`
 export const CloseModal = styled.button`
   width: 3rem;
   height: 3rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   position: absolute;
   top: 0;
   right: -3.5rem;

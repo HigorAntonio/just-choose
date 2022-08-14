@@ -10,7 +10,7 @@ export const Input = styled.div`
     background: var(--background-500);
     padding: 0.5rem 3.7rem 0.5rem 1rem;
     border: 0.2rem solid var(--background-500);
-    border-radius: 5px;
+    border-radius: 0.5rem;
     outline: none;
 
     &:hover {
@@ -39,7 +39,7 @@ export const ToggleVisibility = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 2px;
+  border-radius: 0.2rem;
 
   &:hover {
     background: var(--background-500);

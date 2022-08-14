@@ -20,8 +20,8 @@ const Result = ({ error, content, lastElementRef }) => {
         <div className="headerPosition">
           <h2>
             <FaHashtag
-              size={'20px'}
-              style={{ flexShrink: 0, margin: '0 5px' }}
+              size={'2rem'}
+              style={{ flexShrink: 0, margin: '0 0.5rem' }}
             />
           </h2>
         </div>

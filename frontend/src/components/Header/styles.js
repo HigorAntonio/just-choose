@@ -9,7 +9,7 @@ export const Container = styled.div`
   display: flex;
   justify-content: space-between;
 
-  /* height: 59px; */
+  /* height: 5.9rem; */
   padding: 0.5em;
 
   background: var(--background-100);
@@ -83,7 +83,7 @@ export const SearchBar = styled.div`
     padding: 0.5rem;
     min-width: 39rem;
     margin: 0;
-    border-radius: 5px;
+    border-radius: 0.5rem;
     position: absolute;
     top: 4.5rem;
     right: 0;
@@ -120,7 +120,7 @@ export const SearchInput = styled.input`
   height: 3.6rem;
   font-size: 1.4rem;
   padding: 0.5rem 1rem;
-  border-radius: 5px 0 0 5px;
+  border-radius: 0.5rem 0 0 0.5rem;
   border: 0.2rem solid var(--background-400);
   background: var(--background-400);
   text-overflow: ellipsis;
@@ -147,13 +147,15 @@ export const SearchButton = styled.button`
   height: 3.6rem;
   min-width: 3rem;
   padding: 0.5rem;
-  border-radius: 0 5px 5px 0;
+  border-radius: 0 0.5rem 0.5rem 0;
   margin-left: 0.1rem;
   background: var(--background-300);
+  display: flex;
+  justify-content: center;
 
   &.squared {
     width: 3.6rem;
-    border-radius: 5px;
+    border-radius: 0.5rem;
   }
 
   &.no-background {
@@ -199,7 +201,7 @@ const navButtonCss = css`
   width: 3.5rem;
   height: 3.5rem;
 
-  border-radius: 5px;
+  border-radius: 0.5rem;
 
   outline: none;
 
@@ -244,7 +246,7 @@ const signButton = css`
   color: var(--text);
   height: 3.5rem;
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   white-space: nowrap;
   outline: none;
 
@@ -306,7 +308,7 @@ export const ProfileDropDown = styled.div`
   width: 28rem;
   background: var(--background-100);
   padding: 1rem;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   position: absolute;
   bottom: -0.5rem;
   right: 0;
@@ -382,7 +384,7 @@ export const DropDownOption = styled.div`
   align-items: center;
   width: 100%;
   padding: 0.5rem;
-  border-radius: 2.5px;
+  border-radius: 0.25rem;
 
   .align-left {
     flex: 0;
