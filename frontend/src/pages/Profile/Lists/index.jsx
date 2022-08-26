@@ -119,7 +119,7 @@ const Lists = () => {
         <AlignLeftFilters>
           <Label>Filtrar por</Label>
           <SearchWrapper>
-            <GoSearch size={'1.5rem'} style={{ flexShrink: 0 }} />
+            <GoSearch size={'15px'} style={{ flexShrink: 0 }} />
             <input
               type="search"
               id="search"

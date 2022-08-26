@@ -7,7 +7,7 @@ import Trending from './Trending';
 import Following from './Following';
 import Votes from './Votes';
 
-import { Container } from './styles';
+import { Container, Wrapper } from './styles';
 
 const Home = () => {
   const { contentWrapperRef } = useContext(LayoutContext);
@@ -19,16 +19,11 @@ const Home = () => {
 
   return (
     <Container>
-      <h1>Trending</h1>
-      <Trending />
-      {authenticated && (
-        <>
-          <h1>Following</h1>
-          <Following />
-          <h1>Votes</h1>
-          <Votes />
-        </>
-      )}
+      <Wrapper>
+        <Trending />
+        {authenticated && <Following />}
+        {authenticated && <Votes />}
+      </Wrapper>
     </Container>
   );
 };

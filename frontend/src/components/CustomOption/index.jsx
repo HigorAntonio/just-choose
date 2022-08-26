@@ -13,9 +13,9 @@ const CustomOption = ({ click, children, check, ...rest }) => {
     >
       <span>{children}</span>
       {check ? (
-        <ImCheckboxChecked size={'1.5rem'} style={{ flexShrink: 0 }} />
+        <ImCheckboxChecked size={'15px'} style={{ flexShrink: 0 }} />
       ) : (
-        <ImCheckboxUnchecked size={'1.5rem'} style={{ flexShrink: 0 }} />
+        <ImCheckboxUnchecked size={'15px'} style={{ flexShrink: 0 }} />
       )}
     </Container>
   );

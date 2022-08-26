@@ -16,9 +16,9 @@ const ContentProvider = ({ click, children, check, ...rest }) => {
         <span>{children}</span>
       </div>
       {check ? (
-        <ImCheckboxChecked size={'1.5rem'} style={{ flexShrink: 0 }} />
+        <ImCheckboxChecked size={'15px'} style={{ flexShrink: 0 }} />
       ) : (
-        <ImCheckboxUnchecked size={'1.5rem'} style={{ flexShrink: 0 }} />
+        <ImCheckboxUnchecked size={'15px'} style={{ flexShrink: 0 }} />
       )}
     </Container>
   );

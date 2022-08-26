@@ -4,7 +4,7 @@ import { ViewportContext } from '../../../context/ViewportContext';
 
 import ListCard from '../../../components/ListCard';
 
-import { Container } from './styles';
+import { Container, Wrapper, TitleWrapper, Title } from './styles';
 
 const FollowingLists = ({ content }) => {
   const { width } = useContext(ViewportContext);
@@ -31,21 +31,26 @@ const FollowingLists = ({ content }) => {
 
   return (
     <Container>
-      {content &&
-        content.length > 0 &&
-        [...Array(6).keys()].map((_, i) => {
-          if (i < lastContentIndex && content[i]) {
-            return (
-              <div key={`followingList${content[i].id}`}>
-                <ListCard contentList={content[i]} showProfile />
-              </div>
-            );
-          }
-          if (i < lastContentIndex) {
-            return <div key={`followingListEmpty${i}`} />;
-          }
-          return '';
-        })}
+      <TitleWrapper>
+        <Title>Listas de perfis seguidos</Title>
+      </TitleWrapper>
+      <Wrapper>
+        {content &&
+          content.length > 0 &&
+          [...Array(6).keys()].map((_, i) => {
+            if (i < lastContentIndex && content[i]) {
+              return (
+                <div key={`followingList${content[i].id}`}>
+                  <ListCard contentList={content[i]} showProfile />
+                </div>
+              );
+            }
+            if (i < lastContentIndex) {
+              return <div key={`followingListEmpty${i}`} />;
+            }
+            return '';
+          })}
+      </Wrapper>
     </Container>
   );
 };

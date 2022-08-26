@@ -154,7 +154,7 @@ function Header() {
             onKeyPress={handleSearchInputKeyPress}
           />
           <SearchButton disabled={!search} onClick={handleSearch}>
-            <FiSearch size={'2.5rem'} style={{ flexShrink: 0 }} />
+            <FiSearch size={'25px'} style={{ flexShrink: 0 }} />
           </SearchButton>
         </SearchBar>
         <ClickAwayListener
@@ -167,7 +167,7 @@ function Header() {
               className="squared no-background search-button-small-screen"
               onClick={() => setShowSearchDropDown((prevState) => !prevState)}
             >
-              <FiSearch size={'2.5rem'} style={{ flexShrink: 0 }} />
+              <FiSearch size={'25px'} style={{ flexShrink: 0 }} />
             </SearchButton>
             <SearchBar
               className="searchbar-small-screen"
@@ -181,7 +181,7 @@ function Header() {
                 onKeyPress={handleSearchInputKeyPress}
               />
               <SearchButton disabled={!search} onClick={handleSearch}>
-                <FiSearch size={'2.5rem'} style={{ flexShrink: 0 }} />
+                <FiSearch size={'25px'} style={{ flexShrink: 0 }} />
               </SearchButton>
             </SearchBar>
           </div>
@@ -199,7 +199,7 @@ function Header() {
               >
                 <NewListButton>
                   {/* <NewListIcon /> */}
-                  <HiDocumentAdd size={'2.5rem'} style={{ flexShrink: 0 }} />
+                  <HiDocumentAdd size={'25px'} style={{ flexShrink: 0 }} />
                 </NewListButton>
               </TooltipHover>
             </Link>
@@ -228,7 +228,7 @@ function Header() {
                   data-profile-image
                 >
                   {!authenticated && (
-                    <BiUser size={'2rem'} style={{ flexShrink: 0 }} />
+                    <BiUser size={'20px'} style={{ flexShrink: 0 }} />
                   )}
                 </Profile>
                 <ProfileDropDown show={showProfileDropDown}>
@@ -253,7 +253,7 @@ function Header() {
                       >
                         <DropDownOption className="hover">
                           <div className="align-left">
-                            <BiCog size={'2rem'} style={{ flexShrink: 0 }} />{' '}
+                            <BiCog size={'20px'} style={{ flexShrink: 0 }} />{' '}
                           </div>
                           <div className="align-right">Configurações</div>
                         </DropDownOption>
@@ -265,7 +265,7 @@ function Header() {
                     tabIndex="0"
                   >
                     <div className="align-left">
-                      <HiOutlineMoon size={'2rem'} style={{ flexShrink: 0 }} />{' '}
+                      <HiOutlineMoon size={'20px'} style={{ flexShrink: 0 }} />{' '}
                     </div>
                     <div className="align-right switch">
                       <label htmlFor="theme-switch">Tema escuro</label>
@@ -299,7 +299,7 @@ function Header() {
                         tabIndex="0"
                       >
                         <div className="align-left">
-                          <BiLogIn size={'2rem'} style={{ flexShrink: 0 }} />{' '}
+                          <BiLogIn size={'20px'} style={{ flexShrink: 0 }} />{' '}
                         </div>
                         <div className="align-right">Entrar</div>
                       </DropDownOption>
@@ -315,7 +315,7 @@ function Header() {
                         tabIndex="0"
                       >
                         <div className="align-left">
-                          <BiLogOut size={'2rem'} style={{ flexShrink: 0 }} />{' '}
+                          <BiLogOut size={'20px'} style={{ flexShrink: 0 }} />{' '}
                         </div>
                         <div className="align-right">Sair</div>
                       </DropDownOption>

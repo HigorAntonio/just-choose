@@ -393,8 +393,8 @@ const ShowPoll = () => {
                 <Link to={`/lists/${poll.content_lists[0].id}`} tabIndex="-1">
                   <HeaderButton title="Visualizar lista de conteúdo">
                     <IoMdListBox
-                      size={'2.5rem'}
-                      style={{ flexShrink: 0, margin: '0 0.5rem' }}
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
                     />
                   </HeaderButton>
                 </Link>
@@ -407,22 +407,22 @@ const ShowPoll = () => {
                   >
                     {!poll.is_active && (
                       <FaPlay
-                        size={'2.5rem'}
-                        style={{ flexShrink: 0, margin: '0 0.5rem' }}
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
                       />
                     )}
                     {poll.is_active && (
                       <FaStop
-                        size={'2.5rem'}
-                        style={{ flexShrink: 0, margin: '0 0.5rem' }}
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
                       />
                     )}
                   </HeaderButton>
                   <Link to={`/polls/${pollId}/update`} tabIndex="-1">
                     <HeaderButton title="Editar votação">
                       <MdSettings
-                        size={'2.5rem'}
-                        style={{ flexShrink: 0, margin: '0 0.5rem' }}
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
                       />
                     </HeaderButton>
                   </Link>
@@ -431,8 +431,8 @@ const ShowPoll = () => {
                     onClick={() => setShowDeleteDialog(true)}
                   >
                     <FaTrash
-                      size={'2.5rem'}
-                      style={{ flexShrink: 0, margin: '0 0.5rem' }}
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
                     />
                   </HeaderDeleteButton>
                 </>

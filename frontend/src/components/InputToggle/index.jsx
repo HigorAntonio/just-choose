@@ -24,9 +24,9 @@ const InputToggle = (props) => {
             onMouseDown={(e) => e.preventDefault()}
           >
             {showPassword ? (
-              <MdVisibilityOff size={'1.6rem'} style={{ flexShrink: 0 }} />
+              <MdVisibilityOff size={'16px'} style={{ flexShrink: 0 }} />
             ) : (
-              <MdVisibility size={'1.6rem'} style={{ flexShrink: 0 }} />
+              <MdVisibility size={'16px'} style={{ flexShrink: 0 }} />
             )}
           </ToggleVisibility>
         </label>

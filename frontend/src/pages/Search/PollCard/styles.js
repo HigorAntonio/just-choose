@@ -57,9 +57,8 @@ export const Thumbnail = styled.img`
   object-fit: cover;
   flex-shrink: 0;
   position: absolute;
-  transform: translate(-50%, -50%);
-  left: 50%;
-  top: 50%;
+  left: 0;
+  top: 0;
   ${(props) => props.error && 'display: none;'}
 `;
 

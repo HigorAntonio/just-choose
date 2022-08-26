@@ -4,7 +4,7 @@ import { ViewportContext } from '../../../context/ViewportContext';
 
 import PollCard from '../../../components/PollCard';
 
-import { Container } from './styles';
+import { Container, Wrapper, TitleWrapper, Title } from './styles';
 
 const FollowingPolls = ({ content }) => {
   const { width } = useContext(ViewportContext);
@@ -31,21 +31,26 @@ const FollowingPolls = ({ content }) => {
 
   return (
     <Container>
-      {content &&
-        content.length > 0 &&
-        [...Array(6).keys()].map((_, i) => {
-          if (i < lastContentIndex && content[i]) {
-            return (
-              <div key={`trendingPoll${content[i].id}`}>
-                <PollCard poll={content[i]} showProfile />
-              </div>
-            );
-          }
-          if (i < lastContentIndex) {
-            return <div key={`trendingPollEmpty${i}`} />;
-          }
-          return '';
-        })}
+      <TitleWrapper>
+        <Title>Votações de perfis seguidos</Title>
+      </TitleWrapper>
+      <Wrapper>
+        {content &&
+          content.length > 0 &&
+          [...Array(6).keys()].map((_, i) => {
+            if (i < lastContentIndex && content[i]) {
+              return (
+                <div key={`trendingPoll${content[i].id}`}>
+                  <PollCard poll={content[i]} showProfile />
+                </div>
+              );
+            }
+            if (i < lastContentIndex) {
+              return <div key={`trendingPollEmpty${i}`} />;
+            }
+            return '';
+          })}
+      </Wrapper>
     </Container>
   );
 };

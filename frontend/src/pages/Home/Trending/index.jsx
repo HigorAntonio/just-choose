@@ -4,7 +4,7 @@ import axios from 'axios';
 import justChooseApi from '../../../services/justChooseApi';
 import TrendingLists from '../TrendingLists';
 
-import { Container } from './styles';
+import { Container, LineWrapper, Line } from './styles';
 
 const Trending = () => {
   const [contentLists, setContentLists] = useState([]);
@@ -37,6 +37,9 @@ const Trending = () => {
   return (
     <Container>
       {contentLists.length > 0 && <TrendingLists content={contentLists} />}
+      <LineWrapper>
+        <Line />
+      </LineWrapper>
     </Container>
   );
 };

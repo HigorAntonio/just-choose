@@ -4,7 +4,7 @@ import { ViewportContext } from '../../../context/ViewportContext';
 
 import ListCard from '../../../components/ListCard';
 
-import { Container } from './styles';
+import { Container, Wrapper, TitleWrapper, Title } from './styles';
 
 const TrendingLists = ({ content }) => {
   const { width } = useContext(ViewportContext);
@@ -31,21 +31,26 @@ const TrendingLists = ({ content }) => {
 
   return (
     <Container>
-      {content &&
-        content.length > 0 &&
-        [...Array(6).keys()].map((_, i) => {
-          if (i < lastContentIndex && content[i]) {
-            return (
-              <div key={`trendingList${content[i].id}`}>
-                <ListCard contentList={content[i]} showProfile />
-              </div>
-            );
-          }
-          if (i < lastContentIndex) {
-            return <div key={`trendingListEmpty${i}`} />;
-          }
-          return '';
-        })}
+      <TitleWrapper>
+        <Title>Listas populares</Title>
+      </TitleWrapper>
+      <Wrapper>
+        {content &&
+          content.length > 0 &&
+          [...Array(6).keys()].map((_, i) => {
+            if (i < lastContentIndex && content[i]) {
+              return (
+                <div key={`trendingList${content[i].id}`}>
+                  <ListCard contentList={content[i]} showProfile />
+                </div>
+              );
+            }
+            if (i < lastContentIndex) {
+              return <div key={`trendingListEmpty${i}`} />;
+            }
+            return '';
+          })}
+      </Wrapper>
     </Container>
   );
 };

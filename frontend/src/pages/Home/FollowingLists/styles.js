@@ -1,6 +1,16 @@
 import styled from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.div``;
+
+export const TitleWrapper = styled.div`
+  padding-bottom: 1rem;
+`;
+
+export const Title = styled.h2`
+  font-size: 2rem;
+`;
+
+export const Wrapper = styled.div`
   display: flex;
   min-width: 100%;
   margin-bottom: 1rem;

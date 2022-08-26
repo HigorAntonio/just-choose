@@ -64,18 +64,33 @@ const ContentListCard = ({ contentList }) => {
       tabIndex="0"
     >
       <ThumbnailContainer>
-        <ThumbnailWrapper>
-          <Thumbnail
-            src={thumbnail}
-            onError={() => setThumbnailError(true)}
-            error={thumbnailError}
-          />
-          {thumbnailError && <BsImage />}
-          <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
-        </ThumbnailWrapper>
+        <Link to={`/lists/${listId}`} data-prevent-container-click>
+          <ThumbnailWrapper data-prevent-container-click>
+            <Thumbnail
+              src={thumbnail}
+              onError={() => setThumbnailError(true)}
+              error={thumbnailError}
+              data-prevent-container-click
+            />
+            {thumbnailError && (
+              <BsImage
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              />
+            )}
+            <TimeFromNow data-prevent-container-click>
+              {fromNow(updated_at)}
+            </TimeFromNow>
+          </ThumbnailWrapper>
+        </Link>
       </ThumbnailContainer>
       <TextWrapperLargeScreen>
-        <Title title={title}>{title}</Title>
+        <Title title={title}>
+          <Link to={`/lists/${listId}`} data-prevent-container-click>
+            {title}
+          </Link>
+        </Title>
         <Meta>
           <Likes>
             {formatCount(likes) + ' '}
@@ -120,7 +135,11 @@ const ContentListCard = ({ contentList }) => {
           </Link>
         </ProfileImageWrapper>
         <Meta>
-          <Title title={title}>{title}</Title>
+          <Title title={title}>
+            <Link to={`/lists/${listId}`} data-prevent-container-click>
+              {title}
+            </Link>
+          </Title>
           <Meta>
             <ProfileName>
               <Link to={`/profiles/${profileId}`} data-prevent-container-click>

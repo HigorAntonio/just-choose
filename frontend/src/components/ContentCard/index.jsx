@@ -31,12 +31,12 @@ const ContentCard = ({ src, title, check, click }) => {
       >
         {check ? (
           <ImCheckboxChecked
-            size={'1.5rem'}
+            size={'15px'}
             style={{ fill: '#fff', flexShrink: 0 }}
           />
         ) : (
           <ImCheckboxUnchecked
-            size={'1.5rem'}
+            size={'15px'}
             style={{ fill: '#fff', flexShrink: 0 }}
           />
         )}

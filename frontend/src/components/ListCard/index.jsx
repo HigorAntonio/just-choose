@@ -60,15 +60,26 @@ const ListCard = ({ contentList, showProfile = false }) => {
     >
       <CardWrapper>
         <Top>
-          <ThumbWrapper>
-            <Thumbnail
-              src={thumbnail}
-              onError={() => setThumbnailError(true)}
-              error={thumbnailError}
-            />
-            {thumbnailError && <BsImage />}
-            <TimeFromNow>{fromNow(updated_at)}</TimeFromNow>
-          </ThumbWrapper>
+          <Link to={`/lists/${listId}`} data-prevent-container-click>
+            <ThumbWrapper data-prevent-container-click>
+              <Thumbnail
+                src={thumbnail}
+                onError={() => setThumbnailError(true)}
+                error={thumbnailError}
+                data-prevent-container-click
+              />
+              {thumbnailError && (
+                <BsImage
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              <TimeFromNow data-prevent-container-click>
+                {fromNow(updated_at)}
+              </TimeFromNow>
+            </ThumbWrapper>
+          </Link>
         </Top>
         <Bottom>
           {showProfile && (
@@ -84,7 +95,11 @@ const ListCard = ({ contentList, showProfile = false }) => {
             </ProfileImageWrapper>
           )}
           <Meta>
-            <Title title={title}>{title}</Title>
+            <Title title={title}>
+              <Link to={`/lists/${listId}`} data-prevent-container-click>
+                {title}
+              </Link>
+            </Title>
             {showProfile && (
               <ProfileName>
                 <Link
