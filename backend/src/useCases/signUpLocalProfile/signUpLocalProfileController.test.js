@@ -27,7 +27,7 @@ describe('signUpLocalProfileController', () => {
       const response = await request(app).post('/signup').send(profile);
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -64,7 +64,7 @@ describe('signUpLocalProfileController', () => {
     responses[2] = await request(app).post('/signup').send(profiles[2]);
 
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profiles[0].name);
+      await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,

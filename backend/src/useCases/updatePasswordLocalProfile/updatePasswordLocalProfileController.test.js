@@ -26,7 +26,7 @@ describe('updatePasswordLocalProfileController', () => {
       const newPassword = 'SYk7iu2FOz';
       const signUpResponse = await request(app).post('/signup').send(profile);
       const { password: passwordBefore } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       const comparePasswordBefore = localAuthUtils.comparePassword(
         profile.password,
         passwordBefore
@@ -41,7 +41,7 @@ describe('updatePasswordLocalProfileController', () => {
         });
 
       const { id: profileId, password: passwordAfter } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       const comparePasswordAfter = localAuthUtils.comparePassword(
         newPassword,
         passwordAfter
@@ -108,7 +108,7 @@ describe('updatePasswordLocalProfileController', () => {
       }
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -184,7 +184,7 @@ describe('updatePasswordLocalProfileController', () => {
       }
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -206,7 +206,7 @@ describe('updatePasswordLocalProfileController', () => {
     const newPassword = 'sSsbmjWlyM';
     const signUpResponse = await request(app).post('/signup').send(profile);
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
 
     const response = await request(app)

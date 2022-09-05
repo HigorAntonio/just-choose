@@ -53,7 +53,7 @@ describe('refreshAuthTokenLocalProfileController', () => {
         .send({ refresh_token: signUpResponse.body.refresh_token });
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       const isRefreshTokenWhitelisted =
         await localAuthUtils.isRefreshTokenInStorage(
           profileId,
@@ -141,7 +141,7 @@ describe('refreshAuthTokenLocalProfileController', () => {
       };
       const signUpResponse = await request(app).post('/signup').send(profile);
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       const refreshToken = await createRefreshToken(profileId, {
         expiresIn: '10',
       });
@@ -176,7 +176,7 @@ describe('refreshAuthTokenLocalProfileController', () => {
       };
       const signUpResponse = await request(app).post('/signup').send(profile);
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
         signUpResponse.body.refresh_token

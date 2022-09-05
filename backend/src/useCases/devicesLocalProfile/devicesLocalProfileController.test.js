@@ -64,7 +64,7 @@ describe('devicesLocalProfileController', () => {
         .set('Authorization', `Bearer ${signUpResponse.body.access_token}`);
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -100,7 +100,7 @@ describe('devicesLocalProfileController', () => {
       const response = await request(app).get('/devices');
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -170,7 +170,7 @@ describe('devicesLocalProfileController', () => {
             '(KHTML, like Gecko) Chrome/101.0.4951.61 Mobile Safari/537.36'
         );
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
         signUpResponse.body.refresh_token

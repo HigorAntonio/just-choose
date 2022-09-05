@@ -22,7 +22,7 @@ describe('exitDeviceLocalProfileController', () => {
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     const isRefreshTokenWhitelisted =
       await localAuthUtils.isRefreshTokenInStorage(
         profileId,
@@ -114,7 +114,7 @@ describe('exitDeviceLocalProfileController', () => {
       }
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -184,7 +184,7 @@ describe('exitDeviceLocalProfileController', () => {
       }
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -208,7 +208,7 @@ describe('exitDeviceLocalProfileController', () => {
       };
       const signUpResponse = await request(app).post('/signup').send(profile);
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
         signUpResponse.body.refresh_token
@@ -264,7 +264,9 @@ describe('exitDeviceLocalProfileController', () => {
           .post('/signup')
           .send(test.profile);
         const { id: profileId } =
-          await localProfileRepository.getLocalProfileByName(test.profile.name);
+          await localProfileRepository.getLocalProfileByEmail(
+            test.profile.email
+          );
         tests[i].accessToken = signUpResponse.body.access_token;
         tests[i].refreshToken = signUpResponse.body.refresh_token;
         tests[i].profileId = profileId;

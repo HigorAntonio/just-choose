@@ -27,7 +27,7 @@ describe('resendConfirmEmailLocalProfileController', () => {
       .set('Authorization', `Bearer ${signUpResponse.body.access_token}`);
 
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,
@@ -44,7 +44,7 @@ describe('resendConfirmEmailLocalProfileController', () => {
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
 
     const response = await request(app)
@@ -70,7 +70,7 @@ describe('resendConfirmEmailLocalProfileController', () => {
       };
       const signUpResponse = await request(app).post('/signup').send(profile);
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.updateIsActiveLocalProfile(profileId, true);
 
       const response = await request(app)

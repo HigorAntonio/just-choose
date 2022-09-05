@@ -28,7 +28,7 @@ describe('signInLocalProfileController', () => {
     });
 
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,
@@ -86,7 +86,7 @@ describe('signInLocalProfileController', () => {
     }
 
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,
@@ -174,7 +174,7 @@ describe('signInLocalProfileController', () => {
     }
 
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,
@@ -224,7 +224,7 @@ describe('signInLocalProfileController', () => {
     }
 
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,
@@ -304,7 +304,7 @@ describe('signInLocalProfileController', () => {
     }
 
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,

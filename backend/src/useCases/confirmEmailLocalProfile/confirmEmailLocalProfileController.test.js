@@ -41,7 +41,7 @@ describe('confirmEmailLocalProfileController', () => {
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
     const { id: profileId, is_active: statusBeforeConfirmation } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     const confirmEmailToken = createConfirmEmailToken(profileId);
 
     const response = await request(app).patch(
@@ -49,7 +49,7 @@ describe('confirmEmailLocalProfileController', () => {
     );
 
     const { is_active: statusAfterConfirmation } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,
@@ -68,7 +68,7 @@ describe('confirmEmailLocalProfileController', () => {
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     const confirmEmailToken = createConfirmEmailToken(profileId);
     await localProfileRepository.deleteLocalProfile(profileId);
 
@@ -92,7 +92,7 @@ describe('confirmEmailLocalProfileController', () => {
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
     const { id: profileId, is_active: statusBeforeConfirmation } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     const confirmEmailToken = await createConfirmEmailToken(profileId, {
       expiresIn: '10',
     });
@@ -103,7 +103,7 @@ describe('confirmEmailLocalProfileController', () => {
     );
 
     const { is_active: statusAfterConfirmation } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     await localProfileRepository.deleteLocalProfile(profileId);
     await localAuthUtils.removeRefreshTokenFromStorage(
       profileId,

@@ -24,7 +24,7 @@ describe('logoutLocalProfileController', () => {
       body: { access_token: accessToken, refresh_token: refreshToken },
     } = await request(app).post('/signup').send(profile);
     const { id: profileId } =
-      await localProfileRepository.getLocalProfileByName(profile.name);
+      await localProfileRepository.getLocalProfileByEmail(profile.email);
     const isRefreshTokenWhitelisted =
       await localAuthUtils.isRefreshTokenInStorage(profileId, refreshToken);
 
@@ -95,7 +95,7 @@ describe('logoutLocalProfileController', () => {
       }
 
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localProfileRepository.deleteLocalProfile(profileId);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -121,7 +121,7 @@ describe('logoutLocalProfileController', () => {
         body: { access_token: accessToken, refresh_token: refreshToken },
       } = await request(app).post('/signup').send(profile);
       const { id: profileId } =
-        await localProfileRepository.getLocalProfileByName(profile.name);
+        await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
         refreshToken
@@ -174,7 +174,9 @@ describe('logoutLocalProfileController', () => {
           body: { access_token: accessToken, refresh_token: refreshToken },
         } = await request(app).post('/signup').send(test.profile);
         const { id: profileId } =
-          await localProfileRepository.getLocalProfileByName(test.profile.name);
+          await localProfileRepository.getLocalProfileByEmail(
+            test.profile.email
+          );
         tests[i].accessToken = accessToken;
         tests[i].refreshToken = refreshToken;
         tests[i].profileId = profileId;
