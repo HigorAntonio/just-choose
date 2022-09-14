@@ -14,8 +14,8 @@ import {
 
 const FollowingCard = ({ profile }) => {
   const {
-    id: profileId,
     name: profileName,
+    display_name: profileDisplayName,
     followers_count: followersCount,
   } = profile;
   const profileImageUrl = profile.profile_image_url
@@ -25,8 +25,8 @@ const FollowingCard = ({ profile }) => {
   const [profileImageError, setProfileImageError] = useState(false);
 
   return (
-    <Container title={profileName}>
-      <Link to={`/profiles/${profileId}`}>
+    <Container title={profileDisplayName}>
+      <Link to={`/profiles/${profileName}`}>
         <ProfileImageWrapper>
           <ProfileImage
             src={profileImageUrl}
@@ -34,7 +34,7 @@ const FollowingCard = ({ profile }) => {
             error={profileImageError}
           />
         </ProfileImageWrapper>
-        <ProfileName>{profileName}</ProfileName>
+        <ProfileName>{profileDisplayName}</ProfileName>
         <Meta>
           <FollowersCount>
             {formatCount(followersCount)}

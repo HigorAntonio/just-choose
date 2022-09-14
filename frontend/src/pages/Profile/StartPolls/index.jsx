@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { ViewportContext } from '../../../context/ViewportContext';
@@ -9,10 +8,8 @@ import PollCard from '../../../components/PollCard';
 
 import { Container, TitleWrapper, Title, Main } from './styles';
 
-const StartPolls = () => {
+const StartPolls = ({ profileToShowId }) => {
   const { width } = useContext(ViewportContext);
-
-  const { id: profileId } = useParams();
 
   const [lastContentIndex, setLastContentIndex] = useState(0);
   const [content, setContent] = useState([]);
@@ -26,7 +23,7 @@ const StartPolls = () => {
       try {
         const { data } = await justChooseApi.get('/polls', {
           params: {
-            profile_id: profileId,
+            profile_id: profileToShowId,
             page: 1,
             page_size: 6,
             sort_by: 'updated.desc',
@@ -46,7 +43,7 @@ const StartPolls = () => {
     return () => {
       source.cancel();
     };
-  }, [profileId]);
+  }, [profileToShowId]);
 
   useEffect(() => {
     if (width < 547) {

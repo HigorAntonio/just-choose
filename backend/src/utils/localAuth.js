@@ -25,10 +25,16 @@ exports.comparePassword = (password, hashed) => {
   return bcrypt.compareSync(password, hashed);
 };
 
-exports.sendEmailConfirmation = async (profileId, email, Queue) => {
+exports.sendEmailConfirmation = async (
+  profileId,
+  profileName,
+  email,
+  Queue
+) => {
   const payload = {
     iss: APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   const emailConfirmationToken = jwt.sign(payload, CONFIRM_EMAIL_TOKEN_SECRET, {
@@ -38,10 +44,11 @@ exports.sendEmailConfirmation = async (profileId, email, Queue) => {
   await Queue.add('ConfirmationMail', { email, emailConfirmationToken });
 };
 
-exports.generateAccessToken = (profileId) => {
+exports.generateAccessToken = (profileId, profileName) => {
   const payload = {
     iss: APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   return jwt.sign(payload, ACCESS_TOKEN_SECRET, {
@@ -49,10 +56,11 @@ exports.generateAccessToken = (profileId) => {
   });
 };
 
-exports.generateRefreshToken = (profileId) => {
+exports.generateRefreshToken = (profileId, profileName) => {
   const payload = {
     iss: APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
@@ -60,10 +68,11 @@ exports.generateRefreshToken = (profileId) => {
   });
 };
 
-exports.generateForgotPasswordToken = (profileId) => {
+exports.generateForgotPasswordToken = (profileId, profileName) => {
   const payload = {
     iss: APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   return jwt.sign(payload, FORGOT_PASSWORD_TOKEN_SECRET, {

@@ -51,7 +51,7 @@ const Routes = () => {
         component={() => <UpdatePoll />}
       />
       <CustomRoute isPrivate path="/settings" component={() => <Settings />} />
-      <CustomRoute path="/profiles/:id" component={() => <Profile />} />
+      <CustomRoute path="/profiles/:name" component={() => <Profile />} />
       <Route component={NotFound} />
     </Switch>
   );

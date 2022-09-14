@@ -8,6 +8,7 @@ module.exports = async (options) => {
       .select(
         'p.id',
         'p.name',
+        'p.display_name',
         'p.profile_image_url',
         knex.raw('COALESCE(followers_count, 0) AS followers_count'),
         knex.raw('COALESCE(following_count, 0) AS following_count')

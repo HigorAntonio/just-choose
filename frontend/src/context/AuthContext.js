@@ -8,6 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const {
     loading,
     profileId,
+    profileName,
     authenticated,
     handleRegistration,
     handleLogin,
@@ -19,6 +20,7 @@ export const AuthContextProvider = ({ children }) => {
       value={{
         loading,
         profileId,
+        profileName,
         authenticated,
         handleRegistration,
         handleLogin,

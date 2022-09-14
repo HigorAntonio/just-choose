@@ -6,7 +6,9 @@ const getProfile = async (tableKey, tableValue) => {
     .select(
       'p.id',
       'p.name',
+      'p.display_name',
       'p.email',
+      'p.about',
       'p.profile_image_url',
       'p.method',
       'p.is_active',
@@ -32,10 +34,10 @@ exports.getLocalProfileByEmail = (profileEmail) => {
   return getProfile('email', profileEmail);
 };
 
-exports.saveLocalProfile = ({ name, email, password }) => {
+exports.saveLocalProfile = ({ name, displayName, email, password }) => {
   return knex.transaction(async (trx) => {
     const [profileId] = await trx('profiles').insert(
-      { name, email, method: 'local' },
+      { name, display_name: displayName, email, method: 'local' },
       'id'
     );
 

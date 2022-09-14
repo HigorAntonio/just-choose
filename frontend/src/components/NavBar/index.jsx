@@ -132,22 +132,22 @@ const NavBar = () => {
               {following.map((p, i) => {
                 if (following.length === i + 1) {
                   return (
-                    <Link key={p.id} to={`/profiles/${p.id}`}>
-                      <Profile ref={lastFollowRef} title={p.name}>
+                    <Link key={p.id} to={`/profiles/${p.name}`}>
+                      <Profile ref={lastFollowRef} title={p.display_name}>
                         <ProfileImage src={p.profile_image_url} />
                         <ProfileData>
-                          <span>{p.name}</span>
+                          <span>{p.display_name}</span>
                         </ProfileData>
                       </Profile>
                     </Link>
                   );
                 }
                 return (
-                  <Link key={p.id} to={`/profiles/${p.id}`}>
-                    <Profile title={p.name}>
+                  <Link key={p.id} to={`/profiles/${p.name}`}>
+                    <Profile title={p.display_name}>
                       <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
-                        <span>{p.name}</span>
+                        <span>{p.display_name}</span>
                       </ProfileData>
                     </Profile>
                   </Link>
@@ -165,22 +165,22 @@ const NavBar = () => {
               {profiles.map((p, i) => {
                 if (profiles.length === i + 1) {
                   return (
-                    <Link key={p.id} to={`/profiles/${p.id}`}>
-                      <Profile ref={lastProfileRef} title={p.name}>
+                    <Link key={p.id} to={`/profiles/${p.name}`}>
+                      <Profile ref={lastProfileRef} title={p.display_name}>
                         <ProfileImage src={p.profile_image_url} />
                         <ProfileData>
-                          <span>{p.name}</span>
+                          <span>{p.display_name}</span>
                         </ProfileData>
                       </Profile>
                     </Link>
                   );
                 }
                 return (
-                  <Link key={p.id} to={`/profiles/${p.id}`}>
-                    <Profile title={p.name}>
+                  <Link key={p.id} to={`/profiles/${p.name}`}>
+                    <Profile title={p.display_name}>
                       <ProfileImage src={p.profile_image_url} />
                       <ProfileData>
-                        <span>{p.name}</span>
+                        <span>{p.display_name}</span>
                       </ProfileData>
                     </Profile>
                   </Link>

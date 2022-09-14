@@ -367,7 +367,7 @@ const ShowList = () => {
           </CreatedAt>
           <CreatedBy>
             <span>por</span>&nbsp;
-            <Link to={`/profiles/${contentList.profile_id}`}>
+            <Link to={`/profiles/${contentList.profile_name}`}>
               <ProfileImageWrapper>
                 <img
                   src={contentList.profile_image_url}
@@ -376,7 +376,7 @@ const ShowList = () => {
                 />
               </ProfileImageWrapper>
               &nbsp;
-              {contentList.profile_name}&nbsp;
+              {contentList.profile_display_name}&nbsp;
             </Link>
           </CreatedBy>
         </ListInfo>
@@ -440,7 +440,7 @@ const ShowList = () => {
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog
-          createdBy={contentList.profile_name}
+          createdBy={contentList.profile_display_name}
           listTitle={contentList.title}
           handleDelete={handleDelete}
         />

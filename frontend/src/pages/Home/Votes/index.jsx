@@ -81,6 +81,7 @@ const Votes = () => {
                 id: content[i].poll_id,
                 profile_id: content[i].poll_profile_id,
                 profile_name: content[i].poll_profile_name,
+                profile_display_name: content[i].poll_profile_display_name,
                 profile_image_url: content[i].poll_profile_profile_image_url,
                 thumbnail: content[i].poll_thumbnail,
                 title: content[i].poll_title,

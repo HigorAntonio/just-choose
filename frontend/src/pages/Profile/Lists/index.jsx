@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import { GoSearch } from 'react-icons/go';
 
@@ -36,8 +36,7 @@ const isSortValid = (sort) => {
   return !!sortByList.find((e) => e.value === sort);
 };
 
-const Lists = () => {
-  const { id: profileId } = useParams();
+const Lists = ({ profileToShowId }) => {
   const location = useLocation();
   const queryParams = useMemo(
     () => queryString.parse(location.search),
@@ -46,7 +45,7 @@ const Lists = () => {
   const { query, sort = 'updated.desc' } = queryParams;
   const history = useHistory();
   const [params, setParams] = useState({
-    profile_id: profileId,
+    profile_id: profileToShowId,
     sort_by: sort,
     query,
   });
@@ -67,11 +66,11 @@ const Lists = () => {
 
   useEffect(() => {
     setParams({
-      profile_id: profileId,
+      profile_id: profileToShowId,
       sort_by: sort,
       query,
     });
-  }, [profileId, sort, query]);
+  }, [profileToShowId, sort, query]);
 
   const { loading, content, lastElementRef } =
     useLoadMoreWhenLastElementIsOnScreen('/contentlists', params);

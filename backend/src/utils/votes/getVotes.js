@@ -8,6 +8,7 @@ module.exports = async (options) => {
       .select(
         'po.profile_id as poll_profile_id',
         'pr.name as poll_profile_name',
+        'pr.display_name as poll_profile_display_name',
         'pr.profile_image_url as poll_profile_profile_image_url',
         'votes_union_query.poll_id',
         'po.title as poll_title',

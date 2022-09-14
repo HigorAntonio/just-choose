@@ -8,7 +8,7 @@ const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const localAuthUtils = require('../../utils/localAuth');
 
-const createRefreshToken = async (profileId, options = {}) => {
+const createRefreshToken = async (profileId, profileName, options = {}) => {
   const {
     secret = process.env.REFRESH_TOKEN_SECRET,
     expiresIn = process.env.REFRESH_TOKEN_EXPIRATION_TIME,
@@ -16,6 +16,7 @@ const createRefreshToken = async (profileId, options = {}) => {
   const payload = {
     iss: process.env.APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   const refreshToken = jwt.sign(payload, secret, {
@@ -140,9 +141,9 @@ describe('refreshAuthTokenLocalProfileController', () => {
         password: 'x8eiIEMBt5',
       };
       const signUpResponse = await request(app).post('/signup').send(profile);
-      const { id: profileId } =
+      const { id: profileId, name: profileName } =
         await localProfileRepository.getLocalProfileByEmail(profile.email);
-      const refreshToken = await createRefreshToken(profileId, {
+      const refreshToken = await createRefreshToken(profileId, profileName, {
         expiresIn: '10',
       });
       await new Promise((resolve) => setTimeout(resolve, 20));

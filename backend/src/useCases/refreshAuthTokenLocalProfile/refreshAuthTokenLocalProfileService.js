@@ -19,8 +19,14 @@ const refreshAuthTokenLocalProfileService = async (refreshToken, uastring) => {
     throw new Error('"refresh_token" not found');
   }
 
-  const accessToken = localAuthUtils.generateAccessToken(decoded.sub);
-  const newRefreshToken = localAuthUtils.generateRefreshToken(decoded.sub);
+  const accessToken = localAuthUtils.generateAccessToken(
+    decoded.sub,
+    decoded.name
+  );
+  const newRefreshToken = localAuthUtils.generateRefreshToken(
+    decoded.sub,
+    decoded.name
+  );
   const ua = uaParser(uastring);
   // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
   const device = {

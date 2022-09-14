@@ -21,6 +21,7 @@ const resendConfirmEmailLocalProfileService = async (profileId) => {
 
   await localAuthUtils.sendEmailConfirmation(
     localProfile.id,
+    localProfile.name,
     localProfile.email,
     Queue
   );

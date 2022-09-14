@@ -243,7 +243,7 @@ function Header() {
                           <ProfileImage src={profile.profile_image_url} />
                         </Link>
                         <ProfileData>
-                          <span>{profile.name}</span>
+                          <span>{profile.display_name}</span>
                         </ProfileData>
                       </ProfileOption>
                       <DropDownSeparator />

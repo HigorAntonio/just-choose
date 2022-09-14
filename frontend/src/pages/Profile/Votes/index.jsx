@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import { GoSearch } from 'react-icons/go';
 
@@ -32,8 +32,7 @@ const isSortValid = (sort) => {
   return !!sortByList.find((e) => e.value === sort);
 };
 
-const Votes = () => {
-  const { id: profileId } = useParams();
+const Votes = ({ profileToShowId }) => {
   const location = useLocation();
   const queryParams = useMemo(
     () => queryString.parse(location.search),
@@ -62,15 +61,15 @@ const Votes = () => {
 
   useEffect(() => {
     setParams({
-      profile_id: profileId,
+      profile_id: profileToShowId,
       sort_by: sort,
       query,
     });
-  }, [profileId, sort, query]);
+  }, [profileToShowId, sort, query]);
 
   const { loading, content, lastElementRef } =
     useLoadMoreWhenLastElementIsOnScreen(
-      `/profiles/${profileId}/votes`,
+      `/profiles/${profileToShowId}/votes`,
       params
     );
 

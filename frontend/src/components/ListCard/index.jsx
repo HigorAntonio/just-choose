@@ -26,8 +26,8 @@ import {
 const ListCard = ({ contentList, showProfile = false }) => {
   const {
     id: listId,
-    profile_id: profileId,
     profile_name: profileName,
+    profile_display_name: profileDisplayName,
     profile_image_url: profileImageUrl,
     thumbnail,
     title,
@@ -84,7 +84,10 @@ const ListCard = ({ contentList, showProfile = false }) => {
         <Bottom>
           {showProfile && (
             <ProfileImageWrapper>
-              <Link to={`/profiles/${profileId}`} data-prevent-container-click>
+              <Link
+                to={`/profiles/${profileName}`}
+                data-prevent-container-click
+              >
                 <ProfileImage
                   src={profileImageUrl}
                   onError={() => setProfileImageError(true)}
@@ -103,10 +106,10 @@ const ListCard = ({ contentList, showProfile = false }) => {
             {showProfile && (
               <ProfileName>
                 <Link
-                  to={`/profiles/${profileId}`}
+                  to={`/profiles/${profileName}`}
                   data-prevent-container-click
                 >
-                  {profileName}
+                  {profileDisplayName}
                 </Link>
               </ProfileName>
             )}

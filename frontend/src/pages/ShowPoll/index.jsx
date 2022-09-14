@@ -448,7 +448,7 @@ const ShowPoll = () => {
           </CreatedAt>
           <CreatedBy>
             <span>por</span>&nbsp;
-            <Link to={`/profiles/${poll.profile_id}`}>
+            <Link to={`/profiles/${poll.profile_name}`}>
               <ProfileImageWrapper>
                 <img
                   src={poll.profile_image_url}
@@ -457,7 +457,7 @@ const ShowPoll = () => {
                 />
               </ProfileImageWrapper>
               &nbsp;
-              {poll.profile_name}&nbsp;
+              {poll.profile_display_name}&nbsp;
             </Link>
           </CreatedBy>
         </ListInfo>
@@ -534,7 +534,7 @@ const ShowPoll = () => {
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog
-          createdBy={poll.profile_name}
+          createdBy={poll.profile_display_name}
           pollTitle={poll.title}
           handleDelete={handleDelete}
         />

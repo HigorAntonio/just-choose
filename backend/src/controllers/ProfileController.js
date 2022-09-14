@@ -70,15 +70,15 @@ module.exports = {
     try {
       const profileId = req.profileId;
 
-      const profileToShowId = parseInt(req.params.id);
+      const profileToShowName = req.params.name;
 
-      if (isNaN(profileToShowId)) {
+      if (typeof profileToShowName !== 'string') {
         return res
           .status(400)
-          .json({ erro: 'Id do perfil de usuário, valor inválido' });
+          .json({ erro: 'Nome do perfil de usuário, valor inválido' });
       }
 
-      const profile = await getProfile(profileToShowId);
+      const profile = await getProfile(profileToShowName);
 
       if (!profile) {
         return res
@@ -86,7 +86,7 @@ module.exports = {
           .json({ erro: 'Perfil de usuário não encontrado' });
       }
 
-      if (profileId !== profileToShowId) {
+      if (parseInt(profileId) !== parseInt(profile.id)) {
         delete profile.email;
         delete profile.method;
         delete profile.is_active;
@@ -134,6 +134,7 @@ module.exports = {
       const {
         name = profile.name,
         following_privacy: followingPrivacy = profile.following_privacy,
+        about = profile.about,
       } = dataObj;
       const errors = [];
 
@@ -141,6 +142,11 @@ module.exports = {
         errors.push('Nome do usuário não informado');
       } else if (typeof name !== 'string') {
         errors.push('Nome do usuário, valor inválido');
+      } else if (profile.name !== name.toLowerCase()) {
+        errors.push(
+          'Não é possível alterar o nome de exibição, apenas ' +
+            'a configuração de letras maiúsculas e minúsculas nele contida'
+        );
       }
       if (
         followingPrivacy !== 'private' &&
@@ -148,29 +154,20 @@ module.exports = {
         followingPrivacy !== 'followed_profiles'
       ) {
         errors.push(
-          'Opção de privacidade das listas de perfis seguidos e de seguidores, valor inválido'
+          'Opção de privacidade das listas de perfis ' +
+            'seguidos e de seguidores, valor inválido'
         );
+      }
+      if (about && typeof about !== 'string') {
+        errors.push('Campo about, valor inválido');
+      } else if (about && about.length >= 300) {
+        errors.push('O campo about deve ter menos de 300 caracteres');
       }
       if (errors.length > 0) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
         return res.status(400).json({ erros: errors });
-      }
-
-      if (dataObj.name) {
-        const profileWithSameName = await knex
-          .select()
-          .from('profiles as p')
-          .where({ 'p.name': name })
-          .first();
-
-        if (profileWithSameName) {
-          try {
-            await deleteFile(req.file.key);
-          } catch (error) {}
-          return res.status(400).json({ erro: 'Nome de usuário indisponível' });
-        }
       }
 
       const deleteOldProfileImage = req.file ? true : false;
@@ -180,9 +177,10 @@ module.exports = {
 
       await knex('profiles')
         .update({
-          name,
+          display_name: name,
           profile_image_url: profileImageUrl,
           following_privacy: followingPrivacy,
+          about,
         })
         .where({ id: profileId });
 

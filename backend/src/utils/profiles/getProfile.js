@@ -1,11 +1,12 @@
 const knex = require('../../database');
 
-module.exports = async (profileId) => {
+module.exports = async (profileName) => {
   try {
     const profile = await knex
       .select(
         'id',
         'name',
+        'display_name',
         'email',
         'profile_image_url',
         'method',
@@ -32,11 +33,13 @@ module.exports = async (profileId) => {
         'p.id',
         'fing.profile_id'
       )
-      .where({ 'p.id': profileId })
+      .where({ 'p.name': profileName })
       .first();
 
-    profile.followers_count = parseInt(profile.followers_count);
-    profile.following_count = parseInt(profile.following_count);
+    if (profile) {
+      profile.followers_count = parseInt(profile.followers_count);
+      profile.following_count = parseInt(profile.following_count);
+    }
 
     return profile;
   } catch (error) {

@@ -31,8 +31,8 @@ const ContentListCard = ({ contentList }) => {
 
   const {
     id: listId,
-    profile_id: profileId,
     profile_name: profileName,
+    profile_display_name: profileDisplayName,
     profile_image_url: profileImageUrl,
     title,
     description,
@@ -104,7 +104,7 @@ const ContentListCard = ({ contentList }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <Link to={`/profiles/${profileId}`} data-prevent-container-click>
+            <Link to={`/profiles/${profileName}`} data-prevent-container-click>
               <ProfileImage
                 src={profileImageUrl}
                 onError={() => setProfileImageError(true)}
@@ -114,8 +114,8 @@ const ContentListCard = ({ contentList }) => {
             </Link>
           </ProfileImageWrapper>
           <ProfileName>
-            <Link to={`/profiles/${profileId}`} data-prevent-container-click>
-              {profileName}
+            <Link to={`/profiles/${profileName}`} data-prevent-container-click>
+              {profileDisplayName}
             </Link>
           </ProfileName>
         </ProfileInfo>
@@ -125,7 +125,7 @@ const ContentListCard = ({ contentList }) => {
       </TextWrapperLargeScreen>
       <TextWrapperSmallScreen>
         <ProfileImageWrapper>
-          <Link to={`/profiles/${profileId}`} data-prevent-container-click>
+          <Link to={`/profiles/${profileName}`} data-prevent-container-click>
             <ProfileImage
               src={profileImageUrl}
               onError={() => setProfileImageError(true)}
@@ -142,8 +142,11 @@ const ContentListCard = ({ contentList }) => {
           </Title>
           <Meta>
             <ProfileName>
-              <Link to={`/profiles/${profileId}`} data-prevent-container-click>
-                {profileName}
+              <Link
+                to={`/profiles/${profileName}`}
+                data-prevent-container-click
+              >
+                {profileDisplayName}
               </Link>
             </ProfileName>
             <MetaSeparator>•</MetaSeparator>

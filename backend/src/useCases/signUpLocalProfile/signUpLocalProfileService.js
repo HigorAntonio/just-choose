@@ -14,7 +14,11 @@ const signUpLocalProfileService = async (
     password,
   });
 
-  if (await localProfileRepository.getLocalProfileByName(localProfile.name)) {
+  if (
+    await localProfileRepository.getLocalProfileByName(
+      localProfile.name.toLowerCase()
+    )
+  ) {
     throw new Error('"name" unavailable');
   }
   if (await localProfileRepository.getLocalProfileByEmail(localProfile.email)) {
@@ -22,19 +26,27 @@ const signUpLocalProfileService = async (
   }
 
   const profileId = await localProfileRepository.saveLocalProfile({
-    name: localProfile.name,
+    name: localProfile.name.toLowerCase(),
+    displayName: localProfile.name,
     email: localProfile.email,
     password: localProfile.password,
   });
 
   await localAuthUtils.sendEmailConfirmation(
     profileId,
+    localProfile.name,
     localProfile.email,
     Queue
   );
 
-  const accessToken = localAuthUtils.generateAccessToken(profileId);
-  const refreshToken = localAuthUtils.generateRefreshToken(profileId);
+  const accessToken = localAuthUtils.generateAccessToken(
+    profileId,
+    localProfile.name.toLowerCase()
+  );
+  const refreshToken = localAuthUtils.generateRefreshToken(
+    profileId,
+    localProfile.name.toLowerCase()
+  );
   const ua = uaParser(uastring);
   // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
   const device = {

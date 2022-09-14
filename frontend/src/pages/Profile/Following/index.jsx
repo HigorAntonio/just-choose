@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 
 import useLoadMoreWhenLastElementIsOnScreen from '../../../hooks/useLoadMoreWhenLastElementIsOnScreen';
 import FollowingCard from '../FollowingCard';
@@ -7,14 +6,12 @@ import Grid from '../Grid';
 
 import { Container, Message } from './styles';
 
-const Following = () => {
-  const { id: profileId } = useParams();
-
+const Following = ({ profileToShowId }) => {
   const [params] = useState({});
 
   const { loading, content, lastElementRef } =
     useLoadMoreWhenLastElementIsOnScreen(
-      `/profiles/${profileId}/following`,
+      `/profiles/${profileToShowId}/following`,
       params
     );
 
@@ -31,9 +28,9 @@ const Following = () => {
                 <div key={p.id} ref={lastElementRef}>
                   <FollowingCard
                     profile={{
-                      id: p.id,
-                      profile_image_url: p.profile_image_url,
                       name: p.name,
+                      display_name: p.display_name,
+                      profile_image_url: p.profile_image_url,
                       followers_count: p.followers_count,
                     }}
                   />
@@ -44,9 +41,9 @@ const Following = () => {
               <div key={p.id}>
                 <FollowingCard
                   profile={{
-                    id: p.id,
-                    profile_image_url: p.profile_image_url,
                     name: p.name,
+                    display_name: p.display_name,
+                    profile_image_url: p.profile_image_url,
                     followers_count: p.followers_count,
                   }}
                 />

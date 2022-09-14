@@ -7,6 +7,7 @@ module.exports = async (pollId) => {
         'po.id',
         'po.profile_id',
         'pr.name as profile_name',
+        'pr.display_name as profile_display_name',
         'pr.profile_image_url',
         'po.title',
         'po.description',

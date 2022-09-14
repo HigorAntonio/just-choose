@@ -16,7 +16,8 @@ const forgotPasswordLocalProfileService = async (email) => {
   }
 
   const forgotPasswordToken = localAuthUtils.generateForgotPasswordToken(
-    profile.id
+    profile.id,
+    profile.name
   );
   if (
     !(await localAuthUtils.storeForgotPasswordToken(

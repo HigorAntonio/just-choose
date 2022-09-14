@@ -17,8 +17,8 @@ import {
 
 const ProfileCard = ({ profile }) => {
   const {
-    id: profileId,
     name: profileName,
+    display_name: profileDisplayName,
     followers_count: followersCount,
   } = profile;
   const profileImageUrl = profile.profile_image_url
@@ -29,7 +29,7 @@ const ProfileCard = ({ profile }) => {
 
   return (
     <Container>
-      <Link to={`profiles/${profileId}`}>
+      <Link to={`/profiles/${profileName}`}>
         <ProfileImageWrapper>
           <ProfileImage
             src={profileImageUrl}
@@ -38,7 +38,7 @@ const ProfileCard = ({ profile }) => {
           />
         </ProfileImageWrapper>
         <TextWrapper>
-          <ProfileName>{profileName}</ProfileName>
+          <ProfileName>{profileDisplayName}</ProfileName>
           <Meta>
             <FollowersCount>
               {formatCount(followersCount)}

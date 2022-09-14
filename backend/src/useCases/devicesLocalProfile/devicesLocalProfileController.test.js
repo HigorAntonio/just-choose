@@ -9,7 +9,12 @@ const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const localAuthUtils = require('../../utils/localAuth');
 
-const createRefreshToken = async (profileId, uastring, options = {}) => {
+const createRefreshToken = async (
+  profileId,
+  profileName,
+  uastring,
+  options = {}
+) => {
   const {
     secret = process.env.REFRESH_TOKEN_SECRET,
     expiresIn = process.env.REFRESH_TOKEN_EXPIRATION_TIME,
@@ -17,6 +22,7 @@ const createRefreshToken = async (profileId, uastring, options = {}) => {
   const payload = {
     iss: process.env.APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   const refreshToken = jwt.sign(payload, secret, {
@@ -169,7 +175,7 @@ describe('devicesLocalProfileController', () => {
           'Mozilla/5.0 (Linux; Android 6.0.1; SM-J700M) AppleWebKit/537.36 ' +
             '(KHTML, like Gecko) Chrome/101.0.4951.61 Mobile Safari/537.36'
         );
-      const { id: profileId } =
+      const { id: profileId, name: profileName } =
         await localProfileRepository.getLocalProfileByEmail(profile.email);
       await localAuthUtils.removeRefreshTokenFromStorage(
         profileId,
@@ -178,6 +184,7 @@ describe('devicesLocalProfileController', () => {
       for (const [i, test] of tests.entries()) {
         tests[i].refreshToken = await createRefreshToken(
           profileId,
+          profileName,
           test.userAgent,
           { expiresIn: test.expiresIn }
         );

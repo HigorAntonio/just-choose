@@ -8,7 +8,11 @@ const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const localAuthUtils = require('../../utils/localAuth');
 
-const createForgotPasswordToken = async (profileId, options = {}) => {
+const createForgotPasswordToken = async (
+  profileId,
+  profileName,
+  options = {}
+) => {
   const {
     secret = process.env.FORGOT_PASSWORD_TOKEN_SECRET,
     expiresIn = process.env.FORGOT_PASSWORD_TOKEN_EXPIRATION_TIME,
@@ -16,6 +20,7 @@ const createForgotPasswordToken = async (profileId, options = {}) => {
   const payload = {
     iss: process.env.APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   const forgotPasswordToken = jwt.sign(payload, secret, {
@@ -44,7 +49,8 @@ describe('resetPasswordLocalProfileController', () => {
     const initialProfileData =
       await localProfileRepository.getLocalProfileByEmail(profile.email);
     const forgotPasswordToken = await createForgotPasswordToken(
-      initialProfileData.id
+      initialProfileData.id,
+      initialProfileData.name
     );
 
     const response = await request(app).patch('/resetpassword').send({
@@ -89,7 +95,10 @@ describe('resetPasswordLocalProfileController', () => {
       profile.id = (
         await localProfileRepository.getLocalProfileByEmail(profile.email)
       ).id;
-      const forgotPasswordToken = await createForgotPasswordToken(profile.id);
+      const forgotPasswordToken = await createForgotPasswordToken(
+        profile.id,
+        profile.name.toLowerCase()
+      );
       const tests = [
         {
           data: {
@@ -347,7 +356,8 @@ describe('resetPasswordLocalProfileController', () => {
       const registeredProfile =
         await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
       const forgotPasswordToken = await createForgotPasswordToken(
-        registeredProfile.id
+        registeredProfile.id,
+        registeredProfile.name
       );
 
       const response = await request(app).patch('/resetpassword').send({
@@ -402,7 +412,8 @@ describe('resetPasswordLocalProfileController', () => {
         profile.email
       );
       const forgotPasswordToken = await createForgotPasswordToken(
-        profileData.id
+        profileData.id,
+        profileData.name
       );
       localAuthUtils.removeForgotPasswordTokenFromStorage(
         profileData.id,
@@ -453,6 +464,7 @@ describe('resetPasswordLocalProfileController', () => {
       );
       const forgotPasswordToken = await createForgotPasswordToken(
         profileData.id,
+        profileData.name,
         { expiresIn: '10' }
       );
       await new Promise((resolve) => setTimeout(resolve, 20));
@@ -505,6 +517,7 @@ describe('resetPasswordLocalProfileController', () => {
       );
       const forgotPasswordToken = await createForgotPasswordToken(
         profileData.id,
+        profileData.name,
         {
           secret:
             '80ed5dee82c93fe7afdb09e9c472bb3fb736daca1d88c1deea9b6a5737772574',
@@ -570,7 +583,8 @@ describe('resetPasswordLocalProfileController', () => {
         profiles[1].email
       );
       const forgotPasswordToken = await createForgotPasswordToken(
-        profiles[1].data.id
+        profiles[1].data.id,
+        profiles[1].data.name
       );
 
       const response = await request(app).patch('/resetpassword').send({

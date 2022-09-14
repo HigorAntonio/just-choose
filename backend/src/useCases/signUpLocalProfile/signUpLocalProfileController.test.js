@@ -56,12 +56,18 @@ describe('signUpLocalProfileController', () => {
         email: 'giovanna-santos87@gameecia.com.br',
         password: '15wuGAxzlE',
       },
+      {
+        name: 'GiovannaISABEL',
+        email: 'giovanna-santos89@gameecia.com.br',
+        password: '15wuGAxzlE',
+      },
     ];
 
     const responses = [];
     responses[0] = await request(app).post('/signup').send(profiles[0]);
     responses[1] = await request(app).post('/signup').send(profiles[1]);
     responses[2] = await request(app).post('/signup').send(profiles[2]);
+    responses[3] = await request(app).post('/signup').send(profiles[3]);
 
     const { id: profileId } =
       await localProfileRepository.getLocalProfileByEmail(profiles[0].email);
@@ -74,6 +80,8 @@ describe('signUpLocalProfileController', () => {
     expect(responses[1].body.message).toBe('"name" unavailable');
     expect(responses[2].status).toBe(409);
     expect(responses[2].body.message).toBe('"email" unavailable');
+    expect(responses[3].status).toBe(409);
+    expect(responses[3].body.message).toBe('"name" unavailable');
   });
 
   it('Should not be able to create a profile with invalid data', async () => {

@@ -39,7 +39,8 @@ describe('authorizationMiddleware', () => {
         const req = {
           headers: {
             authorization: `Bearer ${localAuthUtils.generateAccessToken(
-              profileId
+              profileId,
+              `profile${profileId}`
             )}`,
           },
         };

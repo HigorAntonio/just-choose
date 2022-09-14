@@ -80,7 +80,7 @@ routes.patch(
 
 // ProfileController
 routes.get('/profiles', getLoggedProfileId, ProfileController.index);
-routes.get('/profiles/:id', getLoggedProfileId, ProfileController.show);
+routes.get('/profiles/:name', getLoggedProfileId, ProfileController.show);
 routes.put(
   '/profiles',
   authorization,

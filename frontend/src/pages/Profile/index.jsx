@@ -44,11 +44,11 @@ import {
 
 const Profile = () => {
   const history = useHistory();
-  const { id: profileToShowId } = useParams();
+  const { name: profileToShowName } = useParams();
   const { path, url } = useRouteMatch();
   const location = useLocation();
 
-  const { profileId, authenticated } = useContext(AuthContext);
+  const { profileName, authenticated } = useContext(AuthContext);
   const {
     profile: { is_active: isProfileActive },
   } = useContext(ProfileContext);
@@ -82,20 +82,24 @@ const Profile = () => {
 
   useEffect(() => {
     if (
-      (location.pathname !== `${path.replace(':id', profileToShowId)}` &&
-        location.pathname !== `${path.replace(':id', profileToShowId)}/lists` &&
-        location.pathname !== `${path.replace(':id', profileToShowId)}/polls` &&
-        location.pathname !== `${path.replace(':id', profileToShowId)}/votes` &&
+      (location.pathname !== `${path.replace(':name', profileToShowName)}` &&
         location.pathname !==
-          `${path.replace(':id', profileToShowId)}/following` &&
+          `${path.replace(':name', profileToShowName)}/lists` &&
         location.pathname !==
-          `${path.replace(':id', profileToShowId)}/about`) ||
-      (location.pathname === `${path.replace(':id', profileToShowId)}/votes` &&
-        parseInt(profileId) !== parseInt(profileToShowId))
+          `${path.replace(':name', profileToShowName)}/polls` &&
+        location.pathname !==
+          `${path.replace(':name', profileToShowName)}/votes` &&
+        location.pathname !==
+          `${path.replace(':name', profileToShowName)}/following` &&
+        location.pathname !==
+          `${path.replace(':name', profileToShowName)}/about`) ||
+      (location.pathname ===
+        `${path.replace(':name', profileToShowName)}/votes` &&
+        profileName !== profileToShowName)
     ) {
-      history.replace(`${path.replace(':id', profileToShowId)}`);
+      history.replace(`${path.replace(':name', profileToShowName)}`);
     }
-  }, [location, path, profileToShowId, profileId, history]);
+  }, [location, path, profileToShowName, profileName, history]);
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
@@ -110,12 +114,13 @@ const Profile = () => {
         setLoading(true);
         clearState();
         const { data } = await justChooseApi.get(
-          `/profiles/${profileToShowId}`,
+          `/profiles/${profileToShowName}`,
           {
             cancelToken: source.current.token,
           }
         );
         setProfile(data);
+        const { id: profileToShowId } = data;
         if (authenticated && isProfileActive) {
           const {
             data: { following },
@@ -141,7 +146,7 @@ const Profile = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [profileToShowId, authenticated, isProfileActive]);
+  }, [profileToShowName, authenticated, isProfileActive]);
 
   const handleFollow = async () => {
     if (!authenticated || !isProfileActive) {
@@ -159,7 +164,7 @@ const Profile = () => {
     try {
       if (!following) {
         await justChooseApi.post(`/profiles/follow`, {
-          followsId: profileToShowId,
+          followsId: profile.id,
         });
         if (mounted.current) {
           setProfile((prevState) => ({
@@ -171,6 +176,7 @@ const Profile = () => {
             {
               id: profile.id,
               name: profile.name,
+              display_name: profile.display_name,
               profile_image_url: profile.profile_image_url,
             },
           ]);
@@ -178,7 +184,7 @@ const Profile = () => {
       }
       if (following) {
         await justChooseApi.delete(`/profiles/follow`, {
-          data: { followsId: profileToShowId },
+          data: { followsId: profile.id },
         });
         if (mounted.current) {
           setProfile((prevState) => ({
@@ -222,26 +228,25 @@ const Profile = () => {
                 />
               </ProfileImageWrapper>
               <ProfileMeta>
-                <ProfileName>{profile.name}</ProfileName>
+                <ProfileName>{profile.display_name}</ProfileName>
                 <ProfileFollowers>{`${profile.followers_count} ${
                   profile.followers_count === 1 ? 'seguidor' : 'seguidores'
                 }`}</ProfileFollowers>
               </ProfileMeta>
             </ProfileWrapper>
-            {parseInt(profileId) !== parseInt(profileToShowId) && (
+            {profileName !== profileToShowName && (
               <HeaderButtons>
-                {parseInt(profileId) !== parseInt(profileToShowId) &&
-                  (!following ? (
-                    <FollowButton following={following} onClick={handleFollow}>
-                      <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
-                      <span>Seguir</span>
-                    </FollowButton>
-                  ) : (
-                    <FollowButton following={following} onClick={handleFollow}>
-                      <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
-                      <span>Seguindo</span>
-                    </FollowButton>
-                  ))}
+                {!following ? (
+                  <FollowButton following={following} onClick={handleFollow}>
+                    <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
+                    <span>Seguir</span>
+                  </FollowButton>
+                ) : (
+                  <FollowButton following={following} onClick={handleFollow}>
+                    <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
+                    <span>Seguindo</span>
+                  </FollowButton>
+                )}
               </HeaderButtons>
             )}
           </HeaderContainer>
@@ -273,7 +278,7 @@ const Profile = () => {
                 >
                   Votações
                 </div>
-                {parseInt(profileId) === parseInt(profileToShowId) && (
+                {profileName === profileToShowName && (
                   <div
                     className={
                       location.pathname === `${url}/votes` ? 'active' : ''
@@ -308,18 +313,27 @@ const Profile = () => {
         </Header>
       </StickyWrapper>
       <Main>
-        {location.pathname === `${path.replace(':id', profileToShowId)}` && (
-          <Start />
+        {location.pathname ===
+          `${path.replace(':name', profileToShowName)}` && (
+          <Start profileToShowId={profile.id} />
         )}
         {location.pathname ===
-          `${path.replace(':id', profileToShowId)}/lists` && <Lists />}
+          `${path.replace(':name', profileToShowName)}/lists` && (
+          <Lists profileToShowId={profile.id} />
+        )}
         {location.pathname ===
-          `${path.replace(':id', profileToShowId)}/polls` && <Polls />}
+          `${path.replace(':name', profileToShowName)}/polls` && (
+          <Polls profileToShowId={profile.id} />
+        )}
         {location.pathname ===
-          `${path.replace(':id', profileToShowId)}/votes` &&
-          parseInt(profileId) === parseInt(profileToShowId) && <Votes />}
+          `${path.replace(':name', profileToShowName)}/votes` &&
+          profileName === profileToShowName && (
+            <Votes profileToShowId={profile.id} />
+          )}
         {location.pathname ===
-          `${path.replace(':id', profileToShowId)}/following` && <Following />}
+          `${path.replace(':name', profileToShowName)}/following` && (
+          <Following profileToShowId={profile.id} />
+        )}
       </Main>
     </Container>
   );

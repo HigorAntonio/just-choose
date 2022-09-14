@@ -4,7 +4,7 @@ import justChooseApi from '../services/justChooseApi';
 import { AuthContext } from '../context/AuthContext';
 
 const useProfileData = () => {
-  const { loading: loadingAuth, profileId } = useContext(AuthContext);
+  const { loading: loadingAuth, profileName } = useContext(AuthContext);
 
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
@@ -15,8 +15,8 @@ const useProfileData = () => {
       setLoading(true);
       setLoadingError(false);
 
-      if (profileId) {
-        const { data } = await justChooseApi.get(`/profiles/${profileId}`);
+      if (profileName) {
+        const { data } = await justChooseApi.get(`/profiles/${profileName}`);
         setProfile(data);
       }
       if (!loadingAuth) {
@@ -29,13 +29,13 @@ const useProfileData = () => {
       }
       setLoading(false);
     }
-  }, [loadingAuth, profileId]);
+  }, [loadingAuth, profileName]);
 
   useEffect(() => {
     (async () => {
       await refreshProfileData();
     })();
-  }, [refreshProfileData, profileId]);
+  }, [refreshProfileData, profileName]);
 
   return {
     loading,

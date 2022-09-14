@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { useParams } from 'react-router-dom';
 
 import { AuthContext } from '../../../context/AuthContext';
 
@@ -9,15 +8,16 @@ import StartVotes from '../StartVotes';
 
 import { Container } from './styles';
 
-const Start = () => {
+const Start = ({ profileToShowId }) => {
   const { profileId } = useContext(AuthContext);
-  const { id: profileToShowId } = useParams();
 
   return (
     <Container>
-      <StartLists />
-      <StartPolls />
-      {parseInt(profileId) === parseInt(profileToShowId) && <StartVotes />}
+      <StartLists profileToShowId={profileToShowId} />
+      <StartPolls profileToShowId={profileToShowId} />
+      {parseInt(profileId) === parseInt(profileToShowId) && (
+        <StartVotes profileToShowId={profileToShowId} />
+      )}
     </Container>
   );
 };

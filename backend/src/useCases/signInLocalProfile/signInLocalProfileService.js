@@ -19,8 +19,14 @@ const signInLocalProfileService = async ({ email, password }, uastring) => {
     throw new Error('incorrect password');
   }
 
-  const accessToken = localAuthUtils.generateAccessToken(localProfile.id);
-  const refreshToken = localAuthUtils.generateRefreshToken(localProfile.id);
+  const accessToken = localAuthUtils.generateAccessToken(
+    localProfile.id,
+    localProfile.name
+  );
+  const refreshToken = localAuthUtils.generateRefreshToken(
+    localProfile.id,
+    localProfile.name
+  );
   const ua = uaParser(uastring);
   // TODO: Obter informações de localização do usuário através do ip (estado, país) e armazená-las no token
   const device = {

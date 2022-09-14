@@ -6,6 +6,7 @@ import justChooseApi from '../services/justChooseApi';
 const useAuth = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [profileId, setProfileId] = useState();
+  const [profileName, setProfileName] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,6 +18,7 @@ const useAuth = () => {
       )}`;
       const decoded = jwt_decode(accessToken);
       setProfileId(decoded.sub);
+      setProfileName(decoded.name);
       setAuthenticated(true);
     }
 
@@ -35,6 +37,7 @@ const useAuth = () => {
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
       const decoded = jwt_decode(accessToken);
       setProfileId(decoded.sub);
+      setProfileName(decoded.name);
       setAuthenticated(true);
     } catch (error) {
       throw error;
@@ -53,6 +56,7 @@ const useAuth = () => {
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
       const decoded = jwt_decode(accessToken);
       setProfileId(decoded.sub);
+      setProfileName(decoded.name);
       setAuthenticated(true);
     } catch (error) {
       throw error;
@@ -67,6 +71,7 @@ const useAuth = () => {
 
       setAuthenticated(false);
       setProfileId(null);
+      setProfileName(null);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 
@@ -79,6 +84,7 @@ const useAuth = () => {
   return {
     loading,
     profileId,
+    profileName,
     authenticated,
     handleRegistration,
     handleLogin,

@@ -148,7 +148,6 @@ const CreatePoll = () => {
     setThumbnail(null);
     setThumbPreview(null);
     setThumbError('');
-    thumbInputFileRef.current = null;
     setCreating(false);
     setErrorOnCreate(false);
     setCreatedSuccessfully(false);

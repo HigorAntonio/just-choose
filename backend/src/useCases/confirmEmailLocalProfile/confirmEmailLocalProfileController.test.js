@@ -8,7 +8,7 @@ const app = require('../../app');
 const localProfileRepository = require('../../repositories/localProfileRepository');
 const localAuthUtils = require('../../utils/localAuth');
 
-const createConfirmEmailToken = (profileId, options = {}) => {
+const createConfirmEmailToken = (profileId, profileName, options = {}) => {
   const {
     secret = process.env.CONFIRM_EMAIL_TOKEN_SECRET,
     expiresIn = process.env.CONFIRM_EMAIL_TOKEN_EXPIRATION_TIME,
@@ -16,6 +16,7 @@ const createConfirmEmailToken = (profileId, options = {}) => {
   const payload = {
     iss: process.env.APP_URL,
     sub: profileId,
+    name: profileName,
     jti: randomUUID(),
   };
   const emailConfirmationToken = jwt.sign(payload, secret, {
@@ -40,9 +41,12 @@ describe('confirmEmailLocalProfileController', () => {
       password: 'S3HjCf4wwN',
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
-    const { id: profileId, is_active: statusBeforeConfirmation } =
-      await localProfileRepository.getLocalProfileByEmail(profile.email);
-    const confirmEmailToken = createConfirmEmailToken(profileId);
+    const {
+      id: profileId,
+      name: profileName,
+      is_active: statusBeforeConfirmation,
+    } = await localProfileRepository.getLocalProfileByEmail(profile.email);
+    const confirmEmailToken = createConfirmEmailToken(profileId, profileName);
 
     const response = await request(app).patch(
       `/confirmation/${confirmEmailToken}`
@@ -67,9 +71,9 @@ describe('confirmEmailLocalProfileController', () => {
       password: 'ZjOOFyOpTO',
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
-    const { id: profileId } =
+    const { id: profileId, name: profileName } =
       await localProfileRepository.getLocalProfileByEmail(profile.email);
-    const confirmEmailToken = createConfirmEmailToken(profileId);
+    const confirmEmailToken = createConfirmEmailToken(profileId, profileName);
     await localProfileRepository.deleteLocalProfile(profileId);
 
     const response = await request(app).patch(
@@ -91,11 +95,18 @@ describe('confirmEmailLocalProfileController', () => {
       password: 'fztgKNHtJe',
     };
     const signUpResponse = await request(app).post('/signup').send(profile);
-    const { id: profileId, is_active: statusBeforeConfirmation } =
-      await localProfileRepository.getLocalProfileByEmail(profile.email);
-    const confirmEmailToken = await createConfirmEmailToken(profileId, {
-      expiresIn: '10',
-    });
+    const {
+      id: profileId,
+      name: profileName,
+      is_active: statusBeforeConfirmation,
+    } = await localProfileRepository.getLocalProfileByEmail(profile.email);
+    const confirmEmailToken = await createConfirmEmailToken(
+      profileId,
+      profileName,
+      {
+        expiresIn: '10',
+      }
+    );
     await new Promise((resolve) => setTimeout(resolve, 20));
 
     const response = await request(app).patch(

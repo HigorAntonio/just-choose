@@ -31,8 +31,8 @@ const PollCard = ({ poll }) => {
 
   const {
     id: pollId,
-    profile_id: profileId,
     profile_name: profileName,
+    profile_display_name: profileDisplayName,
     profile_image_url: profileImageUrl,
     title,
     description,
@@ -101,7 +101,7 @@ const PollCard = ({ poll }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <Link to={`/profiles/${profileId}`} data-prevent-container-click>
+            <Link to={`/profiles/${profileName}`} data-prevent-container-click>
               <ProfileImage
                 src={profileImageUrl}
                 onError={() => setProfileImageError(true)}
@@ -111,8 +111,8 @@ const PollCard = ({ poll }) => {
             </Link>
           </ProfileImageWrapper>
           <ProfileName>
-            <Link to={`/profiles/${profileId}`} data-prevent-container-click>
-              {profileName}
+            <Link to={`/profiles/${profileName}`} data-prevent-container-click>
+              {profileDisplayName}
             </Link>
           </ProfileName>
         </ProfileInfo>
@@ -122,7 +122,7 @@ const PollCard = ({ poll }) => {
       </TextWrapperLargeScreen>
       <TextWrapperSmallScreen>
         <ProfileImageWrapper>
-          <Link to={`/profiles/${profileId}`} data-prevent-container-click>
+          <Link to={`/profiles/${profileName}`} data-prevent-container-click>
             <ProfileImage
               src={profileImageUrl}
               onError={() => setProfileImageError(true)}
@@ -139,8 +139,11 @@ const PollCard = ({ poll }) => {
           </Title>
           <Meta>
             <ProfileName>
-              <Link to={`/profiles/${profileId}`} data-prevent-container-click>
-                {profileName}
+              <Link
+                to={`/profiles/${profileName}`}
+                data-prevent-container-click
+              >
+                {profileDisplayName}
               </Link>
             </ProfileName>
             <MetaSeparator>•</MetaSeparator>
