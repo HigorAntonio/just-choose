@@ -156,7 +156,7 @@ export const ProfileImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  ${(props) => props.error && 'display: none;'}
+  ${(props) => (props.error || !props.src) && 'display: none;'}
 `;
 
 export const DescriptionWrapper = styled.div`
