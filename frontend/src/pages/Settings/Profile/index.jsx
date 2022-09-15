@@ -15,11 +15,13 @@ import justChooseApi from '../../../services/justChooseApi';
 import {
   Container,
   LayoutBox,
-  ThumbnailWrapper,
-  ThumbPreview,
+  ProfileImageWrapper,
+  ProfileImagePreview,
+  Hint,
   InputWrapper,
   LabelWrapper,
   NameInput,
+  AboutTextArea,
   ButtonWrapper,
   ProfileButton,
 } from './styles';
@@ -40,6 +42,9 @@ const Profile = () => {
   const [profileImageError, setProfileImageError] = useState('');
   const [profileName, setProfileName] = useState('');
   const [profileNameError, setProfileNameError] = useState('');
+  const [profileDisplayName, setProfileDisplayName] = useState('');
+  const [profileDisplayNameError, setProfileDisplayNameError] = useState('');
+  const [profileAbout, setProfileAbout] = useState('');
   const [profileSettingsChange, setProfileSettingsChange] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [errorOnUpdate, setErrorOnUpdate] = useState(false);
@@ -52,6 +57,8 @@ const Profile = () => {
     profile.profile_image_url &&
       setProfileImagePreview(profile.profile_image_url);
     profile.name && setProfileName(profile.name);
+    profile.display_name && setProfileDisplayName(profile.display_name);
+    profile.about && setProfileAbout(profile.about);
     setProfileSettingsChange(false);
   }, [profile]);
 
@@ -109,9 +116,13 @@ const Profile = () => {
     }
   };
 
+  const isProfileNameValid = (profileName) => {
+    return profileName.length >= 4 && profileName.length <= 25;
+  };
+
   const validateProfileName = (profileName) => {
     setProfileNameError('');
-    if (profileName.length < 4 || profileName.length > 25) {
+    if (!isProfileNameValid(profileName)) {
       setProfileNameError(
         'Os nomes de usuário devem ter entre 4 e 25 caracteres.'
       );
@@ -121,7 +132,33 @@ const Profile = () => {
   const handleProfileName = (e) => {
     setProfileName(e.target.value);
     validateProfileName(e.target.value);
-    setProfileSettingsChange(true);
+    setProfileSettingsChange(profile.name !== e.target.value);
+  };
+
+  const isProfileDisplayNameValid = (profileDisplayName) => {
+    return profileName === `${profileDisplayName}`.toLowerCase();
+  };
+
+  const validateProfileDisplayName = (profileDisplayName) => {
+    setProfileDisplayNameError('');
+    if (!isProfileDisplayNameValid(profileDisplayName)) {
+      setProfileDisplayNameError(
+        'Você não pode alterar seu nome de exibição, ' +
+          'apenas a configuração de letras ' +
+          'maiúsculas e minúsculas nele contida'
+      );
+    }
+  };
+
+  const handleProfileDisplayName = (e) => {
+    setProfileDisplayName(e.target.value);
+    validateProfileDisplayName(e.target.value);
+    setProfileSettingsChange(profile.display_name !== e.target.value);
+  };
+
+  const handleProfileAbout = (e) => {
+    setProfileAbout(e.target.value);
+    setProfileSettingsChange(profile.about !== e.target.value);
   };
 
   const handleUpdateProfile = async () => {
@@ -133,8 +170,11 @@ const Profile = () => {
 
     let successfulyUpdated = true;
     const data = {};
-    if (profileName !== profile.name) {
-      data.name = profileName;
+    if (profileDisplayName !== profile.display_name) {
+      data.display_name = profileDisplayName;
+    }
+    if (profileAbout !== profile.about) {
+      data.about = profileAbout;
     }
 
     const formData = new FormData();
@@ -180,8 +220,8 @@ const Profile = () => {
   const isDisabledUpdateProfileButton = () => {
     return (
       !profileSettingsChange ||
-      profileName.length < 4 ||
-      profileName.length > 25
+      !isProfileNameValid(profileName) ||
+      !isProfileDisplayNameValid(profileDisplayName)
     );
   };
 
@@ -189,9 +229,12 @@ const Profile = () => {
     <Container>
       <h3>Imagem de perfil</h3>
       <LayoutBox>
-        <ThumbnailWrapper>
+        <ProfileImageWrapper>
           <div className="column">
-            <ThumbPreview src={profileImagePreview} className="rounded" />
+            <ProfileImagePreview
+              src={profileImagePreview}
+              className="rounded"
+            />
           </div>
           <div className="column button-wrapper">
             <div className="file-input">
@@ -210,15 +253,15 @@ const Profile = () => {
                 ref={profileImageInputFileRef}
               />
             </div>
-            <p>
+            <Hint>
               A imagem deve estar no formato JPEG, PNG ou GIF e não pode ter
               mais do que 2 MB.
-            </p>
+            </Hint>
             {profileImageError && (
               <p className="thumb-error">{profileImageError}</p>
             )}
           </div>
-        </ThumbnailWrapper>
+        </ProfileImageWrapper>
       </LayoutBox>
       <h3>Configurações de perfil</h3>
       <LayoutBox>
@@ -234,8 +277,50 @@ const Profile = () => {
               value={profileName}
               onChange={handleProfileName}
               validationError={profileNameError}
+              disabled
             />
             {profileNameError && <p className="error">{profileNameError}</p>}
+          </div>
+        </InputWrapper>
+        <InputWrapper>
+          <LabelWrapper>
+            <label htmlFor="display-name">Nome de exibição</label>
+          </LabelWrapper>
+          <div className="column">
+            <NameInput
+              spellCheck={false}
+              type="text"
+              id="display-name"
+              value={profileDisplayName}
+              onChange={handleProfileDisplayName}
+              validationError={profileDisplayNameError}
+            />
+            <Hint>
+              Personalize as letras maiúsculas e minúsculas em seu nome de
+              usuário
+            </Hint>
+            {profileDisplayNameError && (
+              <p className="error">{profileDisplayNameError}</p>
+            )}
+          </div>
+        </InputWrapper>
+        <InputWrapper>
+          <LabelWrapper>
+            <label htmlFor="description">Descrição</label>
+          </LabelWrapper>
+          <div className="column">
+            <AboutTextArea
+              id="description"
+              cols="30"
+              rows="10"
+              maxLength="300"
+              value={profileAbout}
+              onChange={handleProfileAbout}
+            ></AboutTextArea>
+            <Hint>
+              Descrição com menos de 300 caracteres para o painel Sobre na
+              página do seu perfil
+            </Hint>
           </div>
         </InputWrapper>
         <ButtonWrapper>

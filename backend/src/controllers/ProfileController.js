@@ -132,17 +132,15 @@ module.exports = {
 
       const dataObj = JSON.parse(data);
       const {
-        name = profile.name,
+        display_name: displayName = profile.display_name,
         following_privacy: followingPrivacy = profile.following_privacy,
         about = profile.about,
       } = dataObj;
       const errors = [];
 
-      if (!name) {
-        errors.push('Nome do usuário não informado');
-      } else if (typeof name !== 'string') {
-        errors.push('Nome do usuário, valor inválido');
-      } else if (profile.name !== name.toLowerCase()) {
+      if (displayName && typeof displayName !== 'string') {
+        errors.push('Nome de exibição do usuário, valor inválido');
+      } else if (profile.name !== displayName.toLowerCase()) {
         errors.push(
           'Não é possível alterar o nome de exibição, apenas ' +
             'a configuração de letras maiúsculas e minúsculas nele contida'
@@ -177,7 +175,7 @@ module.exports = {
 
       await knex('profiles')
         .update({
-          display_name: name,
+          display_name: displayName,
           profile_image_url: profileImageUrl,
           following_privacy: followingPrivacy,
           about,

@@ -20,25 +20,7 @@ export const Container = styled.div`
   }
 `;
 
-export const LayoutBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 90%;
-  max-width: 90rem;
-  background: var(--background-100);
-  border: 0.01rem solid var(--background-600);
-  border-radius: 0.5rem;
-
-  > div {
-    padding: 2rem;
-  }
-
-  @media (max-width: 1130px) {
-    width: 100%;
-  }
-`;
-
-export const ThumbnailWrapper = styled.div`
+export const ProfileImageWrapper = styled.div`
   display: flex;
   align-items: center;
   padding: 2rem;
@@ -95,7 +77,7 @@ export const ThumbnailWrapper = styled.div`
   }
 `;
 
-export const ThumbPreview = styled.div`
+export const ProfileImagePreview = styled.div`
   width: 9.6rem;
   background: var(--background-400);
   display: flex;
@@ -145,28 +127,6 @@ export const InputWrapper = styled.div`
     }
   }
 
-  > textarea {
-    font-size: 1.4rem;
-    width: 100%;
-    max-width: 68rem;
-    max-height: 5rem;
-    resize: none;
-    padding: 0.5rem 1rem;
-    border: 0.2rem solid var(--background-400);
-    border-radius: 0.5rem;
-    background: var(--background-400);
-    outline: none;
-
-    &:hover {
-      border: 0.2rem solid var(--gray);
-    }
-    &:focus {
-      border: 0.2rem solid var(--primary-400);
-    }
-
-    transition: border 0.3s;
-  }
-
   @media (max-width: 1027px) {
     flex-direction: column;
 
@@ -204,11 +164,16 @@ export const NameInput = styled.input`
       ? `border: 0.2rem solid var(--error);`
       : `border: 0.2rem solid var(--background-400);`}
 
-  &:hover {
+  &:hover:not([disabled]) {
     border: 0.2rem solid var(--gray);
   }
-  &:focus {
+  &:focus:not([disabled]) {
     border: 0.2rem solid var(--primary-400);
+  }
+  &:disabled {
+    background: var(--background-300);
+    border: 0.2rem solid var(--background-300);
+    color: var(--dark-gray);
   }
 
   transition: border 0.3s;
@@ -241,4 +206,53 @@ export const ProfileButton = styled.button`
   &:hover {
     cursor: ${(props) => (props.disabled ? `not-allowed` : `pointer`)};
   }
+`;
+
+export const LayoutBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 90rem;
+  background: var(--background-100);
+  border: 0.01rem solid var(--background-600);
+  border-radius: 0.5rem;
+
+  > div {
+    padding: 2rem;
+  }
+
+  & ${InputWrapper} + ${InputWrapper} {
+    border-top: 0.01rem solid var(--background-600);
+  }
+
+  @media (max-width: 1130px) {
+    width: 100%;
+  }
+`;
+
+export const Hint = styled.p`
+  margin-top: 1rem;
+  font-size: 1.4rem;
+`;
+
+export const AboutTextArea = styled.textarea`
+  font-size: 1.4rem;
+  width: 100%;
+  max-width: 68rem;
+  max-height: 5rem;
+  resize: none;
+  padding: 0.5rem 1rem;
+  border: 0.2rem solid var(--background-400);
+  border-radius: 0.5rem;
+  background: var(--background-400);
+  outline: none;
+
+  &:hover {
+    border: 0.2rem solid var(--gray);
+  }
+  &:focus {
+    border: 0.2rem solid var(--primary-400);
+  }
+
+  transition: border 0.3s;
 `;

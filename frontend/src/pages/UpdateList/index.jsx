@@ -421,6 +421,7 @@ const UpdateList = () => {
               <TitleInput
                 type="text"
                 id="title"
+                maxLength="100"
                 autoFocus
                 value={title}
                 onChange={handleTitle}
@@ -437,6 +438,7 @@ const UpdateList = () => {
               id="description"
               cols="30"
               rows="10"
+              maxLength="300"
               value={description}
               onChange={handleDescription}
             ></textarea>

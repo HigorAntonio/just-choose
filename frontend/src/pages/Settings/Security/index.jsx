@@ -126,8 +126,11 @@ const Security = () => {
   };
 
   const handleCurrentPasswordInput = (e) => {
-    setCurrentPassword(e.target.value);
     setCurrentPasswordError('');
+    setCurrentPassword(e.target.value);
+    if (e.target.value.length < 8 || e.target.value.length > 64) {
+      setCurrentPasswordError('Senha inválida.');
+    }
   };
 
   const handleNewPasswordInput = (e) => {
@@ -180,8 +183,8 @@ const Security = () => {
     try {
       await justChooseApi({
         url: `/updatepassword`,
-        method: 'PUT',
-        data: { currentPassword, newPassword },
+        method: 'PATCH',
+        data: { current_password: currentPassword, new_password: newPassword },
       });
     } catch (error) {
       if (mounted.current) {
@@ -193,7 +196,7 @@ const Security = () => {
         mounted.current &&
         error.response &&
         error.response.status === 400 &&
-        error.response.data.erro === 'Senha inválida'
+        error.response.data.message === 'incorrect password'
       ) {
         setCurrentPasswordError('Senha inválida.');
       }

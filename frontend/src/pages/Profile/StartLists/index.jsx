@@ -6,7 +6,14 @@ import { ViewportContext } from '../../../context/ViewportContext';
 import justChooseApi from '../../../services/justChooseApi';
 import ListCard from '../../../components/ListCard';
 
-import { Container, TitleWrapper, Title, Main } from './styles';
+import {
+  Container,
+  TitleWrapper,
+  Title,
+  Main,
+  LineWrapper,
+  Line,
+} from './styles';
 
 const StartLists = ({ profileToShowId }) => {
   const { width } = useContext(ViewportContext);
@@ -86,6 +93,9 @@ const StartLists = ({ profileToShowId }) => {
             return '';
           })}
       </Main>
+      <LineWrapper>
+        <Line />
+      </LineWrapper>
     </Container>
   );
 };

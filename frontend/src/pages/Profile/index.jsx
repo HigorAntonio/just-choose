@@ -22,6 +22,7 @@ import Lists from './Lists';
 import Polls from './Polls';
 import Votes from './Votes';
 import Following from './Following';
+import About from './About';
 import navOnAuxClick from '../../utils/navOnAuxClick';
 
 import {
@@ -333,6 +334,10 @@ const Profile = () => {
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}/following` && (
           <Following profileToShowId={profile.id} />
+        )}
+        {location.pathname ===
+          `${path.replace(':name', profileToShowName)}/about` && (
+          <About profileAbout={profile.about} />
         )}
       </Main>
     </Container>

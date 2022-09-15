@@ -135,6 +135,7 @@ const buttonCss = css`
 
 export const FollowButton = styled.button`
   ${buttonCss}
+  font-weight: 500;
   ${(props) => !props.following && `background: var(--primary-400);`}
 
   > span {

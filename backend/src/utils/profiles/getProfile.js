@@ -8,6 +8,7 @@ module.exports = async (profileName) => {
         'name',
         'display_name',
         'email',
+        'about',
         'profile_image_url',
         'method',
         'is_active',
