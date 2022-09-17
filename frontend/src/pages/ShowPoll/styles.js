@@ -200,21 +200,22 @@ export const ProfileImageWrapper = styled.div`
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--gray);
+  background: var(--background-600);
+`;
 
-  > img {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    object-fit: cover;
-    ${(props) => !props.src && 'display: none;'}
-  }
+export const ProfileImage = styled.img`
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  object-fit: cover;
+  ${(props) => !props.src && 'display: none;'}
 `;
 
 export const Description = styled.div`
   width: 100%;
   max-width: 65rem;
   font-size: 1.6rem;
+  word-break: break-word;
 `;
 
 export const Filters = styled.div`

@@ -21,6 +21,7 @@ export const Main = styled.div`
   background: var(--background-100);
   padding: 2rem;
   border-radius: 0 0 0.5rem 0.5rem;
+  word-break: break-word;
 
   > div + div {
     margin-top: 2rem;

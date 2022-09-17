@@ -41,6 +41,7 @@ import {
   CreatedAt,
   CreatedBy,
   ProfileImageWrapper,
+  ProfileImage,
   Description,
   Filters,
   TypeOptions,
@@ -369,7 +370,7 @@ const ShowList = () => {
             <span>por</span>&nbsp;
             <Link to={`/profiles/${contentList.profile_name}`}>
               <ProfileImageWrapper>
-                <img
+                <ProfileImage
                   src={contentList.profile_image_url}
                   alt=""
                   onError={(e) => (e.target.style.display = 'none')}

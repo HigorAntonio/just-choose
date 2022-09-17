@@ -438,7 +438,7 @@ const UpdateList = () => {
               id="description"
               cols="30"
               rows="10"
-              maxLength="300"
+              maxLength="1000"
               value={description}
               onChange={handleDescription}
             ></textarea>

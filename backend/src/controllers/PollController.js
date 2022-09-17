@@ -36,9 +36,13 @@ module.exports = {
         errors.push('Título da votação não informado');
       } else if (typeof title !== 'string') {
         errors.push('Título da votação, valor inválido');
+      } else if (title && title.length > 100) {
+        errors.push('O campo title deve ter no máximo 100 caracteres');
       }
       if (description && typeof description !== 'string') {
         errors.push('Descrição da votação, valor inválido');
+      } else if (description && description.length > 1000) {
+        errors.push('O campo description deve ter no máximo 1000 caracteres');
       }
       if (
         typeof sharingOption !== 'undefined' &&
@@ -281,9 +285,13 @@ module.exports = {
         errors.push('Título da votação não informado');
       } else if (typeof title !== 'string') {
         errors.push('Título da votação, valor inválido');
+      } else if (title && title.length > 100) {
+        errors.push('O campo title deve ter no máximo 100 caracteres');
       }
       if (description && typeof description !== 'string') {
         errors.push('Descrição da votação, valor inválido');
+      } else if (description && description.length > 1000) {
+        errors.push('O campo description deve ter no máximo 1000 caracteres');
       }
       if (
         sharingOption !== 'private' &&
