@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const Container = styled.div`
   width: 50rem;
   max-width: calc(95vw - 4rem);
+  word-break: break-word;
 `;
 
 export const Header = styled.div`
@@ -21,7 +22,6 @@ export const Main = styled.div`
   background: var(--background-100);
   padding: 2rem;
   border-radius: 0 0 0.5rem 0.5rem;
-  word-break: break-word;
 
   > div + div {
     margin-top: 2rem;

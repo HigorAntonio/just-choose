@@ -24,6 +24,8 @@ import Votes from './Votes';
 import Following from './Following';
 import About from './About';
 import navOnAuxClick from '../../utils/navOnAuxClick';
+import Modal from '../../components/Modal';
+import ConfirmUnfollowDialog from './ConfirmUnfollowDialog';
 
 import {
   Container,
@@ -70,6 +72,7 @@ const Profile = () => {
   const [following, setFollowing] = useState(false);
   const [profile, setProfile] = useState({});
   const [profileImageError, setProfileImageError] = useState(false);
+  const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
 
   const mounted = useRef();
   const source = useRef();
@@ -79,6 +82,7 @@ const Profile = () => {
     setFollowing(false);
     setProfile({});
     setProfileImageError(false);
+    setShowUnfollowDialog(false);
   };
 
   useEffect(() => {
@@ -149,6 +153,23 @@ const Profile = () => {
     };
   }, [profileToShowName, authenticated, isProfileActive]);
 
+  const handleUnfollow = async () => {
+    setShowUnfollowDialog(false);
+    await justChooseApi.delete(`/profiles/follow`, {
+      data: { followsId: profile.id },
+    });
+    if (mounted.current) {
+      setProfile((prevState) => ({
+        ...prevState,
+        followers_count: prevState.followers_count - 1,
+      }));
+      setFollowingList((prevState) =>
+        prevState.filter((fl) => fl.id !== profile.id)
+      );
+      setFollowing(false);
+    }
+  };
+
   const handleFollow = async () => {
     if (!authenticated || !isProfileActive) {
       clearTimeout(alertTimeout);
@@ -181,24 +202,13 @@ const Profile = () => {
               profile_image_url: profile.profile_image_url,
             },
           ]);
+          setFollowing(true);
         }
       }
       if (following) {
-        await justChooseApi.delete(`/profiles/follow`, {
-          data: { followsId: profile.id },
-        });
         if (mounted.current) {
-          setProfile((prevState) => ({
-            ...prevState,
-            followers_count: prevState.followers_count - 1,
-          }));
-          setFollowingList((prevState) =>
-            prevState.filter((fl) => fl.id !== profile.id)
-          );
+          setShowUnfollowDialog(true);
         }
-      }
-      if (mounted.current) {
-        setFollowing((prevState) => !prevState);
       }
     } catch (error) {}
   };
@@ -340,6 +350,13 @@ const Profile = () => {
           <About profileAbout={profile.about} />
         )}
       </Main>
+      <Modal show={showUnfollowDialog} setShow={setShowUnfollowDialog}>
+        <ConfirmUnfollowDialog
+          profileDisplayName={profile.display_name}
+          handleConfirm={handleUnfollow}
+          handleCancel={() => setShowUnfollowDialog(false)}
+        />
+      </Modal>
     </Container>
   );
 };

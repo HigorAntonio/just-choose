@@ -39,14 +39,22 @@ const Following = () => {
 
   return (
     <Container>
-      {polls.length > 0 && <FollowingPolls content={polls} />}
-      <LineWrapper>
-        <Line />
-      </LineWrapper>
-      {contentLists.length > 0 && <FollowingLists content={contentLists} />}
-      <LineWrapper>
-        <Line />
-      </LineWrapper>
+      {polls.length > 0 && (
+        <>
+          <FollowingPolls content={polls} />
+          <LineWrapper>
+            <Line />
+          </LineWrapper>
+        </>
+      )}
+      {contentLists.length > 0 && (
+        <>
+          <FollowingLists content={contentLists} />
+          <LineWrapper>
+            <Line />
+          </LineWrapper>
+        </>
+      )}
     </Container>
   );
 };

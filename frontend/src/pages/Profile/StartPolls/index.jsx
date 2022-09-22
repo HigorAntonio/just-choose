@@ -73,29 +73,30 @@ const StartPolls = ({ profileToShowId }) => {
   return (
     <Container>
       {content.length > 0 && (
-        <TitleWrapper>
-          <Title>Votações</Title>
-        </TitleWrapper>
+        <>
+          <TitleWrapper>
+            <Title>Votações</Title>
+          </TitleWrapper>
+          <Main>
+            {[...Array(6).keys()].map((_, i) => {
+              if (i < lastContentIndex && content[i]) {
+                return (
+                  <div key={`profileStarPoll${content[i].id}`}>
+                    <PollCard poll={content[i]} />
+                  </div>
+                );
+              }
+              if (i < lastContentIndex) {
+                return <div key={`profileStarPollEmpty${i}`} />;
+              }
+              return '';
+            })}
+          </Main>
+          <LineWrapper>
+            <Line />
+          </LineWrapper>
+        </>
       )}
-      <Main>
-        {content.length > 0 &&
-          [...Array(6).keys()].map((_, i) => {
-            if (i < lastContentIndex && content[i]) {
-              return (
-                <div key={`profileStarPoll${content[i].id}`}>
-                  <PollCard poll={content[i]} />
-                </div>
-              );
-            }
-            if (i < lastContentIndex) {
-              return <div key={`profileStarPollEmpty${i}`} />;
-            }
-            return '';
-          })}
-      </Main>
-      <LineWrapper>
-        <Line />
-      </LineWrapper>
     </Container>
   );
 };

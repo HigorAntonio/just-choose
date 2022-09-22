@@ -73,29 +73,30 @@ const StartLists = ({ profileToShowId }) => {
   return (
     <Container>
       {content.length > 0 && (
-        <TitleWrapper>
-          <Title>Listas</Title>
-        </TitleWrapper>
+        <>
+          <TitleWrapper>
+            <Title>Listas</Title>
+          </TitleWrapper>
+          <Main>
+            {[...Array(6).keys()].map((_, i) => {
+              if (i < lastContentIndex && content[i]) {
+                return (
+                  <div key={`profileStarList${content[i].id}`}>
+                    <ListCard contentList={content[i]} />
+                  </div>
+                );
+              }
+              if (i < lastContentIndex) {
+                return <div key={`profileStarListEmpty${i}`} />;
+              }
+              return '';
+            })}
+          </Main>
+          <LineWrapper>
+            <Line />
+          </LineWrapper>
+        </>
       )}
-      <Main>
-        {content.length > 0 &&
-          [...Array(6).keys()].map((_, i) => {
-            if (i < lastContentIndex && content[i]) {
-              return (
-                <div key={`profileStarList${content[i].id}`}>
-                  <ListCard contentList={content[i]} />
-                </div>
-              );
-            }
-            if (i < lastContentIndex) {
-              return <div key={`profileStarListEmpty${i}`} />;
-            }
-            return '';
-          })}
-      </Main>
-      <LineWrapper>
-        <Line />
-      </LineWrapper>
     </Container>
   );
 };

@@ -36,10 +36,14 @@ const Trending = () => {
 
   return (
     <Container>
-      {contentLists.length > 0 && <TrendingLists content={contentLists} />}
-      <LineWrapper>
-        <Line />
-      </LineWrapper>
+      {contentLists.length > 0 && (
+        <>
+          <TrendingLists content={contentLists} />
+          <LineWrapper>
+            <Line />
+          </LineWrapper>
+        </>
+      )}
     </Container>
   );
 };

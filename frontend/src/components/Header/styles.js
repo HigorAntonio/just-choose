@@ -164,6 +164,7 @@ export const SearchButton = styled.button`
 
   &:hover {
     background: var(--background-500);
+    cursor: pointer;
   }
 
   &:disabled {

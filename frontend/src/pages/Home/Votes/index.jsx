@@ -70,37 +70,40 @@ const Votes = () => {
 
   return (
     <Container>
-      <TitleWrapper>
-        <Title>Seus votos</Title>
-      </TitleWrapper>
-      <Wrapper>
-        {content.length > 0 &&
-          [...Array(6).keys()].map((_, i) => {
-            if (i < lastContentIndex && content[i]) {
-              const poll = {
-                id: content[i].poll_id,
-                profile_id: content[i].poll_profile_id,
-                profile_name: content[i].poll_profile_name,
-                profile_display_name: content[i].poll_profile_display_name,
-                profile_image_url: content[i].poll_profile_profile_image_url,
-                thumbnail: content[i].poll_thumbnail,
-                title: content[i].poll_title,
-                is_active: content[i].poll_is_active,
-                total_votes: content[i].poll_total_votes,
-                updated_at: content[i].updated_at,
-              };
-              return (
-                <div key={`profileStartVote${poll.id}`}>
-                  <PollCard poll={poll} showProfile />
-                </div>
-              );
-            }
-            if (i < lastContentIndex) {
-              return <div key={`profileStartVoteEmpty${i}`} />;
-            }
-            return '';
-          })}
-      </Wrapper>
+      {content.length > 0 && (
+        <>
+          <TitleWrapper>
+            <Title>Seus votos</Title>
+          </TitleWrapper>
+          <Wrapper>
+            {[...Array(6).keys()].map((_, i) => {
+              if (i < lastContentIndex && content[i]) {
+                const poll = {
+                  id: content[i].poll_id,
+                  profile_id: content[i].poll_profile_id,
+                  profile_name: content[i].poll_profile_name,
+                  profile_display_name: content[i].poll_profile_display_name,
+                  profile_image_url: content[i].poll_profile_profile_image_url,
+                  thumbnail: content[i].poll_thumbnail,
+                  title: content[i].poll_title,
+                  is_active: content[i].poll_is_active,
+                  total_votes: content[i].poll_total_votes,
+                  updated_at: content[i].updated_at,
+                };
+                return (
+                  <div key={`profileStartVote${poll.id}`}>
+                    <PollCard poll={poll} showProfile />
+                  </div>
+                );
+              }
+              if (i < lastContentIndex) {
+                return <div key={`profileStartVoteEmpty${i}`} />;
+              }
+              return '';
+            })}
+          </Wrapper>
+        </>
+      )}
     </Container>
   );
 };
