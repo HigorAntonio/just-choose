@@ -4,19 +4,14 @@ const localAuthUtils = require('../../utils/localAuth');
 
 const exitDeviceLocalProfileService = async ({
   profileId,
-  refreshToken,
+  deviceId,
   password,
 }) => {
   const data = await exitDeviceLocalProfileValidationSchema.validateAsync({
     profileId,
-    refreshToken,
+    deviceId,
     password,
   });
-
-  const decoded = localAuthUtils.verifyRefreshToken(data.refreshToken);
-  if (decoded.sub !== data.profileId) {
-    throw new Error('invalid "profile_id"');
-  }
 
   const localProfile = await localProfileRepository.getLocalProfileById(
     data.profileId
@@ -28,10 +23,18 @@ const exitDeviceLocalProfileService = async ({
     throw new Error('incorrect password');
   }
 
+  const device = await localAuthUtils.getDeviceFromStorage(
+    data.profileId,
+    data.deviceId
+  );
+  if (!device) {
+    throw new Error('invalid "device_id"');
+  }
+
   if (
     !(await localAuthUtils.removeRefreshTokenFromStorage(
-      decoded.sub,
-      data.refreshToken
+      data.profileId,
+      device.refreshToken
     ))
   ) {
     throw new Error('"refresh_token" not found');

@@ -14,7 +14,7 @@ afterAll(async () => {
 });
 
 describe('exitDeviceLocalProfileController', () => {
-  it('Should be able to delete the refresh token provided when it is valid', async () => {
+  it('Should be able to exit the device when the "device_id" provided is valid', async () => {
     const profile = {
       name: 'DanielaTeixeira',
       email: 'daniela_teixeira@weatherford.com',
@@ -28,12 +28,15 @@ describe('exitDeviceLocalProfileController', () => {
         profileId,
         signUpResponse.body.refresh_token
       );
+    const devicesResponse = await request(app)
+      .get('/devices')
+      .set('Authorization', `Bearer ${signUpResponse.body.access_token}`);
 
     const response = await request(app)
       .delete('/devices')
       .send({
+        device_id: devicesResponse.body[0].id,
         password: profile.password,
-        refresh_token: signUpResponse.body.refresh_token,
       })
       .set('Authorization', `Bearer ${signUpResponse.body.access_token}`);
 
@@ -49,7 +52,7 @@ describe('exitDeviceLocalProfileController', () => {
   });
 
   it(
-    'Should not be able to delete the refresh token ' +
+    'Should not be able to exit the device with the "device_id" ' +
       'provided when password is invalid',
     async () => {
       const profile = {
@@ -58,16 +61,19 @@ describe('exitDeviceLocalProfileController', () => {
         password: 'tKgtgKZA2Y',
       };
       const signUpResponse = await request(app).post('/signup').send(profile);
+      const devicesResponse = await request(app)
+        .get('/devices')
+        .set('Authorization', `Bearer ${signUpResponse.body.access_token}`);
       const tests = [
         {
-          body: { refresh_token: signUpResponse.body.refresh_token },
+          body: { device_id: devicesResponse.body[0].id },
           status: 400,
           message: '"password" is required',
         },
         {
           body: {
             password: '',
-            refresh_token: signUpResponse.body.refresh_token,
+            device_id: devicesResponse.body[0].id,
           },
           status: 400,
           message: '"password" is not allowed to be empty',
@@ -75,7 +81,7 @@ describe('exitDeviceLocalProfileController', () => {
         {
           body: {
             password: 8380,
-            refresh_token: signUpResponse.body.refresh_token,
+            device_id: devicesResponse.body[0].id,
           },
           status: 400,
           message: '"password" must be a string',
@@ -83,7 +89,7 @@ describe('exitDeviceLocalProfileController', () => {
         {
           body: {
             password: true,
-            refresh_token: signUpResponse.body.refresh_token,
+            device_id: devicesResponse.body[0].id,
           },
           status: 400,
           message: '"password" must be a string',
@@ -91,7 +97,7 @@ describe('exitDeviceLocalProfileController', () => {
         {
           body: {
             password: false,
-            refresh_token: signUpResponse.body.refresh_token,
+            device_id: devicesResponse.body[0].id,
           },
           status: 400,
           message: '"password" must be a string',
@@ -99,7 +105,7 @@ describe('exitDeviceLocalProfileController', () => {
         {
           body: {
             password: 'KZA2YtKgtg',
-            refresh_token: signUpResponse.body.refresh_token,
+            device_id: devicesResponse.body[0].id,
           },
           status: 400,
           message: 'incorrect password',
@@ -128,7 +134,7 @@ describe('exitDeviceLocalProfileController', () => {
   );
 
   it(
-    'Should not be able to delete the refresh token ' +
+    'Should not be able to exit the device with the "device_id" ' +
       'provided when it is invalid',
     async () => {
       const profile = {
@@ -140,38 +146,35 @@ describe('exitDeviceLocalProfileController', () => {
         {
           body: { password: profile.password },
           status: 400,
-          message: '"refresh_token" is required',
+          message: '"device_id" is required',
         },
         {
-          body: { password: profile.password, refresh_token: '' },
+          body: { password: profile.password, device_id: '' },
           status: 400,
-          message: '"refresh_token" is not allowed to be empty',
+          message: '"device_id" is not allowed to be empty',
         },
         {
-          body: { password: profile.password, refresh_token: 7594 },
+          body: { password: profile.password, device_id: 7594 },
           status: 400,
-          message: '"refresh_token" must be a string',
+          message: '"device_id" must be a string',
         },
         {
-          body: { password: profile.password, refresh_token: true },
+          body: { password: profile.password, device_id: true },
           status: 400,
-          message: '"refresh_token" must be a string',
+          message: '"device_id" must be a string',
         },
         {
-          body: { password: profile.password, refresh_token: false },
+          body: { password: profile.password, device_id: false },
           status: 400,
-          message: '"refresh_token" must be a string',
+          message: '"device_id" must be a string',
         },
         {
           body: {
             password: profile.password,
-            refresh_token:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwI' +
-              'iwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeK' +
-              'KF2QT4fwpMeJf36POk6yJV_adQssw5c',
+            device_id: '93d5aac9-0148-498c-8a54-bac2d40f765@',
           },
           status: 403,
-          message: 'invalid "refresh_token"',
+          message: 'invalid "device_id"',
         },
       ];
       const signUpResponse = await request(app).post('/signup').send(profile);
@@ -193,115 +196,6 @@ describe('exitDeviceLocalProfileController', () => {
       for (const test of tests) {
         expect(test.response.status).toBe(test.status);
         expect(test.response.body.message).toBe(test.message);
-      }
-    }
-  );
-
-  it(
-    'Should not be able to delete the refresh token ' +
-      'provided when it is not whitelisted',
-    async () => {
-      const profile = {
-        name: 'LeviBruno',
-        email: 'levibrunodacunha@nine9.com.br',
-        password: 'xezr5OHtW5',
-      };
-      const signUpResponse = await request(app).post('/signup').send(profile);
-      const { id: profileId } =
-        await localProfileRepository.getLocalProfileByEmail(profile.email);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profileId,
-        signUpResponse.body.refresh_token
-      );
-
-      const response = await request(app)
-        .delete('/devices')
-        .send({
-          password: profile.password,
-          refresh_token: signUpResponse.body.refresh_token,
-        })
-        .set('Authorization', `Bearer ${signUpResponse.body.access_token}`);
-
-      await localProfileRepository.deleteLocalProfile(profileId);
-      await localAuthUtils.removeRefreshTokenFromStorage(
-        profileId,
-        signUpResponse.body.refresh_token
-      );
-      expect(response.status).toBe(403);
-      expect(response.body.message).toBe('"refresh_token" not found');
-    }
-  );
-
-  it(
-    'Should not be able to delete the refresh token provided when it ' +
-      'does not belong to the profile it is trying to delete',
-    async () => {
-      const tests = [
-        {
-          profile: {
-            name: 'LouisePires',
-            email: 'louise-pires98@archosolutions.com.br',
-            password: '2l7TEl7wmQ',
-          },
-        },
-        {
-          profile: {
-            name: 'Jorge_Caldeira',
-            email: 'jorge_caldeira@edpbr.com.br',
-            password: 'myQYKZMgWO',
-          },
-        },
-        {
-          profile: {
-            name: 'KaueEnrico',
-            email: 'kaue.enrico.lima@prcondominios.com.br',
-            password: 'oJW28jXpzX',
-          },
-        },
-      ];
-      for (const [i, test] of tests.entries()) {
-        const signUpResponse = await request(app)
-          .post('/signup')
-          .send(test.profile);
-        const { id: profileId } =
-          await localProfileRepository.getLocalProfileByEmail(
-            test.profile.email
-          );
-        tests[i].accessToken = signUpResponse.body.access_token;
-        tests[i].refreshToken = signUpResponse.body.refresh_token;
-        tests[i].profileId = profileId;
-      }
-      for (const [i, test] of tests.entries()) {
-        const accessToken =
-          i === tests.length - 1
-            ? tests[0].accessToken
-            : tests[i + 1].accessToken;
-
-        tests[i].response = await request(app)
-          .delete('/devices')
-          .send({
-            password: test.profile.password,
-            refresh_token: test.refreshToken,
-          })
-          .set('Authorization', `Bearer ${accessToken}`);
-
-        tests[i].isRefreshTokenWhitelisted =
-          await localAuthUtils.isRefreshTokenInStorage(
-            test.profileId,
-            test.refreshToken
-          );
-      }
-      for (const test of tests) {
-        await localProfileRepository.deleteLocalProfile(test.profileId);
-        await localAuthUtils.removeRefreshTokenFromStorage(
-          test.profileId,
-          test.refreshToken
-        );
-      }
-      for (const test of tests) {
-        expect(test.response.status).toBe(403);
-        expect(test.response.body.message).toBe('invalid "profile_id"');
-        expect(test.isRefreshTokenWhitelisted).toBeTruthy();
       }
     }
   );

@@ -160,7 +160,7 @@ exports.isRefreshTokenInStorage = (profileId, refreshToken) => {
   return isInHashInMemory(`localAuth:profile:${profileId}`, refreshToken);
 };
 
-exports.getRefreshTokenFromStorage = async (profileId, deviceId) => {
+exports.getDeviceFromStorage = async (profileId, deviceId) => {
   const hashMembers = await getHashMembersFromMemory(
     `localAuth:profile:${profileId}`
   );

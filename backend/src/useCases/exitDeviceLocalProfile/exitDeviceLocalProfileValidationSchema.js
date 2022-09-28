@@ -5,7 +5,7 @@ const exitDeviceLocalProfileValidationSchema = Joi.object({
     'number.base': 'authentication required',
     'any.required': 'authentication required',
   }),
-  refreshToken: Joi.string().label('refresh_token').required(),
+  deviceId: Joi.string().label('device_id').required(),
   password: Joi.string().required(),
 });
 
