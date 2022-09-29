@@ -6,6 +6,7 @@ import { LayoutContext } from '../../context/LayoutContext';
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import Profile from './Profile';
 import Security from './Security';
+import Devices from './Devices';
 import navOnAuxClick from '../../utils/navOnAuxClick';
 
 import {
@@ -103,7 +104,7 @@ const Settings = () => {
       <Main>
         {location.pathname === `${path}/profile` && <Profile />}
         {location.pathname === `${path}/security` && <Security />}
-        {location.pathname === `${path}/devices` && <h3>Devices</h3>}
+        {location.pathname === `${path}/devices` && <Devices />}
       </Main>
     </Container>
   );
