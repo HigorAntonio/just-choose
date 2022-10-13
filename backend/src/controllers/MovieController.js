@@ -15,7 +15,7 @@ module.exports = {
 
       const { params, errors } = validateDiscoverMovieParams(queryParams);
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const url = `/discover/movie`;
@@ -55,7 +55,7 @@ module.exports = {
 
       const { params, errors } = validateSearchMovieParams(queryParams);
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const url = `/search/movie`;

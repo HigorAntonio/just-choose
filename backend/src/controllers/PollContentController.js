@@ -14,7 +14,7 @@ module.exports = {
       if (isNaN(pollId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
+          .json({ message: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const {
@@ -52,13 +52,13 @@ module.exports = {
         }
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const poll = await getPoll(pollId);
 
       if (!poll) {
-        return res.status(400).json({ erro: 'Votação não encontrada' });
+        return res.status(400).json({ message: 'Votação não encontrada' });
       }
 
       if (

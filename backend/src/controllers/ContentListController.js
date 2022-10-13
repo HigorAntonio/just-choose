@@ -20,7 +20,9 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erro: 'Dados da lista não informados' });
+        return res
+          .status(400)
+          .json({ message: 'Dados da lista não informados' });
       }
 
       const {
@@ -67,7 +69,7 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const thumbnail = `${process.env.APP_URL}/files/${req.file.key}`;
@@ -136,7 +138,7 @@ module.exports = {
         }
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const followersIds = await getProfileFollowersIds(authProfileId);
@@ -174,7 +176,7 @@ module.exports = {
       if (isNaN(contentListId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
+          .json({ message: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const contentList = await getContentList(contentListId);
@@ -182,7 +184,7 @@ module.exports = {
       if (!contentList) {
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       if (
@@ -213,7 +215,7 @@ module.exports = {
         } catch (error) {}
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
+          .json({ message: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const contentList = await knex('content_lists')
@@ -228,14 +230,14 @@ module.exports = {
         } catch (error) {}
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       if (contentList.profile_id !== profileId) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(403).json({ erro: 'Usuário inválido' });
+        return res.status(403).json({ message: 'Usuário inválido' });
       }
 
       const { data } = req.body;
@@ -243,7 +245,9 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erro: 'Dados da lista não informados' });
+        return res
+          .status(400)
+          .json({ message: 'Dados da lista não informados' });
       }
 
       const {
@@ -284,7 +288,7 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const deleteOldThumbnail = req.file ? true : false;
@@ -328,7 +332,7 @@ module.exports = {
       if (isNaN(contentListId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
+          .json({ message: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const contentList = await knex('content_lists')
@@ -340,11 +344,11 @@ module.exports = {
       if (!contentList) {
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       if (contentList.profile_id !== profileId) {
-        return res.status(403).json({ erro: 'Usuário inválido' });
+        return res.status(403).json({ message: 'Usuário inválido' });
       }
 
       await deleteContentList(contentListId);

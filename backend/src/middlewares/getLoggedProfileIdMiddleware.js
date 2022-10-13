@@ -11,14 +11,14 @@ module.exports = (req, res, next) => {
 
   const parts = authHeader.split(' ');
   if (parts.length !== 2)
-    return res.status(401).json({ erro: 'invalid "access_token"' });
+    return res.status(401).json({ message: 'invalid "access_token"' });
 
   const [scheme, token] = parts;
   if (!/^Bearer$/i.test(scheme))
-    return res.status(401).json({ erro: 'invalid "access_token"' });
+    return res.status(401).json({ message: 'invalid "access_token"' });
 
   jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ erro: 'invalid "access_token"' });
+    if (err) return res.status(401).json({ message: 'invalid "access_token"' });
 
     req.profileId = decoded.sub;
 

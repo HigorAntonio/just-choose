@@ -32,7 +32,7 @@ module.exports = {
         }
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const followersIds = await getProfileFollowersIds(profileId);

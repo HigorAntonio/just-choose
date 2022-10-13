@@ -11,12 +11,12 @@ module.exports = {
       if (!contentListId) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo não informado' });
+          .json({ message: 'Id da lista de conteúdo não informado' });
       }
       if (isNaN(contentListId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo valor inválido' });
+          .json({ message: 'Id da lista de conteúdo valor inválido' });
       }
 
       const contentList = await knex
@@ -28,7 +28,7 @@ module.exports = {
       if (!contentList) {
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       if (
@@ -46,7 +46,7 @@ module.exports = {
         .where({ content_list_id: contentListId, profile_id: profileId })
         .first();
       if (like) {
-        return res.status(403).json({ erro: 'Like existente' });
+        return res.status(403).json({ message: 'Like existente' });
       }
 
       await knex('content_list_likes').insert({
@@ -69,12 +69,12 @@ module.exports = {
       if (!contentListId) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo não informado' });
+          .json({ message: 'Id da lista de conteúdo não informado' });
       }
       if (isNaN(contentListId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo valor inválido' });
+          .json({ message: 'Id da lista de conteúdo valor inválido' });
       }
 
       const contentList = await knex
@@ -86,7 +86,7 @@ module.exports = {
       if (!contentList) {
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       const like = await knex
@@ -110,12 +110,12 @@ module.exports = {
       if (!contentListId) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo não informado' });
+          .json({ message: 'Id da lista de conteúdo não informado' });
       }
       if (isNaN(contentListId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo valor inválido' });
+          .json({ message: 'Id da lista de conteúdo valor inválido' });
       }
 
       const contentList = await knex
@@ -127,7 +127,7 @@ module.exports = {
       if (!contentList) {
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       const like = await knex
@@ -136,7 +136,7 @@ module.exports = {
         .where({ content_list_id: contentListId, profile_id: profileId })
         .first();
       if (!like) {
-        return res.status(400).json({ erro: 'Like não encontrado' });
+        return res.status(400).json({ message: 'Like não encontrado' });
       }
 
       await knex('content_list_likes').del().where({

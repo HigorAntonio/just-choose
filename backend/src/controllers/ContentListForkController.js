@@ -14,12 +14,12 @@ module.exports = {
       if (!originalListId) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista original não informado' });
+          .json({ message: 'Id da lista original não informado' });
       }
       if (isNaN(originalListId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista original valor inválido' });
+          .json({ message: 'Id da lista original valor inválido' });
       }
 
       const originalList = await knex
@@ -31,7 +31,7 @@ module.exports = {
       if (!originalList) {
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       if (

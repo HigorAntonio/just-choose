@@ -29,12 +29,12 @@ module.exports = {
         errors.push('Votação, valor inválido');
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const poll = await knex('polls').where({ id: pollId }).first();
       if (!poll) {
-        return res.status(400).json({ erro: 'Votação não encontrada' });
+        return res.status(400).json({ message: 'Votação não encontrada' });
       }
       if (
         (poll.sharing_option === 'private' && poll.profile_id !== profileId) ||
@@ -44,7 +44,7 @@ module.exports = {
         return res.sendStatus(403);
       }
       if (!poll.is_active) {
-        return res.status(403).json({ erro: 'Votação desativada' });
+        return res.status(403).json({ message: 'Votação desativada' });
       }
 
       const contentTypes = (
@@ -53,7 +53,7 @@ module.exports = {
       if (!contentTypes.includes(type)) {
         return res
           .status(400)
-          .json({ erro: 'Tipo de conteúdo não encontrado' });
+          .json({ message: 'Tipo de conteúdo não encontrado' });
       }
 
       for (const name of contentTypes) {
@@ -61,7 +61,7 @@ module.exports = {
           .where({ profile_id: profileId, poll_id: pollId })
           .first();
         if (vote) {
-          return res.status(403).json({ erro: 'Número de votos excedido' });
+          return res.status(403).json({ message: 'Número de votos excedido' });
         }
       }
 
@@ -78,7 +78,7 @@ module.exports = {
         })
         .first();
       if (!content) {
-        return res.status(400).json({ erro: 'Conteúdo não encontrado' });
+        return res.status(400).json({ message: 'Conteúdo não encontrado' });
       }
 
       await knex(`${type}_votes`).insert({
@@ -129,7 +129,7 @@ module.exports = {
         }
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       if (parseInt(profileId) !== parseInt(profileToShowId)) {
@@ -164,12 +164,14 @@ module.exports = {
 
       const pollId = req.params.id;
       if (isNaN(pollId)) {
-        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
+        return res
+          .status(400)
+          .json({ message: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex('polls').where({ id: pollId }).first();
       if (!poll) {
-        return res.status(400).json({ erro: 'Votação não encontrada' });
+        return res.status(400).json({ message: 'Votação não encontrada' });
       }
 
       const contentTypes = (
@@ -212,15 +214,17 @@ module.exports = {
 
       const pollId = req.params.id;
       if (isNaN(pollId)) {
-        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
+        return res
+          .status(400)
+          .json({ message: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex('polls').where({ id: pollId }).first();
       if (!poll) {
-        return res.status(400).json({ erro: 'Votação não encontrada' });
+        return res.status(400).json({ message: 'Votação não encontrada' });
       }
       if (!poll.is_active) {
-        return res.status(403).json({ erro: 'Votação desativada' });
+        return res.status(403).json({ message: 'Votação desativada' });
       }
 
       const contentTypes = (
@@ -238,7 +242,7 @@ module.exports = {
         }
       }
       if (!vote) {
-        return res.status(400).json({ erro: 'Voto não encontrado' });
+        return res.status(400).json({ message: 'Voto não encontrado' });
       }
 
       await knex(`${contentType}_votes`)

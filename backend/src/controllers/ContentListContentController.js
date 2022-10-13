@@ -14,7 +14,7 @@ module.exports = {
       if (isNaN(contentListId)) {
         return res
           .status(400)
-          .json({ erro: 'Id da lista de conteúdo, valor inválido' });
+          .json({ message: 'Id da lista de conteúdo, valor inválido' });
       }
 
       const {
@@ -52,7 +52,7 @@ module.exports = {
         }
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const contentList = await getContentList(contentListId);
@@ -60,7 +60,7 @@ module.exports = {
       if (!contentList) {
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
 
       if (

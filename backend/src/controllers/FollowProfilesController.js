@@ -8,10 +8,10 @@ module.exports = {
 
       const { followsId } = req.body;
       if (!followsId) {
-        return res.status(400).json({ erro: 'Id do usuário não informado' });
+        return res.status(400).json({ message: 'Id do usuário não informado' });
       }
       if (parseInt(profileId) === parseInt(followsId)) {
-        return res.status(400).json({ erro: 'Id do usuário inválido' });
+        return res.status(400).json({ message: 'Id do usuário inválido' });
       }
 
       const followsProfile = await knex
@@ -20,7 +20,7 @@ module.exports = {
         .where({ id: followsId })
         .first();
       if (!followsProfile) {
-        return res.status(400).json({ erro: 'Usuário não encontrado' });
+        return res.status(400).json({ message: 'Usuário não encontrado' });
       }
 
       const relationship = await knex
@@ -32,7 +32,7 @@ module.exports = {
         })
         .first();
       if (relationship) {
-        return res.status(400).json({ erro: 'Relação existente' });
+        return res.status(400).json({ message: 'Relação existente' });
       }
 
       await knex('follows_profiles').insert({
@@ -53,7 +53,7 @@ module.exports = {
 
       const { followsId } = req.body;
       if (!followsId) {
-        return res.status(400).json({ erro: 'Id do usuário não informado' });
+        return res.status(400).json({ message: 'Id do usuário não informado' });
       }
 
       const relationship = await knex
@@ -65,7 +65,7 @@ module.exports = {
         })
         .first();
       if (!relationship) {
-        return res.status(400).json({ erro: 'Relação não encontrada' });
+        return res.status(400).json({ message: 'Relação não encontrada' });
       }
 
       await knex('follows_profiles').del().where({

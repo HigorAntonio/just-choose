@@ -15,7 +15,7 @@ module.exports = {
 
       const { params, errors } = validateDiscoverShowParams(queryParams);
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const url = `/discover/tv`;
@@ -53,7 +53,7 @@ module.exports = {
 
       const { params, errors } = validateSearchShowParams(queryParams);
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const url = `/search/tv`;

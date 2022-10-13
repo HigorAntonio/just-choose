@@ -20,7 +20,9 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erro: 'Dados da lista não informados' });
+        return res
+          .status(400)
+          .json({ message: 'Dados da lista não informados' });
       }
 
       const {
@@ -64,7 +66,7 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const contentList = await knex('content_lists')
@@ -77,7 +79,7 @@ module.exports = {
         } catch (error) {}
         return res
           .status(400)
-          .json({ erro: 'Lista de conteúdo não encontrada' });
+          .json({ message: 'Lista de conteúdo não encontrada' });
       }
       // O usuário só pode criar votações a partir de listas criadas pelo próprio usuário.
       // O usuário pode fazer um fork de uma lista de outro usuário. A lista fork poderá
@@ -168,7 +170,7 @@ module.exports = {
         }
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const followersIds = await getProfileFollowersIds(authProfileId);
@@ -204,13 +206,15 @@ module.exports = {
       const pollId = req.params.id;
 
       if (isNaN(pollId)) {
-        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
+        return res
+          .status(400)
+          .json({ message: 'Id da votação, valor inválido' });
       }
 
       const poll = await getPoll(pollId);
 
       if (!poll) {
-        return res.status(400).json({ erro: 'Votação não encontrada' });
+        return res.status(400).json({ message: 'Votação não encontrada' });
       }
 
       if (
@@ -238,7 +242,9 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
+        return res
+          .status(400)
+          .json({ message: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex('polls')
@@ -251,14 +257,14 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erro: 'Votação não encontrada' });
+        return res.status(400).json({ message: 'Votação não encontrada' });
       }
 
       if (poll.profile_id !== profileId) {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(403).json({ erro: 'Usuário inválido' });
+        return res.status(403).json({ message: 'Usuário inválido' });
       }
 
       const { data } = req.body;
@@ -266,7 +272,9 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erro: 'Dados da lista não informados' });
+        return res
+          .status(400)
+          .json({ message: 'Dados da lista não informados' });
       }
 
       const {
@@ -307,7 +315,7 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       await knex('polls')
@@ -343,7 +351,9 @@ module.exports = {
       const pollId = req.params.id;
 
       if (isNaN(pollId)) {
-        return res.status(400).json({ erro: 'Id da votação, valor inválido' });
+        return res
+          .status(400)
+          .json({ message: 'Id da votação, valor inválido' });
       }
 
       const poll = await knex('polls')
@@ -353,11 +363,11 @@ module.exports = {
         .first();
 
       if (!poll) {
-        return res.status(400).json({ erro: 'Votação não encontrada' });
+        return res.status(400).json({ message: 'Votação não encontrada' });
       }
 
       if (poll.profile_id !== profileId) {
-        return res.status(403).json({ erro: 'Usuário inválido' });
+        return res.status(403).json({ message: 'Usuário inválido' });
       }
 
       await knex('polls').del().where({ id: pollId });

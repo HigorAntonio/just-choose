@@ -14,7 +14,7 @@ module.exports = {
 
       const { params, errors } = validateGamesParams(queryParams);
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const url = `/games`;

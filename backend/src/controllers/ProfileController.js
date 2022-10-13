@@ -41,7 +41,7 @@ module.exports = {
         }
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const { profiles, count } = await getProfiles({
@@ -75,7 +75,7 @@ module.exports = {
       if (typeof profileToShowName !== 'string') {
         return res
           .status(400)
-          .json({ erro: 'Nome do perfil de usuário, valor inválido' });
+          .json({ message: 'Nome do perfil de usuário, valor inválido' });
       }
 
       const profile = await getProfile(profileToShowName);
@@ -83,7 +83,7 @@ module.exports = {
       if (!profile) {
         return res
           .status(400)
-          .json({ erro: 'Perfil de usuário não encontrado' });
+          .json({ message: 'Perfil de usuário não encontrado' });
       }
 
       if (parseInt(profileId) !== parseInt(profile.id)) {
@@ -107,7 +107,9 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erro: 'Id do usuário, valor inválido' });
+        return res
+          .status(400)
+          .json({ message: 'Id do usuário, valor inválido' });
       }
 
       const profile = await knex
@@ -117,7 +119,7 @@ module.exports = {
         .first();
 
       if (!profile) {
-        return res.status(400).json({ erro: 'Usuário não encontrado' });
+        return res.status(400).json({ message: 'Usuário não encontrado' });
       }
 
       const { data } = req.body;
@@ -127,7 +129,7 @@ module.exports = {
         } catch (error) {}
         return res
           .status(400)
-          .json({ erro: 'Dados do usuário não informados' });
+          .json({ message: 'Dados do usuário não informados' });
       }
 
       const dataObj = JSON.parse(data);
@@ -165,7 +167,7 @@ module.exports = {
         try {
           await deleteFile(req.file.key);
         } catch (error) {}
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const deleteOldProfileImage = req.file ? true : false;

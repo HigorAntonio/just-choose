@@ -26,7 +26,7 @@ module.exports = {
         errors.push('Parâmetro page_size inválido. Min 1, Max 100');
       }
       if (errors.length > 0) {
-        return res.status(400).json({ erros: errors });
+        return res.status(400).json({ messages: errors });
       }
 
       const profile = await knex
@@ -35,7 +35,7 @@ module.exports = {
         .where({ id: profileToShowId })
         .first();
       if (!profile) {
-        return res.status(400).json({ erro: 'Perfil não encontrado' });
+        return res.status(400).json({ message: 'Perfil não encontrado' });
       }
 
       if (
@@ -81,7 +81,7 @@ module.exports = {
       if (isNaN(followerId)) {
         return res
           .status(400)
-          .json({ erro: 'Id do perfil seguidor, valor inválido' });
+          .json({ message: 'Id do perfil seguidor, valor inválido' });
       }
 
       const follower = await isProfileFollowing(followerId, profileId);

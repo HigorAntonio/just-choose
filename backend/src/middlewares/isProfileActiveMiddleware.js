@@ -10,11 +10,13 @@ module.exports = async (req, res, next) => {
       .first();
 
     if (!profile) {
-      return res.status(400).json({ erro: 'Usuário não encontrado' });
+      return res.status(400).json({ message: 'Usuário não encontrado' });
     }
 
     if (!profile.is_active) {
-      return res.status(403).json({ erro: 'Usuário não confirmou seu e-mail' });
+      return res
+        .status(403)
+        .json({ message: 'Usuário não confirmou seu e-mail' });
     }
 
     next();
