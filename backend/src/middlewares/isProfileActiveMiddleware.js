@@ -3,9 +3,6 @@ const knex = require('../database');
 module.exports = async (req, res, next) => {
   try {
     const profileId = req.profileId;
-    if (!profileId) {
-      return res.sendStatus(401);
-    }
 
     const profile = await knex('profiles')
       .select()

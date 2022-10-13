@@ -10,11 +10,11 @@ module.exports = (req, res, next) => {
 
   const parts = authHeader.split(' ');
   if (parts.length !== 2)
-    return res.status(401).json({ message: '"access_token" error' });
+    return res.status(401).json({ message: 'invalid "access_token"' });
 
   const [scheme, token] = parts;
   if (!/^Bearer$/i.test(scheme))
-    return res.status(401).json({ message: '"access_token" malformed' });
+    return res.status(401).json({ message: 'invalid "access_token"' });
 
   jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ message: 'invalid "access_token"' });

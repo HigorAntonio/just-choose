@@ -119,7 +119,7 @@ describe('authorizationMiddleware', () => {
         authorization(req, res, next);
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.message).toBe('"access_token" error');
+        expect(res.body.message).toBe('invalid "access_token"');
         expect(next.mock.calls.length).toBe(0);
       }
     }
@@ -145,7 +145,7 @@ describe('authorizationMiddleware', () => {
         authorization(req, res, next);
 
         expect(res.statusCode).toBe(401);
-        expect(res.body.message).toBe('"access_token" malformed');
+        expect(res.body.message).toBe('invalid "access_token"');
         expect(next.mock.calls.length).toBe(0);
       }
     }
