@@ -1,11 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import { GoSearch } from 'react-icons/go';
 
 import setQueryParamAndGetNewUrl from '../../../utils/setQueryParamAndGetNewUrl';
 import SingleOptionSelect from '../../../components/SingleOptionSelect';
-import useLoadMoreWhenLastElementIsOnScreen from '../../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import useInfiniteQuery from '../../../hooks/useInfiniteQuery';
+import justChooseApi from '../../../services/justChooseApi';
 import PollCard from '../../../components/PollCard';
 import Grid from '../Grid';
 
@@ -68,8 +69,24 @@ const Polls = ({ profileToShowId }) => {
     });
   }, [profileToShowId, sort, query]);
 
-  const { loading, content, lastElementRef } =
-    useLoadMoreWhenLastElementIsOnScreen('/polls', params);
+  const getPolls = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get('/polls', {
+        params: { ...params, page: pageParam },
+      });
+      return response.data;
+    },
+    [params]
+  );
+
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['profile/polls/getPolls', params], getPolls, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   const handleSearchInputEnterKey = (e) => {
     if (e.key === 'Enter' && e.target.value) {
@@ -153,13 +170,13 @@ const Polls = ({ profileToShowId }) => {
           </SingleOptionSelect>
         </AlignRightFilters>
       </Filters>
-      {!loading && content.length === 0 && (
+      {!isFetching && data?.pages[0]?.total_results === 0 && (
         <NotFound>Nenhuma votação encontrada.</NotFound>
       )}
-      {content.length > 0 && (
-        <Grid minWidth="29rem" gridGap="1rem">
-          {content.map((poll, i) =>
-            content.length === i + 1 ? (
+      <Grid minWidth="29rem" gridGap="1rem">
+        {data?.pages.map((page) => {
+          return page.results.map((poll, i) =>
+            page.results.length === i + 1 ? (
               <div key={`poll${poll.id}`} ref={lastElementRef}>
                 <PollCard poll={poll} />
               </div>
@@ -168,9 +185,9 @@ const Polls = ({ profileToShowId }) => {
                 <PollCard poll={poll} />
               </div>
             )
-          )}
-        </Grid>
-      )}
+          );
+        })}
+      </Grid>
     </Container>
   );
 };

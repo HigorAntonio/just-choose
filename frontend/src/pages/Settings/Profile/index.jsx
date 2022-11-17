@@ -8,7 +8,7 @@ import React, {
 
 import { LayoutContext } from '../../../context/LayoutContext';
 import { AlertContext } from '../../../context/AlertContext';
-import { ProfileContext } from '../../../context/ProfileContext';
+import { AuthContext } from '../../../context/AuthContext';
 
 import justChooseApi from '../../../services/justChooseApi';
 
@@ -35,7 +35,7 @@ const Profile = () => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { profile, refreshProfileData } = useContext(ProfileContext);
+  const { authentication, refreshProfileData } = useContext(AuthContext);
 
   const [profileImagePreview, setProfileImagePreview] = useState();
   const [profileImage, setProfileImage] = useState();
@@ -54,13 +54,18 @@ const Profile = () => {
   const mounted = useRef();
 
   const setInitialFormData = useCallback(() => {
-    profile.profile_image_url &&
-      setProfileImagePreview(profile.profile_image_url);
-    profile.name && setProfileName(profile.name);
-    profile.display_name && setProfileDisplayName(profile.display_name);
-    profile.about && setProfileAbout(profile.about);
-    setProfileSettingsChange(false);
-  }, [profile]);
+    if (authentication && authentication.profile) {
+      authentication.profile.profile_image_url &&
+        setProfileImagePreview(authentication.profile.profile_image_url);
+      authentication.profile.name &&
+        setProfileName(authentication.profile.name);
+      authentication.profile.display_name &&
+        setProfileDisplayName(authentication.profile.display_name);
+      authentication.profile.about &&
+        setProfileAbout(authentication.profile.about);
+      setProfileSettingsChange(false);
+    }
+  }, [authentication]);
 
   useEffect(() => {
     mounted.current = true;
@@ -132,7 +137,11 @@ const Profile = () => {
   const handleProfileName = (e) => {
     setProfileName(e.target.value);
     validateProfileName(e.target.value);
-    setProfileSettingsChange(profile.name !== e.target.value);
+    setProfileSettingsChange(
+      authentication &&
+        authentication.profile &&
+        authentication.profile.name !== e.target.value
+    );
   };
 
   const isProfileDisplayNameValid = (profileDisplayName) => {
@@ -153,12 +162,20 @@ const Profile = () => {
   const handleProfileDisplayName = (e) => {
     setProfileDisplayName(e.target.value);
     validateProfileDisplayName(e.target.value);
-    setProfileSettingsChange(profile.display_name !== e.target.value);
+    setProfileSettingsChange(
+      authentication &&
+        authentication.profile &&
+        authentication.profile.display_name !== e.target.value
+    );
   };
 
   const handleProfileAbout = (e) => {
     setProfileAbout(e.target.value);
-    setProfileSettingsChange(profile.about !== e.target.value);
+    setProfileSettingsChange(
+      authentication &&
+        authentication.profile &&
+        authentication.profile.about !== e.target.value
+    );
   };
 
   const handleUpdateProfile = async () => {
@@ -170,10 +187,18 @@ const Profile = () => {
 
     let successfulyUpdated = true;
     const data = {};
-    if (profileDisplayName !== profile.display_name) {
+    if (
+      authentication &&
+      authentication.profile &&
+      authentication.profile.display_name !== profileDisplayName
+    ) {
       data.display_name = profileDisplayName;
     }
-    if (profileAbout !== profile.about) {
+    if (
+      authentication &&
+      authentication.profile &&
+      authentication.profile.about !== profileAbout
+    ) {
       data.about = profileAbout;
     }
 

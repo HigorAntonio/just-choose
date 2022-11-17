@@ -9,13 +9,13 @@ import StartVotes from '../StartVotes';
 import { Container } from './styles';
 
 const Start = ({ profileToShowId }) => {
-  const { profileId } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
 
   return (
     <Container>
       <StartLists profileToShowId={profileToShowId} />
       <StartPolls profileToShowId={profileToShowId} />
-      {parseInt(profileId) === parseInt(profileToShowId) && (
+      {parseInt(authentication) === parseInt(profileToShowId) && (
         <StartVotes profileToShowId={profileToShowId} />
       )}
     </Container>

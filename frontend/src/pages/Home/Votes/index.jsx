@@ -11,7 +11,7 @@ import { Container, Wrapper, TitleWrapper, Title } from './styles';
 
 const Votes = () => {
   const { width } = useContext(ViewportContext);
-  const { profileId } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
 
   const [lastContentIndex, setLastContentIndex] = useState(0);
   const [content, setContent] = useState([]);
@@ -21,11 +21,11 @@ const Votes = () => {
     setLoading(true);
     let source = axios.CancelToken.source();
 
-    profileId &&
+    authentication &&
       (async () => {
         try {
           const { data } = await justChooseApi.get(
-            `/profiles/${profileId}/votes`,
+            `/profiles/${authentication.profile.id}/votes`,
             {
               params: {
                 page: 1,
@@ -48,7 +48,7 @@ const Votes = () => {
     return () => {
       source.cancel();
     };
-  }, [profileId]);
+  }, [authentication]);
 
   useEffect(() => {
     if (width < 547) {

@@ -2,16 +2,10 @@ import { useContext, useEffect } from 'react';
 import { Redirect, Route } from 'react-router';
 
 import { AuthContext } from '../../context/AuthContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
 
 const CustomRoute = ({ isPrivate, requiresProfileActivation, ...rest }) => {
-  const { loading: loadingAuth, authenticated } = useContext(AuthContext);
-  const {
-    loading: loadingProfile,
-    loadingError: loadingProfileError,
-    profile: { is_active: isActive },
-  } = useContext(ProfileContext);
+  const { isLoading, isError, authentication } = useContext(AuthContext);
 
   const {
     setMessage,
@@ -22,17 +16,19 @@ const CustomRoute = ({ isPrivate, requiresProfileActivation, ...rest }) => {
   } = useContext(AlertContext);
 
   useEffect(() => {
-    if (!loadingAuth && isPrivate && !authenticated) {
+    if (!isLoading && !isError && isPrivate && !authentication) {
       setSeverity('info');
       setMessage('Para acessar a página você precisar estar logado.');
       setShowAlert(true);
       clearTimeout(alertTimeout);
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     } else if (
-      !loadingProfile &&
-      !loadingProfileError &&
+      !isLoading &&
+      !isError &&
       requiresProfileActivation &&
-      !isActive
+      authentication &&
+      authentication.profile &&
+      authentication.profile.is_active === false
     ) {
       setSeverity('info');
       setMessage('Para acessar a página você precisa confirmar seu e-mail.');
@@ -43,11 +39,9 @@ const CustomRoute = ({ isPrivate, requiresProfileActivation, ...rest }) => {
   }, [
     isPrivate,
     requiresProfileActivation,
-    loadingAuth,
-    authenticated,
-    loadingProfile,
-    loadingProfileError,
-    isActive,
+    isLoading,
+    isError,
+    authentication,
     setSeverity,
     setMessage,
     setShowAlert,
@@ -55,13 +49,19 @@ const CustomRoute = ({ isPrivate, requiresProfileActivation, ...rest }) => {
     setAlertTimeout,
   ]);
 
-  if (loadingAuth || loadingProfile) return null;
+  if (isLoading) return null;
 
-  if (isPrivate && !authenticated) {
+  if (isPrivate && !authentication) {
     return <Redirect to="/" />;
   }
 
-  if (requiresProfileActivation && !loadingProfileError && !isActive) {
+  if (
+    requiresProfileActivation &&
+    !isError &&
+    authentication &&
+    authentication.profile &&
+    authentication.profile.is_active === false
+  ) {
     return <Redirect to="/" />;
   }
 

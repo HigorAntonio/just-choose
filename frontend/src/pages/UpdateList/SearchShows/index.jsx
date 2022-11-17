@@ -1,24 +1,20 @@
-import React, { useEffect, useContext, useRef, memo } from 'react';
+import React, { useEffect, useContext, useRef, useCallback, memo } from 'react';
 import { ThemeContext } from 'styled-components';
 import { ThemeProvider } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
-import contentTypes from '../../utils/contentTypes';
-import ContentCard from '../ContentCard';
-import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
-import mUILightTheme from '../../styles/materialUIThemes/light';
-import mUIDarkTheme from '../../styles/materialUIThemes/dark';
-import contentTypesUtility from '../../utils/contentTypes';
+import ContentCard from '../../../components/ContentCard';
+import useInfiniteQuery from '../../../hooks/useInfiniteQuery';
+import mUILightTheme from '../../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../../styles/materialUIThemes/dark';
+import justChooseApi from '../../../services/justChooseApi';
 
-import { Container, Message } from './styles';
+import { Container, CardWrapper, SkeletonWrapper } from './styles';
 
-const ContentList = ({
-  requestType,
-  contentType,
+const SearchShows = ({
   params,
   contentList = {},
   setContentList,
-  showPreview,
   wrapperRef,
   showSkeleton = true,
 }) => {
@@ -87,60 +83,29 @@ const ContentList = ({
     containerRef.current.addEventListener('keydown', handleKeydown);
   }, []);
 
-  const getUrl = () => {
-    if (requestType === 'movie') {
-      return '/movies';
-    }
-    if (requestType === 'movie-search') {
-      return '/movies/search';
-    }
-    if (requestType === 'show') {
-      return '/shows';
-    }
-    if (requestType === 'show-search') {
-      return '/shows/search';
-    }
-    if (requestType === 'game') {
-      return '/games';
-    }
-  };
+  const getAvailableShows = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get('/shows/search', {
+        params: { ...params, page: pageParam },
+      });
+      return response.data;
+    },
+    [params]
+  );
 
-  const { loading, content, lastElementRef } =
-    useLoadMoreWhenLastElementIsOnScreen(getUrl(), params);
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['updateList/searchShows', params], getAvailableShows, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   // Quando a lista de conteudo muda move o scroll da contentList pro início
   useEffect(() => {
     wrapperRef.current.scrollTo(0, 0);
-  }, [wrapperRef, requestType, params]);
-
-  const getPosterPathByContentType = (content) => {
-    if (contentType === 'Filme') {
-      return content.poster_path ? content.poster_path : '';
-    }
-    if (contentType === 'Série') {
-      return content.poster_path ? content.poster_path : '';
-    }
-    if (contentType === 'Jogo') {
-      return content.background_image ? content.background_image : '';
-    }
-    return '';
-  };
-
-  const getPosterUrl = (posterPath) => {
-    if (!posterPath) {
-      return '';
-    }
-    if (contentType === 'Jogo') {
-      return posterPath.replace(
-        'https://media.rawg.io/media',
-        'https://media.rawg.io/media/resize/420/-'
-      );
-    }
-    if (contentType === 'Filme' || contentType === 'Série') {
-      return `${process.env.REACT_APP_TMDB_POSTER_URL}w185${posterPath}`;
-    }
-    return '';
-  };
+  }, [wrapperRef, params]);
 
   const addToContentList = (content) => {
     const { contentPlatformId, title, posterPath } = content;
@@ -157,8 +122,7 @@ const ContentList = ({
           content_platform_id: contentPlatformId,
           title,
           poster_path: posterPath,
-          type: contentTypesUtility.options.find((e) => e.key === contentType)
-            .value,
+          type: 'show',
         },
       ]);
     }
@@ -169,56 +133,32 @@ const ContentList = ({
 
   return (
     <Container ref={containerRef} tabIndex="0" data-content-list-container>
-      {!showPreview &&
-        content.length > 0 &&
-        content.map((c, i) => {
-          const title = contentType === 'Filme' ? c.title : c.name;
+      {data?.pages.map((page) => {
+        return page.results.map((content, i) => {
           const cardWrapperProps =
-            content.length === i + 1 ? { ref: lastElementRef } : {};
+            page.results.length === i + 1 ? { ref: lastElementRef } : {};
           return (
-            <div key={c.id} className="cardWrapper" {...cardWrapperProps}>
+            <CardWrapper key={content.id} {...cardWrapperProps}>
               <ContentCard
-                src={getPosterUrl(getPosterPathByContentType(c))}
-                title={title}
+                src={`${process.env.REACT_APP_TMDB_POSTER_URL}w185${content.poster_path}`}
+                title={content.name}
                 click={() =>
                   addToContentList({
-                    contentPlatformId: c.id,
-                    title: title,
-                    posterPath: getPosterPathByContentType(c),
+                    contentPlatformId: content.id,
+                    title: content.name,
+                    posterPath: `${content.poster_path}`,
                   })
                 }
-                check={isInContentList(c.id)}
+                check={isInContentList(content.id)}
               />
-            </div>
+            </CardWrapper>
           );
-        })}
-      {showPreview &&
-        contentList.length > 0 &&
-        contentList.map((c, i) => {
-          return (
-            <div key={c.content_platform_id} className="cardWrapper">
-              <ContentCard
-                src={contentTypes.getPosterUrl(c)}
-                title={c.title}
-                click={() =>
-                  addToContentList({
-                    contentPlatformId: c.content_platform_id,
-                    title: c.title,
-                    posterPath: c.poster_path,
-                  })
-                }
-                check={isInContentList(c.content_platform_id)}
-              />
-            </div>
-          );
-        })}
-      {showPreview && !contentList.length && (
-        <Message>Você não adicionou itens à lista</Message>
-      )}
+        });
+      })}
       {showSkeleton &&
-        loading &&
+        (isFetching || isFetchingNextPage) &&
         [...new Array(30).keys()].map((_, i) => (
-          <div key={i} className="skeleton">
+          <SkeletonWrapper key={i}>
             <ThemeProvider
               theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
             >
@@ -229,10 +169,10 @@ const ContentList = ({
                 style={{ position: 'absolute', top: '0', left: '0' }}
               />
             </ThemeProvider>
-          </div>
+          </SkeletonWrapper>
         ))}
     </Container>
   );
 };
 
-export default memo(ContentList);
+export default memo(SearchShows);

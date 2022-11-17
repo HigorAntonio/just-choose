@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import { GoSearch } from 'react-icons/go';
 
 import { LayoutContext } from '../../context/LayoutContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import SingleOptionSelect from '../../components/SingleOptionSelect';
-import MovieFilters from '../../components/MovieFilters';
-import ShowFilters from '../../components/ShowFilters';
-import GameFilters from '../../components/GameFilters';
-import ContentList from '../../components/ContentList';
+import AvailableContent from './AvailableContent';
 import justChooseApi from '../../services/justChooseApi';
 import sharingOptions from '../../utils/sharingOptions';
 
@@ -22,14 +18,9 @@ import {
   TitleInput,
   ThumbnailWrapper,
   ThumbPreview,
-  ContentListContainer,
-  ContentListHeader,
   Options,
   Option,
   SharingOption,
-  SearchWrapper,
-  SearchInput,
-  ContentListWrapper,
   CreationOptions,
   ClearButton,
   PreviewButton,
@@ -57,9 +48,6 @@ const CreateList = () => {
   const [thumbPreview, setThumbPreview] = useState();
   const [thumbError, setThumbError] = useState('');
   const [contentType, setContentType] = useState('');
-  const [showContent, setShowContent] = useState(false);
-  const [requestType, setRequestType] = useState('');
-  const [params, setParams] = useState({});
   const [contentList, setContentList] = useState([]);
   const [showListPreview, setShowListPreview] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -68,11 +56,8 @@ const CreateList = () => {
   const [titleError, setTitleError] = useState('');
   const [contentError, setContentError] = useState('');
 
-  const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
   const mounted = useRef();
-
-  const contentTypesList = ['Filme', 'Série', 'Jogo'];
 
   useEffect(() => {
     mounted.current = true;
@@ -87,19 +72,10 @@ const CreateList = () => {
   }, [contentWrapperRef]);
 
   useEffect(() => {
-    setContentError('');
-  }, [contentList]);
-
-  useEffect(() => {
-    setParams({});
-    if (contentType === 'Filme') {
-      setRequestType('movie');
-    } else if (contentType === 'Série') {
-      setRequestType('show');
-    } else if (contentType === 'Jogo') {
-      setRequestType('game');
+    if (mounted.current) {
+      setContentError('');
     }
-  }, [contentType]);
+  }, [contentList]);
 
   useEffect(() => {
     if (creating) {
@@ -139,31 +115,10 @@ const CreateList = () => {
     }
   };
 
-  const handleContentInputEnterKey = (e) => {
-    if (e.key === 'Enter' && e.target.value) {
-      if (contentType === 'Filme') {
-        setRequestType('movie-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Série') {
-        setRequestType('show-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Jogo') {
-        setRequestType('game');
-        setParams({ search: e.target.value });
-      }
-      setShowListPreview(false);
-    }
-  };
-
   const handleSharingOption = (option) => {
     setSharingOption(option);
     setSharingOptionError(false);
     setShowSharingOption(false);
-  };
-
-  const handleContentType = (option) => {
-    setContentType(option);
-    setShowContent(false);
   };
 
   const handleSelectOnPressEnter = (e, cb, option) => {
@@ -192,7 +147,6 @@ const CreateList = () => {
 
   const handlePreviewList = () => {
     setShowListPreview((prevState) => !prevState);
-    contentListWrapperRef.current.scrollTo(0, 0);
   };
 
   const validateFields = () => {
@@ -397,92 +351,14 @@ const CreateList = () => {
         <h3>Conteúdo</h3>
         {contentError && <p className="error">{contentError}</p>}
         <div className={!contentType ? null : 'content-list'}>
-          <ContentListContainer>
-            <ContentListHeader>
-              <div className="wrapper">
-                <div className="wrapper content-type-wrapper">
-                  <label>Tipo de conteúdo</label>
-                  <SingleOptionSelect
-                    label={!contentType ? 'Selecionar' : contentType}
-                    dropDownAlign="left"
-                    show={showContent}
-                    setShow={setShowContent}
-                  >
-                    <Options minWidth={'120px'}>
-                      {contentTypesList.map((ct, i) => (
-                        <Option
-                          key={`contentTypesList${i}`}
-                          onClick={() => {
-                            handleContentType(ct);
-                          }}
-                          onKeyPress={(e) =>
-                            handleSelectOnPressEnter(e, handleContentType, ct)
-                          }
-                          tabIndex="-1"
-                          data-select-option
-                        >
-                          {ct}
-                        </Option>
-                      ))}
-                    </Options>
-                  </SingleOptionSelect>
-                </div>
-                {contentType && (
-                  <SearchWrapper>
-                    <SearchInput>
-                      <GoSearch size={'15px'} style={{ flexShrink: 0 }} />
-                      <input
-                        type="search"
-                        id="search"
-                        placeholder="Buscar"
-                        onKeyPress={handleContentInputEnterKey}
-                      />
-                    </SearchInput>
-                  </SearchWrapper>
-                )}
-              </div>
-              {contentType === 'Filme' && (
-                <div className="wrapper">
-                  <MovieFilters
-                    setParams={setParams}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Série' && (
-                <div className="wrapper">
-                  <ShowFilters
-                    setParams={setParams}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Jogo' && (
-                <div className="wrapper">
-                  <GameFilters
-                    setParams={setParams}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-            </ContentListHeader>
-            {contentType && (
-              <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
-                <ContentList
-                  requestType={requestType}
-                  contentType={contentType}
-                  params={params}
-                  contentList={contentList}
-                  setContentList={setContentList}
-                  showPreview={showListPreview}
-                  wrapperRef={contentListWrapperRef}
-                />
-              </ContentListWrapper>
-            )}
-          </ContentListContainer>
+          <AvailableContent
+            contentType={contentType}
+            setContentType={setContentType}
+            contentList={contentList}
+            setContentList={setContentList}
+            showListPreview={showListPreview}
+            setShowListPreview={setShowListPreview}
+          />
           {contentType && (
             <CreationOptions>
               <div>

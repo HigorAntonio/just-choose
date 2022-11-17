@@ -1,11 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import { GoSearch } from 'react-icons/go';
 
 import setQueryParamAndGetNewUrl from '../../../utils/setQueryParamAndGetNewUrl';
 import SingleOptionSelect from '../../../components/SingleOptionSelect';
-import useLoadMoreWhenLastElementIsOnScreen from '../../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import useInfiniteQuery from '../../../hooks/useInfiniteQuery';
+import justChooseApi from '../../../services/justChooseApi';
 import PollCard from '../../../components/PollCard';
 import Grid from '../Grid';
 
@@ -67,11 +68,27 @@ const Votes = ({ profileToShowId }) => {
     });
   }, [profileToShowId, sort, query]);
 
-  const { loading, content, lastElementRef } =
-    useLoadMoreWhenLastElementIsOnScreen(
-      `/profiles/${profileToShowId}/votes`,
-      params
-    );
+  const getVotes = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get(
+        `/profiles/${profileToShowId}/votes`,
+        {
+          params: { ...params, page: pageParam },
+        }
+      );
+      return response.data;
+    },
+    [profileToShowId, params]
+  );
+
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['profile/votes/getVotes', params], getVotes, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   const handleSearchInputEnterKey = (e) => {
     if (e.key === 'Enter' && e.target.value) {
@@ -155,12 +172,12 @@ const Votes = ({ profileToShowId }) => {
           </SingleOptionSelect>
         </AlignRightFilters>
       </Filters>
-      {!loading && content.length === 0 && (
+      {!isFetching && data?.pages[0]?.total_results === 0 && (
         <NotFound>Nenhum voto encontrado.</NotFound>
       )}
-      {content.length > 0 && (
-        <Grid minWidth="29rem" gridGap="1rem">
-          {content.map((vote, i) => {
+      <Grid minWidth="29rem" gridGap="1rem">
+        {data?.pages.map((page) => {
+          return page.results.map((vote, i) => {
             const poll = {
               id: vote.poll_id,
               thumbnail: vote.poll_thumbnail,
@@ -169,7 +186,7 @@ const Votes = ({ profileToShowId }) => {
               total_votes: vote.poll_total_votes,
               updated_at: vote.updated_at,
             };
-            return content.length === i + 1 ? (
+            return page.results.length === i + 1 ? (
               <div key={`vote${vote.poll_id}`} ref={lastElementRef}>
                 <PollCard poll={poll} />
               </div>
@@ -178,9 +195,9 @@ const Votes = ({ profileToShowId }) => {
                 <PollCard poll={poll} />
               </div>
             );
-          })}
-        </Grid>
-      )}
+          });
+        })}
+      </Grid>
     </Container>
   );
 };

@@ -6,25 +6,27 @@ export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const {
-    loading,
-    profileId,
-    profileName,
-    authenticated,
+    isLoading,
+    isError,
+    authentication,
+    setAuthentication,
     handleRegistration,
     handleLogin,
     handleLogout,
+    refreshProfileData,
   } = useAuth();
 
   return (
     <AuthContext.Provider
       value={{
-        loading,
-        profileId,
-        profileName,
-        authenticated,
+        isLoading,
+        isError,
+        authentication,
+        setAuthentication,
         handleRegistration,
         handleLogin,
         handleLogout,
+        refreshProfileData,
       }}
     >
       {children}

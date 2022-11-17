@@ -12,7 +12,7 @@ import useAuthenticatedRequest from '../hooks/useAuthenticatedRequest';
 export const FollowingProfilesContext = createContext();
 
 export const FollowingProfilesContextProvider = ({ children }) => {
-  const { profileId } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
 
   const [followsParams] = useState({});
   const [followsPageNumber, setFollowsPageNumber] = useState(1);
@@ -23,7 +23,7 @@ export const FollowingProfilesContextProvider = ({ children }) => {
     hasMore: followsHasMore,
     loading: followsLoading,
   } = useAuthenticatedRequest(
-    `/profiles/${profileId}/following`,
+    `/profiles/${authentication && authentication.profile.id}/following`,
     followsParams,
     followsPageNumber
   );

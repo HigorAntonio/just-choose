@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 
 import { AlertContext } from '../../../context/AlertContext';
-import { ProfileContext } from '../../../context/ProfileContext';
+import { AuthContext } from '../../../context/AuthContext';
 
 import justChooseApi from '../../../services/justChooseApi';
 import InputToggle from '../../../components/InputToggle';
@@ -27,7 +27,7 @@ const Security = () => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { profile } = useContext(ProfileContext);
+  const { authentication } = useContext(AuthContext);
 
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -234,25 +234,35 @@ const Security = () => {
           <div className="column">
             <div className="row">
               <EmailWrapper>
-                <Email>{profile.email}</Email>
+                <Email>
+                  {authentication &&
+                    authentication.profile &&
+                    authentication.profile.email}
+                </Email>
               </EmailWrapper>
-              {!profile.is_active && (
-                <ResendEmailButton
-                  disabled={resendingConfirmationEmail}
-                  onClick={handleResendConfirmationEmail}
-                >
-                  Reenviar e-mail
-                </ResendEmailButton>
-              )}
+              {authentication &&
+                authentication.profile &&
+                authentication.profile.is_active === false && (
+                  <ResendEmailButton
+                    disabled={resendingConfirmationEmail}
+                    onClick={handleResendConfirmationEmail}
+                  >
+                    Reenviar e-mail
+                  </ResendEmailButton>
+                )}
             </div>
             <EmailStatus>
-              {profile.is_active ? (
+              {authentication &&
+              authentication.profile &&
+              authentication.profile.is_active ? (
                 <span>Verificado.</span>
               ) : (
                 <span>Não verificado.</span>
               )}
               &nbsp;
-              {profile.is_active
+              {authentication &&
+              authentication.profile &&
+              authentication.profile.is_active
                 ? `Agradecemos por verificar o seu e-mail.`
                 : `Verifique sua caixa de entrada.`}
             </EmailStatus>

@@ -9,14 +9,14 @@ const useAuthenticatedRequest = (url, params, page) => {
   const [error, setError] = useState(false);
   const [data, setData] = useState([]);
   const [hasMore, setHasMore] = useState(false);
-  const { authenticated } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
 
   useEffect(() => {
     setData([]);
-  }, [url, params, authenticated]);
+  }, [url, params, authentication]);
 
   useEffect(() => {
-    if (authenticated) {
+    if (authentication) {
       setLoading(true);
       setError(false);
       let source = axios.CancelToken.source();
@@ -44,7 +44,7 @@ const useAuthenticatedRequest = (url, params, page) => {
         source.cancel();
       };
     }
-  }, [url, params, page, authenticated]);
+  }, [url, params, page, authentication]);
 
   return { loading, error, data, setData, hasMore };
 };

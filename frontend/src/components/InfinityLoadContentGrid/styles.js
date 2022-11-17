@@ -23,3 +23,15 @@ export const CardWrapper = styled.div`
     padding-bottom: calc(271 / 181 * 100%);
   }
 `;
+
+export const SkeletonWrapper = styled.div`
+  position: relative;
+
+  &:before {
+    content: '';
+    display: block;
+    height: 0;
+    width: 0;
+    padding-bottom: calc(271 / 181 * 100%);
+  }
+`;

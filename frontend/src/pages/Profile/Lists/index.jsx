@@ -1,11 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import { GoSearch } from 'react-icons/go';
 
 import setQueryParamAndGetNewUrl from '../../../utils/setQueryParamAndGetNewUrl';
 import SingleOptionSelect from '../../../components/SingleOptionSelect';
-import useLoadMoreWhenLastElementIsOnScreen from '../../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import useInfiniteQuery from '../../../hooks/useInfiniteQuery';
+import justChooseApi from '../../../services/justChooseApi';
 import ListCard from '../../../components/ListCard';
 import Grid from '../Grid';
 
@@ -72,8 +73,24 @@ const Lists = ({ profileToShowId }) => {
     });
   }, [profileToShowId, sort, query]);
 
-  const { loading, content, lastElementRef } =
-    useLoadMoreWhenLastElementIsOnScreen('/contentlists', params);
+  const getLists = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get('/contentlists', {
+        params: { ...params, page: pageParam },
+      });
+      return response.data;
+    },
+    [params]
+  );
+
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['profile/lists/getLists', params], getLists, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   const handleSearchInputEnterKey = (e) => {
     if (e.key === 'Enter' && e.target.value) {
@@ -157,13 +174,13 @@ const Lists = ({ profileToShowId }) => {
           </SingleOptionSelect>
         </AlignRightFilters>
       </Filters>
-      {!loading && content.length === 0 && (
+      {!isFetching && data?.pages[0]?.total_results === 0 && (
         <NotFound>Nenhuma lista encontrada.</NotFound>
       )}
-      {content.length > 0 && (
-        <Grid minWidth="29rem" gridGap="1rem">
-          {content.map((contentList, i) =>
-            content.length === i + 1 ? (
+      <Grid minWidth="29rem" gridGap="1rem">
+        {data?.pages.map((page) => {
+          return page.results.map((contentList, i) =>
+            page.results.length === i + 1 ? (
               <div key={`contentList${contentList.id}`} ref={lastElementRef}>
                 <ListCard contentList={contentList} />
               </div>
@@ -172,9 +189,9 @@ const Lists = ({ profileToShowId }) => {
                 <ListCard contentList={contentList} />
               </div>
             )
-          )}
-        </Grid>
-      )}
+          );
+        })}
+      </Grid>
     </Container>
   );
 };

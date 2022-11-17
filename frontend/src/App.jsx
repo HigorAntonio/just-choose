@@ -1,7 +1,8 @@
 import Layout from './components/Layout';
+import { QueryClientProvider } from 'react-query';
 
+import { queryClient } from './services/queryClient';
 import { AuthContextProvider } from './context/AuthContext';
-import { ProfileContextProvider } from './context/ProfileContext';
 import { ThemeContextProvider } from './context/ThemeContext';
 import { ViewportContextProvider } from './context/ViewportContext';
 import { AlertContextProvider } from './context/AlertContext';
@@ -10,9 +11,9 @@ import { LayoutContextProvider } from './context/LayoutContext';
 
 function App() {
   return (
-    <ThemeContextProvider>
-      <AuthContextProvider>
-        <ProfileContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeContextProvider>
+        <AuthContextProvider>
           <ViewportContextProvider>
             <AlertContextProvider>
               <FollowingProfilesContextProvider>
@@ -22,9 +23,9 @@ function App() {
               </FollowingProfilesContextProvider>
             </AlertContextProvider>
           </ViewportContextProvider>
-        </ProfileContextProvider>
-      </AuthContextProvider>
-    </ThemeContextProvider>
+        </AuthContextProvider>
+      </ThemeContextProvider>
+    </QueryClientProvider>
   );
 }
 

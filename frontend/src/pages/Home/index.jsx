@@ -11,7 +11,7 @@ import { Container, Wrapper } from './styles';
 
 const Home = () => {
   const { contentWrapperRef } = useContext(LayoutContext);
-  const { authenticated } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
@@ -21,8 +21,8 @@ const Home = () => {
     <Container>
       <Wrapper>
         <Trending />
-        {authenticated && <Following />}
-        {authenticated && <Votes />}
+        {authentication && <Following />}
+        {authentication && <Votes />}
       </Wrapper>
     </Container>
   );

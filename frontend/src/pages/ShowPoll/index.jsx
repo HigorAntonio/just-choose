@@ -18,7 +18,6 @@ import { FaTrash } from 'react-icons/fa';
 
 import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../services/justChooseApi';
@@ -36,7 +35,7 @@ import contentTypesUtility from '../../utils/contentTypes';
 import { formatCreationDate } from '../../utils/dataUtility';
 import removeQueryParamAndGetNewUrl from '../../utils/removeQueryParamAndGetNewUrl';
 import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
-import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import useInfiniteQuery from '../../hooks/useInfiniteQuery';
 
 import {
   Container,
@@ -68,10 +67,7 @@ const ShowPoll = () => {
   const { type: contentType } = queryParams;
   const history = useHistory();
 
-  const { profileId, authenticated } = useContext(AuthContext);
-  const {
-    profile: { is_active: isProfileActive },
-  } = useContext(ProfileContext);
+  const { authentication } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -157,7 +153,7 @@ const ShowPoll = () => {
         pollData &&
         JSON.stringify(pollData) !== '{}' &&
         pollData.is_active &&
-        authenticated
+        authentication
       ) {
         const { data: vote } = await justChooseApi.get(
           `/polls/${pollData.id}/votes`,
@@ -180,7 +176,7 @@ const ShowPoll = () => {
         pollData &&
         pollData.content_lists[0] &&
         pollData.content_lists[0].sharing_option === 'followed_profiles' &&
-        authenticated
+        authentication
       ) {
         try {
           const isFollower = await justChooseApi.get(
@@ -195,10 +191,11 @@ const ShowPoll = () => {
       if (
         pollData &&
         pollData.content_lists[0] &&
-        pollData.content_lists[0].sharing_option === 'private'
+        pollData.content_lists[0].sharing_option === 'private' &&
+        authentication
       ) {
         setShowListOption(
-          parseInt(profileId) === parseInt(pollData.profile_id)
+          parseInt(authentication.profile.id) === parseInt(pollData.profile_id)
         );
       }
       setLoading(false);
@@ -215,7 +212,7 @@ const ShowPoll = () => {
       }
       setLoading(false);
     }
-  }, [pollId, authenticated, profileId]);
+  }, [pollId, authentication]);
 
   useEffect(() => {
     mounted.current = true;
@@ -229,15 +226,27 @@ const ShowPoll = () => {
     };
   }, [getPageData]);
 
-  const {
-    loading: loadingContent,
-    error: loadingContentError,
-    content,
-    lastElementRef: lastContentRef,
-  } = useLoadMoreWhenLastElementIsOnScreen(`/polls/${pollId}/content`, params);
+  const getPollContent = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get(`/polls/${pollId}/content`, {
+        params: { ...params, page: pageParam },
+      });
+      return response.data;
+    },
+    [pollId, params]
+  );
+
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['showPoll/getPollContent', params], getPollContent, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   const handleActive = async () => {
-    if (!authenticated) {
+    if (!authentication) {
       return;
     }
     try {
@@ -283,7 +292,7 @@ const ShowPoll = () => {
   };
 
   const handleDelete = async () => {
-    if (!authenticated) {
+    if (!authentication) {
       return;
     }
     try {
@@ -308,7 +317,7 @@ const ShowPoll = () => {
 
   const handleVote = async (e, content) => {
     e.preventDefault();
-    if (!authenticated) {
+    if (!authentication) {
       setShowDeleteDialog(false);
       clearTimeout(alertTimeout);
       setMessage('Faça login para poder votar.');
@@ -317,7 +326,11 @@ const ShowPoll = () => {
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       return;
     }
-    if (!isProfileActive) {
+    if (
+      authentication &&
+      authentication.profile &&
+      authentication.profile.is_active === false
+    ) {
       setShowDeleteDialog(false);
       clearTimeout(alertTimeout);
       setMessage('Confirme seu e-mail para poder votar.');
@@ -400,7 +413,7 @@ const ShowPoll = () => {
                   </HeaderButton>
                 </Link>
               )}
-              {profileId === poll.profile_id && (
+              {authentication && authentication.profile.id === poll.profile_id && (
                 <>
                   <HeaderButton
                     title={poll.is_active ? 'Fechar votação' : 'Abrir votação'}
@@ -500,7 +513,7 @@ const ShowPoll = () => {
         </Filters>
       </Header>
       <Main>
-        {poll.is_active && content.length === 0 && (
+        {poll.is_active && data?.pages[0]?.total_results === 0 && (
           <NoContent
             type={
               contentType
@@ -511,12 +524,12 @@ const ShowPoll = () => {
             }
           />
         )}
-        {poll.is_active && content.length > 0 && (
+        {poll.is_active && (
           <InfinityLoadContentGrid
-            loading={loadingContent}
-            error={loadingContentError}
-            content={content}
-            lastElementRef={lastContentRef}
+            isFetching={isFetching}
+            isFetchingNextPage={isFetchingNextPage}
+            data={data}
+            lastElementRef={lastElementRef}
             checkbox
             checkboxcheck={(c) =>
               vote.content_id === c.content_id && vote.type === c.type
@@ -525,12 +538,8 @@ const ShowPoll = () => {
             tabIndex="-1"
           />
         )}
-        {!poll.is_active && content.length > 0 && (
-          <Result
-            error={loadingContentError}
-            content={content}
-            lastElementRef={lastContentRef}
-          />
+        {!poll.is_active && (
+          <Result data={data} lastElementRef={lastElementRef} />
         )}
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>

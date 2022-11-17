@@ -7,10 +7,6 @@ import React, {
 } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
-import { ThemeContext } from 'styled-components';
-import { ThemeProvider } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
-import { GoSearch } from 'react-icons/go';
 
 import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
@@ -20,15 +16,9 @@ import NotFound from '../../components/NotFound';
 import SomethingWentWrong from '../../components/SomethingWentWrong';
 import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
-import MovieFilters from '../../components/MovieFilters';
-import ShowFilters from '../../components/ShowFilters';
-import GameFilters from '../../components/GameFilters';
-import ContentList from '../../components/ContentList';
+import AvailableContent from './AvailableContent';
 import justChooseApi from '../../services/justChooseApi';
 import sharingOptions from '../../utils/sharingOptions';
-
-import mUILightTheme from '../../styles/materialUIThemes/light';
-import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
 import {
   Container,
@@ -39,15 +29,9 @@ import {
   TitleInput,
   ThumbnailWrapper,
   ThumbPreview,
-  ContentListContainer,
-  ContentListHeader,
   Options,
   Option,
   SharingOption,
-  SearchWrapper,
-  SearchInput,
-  ContentListWrapper,
-  ContentListSkeleton,
   CreationOptions,
   ClearButton,
   PreviewButton,
@@ -59,7 +43,7 @@ const UpdateList = () => {
   const history = useHistory();
 
   const { contentWrapperRef } = useContext(LayoutContext);
-  const { profileId } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -67,7 +51,6 @@ const UpdateList = () => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { title: theme } = useContext(ThemeContext);
 
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -83,9 +66,6 @@ const UpdateList = () => {
   const [thumbPreview, setThumbPreview] = useState();
   const [thumbError, setThumbError] = useState('');
   const [contentType, setContentType] = useState('');
-  const [showContent, setShowContent] = useState(false);
-  const [requestType, setRequestType] = useState('');
-  const [params, setParams] = useState({});
   const [contentList, setContentList] = useState([]);
   const [contentError, setContentError] = useState('');
   const [showListPreview, setShowListPreview] = useState(true);
@@ -97,8 +77,6 @@ const UpdateList = () => {
   const thumbInputFileRef = useRef();
   const mounted = useRef();
   const source = useRef();
-
-  const contentTypesList = ['Filme', 'Série', 'Jogo'];
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
@@ -145,7 +123,7 @@ const UpdateList = () => {
         const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
           cancelToken: source.current.token,
         });
-        if (profileId !== data.profile_id) {
+        if (authentication && authentication.profile.id !== data.profile_id) {
           setDenyAccess(true);
           setLoading(false);
           return;
@@ -175,22 +153,11 @@ const UpdateList = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, profileId, loadContentListContent]);
+  }, [listId, authentication, loadContentListContent]);
 
   useEffect(() => {
     setContentError('');
   }, [contentList]);
-
-  useEffect(() => {
-    setParams({});
-    if (contentType === 'Filme') {
-      setRequestType('movie');
-    } else if (contentType === 'Série') {
-      setRequestType('show');
-    } else if (contentType === 'Jogo') {
-      setRequestType('game');
-    }
-  }, [contentType]);
 
   useEffect(() => {
     if (updating) {
@@ -223,8 +190,6 @@ const UpdateList = () => {
     setThumbError('');
     thumbInputFileRef.current = null;
     setContentType('');
-    setShowContent(false);
-    setRequestType('');
     setContentList([]);
     setContentError('');
     setShowListPreview(true);
@@ -258,31 +223,10 @@ const UpdateList = () => {
     }
   };
 
-  const handleContentInputEnterKey = (e) => {
-    if (e.key === 'Enter' && e.target.value) {
-      if (contentType === 'Filme') {
-        setRequestType('movie-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Série') {
-        setRequestType('show-search');
-        setParams({ query: e.target.value });
-      } else if (contentType === 'Jogo') {
-        setRequestType('game');
-        setParams({ search: e.target.value });
-      }
-      setShowListPreview(false);
-    }
-  };
-
   const handleSharingOption = (option) => {
     setSharingOption(option);
     setSharingOptionError(false);
     setShowSharingOption(false);
-  };
-
-  const handleContentType = (option) => {
-    setContentType(option);
-    setShowContent(false);
   };
 
   const handleSelectOnPressEnter = (e, cb, option) => {
@@ -311,7 +255,6 @@ const UpdateList = () => {
 
   const handlePreviewList = () => {
     setShowListPreview((prevState) => !prevState);
-    contentListWrapperRef.current.scrollTo(0, 0);
   };
 
   const validateFields = () => {
@@ -525,112 +468,15 @@ const UpdateList = () => {
         <h3>Conteúdo</h3>
         {contentError && <p className="error">{contentError}</p>}
         <div className="content-list">
-          <ContentListContainer>
-            <ContentListHeader>
-              <div className="wrapper">
-                <div className="wrapper content-type-wrapper">
-                  <label>Tipo de conteúdo</label>
-                  <SingleOptionSelect
-                    label={!contentType ? 'Selecionar' : contentType}
-                    dropDownAlign="left"
-                    show={showContent}
-                    setShow={setShowContent}
-                  >
-                    <Options minWidth={'120px'}>
-                      {contentTypesList.map((ct, i) => (
-                        <Option
-                          key={`contentTypesList${i}`}
-                          onClick={() => {
-                            handleContentType(ct);
-                          }}
-                          onKeyPress={(e) =>
-                            handleSelectOnPressEnter(e, handleContentType, ct)
-                          }
-                          tabIndex="-1"
-                          data-select-option
-                        >
-                          {ct}
-                        </Option>
-                      ))}
-                    </Options>
-                  </SingleOptionSelect>
-                </div>
-                {contentType && (
-                  <SearchWrapper>
-                    <SearchInput>
-                      <GoSearch size={'15px'} style={{ flexShrink: 0 }} />
-                      <input
-                        type="search"
-                        id="search"
-                        placeholder="Buscar"
-                        onKeyPress={handleContentInputEnterKey}
-                      />
-                    </SearchInput>
-                  </SearchWrapper>
-                )}
-              </div>
-              {contentType === 'Filme' && (
-                <div className="wrapper">
-                  <MovieFilters
-                    setParams={setParams}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Série' && (
-                <div className="wrapper">
-                  <ShowFilters
-                    setParams={setParams}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-              {contentType === 'Jogo' && (
-                <div className="wrapper">
-                  <GameFilters
-                    setParams={setParams}
-                    setRequestType={setRequestType}
-                    setShowListPreview={setShowListPreview}
-                  />
-                </div>
-              )}
-            </ContentListHeader>
-
-            <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
-              {!loading && (
-                <ContentList
-                  requestType={requestType}
-                  contentType={contentType}
-                  params={params}
-                  contentList={contentList}
-                  setContentList={setContentList}
-                  showPreview={showListPreview}
-                  wrapperRef={contentListWrapperRef}
-                  showSkeleton={!!contentType}
-                />
-              )}
-              {loading && (
-                <ContentListSkeleton>
-                  {[...Array(30).keys()].map((c) => (
-                    <div key={c} className="cardWrapper">
-                      <ThemeProvider
-                        theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
-                      >
-                        <Skeleton
-                          variant="rect"
-                          width={'100%'}
-                          height={'100%'}
-                        />
-                      </ThemeProvider>
-                    </div>
-                  ))}
-                </ContentListSkeleton>
-              )}
-            </ContentListWrapper>
-          </ContentListContainer>
-
+          <AvailableContent
+            contentType={contentType}
+            setContentType={setContentType}
+            contentList={contentList}
+            setContentList={setContentList}
+            showListPreview={showListPreview}
+            setShowListPreview={setShowListPreview}
+            loading={loading}
+          />
           <CreationOptions>
             <div>
               <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>

@@ -7,7 +7,7 @@ import ContentCardSimple from '../../../components/ContentCardSimple';
 
 import { Container, Header, Body } from './styles';
 
-const Result = ({ error, content, lastElementRef }) => {
+const Result = ({ data, lastElementRef }) => {
   const handleContentEnterKey = (e, href) => {
     if (e.key === 'Enter') {
       window.open(href);
@@ -33,11 +33,10 @@ const Result = ({ error, content, lastElementRef }) => {
         </div>
       </Header>
       <Body>
-        {!error &&
-          content.length > 0 &&
-          content.map((c, i) => {
+        {data?.pages.map((page) => {
+          return page.results.map((c, i) => {
             const wrapperProps =
-              content.length === i + 1
+              page.results.length === i + 1
                 ? {
                     ref: lastElementRef,
                   }
@@ -79,7 +78,8 @@ const Result = ({ error, content, lastElementRef }) => {
                 </div>
               </div>
             );
-          })}
+          });
+        })}
       </Body>
     </Container>
   );

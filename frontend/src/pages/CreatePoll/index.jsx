@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
 
@@ -12,7 +18,7 @@ import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
 import justChooseApi from '../../services/justChooseApi';
-import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import useInfiniteQuery from '../../hooks/useInfiniteQuery';
 import sharingOptions from '../../utils/sharingOptions';
 
 import {
@@ -37,7 +43,7 @@ const CreatePoll = () => {
   const { id: listId } = useParams();
   const history = useHistory();
 
-  const { profileId } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -86,7 +92,7 @@ const CreatePoll = () => {
         const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
           cancelToken: source.current.token,
         });
-        if (profileId !== data.profile_id) {
+        if (authentication && authentication.profile.id !== data.profile_id) {
           setDenyAccess(true);
           return;
         }
@@ -108,17 +114,29 @@ const CreatePoll = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, profileId]);
+  }, [listId, authentication]);
 
-  const {
-    loading: loadingContent,
-    error: loadingContentError,
-    content,
-    lastElementRef: lastContentRef,
-  } = useLoadMoreWhenLastElementIsOnScreen(
-    `/contentlists/${listId}/content`,
-    params
+  const getContentList = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get(
+        `/contentlists/${listId}/content`,
+        {
+          params: { ...params, page: pageParam },
+        }
+      );
+      return response.data;
+    },
+    [listId, params]
   );
+
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['createPoll/getContentList', params], getContentList, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   useEffect(() => {
     if (creating) {
@@ -409,10 +427,10 @@ const CreatePoll = () => {
           <ContentListContainer>
             <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
               <InfinityLoadContentGrid
-                loading={loadingContent}
-                error={loadingContentError}
-                content={content}
-                lastElementRef={lastContentRef}
+                isFetching={isFetching}
+                isFetchingNextPage={isFetchingNextPage}
+                data={data}
+                lastElementRef={lastElementRef}
                 tabIndex="-1"
               />
             </ContentListWrapper>

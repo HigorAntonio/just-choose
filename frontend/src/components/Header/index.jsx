@@ -13,7 +13,6 @@ import Sign from '../SignModal';
 import Switch from '../Switch';
 
 import { AuthContext } from '../../context/AuthContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { ThemeContext as AppThemeContext } from '../../context/ThemeContext';
 
 import {
@@ -47,8 +46,7 @@ function Header() {
 
   const { title: theme, colors } = useContext(ThemeContext);
   const { theme: appTheme, toggleTheme } = useContext(AppThemeContext);
-  const { loading, authenticated, handleLogout } = useContext(AuthContext);
-  const { profile, setProfile } = useContext(ProfileContext);
+  const { isLoading, authentication, handleLogout } = useContext(AuthContext);
 
   const [showSignModal, setShowSignModal] = useState(false);
   const [navOption, setNavOption] = useState('');
@@ -83,7 +81,6 @@ function Header() {
   const handleProfileExit = async () => {
     try {
       await handleLogout();
-      setProfile({});
       setShowProfileDropDown(false);
       if (location.pathname !== '/') {
         history.push('/');
@@ -190,7 +187,7 @@ function Header() {
 
       <NavMenuWrapper>
         <NavMenu>
-          {!loading && authenticated && (
+          {!isLoading && authentication && (
             <Link to="/list" tabIndex="-1">
               <TooltipHover
                 tooltipText="Nova Lista"
@@ -204,7 +201,7 @@ function Header() {
               </TooltipHover>
             </Link>
           )}
-          {!loading && !authenticated && (
+          {!isLoading && !authentication && (
             <>
               <SignIn onClick={handleSignIn}>Entrar</SignIn>
               <SignUp onClick={handleSignUp}>Cadastrar-se</SignUp>
@@ -219,7 +216,11 @@ function Header() {
             >
               <div>
                 <Profile
-                  src={profile.profile_image_url}
+                  src={
+                    authentication &&
+                    authentication.profile &&
+                    authentication.profile.profile_image_url
+                  }
                   onClick={() =>
                     setShowProfileDropDown((prevState) => !prevState)
                   }
@@ -227,12 +228,12 @@ function Header() {
                   tabIndex="0"
                   data-profile-image
                 >
-                  {!authenticated && (
+                  {!authentication && (
                     <BiUser size={'20px'} style={{ flexShrink: 0 }} />
                   )}
                 </Profile>
                 <ProfileDropDown show={showProfileDropDown}>
-                  {authenticated && (
+                  {authentication && (
                     <>
                       <ProfileOption>
                         <Link
@@ -240,10 +241,22 @@ function Header() {
                           onClick={() => setShowProfileDropDown(false)}
                           tabIndex="-1"
                         >
-                          <ProfileImage src={profile.profile_image_url} />
+                          <ProfileImage
+                            src={
+                              authentication &&
+                              authentication.profile &&
+                              authentication.profile.profile_image_url
+                            }
+                          />
                         </Link>
                         <ProfileData>
-                          <span>{profile.display_name}</span>
+                          <span>
+                            {authentication &&
+                            authentication.profile &&
+                            authentication.profile.display_name
+                              ? authentication.profile.display_name
+                              : ''}
+                          </span>
                         </ProfileData>
                       </ProfileOption>
                       <DropDownSeparator />
@@ -289,7 +302,7 @@ function Header() {
                       />
                     </div>
                   </DropDownOption>
-                  {!authenticated && (
+                  {!authentication && (
                     <>
                       <DropDownSeparator />
                       <DropDownOption
@@ -305,7 +318,7 @@ function Header() {
                       </DropDownOption>
                     </>
                   )}
-                  {authenticated && (
+                  {authentication && (
                     <>
                       <DropDownSeparator />
                       <DropDownOption

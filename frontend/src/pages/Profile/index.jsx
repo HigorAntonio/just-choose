@@ -10,7 +10,6 @@ import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
 import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
 import { FollowingProfilesContext } from '../../context/FollowingProfilesContext';
 
@@ -51,10 +50,7 @@ const Profile = () => {
   const { path, url } = useRouteMatch();
   const location = useLocation();
 
-  const { profileName, authenticated } = useContext(AuthContext);
-  const {
-    profile: { is_active: isProfileActive },
-  } = useContext(ProfileContext);
+  const { authentication } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -100,11 +96,12 @@ const Profile = () => {
           `${path.replace(':name', profileToShowName)}/about`) ||
       (location.pathname ===
         `${path.replace(':name', profileToShowName)}/votes` &&
-        profileName !== profileToShowName)
+        authentication &&
+        authentication.profile.name !== profileToShowName)
     ) {
       history.replace(`${path.replace(':name', profileToShowName)}`);
     }
-  }, [location, path, profileToShowName, profileName, history]);
+  }, [location, path, profileToShowName, authentication, history]);
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
@@ -126,7 +123,11 @@ const Profile = () => {
         );
         setProfile(data);
         const { id: profileToShowId } = data;
-        if (authenticated && isProfileActive) {
+        if (
+          authentication &&
+          authentication.profile &&
+          authentication.profile.is_active
+        ) {
           const {
             data: { following },
           } = await justChooseApi.get(
@@ -151,7 +152,7 @@ const Profile = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [profileToShowName, authenticated, isProfileActive]);
+  }, [profileToShowName, authentication]);
 
   const handleUnfollow = async () => {
     setShowUnfollowDialog(false);
@@ -171,10 +172,15 @@ const Profile = () => {
   };
 
   const handleFollow = async () => {
-    if (!authenticated || !isProfileActive) {
+    if (
+      !authentication ||
+      (authentication &&
+        authentication.profile &&
+        authentication.profile.is_active === false)
+    ) {
       clearTimeout(alertTimeout);
       setMessage(
-        authenticated
+        authentication
           ? 'Confirme seu e-mail para seguir esse perfil'
           : 'Faça login para seguir esse perfil'
       );
@@ -245,21 +251,22 @@ const Profile = () => {
                 }`}</ProfileFollowers>
               </ProfileMeta>
             </ProfileWrapper>
-            {profileName !== profileToShowName && (
-              <HeaderButtons>
-                {!following ? (
-                  <FollowButton following={following} onClick={handleFollow}>
-                    <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
-                    <span>Seguir</span>
-                  </FollowButton>
-                ) : (
-                  <FollowButton following={following} onClick={handleFollow}>
-                    <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
-                    <span>Seguindo</span>
-                  </FollowButton>
-                )}
-              </HeaderButtons>
-            )}
+            {authentication &&
+              authentication.profile.name !== profileToShowName && (
+                <HeaderButtons>
+                  {!following ? (
+                    <FollowButton following={following} onClick={handleFollow}>
+                      <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
+                      <span>Seguir</span>
+                    </FollowButton>
+                  ) : (
+                    <FollowButton following={following} onClick={handleFollow}>
+                      <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
+                      <span>Seguindo</span>
+                    </FollowButton>
+                  )}
+                </HeaderButtons>
+              )}
           </HeaderContainer>
           <NavigationWrapper>
             <HorizontalDragScrolling>
@@ -289,17 +296,18 @@ const Profile = () => {
                 >
                   Votações
                 </div>
-                {profileName === profileToShowName && (
-                  <div
-                    className={
-                      location.pathname === `${url}/votes` ? 'active' : ''
-                    }
-                    onClick={() => handlePush(`${url}/votes`)}
-                    onAuxClick={(e) => navOnAuxClick(e, `${url}/votes`)}
-                  >
-                    Votos
-                  </div>
-                )}
+                {authentication &&
+                  authentication.profile.name === profileToShowName && (
+                    <div
+                      className={
+                        location.pathname === `${url}/votes` ? 'active' : ''
+                      }
+                      onClick={() => handlePush(`${url}/votes`)}
+                      onAuxClick={(e) => navOnAuxClick(e, `${url}/votes`)}
+                    >
+                      Votos
+                    </div>
+                  )}
                 <div
                   className={
                     location.pathname === `${url}/following` ? 'active' : ''
@@ -338,7 +346,8 @@ const Profile = () => {
         )}
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}/votes` &&
-          profileName === profileToShowName && (
+          authentication &&
+          authentication.profile.name === profileToShowName && (
             <Votes profileToShowId={profile.id} />
           )}
         {location.pathname ===

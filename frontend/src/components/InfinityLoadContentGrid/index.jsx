@@ -1,21 +1,27 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
+import { ThemeContext } from 'styled-components';
+import { ThemeProvider } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 import contentTypes from '../../utils/contentTypes';
 import ContentCardSimple from '../ContentCardSimple';
 import ContentCard from '../ContentCard';
+import mUILightTheme from '../../styles/materialUIThemes/light';
+import mUIDarkTheme from '../../styles/materialUIThemes/dark';
 
-import { Container, CardWrapper } from './styles';
+import { Container, CardWrapper, SkeletonWrapper } from './styles';
 
 const InfinityLoadContentGrid = ({
-  loading,
-  error,
-  content,
+  isFetching,
+  isFetchingNextPage,
+  data,
   lastElementRef,
   checkbox = false,
   checkboxcheck,
   checkboxclick,
   tabIndex = '0',
 }) => {
+  const { title: theme } = useContext(ThemeContext);
   const containerRef = useRef();
   const tabIndexRef = useRef(tabIndex);
 
@@ -94,18 +100,17 @@ const InfinityLoadContentGrid = ({
       tabIndex={tabIndexRef.current === '0' ? '-1' : '0'}
       data-content-grid-container
     >
-      {!error &&
-        content.length > 0 &&
-        content.map((c, i) => {
+      {data?.pages.map((page) => {
+        return page.results.map((content, i) => {
           const cardWrapperProps =
-            content.length === i + 1
+            page.results.length === i + 1
               ? {
-                  key: `content${c.type}${c.content_id}`,
+                  key: `content${content.type}${content.content_id}`,
                   ref: lastElementRef,
                 }
-              : { key: `content${c.type}${c.content_id}` };
-          const href = `${contentTypes.getBaseUrl(c.type)}/${
-            c.content_platform_id
+              : { key: `content${content.type}${content.content_id}` };
+          const href = `${contentTypes.getBaseUrl(content.type)}/${
+            content.content_platform_id
           }`;
           return (
             <CardWrapper {...cardWrapperProps}>
@@ -118,21 +123,37 @@ const InfinityLoadContentGrid = ({
               >
                 {checkbox ? (
                   <ContentCard
-                    src={contentTypes.getPosterUrl(c)}
-                    title={c.title}
-                    check={checkboxcheck(c)}
-                    click={(e) => checkboxclick(e, c)}
+                    src={contentTypes.getPosterUrl(content)}
+                    title={content.title}
+                    check={checkboxcheck(content)}
+                    click={(e) => checkboxclick(e, content)}
                   />
                 ) : (
                   <ContentCardSimple
-                    src={contentTypes.getPosterUrl(c)}
-                    title={c.title}
+                    src={contentTypes.getPosterUrl(content)}
+                    title={content.title}
                   />
                 )}
               </a>
             </CardWrapper>
           );
-        })}
+        });
+      })}
+      {(isFetching || isFetchingNextPage) &&
+        [...new Array(30).keys()].map((_, i) => (
+          <SkeletonWrapper key={i}>
+            <ThemeProvider
+              theme={theme === 'light' ? mUILightTheme : mUIDarkTheme}
+            >
+              <Skeleton
+                variant="rect"
+                width={'100%'}
+                height={'100%'}
+                style={{ position: 'absolute', top: '0', left: '0' }}
+              />
+            </ThemeProvider>
+          </SkeletonWrapper>
+        ))}
     </Container>
   );
 };

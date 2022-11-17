@@ -1,13 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import jwt_decode from 'jwt-decode';
 
 import justChooseApi from '../services/justChooseApi';
 
 const useAuth = () => {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [profileId, setProfileId] = useState();
-  const [profileName, setProfileName] = useState();
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [authentication, setAuthentication] = useState(null);
+
+  const refreshProfileData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setIsError(false);
+      if (authentication) {
+        const { data } = await justChooseApi.get(
+          `/profiles/${authentication.profile.name}`
+        );
+        setAuthentication((prevState) => ({ ...prevState, profile: data }));
+      }
+    } catch (error) {
+      console.error('Falha ao obter dados do perfil do usuário');
+      if (!error.response) {
+        setIsError(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [authentication]);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -17,13 +36,21 @@ const useAuth = () => {
         accessToken
       )}`;
       const decoded = jwt_decode(accessToken);
-      setProfileId(decoded.sub);
-      setProfileName(decoded.name);
-      setAuthenticated(true);
+      setAuthentication({ profile: { id: decoded.sub, name: decoded.name } });
     }
 
-    setLoading(false);
+    setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (
+      authentication &&
+      authentication.profile &&
+      Object.keys(authentication.profile).length <= 2
+    ) {
+      refreshProfileData();
+    }
+  }, [refreshProfileData, authentication]);
 
   const handleRegistration = async (body) => {
     try {
@@ -36,9 +63,7 @@ const useAuth = () => {
 
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
       const decoded = jwt_decode(accessToken);
-      setProfileId(decoded.sub);
-      setProfileName(decoded.name);
-      setAuthenticated(true);
+      setAuthentication({ profile: { id: decoded.sub, name: decoded.name } });
     } catch (error) {
       throw error;
     }
@@ -55,9 +80,7 @@ const useAuth = () => {
 
       justChooseApi.defaults.headers.Authorization = `Bearer ${accessToken}`;
       const decoded = jwt_decode(accessToken);
-      setProfileId(decoded.sub);
-      setProfileName(decoded.name);
-      setAuthenticated(true);
+      setAuthentication({ profile: { id: decoded.sub, name: decoded.name } });
     } catch (error) {
       throw error;
     }
@@ -69,9 +92,7 @@ const useAuth = () => {
       const body = { refresh_token: JSON.parse(refreshToken) };
       await justChooseApi.delete('/logout', { data: body });
 
-      setAuthenticated(false);
-      setProfileId(null);
-      setProfileName(null);
+      setAuthentication(null);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 
@@ -82,13 +103,14 @@ const useAuth = () => {
   };
 
   return {
-    loading,
-    profileId,
-    profileName,
-    authenticated,
+    isLoading,
+    isError,
+    authentication,
+    setAuthentication,
     handleRegistration,
     handleLogin,
     handleLogout,
+    refreshProfileData,
   };
 };
 

@@ -9,7 +9,6 @@ import { MdSettings } from 'react-icons/md';
 
 import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
-import { ProfileContext } from '../../context/ProfileContext';
 import { AlertContext } from '../../context/AlertContext';
 
 import justChooseApi from '../../services/justChooseApi';
@@ -60,10 +59,7 @@ const ShowList = () => {
   const history = useHistory();
 
   const { contentWrapperRef } = useContext(LayoutContext);
-  const { profileId, authenticated } = useContext(AuthContext);
-  const {
-    profile: { is_active: isProfileActive },
-  } = useContext(ProfileContext);
+  const { authentication } = useContext(AuthContext);
   const {
     setMessage,
     setSeverity,
@@ -135,7 +131,11 @@ const ShowList = () => {
         if (data && data.content_types) {
           setContentTypes(['all', ...data.content_types]);
         }
-        if (authenticated && isProfileActive) {
+        if (
+          authentication &&
+          authentication.profile &&
+          authentication.profile.is_active
+        ) {
           const {
             data: { like },
           } = await justChooseApi.get(`/contentlists/${listId}/like`, {
@@ -163,7 +163,7 @@ const ShowList = () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, authenticated, isProfileActive]);
+  }, [listId, authentication]);
 
   const {
     loading: loadingContent,
@@ -176,7 +176,12 @@ const ShowList = () => {
   );
 
   const handleLike = async () => {
-    if (!authenticated || !isProfileActive) {
+    if (
+      !authentication ||
+      (authentication &&
+        authentication.profile &&
+        authentication.profile.is_active === false)
+    ) {
       return;
     }
     try {
@@ -205,7 +210,12 @@ const ShowList = () => {
   };
 
   const handleFork = async () => {
-    if (!authenticated || !isProfileActive) {
+    if (
+      !authentication ||
+      (authentication &&
+        authentication.profile &&
+        authentication.profile.is_active === false)
+    ) {
       return;
     }
     try {
@@ -235,7 +245,12 @@ const ShowList = () => {
   };
 
   const handleDelete = async () => {
-    if (!authenticated || !isProfileActive) {
+    if (
+      !authentication ||
+      (authentication &&
+        authentication.profile &&
+        authentication.profile.is_active === false)
+    ) {
       return;
     }
     try {
@@ -299,8 +314,10 @@ const ShowList = () => {
             <div>
               <HeaderButton
                 title={
-                  authenticated
-                    ? isProfileActive
+                  authentication
+                    ? authentication &&
+                      authentication.profile &&
+                      authentication.profile.is_active
                       ? liked
                         ? 'Não gostei'
                         : 'Gostei'
@@ -317,8 +334,10 @@ const ShowList = () => {
               </HeaderButton>
               <HeaderButton
                 title={
-                  authenticated
-                    ? isProfileActive
+                  authentication
+                    ? authentication &&
+                      authentication.profile &&
+                      authentication.profile.is_active
                       ? 'Criar uma cópia da lista para sua conta'
                       : 'Confirme seu e-mail para criar uma cópia da lista'
                     : 'Faça login para criar uma cópia da lista'
@@ -329,35 +348,36 @@ const ShowList = () => {
                 <span>{formatCount(contentList.forks)}</span>
               </HeaderButton>
             </div>
-            {profileId === contentList.profile_id && (
-              <div>
-                <Link to={`/lists/${listId}/poll`} tabIndex="-1">
-                  <HeaderButton title="Criar uma votação a partir da lista">
-                    <FaVoteYea
+            {authentication &&
+              authentication.profile.id === contentList.profile_id && (
+                <div>
+                  <Link to={`/lists/${listId}/poll`} tabIndex="-1">
+                    <HeaderButton title="Criar uma votação a partir da lista">
+                      <FaVoteYea
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
+                      />
+                    </HeaderButton>
+                  </Link>
+                  <Link to={`/lists/${listId}/update`} tabIndex="-1">
+                    <HeaderButton title="Editar lista">
+                      <MdSettings
+                        size={'25px'}
+                        style={{ flexShrink: 0, margin: '0 5px' }}
+                      />
+                    </HeaderButton>
+                  </Link>
+                  <HeaderDeleteButton
+                    title="Excluir lista"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    <FaTrash
                       size={'25px'}
                       style={{ flexShrink: 0, margin: '0 5px' }}
                     />
-                  </HeaderButton>
-                </Link>
-                <Link to={`/lists/${listId}/update`} tabIndex="-1">
-                  <HeaderButton title="Editar lista">
-                    <MdSettings
-                      size={'25px'}
-                      style={{ flexShrink: 0, margin: '0 5px' }}
-                    />
-                  </HeaderButton>
-                </Link>
-                <HeaderDeleteButton
-                  title="Excluir lista"
-                  onClick={() => setShowDeleteDialog(true)}
-                >
-                  <FaTrash
-                    size={'25px'}
-                    style={{ flexShrink: 0, margin: '0 5px' }}
-                  />
-                </HeaderDeleteButton>
-              </div>
-            )}
+                  </HeaderDeleteButton>
+                </div>
+              )}
           </HeaderButtons>
         </HeaderRow>
         <ListInfo>

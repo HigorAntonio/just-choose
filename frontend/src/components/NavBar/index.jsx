@@ -35,7 +35,7 @@ import {
 } from './styles';
 
 const NavBar = () => {
-  const { authenticated } = useContext(AuthContext);
+  const { authentication } = useContext(AuthContext);
   const { width } = useContext(ViewportContext);
   const { following, lastFollowRef } = useContext(FollowingProfilesContext);
 
@@ -123,7 +123,7 @@ const NavBar = () => {
             </div>
           </NavOption>
         </Navigation>
-        {authenticated && !showSearch && (
+        {authentication && !showSearch && (
           <Following>
             <Header>
               <h5>Seguindo</h5>
@@ -156,7 +156,7 @@ const NavBar = () => {
             </Profiles>
           </Following>
         )}
-        {authenticated && showSearch && (
+        {authentication && showSearch && (
           <Following>
             <Header>
               <h5>Resultados</h5>
@@ -196,7 +196,7 @@ const NavBar = () => {
           </Following>
         )}
       </TopSide>
-      {authenticated && width > breakpoints.getInt(breakpoints.size1) && (
+      {authentication && width > breakpoints.getInt(breakpoints.size1) && (
         <BottomSide>
           <SearchProfile>
             <GoSearch size={'15px'} style={{ flexShrink: 0 }} />
