@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useContext, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import { useParams, useHistory, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import queryString from 'query-string';
@@ -26,7 +33,7 @@ import formatCount from '../../utils/formatCount';
 import { formatCreationDate } from '../../utils/dataUtility';
 import removeQueryParamAndGetNewUrl from '../../utils/removeQueryParamAndGetNewUrl';
 import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
-import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import useInfiniteQuery from '../../hooks/useInfiniteQuery';
 
 import {
   Container,
@@ -165,15 +172,27 @@ const ShowList = () => {
     };
   }, [listId, authentication]);
 
-  const {
-    loading: loadingContent,
-    error: loadingContentError,
-    content,
-    lastElementRef: lastContentRef,
-  } = useLoadMoreWhenLastElementIsOnScreen(
-    `/contentlists/${listId}/content`,
-    params
+  const getListContent = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get(
+        `/contentlists/${listId}/content`,
+        {
+          params: { ...params, page: pageParam },
+        }
+      );
+      return response.data;
+    },
+    [listId, params]
   );
+
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['showList/getListContent', params], getListContent, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   const handleLike = async () => {
     if (
@@ -439,7 +458,7 @@ const ShowList = () => {
         </Filters>
       </Header>
       <Main>
-        {content.length === 0 && (
+        {data?.pages[0]?.total_results === 0 && (
           <NoContent
             type={
               contentType
@@ -450,14 +469,12 @@ const ShowList = () => {
             }
           />
         )}
-        {content.length > 0 && (
-          <InfinityLoadContentGrid
-            loading={loadingContent}
-            error={loadingContentError}
-            content={content}
-            lastElementRef={lastContentRef}
-          />
-        )}
+        <InfinityLoadContentGrid
+          isFetching={isFetching}
+          isFetchingNextPage={isFetchingNextPage}
+          data={data}
+          lastElementRef={lastElementRef}
+        />
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog

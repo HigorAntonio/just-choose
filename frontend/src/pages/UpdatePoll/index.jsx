@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
 
@@ -12,7 +18,7 @@ import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
 import justChooseApi from '../../services/justChooseApi';
-import useLoadMoreWhenLastElementIsOnScreen from '../../hooks/useLoadMoreWhenLastElementIsOnScreen';
+import useInfiniteQuery from '../../hooks/useInfiniteQuery';
 import sharingOptions from '../../utils/sharingOptions';
 
 import {
@@ -116,12 +122,24 @@ const UpdatePoll = () => {
     })();
   }, [pollId, authentication]);
 
-  const {
-    loading: loadingContent,
-    error: loadingContentError,
-    content,
-    lastElementRef: lastContentRef,
-  } = useLoadMoreWhenLastElementIsOnScreen(`/polls/${pollId}/content`, params);
+  const getPollContent = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get(`/polls/${pollId}/content`, {
+        params: { ...params, page: pageParam },
+      });
+      return response.data;
+    },
+    [pollId, params]
+  );
+
+  const { isFetching, isFetchingNextPage, data, lastElementRef } =
+    useInfiniteQuery(['updatePoll/getPollContent', params], getPollContent, {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage.page < lastPage.total_pages
+          ? pages.length + 1
+          : undefined;
+      },
+    });
 
   useEffect(() => {
     if (updating) {
@@ -408,10 +426,10 @@ const UpdatePoll = () => {
           <ContentListContainer>
             <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
               <InfinityLoadContentGrid
-                loading={loadingContent}
-                error={loadingContentError}
-                content={content}
-                lastElementRef={lastContentRef}
+                isFetching={isFetching}
+                isFetchingNextPage={isFetchingNextPage}
+                data={data}
+                lastElementRef={lastElementRef}
                 tabIndex="-1"
               />
             </ContentListWrapper>
