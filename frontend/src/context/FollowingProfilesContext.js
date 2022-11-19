@@ -1,60 +1,69 @@
 import {
   createContext,
   useState,
+  useEffect,
   useContext,
   useCallback,
-  useRef,
 } from 'react';
 
 import { AuthContext } from './AuthContext';
-import useAuthenticatedRequest from '../hooks/useAuthenticatedRequest';
+import useInfiniteQuery from '../hooks/useInfiniteQuery';
+import justChooseApi from '../services/justChooseApi';
 
 export const FollowingProfilesContext = createContext();
 
 export const FollowingProfilesContextProvider = ({ children }) => {
   const { authentication } = useContext(AuthContext);
 
-  const [followsParams] = useState({});
-  const [followsPageNumber, setFollowsPageNumber] = useState(1);
+  const [params] = useState({});
+  const [followingProfilesData, setFollowingProfilesData] = useState([]);
 
-  const {
-    data: following,
-    setData: setFollowing,
-    hasMore: followsHasMore,
-    loading: followsLoading,
-  } = useAuthenticatedRequest(
-    `/profiles/${authentication && authentication.profile.id}/following`,
-    followsParams,
-    followsPageNumber
-  );
-
-  const followsObserver = useRef();
-  const lastFollowRef = useCallback(
-    (node) => {
-      if (followsLoading) {
-        return;
+  const getFollowing = useCallback(
+    async ({ pageParam = 1 }) => {
+      if (!authentication) {
+        return undefined;
       }
-      if (followsObserver.current) {
-        followsObserver.current.disconnect();
-      }
-      followsObserver.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && followsHasMore) {
-          setFollowsPageNumber((prevState) => prevState + 1);
+      const response = await justChooseApi.get(
+        `/profiles/${authentication?.profile?.id}/following`,
+        {
+          params: { ...params, page: pageParam },
         }
-      });
-      if (node) {
-        followsObserver.current.observe(node);
-      }
+      );
+      return response.data;
     },
-    [followsLoading, followsHasMore, setFollowsPageNumber]
+    [authentication, params]
   );
+
+  const { isFetching, isFetchingNextPage, refetch, data, lastElementRef } =
+    useInfiniteQuery(
+      ['followingProfilesContext/getFollowing', params, authentication],
+      getFollowing,
+      {
+        getNextPageParam: (lastPage, pages) => {
+          return lastPage?.page < lastPage?.total_pages
+            ? pages?.length + 1
+            : undefined;
+        },
+      }
+    );
+
+  useEffect(() => {
+    setFollowingProfilesData(data?.pages?.map((page) => page?.results).flat());
+  }, [data]);
+
+  const refetchFollowingProfilesData = () => {
+    const lastPageIndex = data?.pages?.length || 0;
+    refetch({ refetchPage: (_, index) => index <= lastPageIndex });
+  };
 
   return (
     <FollowingProfilesContext.Provider
       value={{
-        following,
-        setFollowing,
-        lastFollowRef,
+        isFetching,
+        isFetchingNextPage,
+        followingProfilesData,
+        refetchFollowingProfilesData,
+        lastElementRef,
       }}
     >
       {children}

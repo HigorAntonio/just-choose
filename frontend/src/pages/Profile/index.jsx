@@ -58,9 +58,7 @@ const Profile = () => {
     duration: alertTimeout,
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
-  const { setFollowing: setFollowingList } = useContext(
-    FollowingProfilesContext
-  );
+  const { refetchFollowingProfilesData } = useContext(FollowingProfilesContext);
   const { contentWrapperRef } = useContext(LayoutContext);
 
   const [loading, setLoading] = useState(true);
@@ -164,9 +162,7 @@ const Profile = () => {
         ...prevState,
         followers_count: prevState.followers_count - 1,
       }));
-      setFollowingList((prevState) =>
-        prevState.filter((fl) => fl.id !== profile.id)
-      );
+      refetchFollowingProfilesData();
       setFollowing(false);
     }
   };
@@ -199,15 +195,7 @@ const Profile = () => {
             ...prevState,
             followers_count: prevState.followers_count + 1,
           }));
-          setFollowingList((prevState) => [
-            ...prevState,
-            {
-              id: profile.id,
-              name: profile.name,
-              display_name: profile.display_name,
-              profile_image_url: profile.profile_image_url,
-            },
-          ]);
+          refetchFollowingProfilesData();
           setFollowing(true);
         }
       }

@@ -14,7 +14,8 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { ViewportContext } from '../../context/ViewportContext';
 import { FollowingProfilesContext } from '../../context/FollowingProfilesContext';
-import useAuthenticatedRequest from '../../hooks/useAuthenticatedRequest';
+import useInfiniteQuery from '../../hooks/useInfiniteQuery';
+import justChooseApi from '../../services/justChooseApi';
 import breakpoints from '../../styles/breakpoints';
 
 import {
@@ -37,10 +38,14 @@ import {
 const NavBar = () => {
   const { authentication } = useContext(AuthContext);
   const { width } = useContext(ViewportContext);
-  const { following, lastFollowRef } = useContext(FollowingProfilesContext);
+  const {
+    isFetching: isFetchingFollowingProfiles,
+    isFetchingNextPage: isFetchingNextFollowingProfilesPage,
+    followingProfilesData,
+    lastElementRef: lastFollowingProfileRef,
+  } = useContext(FollowingProfilesContext);
 
-  const [profilesParams, setProfilesParams] = useState({});
-  const [profilesPageNumber, setProfilesPageNumber] = useState(1);
+  const [params, setParams] = useState({});
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 
@@ -51,11 +56,28 @@ const NavBar = () => {
     wrapperRef.current.scrollTo(0, 0);
   }, [wrapperRef, showSearch]);
 
+  const searchProfiles = useCallback(
+    async ({ pageParam = 1 }) => {
+      const response = await justChooseApi.get('/profiles', {
+        params: { ...params, page: pageParam },
+      });
+      return response.data;
+    },
+    [params]
+  );
+
   const {
-    data: profiles,
-    hasMore: profilesHasMore,
-    loading: profilesLoading,
-  } = useAuthenticatedRequest('/profiles', profilesParams, profilesPageNumber);
+    isFetching: isFetchingSearchProfiles,
+    isFetchingNextPage: isFetchingNextSearchProfilesPage,
+    data: searchProfilesData,
+    lastElementRef: lastSearchProfileRef,
+  } = useInfiniteQuery(['navBar/searchProfiles', params], searchProfiles, {
+    getNextPageParam: (lastPage, pages) => {
+      return lastPage.page < lastPage.total_pages
+        ? pages.length + 1
+        : undefined;
+    },
+  });
 
   useEffect(() => {
     if (search === '') {
@@ -72,31 +94,9 @@ const NavBar = () => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && e.target.value) {
       setShowSearch(true);
-      setProfilesParams({ query: e.target.value });
-      setProfilesPageNumber(1);
+      setParams({ query: e.target.value });
     }
   };
-
-  const profilesObserver = useRef();
-  const lastProfileRef = useCallback(
-    (node) => {
-      if (profilesLoading) {
-        return;
-      }
-      if (profilesObserver.current) {
-        profilesObserver.current.disconnect();
-      }
-      profilesObserver.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && profilesHasMore) {
-          setProfilesPageNumber((prevState) => prevState + 1);
-        }
-      });
-      if (node) {
-        profilesObserver.current.observe(node);
-      }
-    },
-    [profilesLoading, profilesHasMore, setProfilesPageNumber]
-  );
 
   return (
     <Container>
@@ -129,11 +129,14 @@ const NavBar = () => {
               <h5>Seguindo</h5>
             </Header>
             <Profiles>
-              {following.map((p, i) => {
-                if (following.length === i + 1) {
+              {followingProfilesData?.map((p, i) => {
+                if (followingProfilesData.length === i + 1) {
                   return (
                     <Link key={p.id} to={`/profiles/${p.name}`}>
-                      <Profile ref={lastFollowRef} title={p.display_name}>
+                      <Profile
+                        ref={lastFollowingProfileRef}
+                        title={p.display_name}
+                      >
                         <ProfileImage src={p.profile_image_url} />
                         <ProfileData>
                           <span>{p.display_name}</span>
@@ -162,11 +165,26 @@ const NavBar = () => {
               <h5>Resultados</h5>
             </Header>
             <Profiles>
-              {profiles.map((p, i) => {
-                if (profiles.length === i + 1) {
+              {searchProfilesData?.pages.map((page) => {
+                return page.results.map((p, i) => {
+                  if (page.results.length === i + 1) {
+                    return (
+                      <Link key={p.id} to={`/profiles/${p.name}`}>
+                        <Profile
+                          ref={lastSearchProfileRef}
+                          title={p.display_name}
+                        >
+                          <ProfileImage src={p.profile_image_url} />
+                          <ProfileData>
+                            <span>{p.display_name}</span>
+                          </ProfileData>
+                        </Profile>
+                      </Link>
+                    );
+                  }
                   return (
                     <Link key={p.id} to={`/profiles/${p.name}`}>
-                      <Profile ref={lastProfileRef} title={p.display_name}>
+                      <Profile title={p.display_name}>
                         <ProfileImage src={p.profile_image_url} />
                         <ProfileData>
                           <span>{p.display_name}</span>
@@ -174,25 +192,15 @@ const NavBar = () => {
                       </Profile>
                     </Link>
                   );
-                }
-                return (
-                  <Link key={p.id} to={`/profiles/${p.name}`}>
-                    <Profile title={p.display_name}>
-                      <ProfileImage src={p.profile_image_url} />
-                      <ProfileData>
-                        <span>{p.display_name}</span>
-                      </ProfileData>
-                    </Profile>
-                  </Link>
-                );
+                });
               })}
             </Profiles>
-            {!profilesLoading && !profiles.length && (
-              <NoResults>
-                Infelizmente, não encontramos ninguém chamado "
-                {profilesParams.query}"
-              </NoResults>
-            )}
+            {!isFetchingSearchProfiles &&
+              searchProfilesData?.pages[0]?.total_results === 0 && (
+                <NoResults>
+                  Infelizmente, não encontramos ninguém chamado "{params.query}"
+                </NoResults>
+              )}
           </Following>
         )}
       </TopSide>
