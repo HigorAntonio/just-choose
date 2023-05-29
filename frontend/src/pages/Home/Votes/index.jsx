@@ -1,10 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
 
 import { ViewportContext } from '../../../context/ViewportContext';
 import { AuthContext } from '../../../context/AuthContext';
 
 import justChooseApi from '../../../services/justChooseApi';
+import useQuery from '../../../hooks/useQuery';
 import PollCard from '../../../components/PollCard';
 
 import { Container, Wrapper, TitleWrapper, Title } from './styles';
@@ -14,41 +14,24 @@ const Votes = () => {
   const { authentication } = useContext(AuthContext);
 
   const [lastContentIndex, setLastContentIndex] = useState(0);
-  const [content, setContent] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    let source = axios.CancelToken.source();
-
-    authentication &&
-      (async () => {
-        try {
-          const { data } = await justChooseApi.get(
-            `/profiles/${authentication.profile.id}/votes`,
-            {
-              params: {
-                page: 1,
-                page_size: 6,
-                sort_by: 'updated.desc',
-              },
-              cancelToken: source.token,
-            }
-          );
-          setContent(data.results);
-          setLoading(false);
-        } catch (error) {
-          if (axios.isCancel(error)) {
-            return;
-          }
-          setLoading(false);
+  const { isFetching, error, data } = useQuery(
+    ['home/votes', authentication],
+    async () => {
+      const response = await justChooseApi.get(
+        `/profiles/${authentication?.profile?.id}/votes`,
+        {
+          params: {
+            page: 1,
+            page_size: 6,
+            sort_by: 'updated.desc',
+          },
         }
-      })();
-
-    return () => {
-      source.cancel();
-    };
-  }, [authentication]);
+      );
+      return response.data;
+    },
+    { retry: false }
+  );
 
   useEffect(() => {
     if (width < 547) {
@@ -70,25 +53,27 @@ const Votes = () => {
 
   return (
     <Container>
-      {content.length > 0 && (
+      {data?.results?.length > 0 && (
         <>
           <TitleWrapper>
             <Title>Seus votos</Title>
           </TitleWrapper>
           <Wrapper>
             {[...Array(6).keys()].map((_, i) => {
-              if (i < lastContentIndex && content[i]) {
+              if (i < lastContentIndex && data?.results[i]) {
                 const poll = {
-                  id: content[i].poll_id,
-                  profile_id: content[i].poll_profile_id,
-                  profile_name: content[i].poll_profile_name,
-                  profile_display_name: content[i].poll_profile_display_name,
-                  profile_image_url: content[i].poll_profile_profile_image_url,
-                  thumbnail: content[i].poll_thumbnail,
-                  title: content[i].poll_title,
-                  is_active: content[i].poll_is_active,
-                  total_votes: content[i].poll_total_votes,
-                  updated_at: content[i].updated_at,
+                  id: data?.results[i].poll_id,
+                  profile_id: data?.results[i].poll_profile_id,
+                  profile_name: data?.results[i].poll_profile_name,
+                  profile_display_name:
+                    data?.results[i].poll_profile_display_name,
+                  profile_image_url:
+                    data?.results[i].poll_profile_profile_image_url,
+                  thumbnail: data?.results[i].poll_thumbnail,
+                  title: data?.results[i].poll_title,
+                  is_active: data?.results[i].poll_is_active,
+                  total_votes: data?.results[i].poll_total_votes,
+                  updated_at: data?.results[i].updated_at,
                 };
                 return (
                   <div key={`profileStartVote${poll.id}`}>

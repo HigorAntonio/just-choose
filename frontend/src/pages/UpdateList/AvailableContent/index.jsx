@@ -26,13 +26,13 @@ import {
 } from './styles';
 
 const AvailableContent = ({
+  listId,
   contentType,
   setContentType,
   contentList,
   setContentList,
   showListPreview,
   setShowListPreview,
-  loading,
 }) => {
   const [showContent, setShowContent] = useState(false);
   const [requestType, setRequestType] = useState('');
@@ -218,10 +218,10 @@ const AvailableContent = ({
         )}
         {showListPreview && (
           <ListPreview
+            listId={listId}
             contentList={contentList}
             setContentList={setContentList}
             wrapperRef={contentListWrapperRef}
-            loading={loading}
           />
         )}
       </ContentListWrapper>

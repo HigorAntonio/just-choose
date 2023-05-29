@@ -1,16 +1,8 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useParams, useHistory, Link, useLocation } from 'react-router-dom';
-import axios from 'axios';
 import queryString from 'query-string';
 import { ThemeContext } from 'styled-components';
-import { FaHeart, FaRegHeart, FaVoteYea, FaTrash } from 'react-icons/fa';
+import { FaVoteYea, FaTrash } from 'react-icons/fa';
 import { BiGitRepoForked } from 'react-icons/bi';
 import { MdSettings } from 'react-icons/md';
 
@@ -21,9 +13,7 @@ import { AlertContext } from '../../context/AlertContext';
 import justChooseApi from '../../services/justChooseApi';
 import NotFound from '../../components/NotFound';
 import SomethingWentWrong from '../../components/SomethingWentWrong';
-import NoContent from './NoContent';
 import AccessDenied from '../../components/AccessDenied';
-import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
@@ -33,7 +23,9 @@ import formatCount from '../../utils/formatCount';
 import { formatCreationDate } from '../../utils/dataUtility';
 import removeQueryParamAndGetNewUrl from '../../utils/removeQueryParamAndGetNewUrl';
 import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
-import useInfiniteQuery from '../../hooks/useInfiniteQuery';
+import HeaderButtonLike from './HeaderButtonLike';
+import ContentGrid from './ContentGrid';
+import useQuery from '../../hooks/useQuery';
 
 import {
   Container,
@@ -76,20 +68,9 @@ const ShowList = () => {
   } = useContext(AlertContext);
   const { colors } = useContext(ThemeContext);
 
-  const [contentList, setContentList] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [loadingError, setLoadingError] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [denyAccess, setDenyAccess] = useState(false);
-  const [createdAt, setCreatedAt] = useState();
-  const [contentTypes, setContentTypes] = useState([]);
   const [showTypeOptions, setShowTypeOptions] = useState(false);
-  const [liked, setLiked] = useState();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [params, setParams] = useState({ page_size: 30, type: contentType });
-
-  const mounted = useRef();
-  const source = useRef();
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
@@ -98,19 +79,6 @@ const ShowList = () => {
   useEffect(() => {
     setParams((prevState) => ({ ...prevState, type: contentType }));
   }, [contentType]);
-
-  const clearState = () => {
-    setContentList({});
-    setLoading(true);
-    setLoadingError(false);
-    setNotFound(false);
-    setDenyAccess(false);
-    setCreatedAt(null);
-    setContentTypes([]);
-    setShowTypeOptions(false);
-    setLiked(null);
-    setShowDeleteDialog(false);
-  };
 
   useEffect(() => {
     if (
@@ -123,122 +91,23 @@ const ShowList = () => {
     }
   }, [contentType, history, location, queryParams]);
 
-  useEffect(() => {
-    mounted.current = true;
-    source.current = axios.CancelToken.source();
-
-    (async () => {
-      try {
-        clearState();
-        const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
-          cancelToken: source.current.token,
-        });
-        setContentList(data);
-        setCreatedAt(new Date(data.created_at));
-        if (data && data.content_types) {
-          setContentTypes(['all', ...data.content_types]);
-        }
-        if (
-          authentication &&
-          authentication.profile &&
-          authentication.profile.is_active
-        ) {
-          const {
-            data: { like },
-          } = await justChooseApi.get(`/contentlists/${listId}/like`, {
-            cancelToken: source.current.token,
-          });
-          setLiked(like);
-        }
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        if (error.response && error.response.status === 400) {
-          setNotFound(true);
-        } else if (error.response && error.response.status === 403) {
-          setDenyAccess(true);
-        } else {
-          setLoadingError(true);
-        }
-        setLoading(false);
-      }
-    })();
-
-    return () => {
-      mounted.current = false;
-      source.current.cancel();
-    };
-  }, [listId, authentication]);
-
-  const getListContent = useCallback(
-    async ({ pageParam = 1 }) => {
-      const response = await justChooseApi.get(
-        `/contentlists/${listId}/content`,
-        {
-          params: { ...params, page: pageParam },
-        }
-      );
-      return response.data;
+  const { isFetching, error, data } = useQuery(
+    ['showlist/list', { listId, authentication }],
+    async () => {
+      const response = await justChooseApi.get(`/contentlists/${listId}`);
+      return {
+        ...response.data,
+        content_types: ['all', ...response.data.content_types],
+      };
     },
-    [listId, params]
+    { retry: false }
   );
 
-  const { isFetching, isFetchingNextPage, data, lastElementRef } =
-    useInfiniteQuery(['showList/getListContent', params], getListContent, {
-      getNextPageParam: (lastPage, pages) => {
-        return lastPage.page < lastPage.total_pages
-          ? pages.length + 1
-          : undefined;
-      },
-    });
-
-  const handleLike = async () => {
-    if (
-      !authentication ||
-      (authentication &&
-        authentication.profile &&
-        authentication.profile.is_active === false)
-    ) {
-      return;
-    }
-    try {
-      if (!liked) {
-        await justChooseApi.post(`/contentlists/${listId}/like`);
-        if (mounted.current) {
-          setContentList((prevState) => ({
-            ...prevState,
-            likes: prevState.likes + 1,
-          }));
-        }
-      }
-      if (liked) {
-        await justChooseApi.delete(`/contentlists/${listId}/like`);
-        if (mounted.current) {
-          setContentList((prevState) => ({
-            ...prevState,
-            likes: prevState.likes - 1,
-          }));
-        }
-      }
-      if (mounted.current) {
-        setLiked((prevState) => !prevState);
-      }
-    } catch (error) {}
-  };
-
   const handleFork = async () => {
-    if (
-      !authentication ||
-      (authentication &&
-        authentication.profile &&
-        authentication.profile.is_active === false)
-    ) {
+    if (!authentication || authentication?.profile?.is_active === false) {
       return;
     }
     try {
-      setLoading(true);
       clearTimeout(alertTimeout);
       setMessage('Por favor, aguarde. Criando lista...');
       setSeverity('info');
@@ -246,17 +115,11 @@ const ShowList = () => {
       const { data } = await justChooseApi.post(
         `/contentlists/${listId}/fork/`
       );
-      if (mounted.current) {
-        setLoading(false);
-      }
       setMessage('Lista criada com sucesso.');
       setSeverity('success');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       history.push(`/lists/${data.forked_list_id}`);
     } catch (error) {
-      if (mounted.current) {
-        setLoading(false);
-      }
       setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
       setSeverity('error');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
@@ -264,12 +127,7 @@ const ShowList = () => {
   };
 
   const handleDelete = async () => {
-    if (
-      !authentication ||
-      (authentication &&
-        authentication.profile &&
-        authentication.profile.is_active === false)
-    ) {
+    if (!authentication || authentication?.profile?.is_active === false) {
       return;
     }
     try {
@@ -292,71 +150,55 @@ const ShowList = () => {
     }
   };
 
-  const handleSelectContentType = (ct) => {
+  const handleSelectContentType = (type) => {
     setShowTypeOptions(false);
     if (
-      ct === contentType ||
-      (ct === 'all' && typeof contentType === 'undefined')
+      type === contentType ||
+      (type === 'all' && typeof contentType === 'undefined')
     )
       return;
-    if (ct === 'all') {
+    if (type === 'all') {
       history.push(
         removeQueryParamAndGetNewUrl(location.pathname, queryParams, 'type')
       );
       return;
     }
     history.push(
-      setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+      setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', type)
     );
   };
 
-  if (loading) {
+  if (isFetching) {
     return <Skeleton />;
   }
-  if (loadingError) {
-    return <SomethingWentWrong />;
-  }
-  if (notFound) {
+  if (error?.response?.status === 400) {
     return <NotFound />;
   }
-  if (denyAccess) {
+  if (error?.response?.status === 403) {
     return <AccessDenied />;
   }
+  if (error) {
+    return <SomethingWentWrong />;
+  }
+
   return (
     <Container>
       <Header>
         <HeaderRow>
           <TitleWrapper>
-            <h1 title={contentList.title}>{contentList.title}</h1>
+            <h1 title={data?.title}>{data?.title}</h1>
           </TitleWrapper>
           <HeaderButtons>
             <div>
+              <HeaderButtonLike
+                authentication={authentication}
+                listId={listId}
+                contentList={data}
+              />
               <HeaderButton
                 title={
                   authentication
-                    ? authentication &&
-                      authentication.profile &&
-                      authentication.profile.is_active
-                      ? liked
-                        ? 'Não gostei'
-                        : 'Gostei'
-                      : 'Confirme seu e-mail para deixar sua reação'
-                    : 'Faça login para deixar sua reação'
-                }
-                onClick={handleLike}
-              >
-                {!liked && (
-                  <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />
-                )}
-                {liked && <FaHeart size={'25px'} style={{ flexShrink: 0 }} />}
-                <span>{formatCount(contentList.likes)}</span>
-              </HeaderButton>
-              <HeaderButton
-                title={
-                  authentication
-                    ? authentication &&
-                      authentication.profile &&
-                      authentication.profile.is_active
+                    ? authentication?.profile?.is_active
                       ? 'Criar uma cópia da lista para sua conta'
                       : 'Confirme seu e-mail para criar uma cópia da lista'
                     : 'Faça login para criar uma cópia da lista'
@@ -364,70 +206,72 @@ const ShowList = () => {
                 onClick={handleFork}
               >
                 <BiGitRepoForked size={'25px'} style={{ flexShrink: 0 }} />
-                <span>{formatCount(contentList.forks)}</span>
+                <span>{formatCount(data?.forks)}</span>
               </HeaderButton>
             </div>
-            {authentication &&
-              authentication.profile.id === contentList.profile_id && (
-                <div>
-                  <Link to={`/lists/${listId}/poll`} tabIndex="-1">
-                    <HeaderButton title="Criar uma votação a partir da lista">
-                      <FaVoteYea
-                        size={'25px'}
-                        style={{ flexShrink: 0, margin: '0 5px' }}
-                      />
-                    </HeaderButton>
-                  </Link>
-                  <Link to={`/lists/${listId}/update`} tabIndex="-1">
-                    <HeaderButton title="Editar lista">
-                      <MdSettings
-                        size={'25px'}
-                        style={{ flexShrink: 0, margin: '0 5px' }}
-                      />
-                    </HeaderButton>
-                  </Link>
-                  <HeaderDeleteButton
-                    title="Excluir lista"
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <FaTrash
+            {+authentication?.profile.id === +data?.profile_id && (
+              <div>
+                <Link to={`/lists/${listId}/poll`} tabIndex="-1">
+                  <HeaderButton title="Criar uma votação a partir da lista">
+                    <FaVoteYea
                       size={'25px'}
                       style={{ flexShrink: 0, margin: '0 5px' }}
                     />
-                  </HeaderDeleteButton>
-                </div>
-              )}
+                  </HeaderButton>
+                </Link>
+                <Link to={`/lists/${listId}/update`} tabIndex="-1">
+                  <HeaderButton title="Editar lista">
+                    <MdSettings
+                      size={'25px'}
+                      style={{ flexShrink: 0, margin: '0 5px' }}
+                    />
+                  </HeaderButton>
+                </Link>
+                <HeaderDeleteButton
+                  title="Excluir lista"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <FaTrash
+                    size={'25px'}
+                    style={{ flexShrink: 0, margin: '0 5px' }}
+                  />
+                </HeaderDeleteButton>
+              </div>
+            )}
           </HeaderButtons>
         </HeaderRow>
         <ListInfo>
           <CreatedAt>
             <span>Criada em</span>&nbsp;
-            {createdAt ? formatCreationDate(createdAt) : '-'}
+            {data?.created_at
+              ? formatCreationDate(new Date(data?.created_at))
+              : '-'}
             &nbsp;
           </CreatedAt>
           <CreatedBy>
             <span>por</span>&nbsp;
-            <Link to={`/profiles/${contentList.profile_name}`}>
+            <Link to={`/profiles/${data?.profile_name}`}>
               <ProfileImageWrapper>
                 <ProfileImage
-                  src={contentList.profile_image_url}
+                  src={data?.profile_image_url}
                   alt=""
                   onError={(e) => (e.target.style.display = 'none')}
                 />
               </ProfileImageWrapper>
               &nbsp;
-              {contentList.profile_display_name}&nbsp;
+              {data?.profile_display_name}&nbsp;
             </Link>
           </CreatedBy>
         </ListInfo>
-        <Description>{contentList.description}</Description>
+        <Description>{data?.description}</Description>
         <Filters>
-          {contentTypes.length > 2 && (
+          {data?.content_types.length > 2 && (
             <>
               <label>Tipo</label>
               <SingleOptionSelect
                 label={
-                  !contentType || !contentTypes.find((ct) => ct === contentType)
+                  !contentType ||
+                  !data?.content_types.find((type) => type === contentType)
                     ? 'Todos'
                     : contentTypesUtility.options.find(
                         (e) => e.value === contentType
@@ -440,14 +284,15 @@ const ShowList = () => {
                 hover={colors['background-700']}
               >
                 <TypeOptions>
-                  {contentTypes.map((ct, i) => (
+                  {data?.content_types.map((type, i) => (
                     <Option
                       key={`typeFilter${i}`}
-                      onClick={() => handleSelectContentType(ct)}
+                      onClick={() => handleSelectContentType(type)}
                     >
                       {
-                        contentTypesUtility.options.find((e) => e.value === ct)
-                          .key
+                        contentTypesUtility.options.find(
+                          (e) => e.value === type
+                        ).key
                       }
                     </Option>
                   ))}
@@ -458,28 +303,16 @@ const ShowList = () => {
         </Filters>
       </Header>
       <Main>
-        {data?.pages[0]?.total_results === 0 && (
-          <NoContent
-            type={
-              contentType
-                ? contentTypesUtility.options
-                    .find((e) => e.value === contentType)
-                    .key.toLowerCase()
-                : ''
-            }
-          />
-        )}
-        <InfinityLoadContentGrid
-          isFetching={isFetching}
-          isFetchingNextPage={isFetchingNextPage}
-          data={data}
-          lastElementRef={lastElementRef}
+        <ContentGrid
+          listId={listId}
+          params={params}
+          contentType={contentType}
         />
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog
-          createdBy={contentList.profile_display_name}
-          listTitle={contentList.title}
+          createdBy={data?.profile_display_name}
+          listTitle={data?.title}
           handleDelete={handleDelete}
         />
       </Modal>

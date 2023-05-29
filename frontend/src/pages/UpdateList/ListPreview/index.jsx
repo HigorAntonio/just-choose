@@ -11,10 +11,10 @@ import contentTypesUtil from '../../../utils/contentTypes';
 import { Container, CardWrapper, Message, SkeletonWrapper } from './styles';
 
 const ListPreview = ({
-  contentList = {},
+  contentList = [],
   setContentList,
   wrapperRef,
-  loading,
+  isFetching,
 }) => {
   const { title: theme } = useContext(ThemeContext);
   const containerRef = useRef();
@@ -112,33 +112,28 @@ const ListPreview = ({
 
   return (
     <Container ref={containerRef} tabIndex="0" data-content-list-container>
-      {!loading && (
-        <>
-          {contentList.length > 0 &&
-            contentList.map((c, i) => {
-              return (
-                <CardWrapper key={c.content_platform_id}>
-                  <ContentCard
-                    src={contentTypesUtil.getPosterUrl(c)}
-                    title={c.title}
-                    click={() =>
-                      addToContentList({
-                        contentPlatformId: c.content_platform_id,
-                        title: c.title,
-                        posterPath: c.poster_path,
-                      })
-                    }
-                    check={isInContentList(c.content_platform_id)}
-                  />
-                </CardWrapper>
-              );
-            })}
-          {!contentList.length && (
-            <Message>Você não adicionou itens à lista</Message>
-          )}
-        </>
+      {contentList?.map((c) => {
+        return (
+          <CardWrapper key={c.content_platform_id}>
+            <ContentCard
+              src={contentTypesUtil.getPosterUrl(c)}
+              title={c.title}
+              click={() =>
+                addToContentList({
+                  contentPlatformId: c.content_platform_id,
+                  title: c.title,
+                  posterPath: c.poster_path,
+                })
+              }
+              check={isInContentList(c.content_platform_id)}
+            />
+          </CardWrapper>
+        );
+      })}
+      {!isFetching && contentList?.length === 0 && (
+        <Message>Você não adicionou itens à lista</Message>
       )}
-      {loading &&
+      {isFetching &&
         [...new Array(30).keys()].map((_, i) => (
           <SkeletonWrapper key={i}>
             <ThemeProvider

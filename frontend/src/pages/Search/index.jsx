@@ -20,7 +20,7 @@ const Search = () => {
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
-  }, [contentWrapperRef]);
+  }, [contentWrapperRef, query, type]);
 
   useEffect(() => {
     if (!query) {

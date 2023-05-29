@@ -34,7 +34,9 @@ const ShowFilters = ({ setParams, setRequestType, setShowListPreview }) => {
     sortByList,
     sortBy,
     setSortBy,
+    isFetchingProviders,
     providers,
+    isFetchingGenres,
     genres,
     selectedProviders,
     setSelectedProviders,
@@ -179,48 +181,46 @@ const ShowFilters = ({ setParams, setRequestType, setShowListPreview }) => {
               }
             >
               <Providers>
-                {providers &&
-                  providers.map((p) => (
-                    <ContentProvider
-                      key={p.id}
-                      click={() => handleSelectProvider(p.id)}
-                      check={isProviderCheck(p.id)}
-                      onKeyPress={(e) =>
-                        handleMultipleSelectOnPressEnter(
-                          e,
-                          handleSelectProvider,
-                          p.id
-                        )
-                      }
-                      tabIndex="-1"
-                      data-select-option
-                    >
-                      {p.name}
-                    </ContentProvider>
-                  ))}
+                {providers?.results?.map((provider) => (
+                  <ContentProvider
+                    key={provider.id}
+                    click={() => handleSelectProvider(provider.id)}
+                    check={isProviderCheck(provider.id)}
+                    onKeyPress={(e) =>
+                      handleMultipleSelectOnPressEnter(
+                        e,
+                        handleSelectProvider,
+                        provider.id
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
+                  >
+                    {provider.name}
+                  </ContentProvider>
+                ))}
               </Providers>
             </CustomSelect>
             <CustomSelect label="Gênero" dropDownAlign="center">
               <Genres>
-                {genres &&
-                  genres.map((g) => (
-                    <CustomOption
-                      key={g.id}
-                      click={() => handleSelectGenre(g.id)}
-                      check={isGenreCheck(g.id)}
-                      onKeyPress={(e) =>
-                        handleMultipleSelectOnPressEnter(
-                          e,
-                          handleSelectGenre,
-                          g.id
-                        )
-                      }
-                      tabIndex="-1"
-                      data-select-option
-                    >
-                      {g.name}
-                    </CustomOption>
-                  ))}
+                {genres?.results?.map((genre) => (
+                  <CustomOption
+                    key={genre.id}
+                    click={() => handleSelectGenre(genre.id)}
+                    check={isGenreCheck(genre.id)}
+                    onKeyPress={(e) =>
+                      handleMultipleSelectOnPressEnter(
+                        e,
+                        handleSelectGenre,
+                        genre.id
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
+                  >
+                    {genre.name}
+                  </CustomOption>
+                ))}
               </Genres>
             </CustomSelect>
             <CustomSelect label="Data de lançamento" dropDownAlign="center">

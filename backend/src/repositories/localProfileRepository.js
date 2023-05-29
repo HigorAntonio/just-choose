@@ -15,7 +15,7 @@ const getProfile = async (tableKey, tableValue) => {
       'lp.password'
     )
     .from('profiles as p')
-    .innerJoin('local_profiles as lp', 'p.id', 'lp.id')
+    .innerJoin('local_profiles as lp', 'p.id', 'lp.profile_id')
     .where({ [`p.${tableKey}`]: tableValue })
     .first();
 

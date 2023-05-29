@@ -34,7 +34,9 @@ const GameFilters = ({ setParams, setRequestType, setShowListPreview }) => {
     sortByList,
     sortBy,
     setSortBy,
+    isFetchingPlatforms,
     platforms,
+    isFetchingGenres,
     genres,
     selectedPlatforms,
     setSelectedPlatforms,
@@ -178,48 +180,46 @@ const GameFilters = ({ setParams, setRequestType, setShowListPreview }) => {
               }
             >
               <Platforms>
-                {platforms &&
-                  platforms.map((p) => (
-                    <ContentProvider
-                      key={p.id}
-                      click={() => handleSelectPlatform(p.id)}
-                      check={isPlatformCheck(p.id)}
-                      onKeyPress={(e) =>
-                        handleMultipleSelectOnPressEnter(
-                          e,
-                          handleSelectPlatform,
-                          p.id
-                        )
-                      }
-                      tabIndex="-1"
-                      data-select-option
-                    >
-                      {p.name}
-                    </ContentProvider>
-                  ))}
+                {platforms?.results?.map((platform) => (
+                  <ContentProvider
+                    key={platform.id}
+                    click={() => handleSelectPlatform(platform.id)}
+                    check={isPlatformCheck(platform.id)}
+                    onKeyPress={(e) =>
+                      handleMultipleSelectOnPressEnter(
+                        e,
+                        handleSelectPlatform,
+                        platform.id
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
+                  >
+                    {platform.name}
+                  </ContentProvider>
+                ))}
               </Platforms>
             </CustomSelect>
             <CustomSelect label="Gênero" dropDownAlign="center">
               <Genres>
-                {genres &&
-                  genres.map((g) => (
-                    <CustomOption
-                      key={g.id}
-                      click={() => handleSelectGenre(g.id)}
-                      check={isGenreCheck(g.id)}
-                      onKeyPress={(e) =>
-                        handleMultipleSelectOnPressEnter(
-                          e,
-                          handleSelectGenre,
-                          g.id
-                        )
-                      }
-                      tabIndex="-1"
-                      data-select-option
-                    >
-                      {g.name}
-                    </CustomOption>
-                  ))}
+                {genres?.results?.map((genre) => (
+                  <CustomOption
+                    key={genre.id}
+                    click={() => handleSelectGenre(genre.id)}
+                    check={isGenreCheck(genre.id)}
+                    onKeyPress={(e) =>
+                      handleMultipleSelectOnPressEnter(
+                        e,
+                        handleSelectGenre,
+                        genre.id
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
+                  >
+                    {genre.name}
+                  </CustomOption>
+                ))}
               </Genres>
             </CustomSelect>
             <CustomSelect label="Data de lançamento" dropDownAlign="center">

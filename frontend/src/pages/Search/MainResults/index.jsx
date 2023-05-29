@@ -1,6 +1,7 @@
 import React from 'react';
 
-import useSearch from '../../../hooks/useSearch';
+import justChooseApi from '../../../services/justChooseApi';
+import useQuery from '../../../hooks/useQuery';
 
 import NotFound from '../NotFound';
 import ResultsGroup from '../ResultsGroup';
@@ -11,7 +12,15 @@ import ContentListCard from '../ContentListCard';
 import { Container } from './styles';
 
 const MainResults = ({ query, path }) => {
-  const { loading, error, content } = useSearch(query);
+  const { isFetching, error, data } = useQuery(
+    ['search/mainResults', query],
+    async () => {
+      const response = await justChooseApi.get('/search', {
+        params: { query },
+      });
+      return response.data;
+    }
+  );
 
   const searchProfileResults = (profiles) =>
     profiles.map((profile) => (
@@ -31,39 +40,38 @@ const MainResults = ({ query, path }) => {
 
   return (
     <>
-      {!loading &&
-        content.profiles.results.length === 0 &&
-        content.polls.results.length === 0 &&
-        content.content_lists.results.length === 0 && (
+      {!isFetching &&
+        data?.results?.profiles?.results?.length === 0 &&
+        data?.results?.polls?.results?.length === 0 &&
+        data?.results?.content_lists?.results?.length === 0 && (
           <NotFound query={query} />
         )}
-      {!loading && !error && content && (
+      {!isFetching && !error && (
         <Container>
-          {content.profiles && content.profiles.results.length > 0 && (
+          {data?.results?.profiles?.results?.length > 0 && (
             <ResultsGroup
               title="Perfis"
-              content={content.profiles}
+              content={data?.results?.profiles}
               renderInMain={searchProfileResults}
               path={`${path}?query=${query}&type=profile`}
             />
           )}
-          {content.polls && content.polls.results.length > 0 && (
+          {data?.results?.polls?.results?.length > 0 && (
             <ResultsGroup
               title="Votações"
-              content={content.polls}
+              content={data?.results?.polls}
               renderInMain={searchPollsResults}
               path={`${path}?query=${query}&type=poll`}
             />
           )}
-          {content.content_lists &&
-            content.content_lists.results.length > 0 && (
-              <ResultsGroup
-                title="Listas"
-                content={content.content_lists}
-                renderInMain={searchContentListsResults}
-                path={`${path}?query=${query}&type=content_list`}
-              />
-            )}
+          {data?.results?.content_lists?.results?.length > 0 && (
+            <ResultsGroup
+              title="Listas"
+              content={data?.results?.content_lists}
+              renderInMain={searchContentListsResults}
+              path={`${path}?query=${query}&type=content_list`}
+            />
+          )}
         </Container>
       )}
     </>

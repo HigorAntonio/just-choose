@@ -30,12 +30,24 @@ import {
   Option,
 } from './styles';
 
+const compareCertifications = (a, b) => {
+  if (a.order < b.order) {
+    return -1;
+  }
+  if (a.order > b.order) {
+    return 1;
+  }
+  return 0;
+};
+
 const MovieFilters = ({ setParams, setRequestType, setShowListPreview }) => {
   const {
     sortByList,
     sortBy,
     setSortBy,
+    isFetchingProviders,
     providers,
+    isFetchingGenres,
     genres,
     certifications,
     selectedProviders,
@@ -114,11 +126,11 @@ const MovieFilters = ({ setParams, setRequestType, setShowListPreview }) => {
     releaseDateGte && (params['primary_release_date.gte'] = releaseDateGte);
     params['primary_release_date.lte'] = releaseDateLte;
     orderedCertifications.length &&
-      (params['certification.gte'] = certifications.filter(
+      (params['certification.gte'] = certifications.results['BR'].filter(
         (c) => c.order === orderedCertifications[0]
       )[0].certification);
     orderedCertifications.length &&
-      (params['certification.lte'] = certifications.filter(
+      (params['certification.lte'] = certifications.results['BR'].filter(
         (c) =>
           c.order === orderedCertifications[orderedCertifications.length - 1]
       )[0].certification);
@@ -205,48 +217,46 @@ const MovieFilters = ({ setParams, setRequestType, setShowListPreview }) => {
               }
             >
               <Providers>
-                {providers &&
-                  providers.map((p) => (
-                    <ContentProvider
-                      key={p.id}
-                      click={() => handleSelectProvider(p.id)}
-                      check={isProviderCheck(p.id)}
-                      onKeyPress={(e) =>
-                        handleMultipleSelectOnPressEnter(
-                          e,
-                          handleSelectProvider,
-                          p.id
-                        )
-                      }
-                      tabIndex="-1"
-                      data-select-option
-                    >
-                      {p.name}
-                    </ContentProvider>
-                  ))}
+                {providers?.results?.map((provider) => (
+                  <ContentProvider
+                    key={provider.id}
+                    click={() => handleSelectProvider(provider.id)}
+                    check={isProviderCheck(provider.id)}
+                    onKeyPress={(e) =>
+                      handleMultipleSelectOnPressEnter(
+                        e,
+                        handleSelectProvider,
+                        provider.id
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
+                  >
+                    {provider.name}
+                  </ContentProvider>
+                ))}
               </Providers>
             </CustomSelect>
             <CustomSelect label="Gênero" dropDownAlign="center">
               <Genres>
-                {genres &&
-                  genres.map((g) => (
-                    <CustomOption
-                      key={g.id}
-                      click={() => handleSelectGenre(g.id)}
-                      check={isGenreCheck(g.id)}
-                      onKeyPress={(e) =>
-                        handleMultipleSelectOnPressEnter(
-                          e,
-                          handleSelectGenre,
-                          g.id
-                        )
-                      }
-                      tabIndex="-1"
-                      data-select-option
-                    >
-                      {g.name}
-                    </CustomOption>
-                  ))}
+                {genres?.results?.map((genre) => (
+                  <CustomOption
+                    key={genre.id}
+                    click={() => handleSelectGenre(genre.id)}
+                    check={isGenreCheck(genre.id)}
+                    onKeyPress={(e) =>
+                      handleMultipleSelectOnPressEnter(
+                        e,
+                        handleSelectGenre,
+                        genre.id
+                      )
+                    }
+                    tabIndex="-1"
+                    data-select-option
+                  >
+                    {genre.name}
+                  </CustomOption>
+                ))}
               </Genres>
             </CustomSelect>
             <CustomSelect
@@ -280,23 +290,26 @@ const MovieFilters = ({ setParams, setRequestType, setShowListPreview }) => {
               dropDownAlign="center"
             >
               <Certification>
-                {certifications &&
-                  certifications.map((c) => (
+                {certifications?.results?.['BR']
+                  ?.sort(compareCertifications)
+                  .map((certification) => (
                     <CustomOption
-                      key={c.order}
-                      click={() => handleSelectCertification(c.order)}
-                      check={isCertificationCheck(c.order)}
+                      key={certification.order}
+                      click={() =>
+                        handleSelectCertification(certification.order)
+                      }
+                      check={isCertificationCheck(certification.order)}
                       onKeyPress={(e) =>
                         handleMultipleSelectOnPressEnter(
                           e,
                           handleSelectCertification,
-                          c.order
+                          certification.order
                         )
                       }
                       tabIndex="-1"
                       data-select-option
                     >
-                      {c.certification}
+                      {certification.certification}
                     </CustomOption>
                   ))}
               </Certification>

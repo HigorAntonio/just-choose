@@ -48,8 +48,14 @@ export const FollowingProfilesContextProvider = ({ children }) => {
     );
 
   useEffect(() => {
-    setFollowingProfilesData(data?.pages?.map((page) => page?.results).flat());
-  }, [data]);
+    if (authentication) {
+      setFollowingProfilesData(
+        data?.pages?.map((page) => page?.results).flat()
+      );
+    } else {
+      setFollowingProfilesData([]);
+    }
+  }, [authentication, data]);
 
   const refetchFollowingProfilesData = () => {
     const lastPageIndex = data?.pages?.length || 0;

@@ -15,7 +15,7 @@ const Start = ({ profileToShowId }) => {
     <Container>
       <StartLists profileToShowId={profileToShowId} />
       <StartPolls profileToShowId={profileToShowId} />
-      {parseInt(authentication) === parseInt(profileToShowId) && (
+      {parseInt(authentication?.profile?.id) === parseInt(profileToShowId) && (
         <StartVotes profileToShowId={profileToShowId} />
       )}
     </Container>

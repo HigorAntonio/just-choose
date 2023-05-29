@@ -21,7 +21,7 @@ const Home = () => {
     <Container>
       <Wrapper>
         <Trending />
-        {authentication && <Following />}
+        {authentication?.profile?.is_active && <Following />}
         {authentication && <Votes />}
       </Wrapper>
     </Container>

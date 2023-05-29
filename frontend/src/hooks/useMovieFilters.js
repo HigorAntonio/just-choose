@@ -1,26 +1,13 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 
 import justChooseApi from '../services/justChooseApi';
-
-const compareCertifications = (a, b) => {
-  if (a.order < b.order) {
-    return -1;
-  }
-  if (a.order > b.order) {
-    return 1;
-  }
-  return 0;
-};
+import useQuery from './useQuery';
 
 const useMovieFilters = () => {
   const [sortBy, setSortBy] = useState({
     key: 'Popularidade (maior)',
     value: 'popularity.desc',
   });
-  const [providers, setProviders] = useState();
-  const [genres, setGenres] = useState();
-  const [certifications, setCertifications] = useState();
   const [selectedProviders, setSelectedProviders] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [releaseDateGte, setReleaseDateGte] = useState();
@@ -51,47 +38,38 @@ const useMovieFilters = () => {
     setSortBy({ key: 'Popularidade (maior)', value: 'popularity.desc' });
   };
 
-  useEffect(() => {
-    let source = axios.CancelToken.source();
+  const { isFetching: isFetchingProviders, data: providers } = useQuery(
+    'useMovieFilters/movies/watch_providers',
+    async () => {
+      const response = await justChooseApi.get('/movies/watch_providers');
+      return response.data;
+    }
+  );
 
-    (async () => {
-      try {
-        const { data } = await justChooseApi.get('/movies/watch_providers', {
-          cancelToken: source.token,
-        });
-        setProviders(data);
-      } catch (error) {}
-      try {
-        const { data } = await justChooseApi.get('/movies/genres', {
-          cancelToken: source.token,
-        });
-        setGenres(data.genres);
-      } catch (error) {}
-      try {
-        const { data } = await justChooseApi.get('/movies/certifications', {
-          cancelToken: source.token,
-        });
-        setCertifications(
-          data.certifications['BR'].sort(compareCertifications)
-        );
-      } catch (error) {}
-    })();
+  const { isFetching: isFetchingGenres, data: genres } = useQuery(
+    'useMovieFilters/movies/genres',
+    async () => {
+      const response = await justChooseApi.get('/movies/genres');
+      return response.data;
+    }
+  );
 
-    return () => {
-      source.cancel();
-    };
-  }, [setProviders, setGenres, setCertifications]);
+  const { isFetching: isFetchingCertifications, data: certifications } =
+    useQuery('useMovieFilters/movies/certifications', async () => {
+      const response = await justChooseApi.get('/movies/certifications');
+      return response.data;
+    });
 
   return {
     sortByList,
     sortBy,
     setSortBy,
+    isFetchingProviders,
     providers,
-    setProviders,
+    isFetchingGenres,
     genres,
-    setGenres,
+    isFetchingCertifications,
     certifications,
-    setCertifications,
     selectedProviders,
     setSelectedProviders,
     selectedGenres,

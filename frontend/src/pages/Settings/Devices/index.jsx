@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import axios from 'axios';
 
 import { AlertContext } from '../../../context/AlertContext';
 
 import justChooseApi from '../../../services/justChooseApi';
+import useQuery from '../../../hooks/useQuery';
 import Modal from '../../../components/Modal';
 import ConfirmExitDeviceDialog from '../ConfirmExitDeviceDialog';
 
@@ -29,63 +29,42 @@ const Devices = () => {
   const [deviceToExit, setDeviceToExit] = useState({});
   const [password, setPassword] = useState('');
   const [disableExitButton, setDisableExitButton] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [loadingError, setLoadingError] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [denyAccess, setDenyAccess] = useState(false);
   const [showExitDeviceDialog, setShowExitDeviceDialog] = useState(false);
 
   const mounted = useRef();
-  const source = useRef();
 
   const clearState = () => {
     setDevices([]);
     setDeviceToExit({});
     setPassword('');
     setDisableExitButton(false);
-    setLoading(true);
-    setLoadingError(false);
-    setNotFound(false);
-    setDenyAccess(false);
     setShowExitDeviceDialog(false);
   };
 
   useEffect(() => {
-    console.debug('deviceToExit:', deviceToExit);
-  }, [deviceToExit]);
-
-  useEffect(() => {
     mounted.current = true;
-    source.current = axios.CancelToken.source();
 
-    (async () => {
-      try {
-        clearState();
-        const { data } = await justChooseApi.get(`/devices`, {
-          cancelToken: source.current.token,
-        });
-        setDevices(data);
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        if (error.response && error.response.status === 400) {
-          setNotFound(true);
-        } else if (error.response && error.response.status === 401) {
-          setDenyAccess(true);
-        } else {
-          setLoadingError(true);
-        }
-        setLoading(false);
-      }
-    })();
+    clearState();
 
     return () => {
       mounted.current = false;
-      source.current.cancel();
     };
   }, []);
+
+  const { isFetching, data } = useQuery(
+    ['settings/devices'],
+    async () => {
+      const response = await justChooseApi.get('/devices');
+      return response.data;
+    },
+    { retry: false }
+  );
+
+  useEffect(() => {
+    if (mounted.current && data !== undefined) {
+      setDevices(data);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (!showExitDeviceDialog) {

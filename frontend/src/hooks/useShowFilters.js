@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 
 import justChooseApi from '../services/justChooseApi';
+import useQuery from './useQuery';
 
 const useShowFilters = () => {
   const [sortBy, setSortBy] = useState({
     key: 'Popularidade (maior)',
     value: 'popularity.desc',
   });
-  const [providers, setProviders] = useState();
-  const [genres, setGenres] = useState();
   const [selectedProviders, setSelectedProviders] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [airDateGte, setAirDateGte] = useState();
@@ -38,37 +36,30 @@ const useShowFilters = () => {
     setSortBy({ key: 'Popularidade (maior)', value: 'popularity.desc' });
   };
 
-  useEffect(() => {
-    let source = axios.CancelToken.source();
+  const { isFetching: isFetchingProviders, data: providers } = useQuery(
+    'useShowFilters/shows/watch_providers',
+    async () => {
+      const response = await justChooseApi.get('/shows/watch_providers');
+      return response.data;
+    }
+  );
 
-    (async () => {
-      try {
-        const { data } = await justChooseApi.get('/shows/watch_providers', {
-          cancelToken: source.token,
-        });
-        setProviders(data);
-      } catch (error) {}
-      try {
-        const { data } = await justChooseApi.get('/shows/genres', {
-          cancelToken: source.token,
-        });
-        setGenres(data.genres);
-      } catch (error) {}
-    })();
-
-    return () => {
-      source.cancel();
-    };
-  }, [setProviders, setGenres]);
+  const { isFetching: isFetchingGenres, data: genres } = useQuery(
+    'useShowFilters/shows/genres',
+    async () => {
+      const response = await justChooseApi.get('/shows/genres');
+      return response.data;
+    }
+  );
 
   return {
     sortByList,
     sortBy,
     setSortBy,
+    isFetchingProviders,
     providers,
-    setProviders,
+    isFetchingGenres,
     genres,
-    setGenres,
     selectedProviders,
     setSelectedProviders,
     selectedGenres,

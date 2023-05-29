@@ -94,7 +94,9 @@ module.exports = {
 
       const responseData = await redisClient.get(key);
       if (!responseData) {
-        const { data } = await tmdbApi.get(url, { params });
+        const data = { results: [] };
+        const { data: responseData } = await tmdbApi.get(url, { params });
+        data.results = [...data.results, ...responseData.genres];
 
         await redisClient.set(
           key,
@@ -114,20 +116,22 @@ module.exports = {
   },
 
   async watchProviders(req, res) {
-    return res.json([
-      { id: 8, name: 'Netflix' },
-      { id: 119, name: 'Amazon Prime Video' },
-      { id: 337, name: 'Disney Plus' },
-      { id: 47, name: 'Looke' },
-      { id: 31, name: 'HBO Go' },
-      { id: 229, name: 'Fox Play' },
-      { id: 167, name: 'Claro Video' },
-      { id: 283, name: 'Crunchyroll' },
-      { id: 307, name: 'Globo Play' },
-      { id: 228, name: 'Fox Premium' },
-      { id: 350, name: 'Apple TV Plus' },
-      { id: 484, name: 'NOW' },
-      { id: 68, name: 'Microsoft Store' },
-    ]);
+    return res.json({
+      results: [
+        { id: 8, name: 'Netflix' },
+        { id: 119, name: 'Amazon Prime Video' },
+        { id: 337, name: 'Disney Plus' },
+        { id: 47, name: 'Looke' },
+        { id: 31, name: 'HBO Go' },
+        { id: 229, name: 'Fox Play' },
+        { id: 167, name: 'Claro Video' },
+        { id: 283, name: 'Crunchyroll' },
+        { id: 307, name: 'Globo Play' },
+        { id: 228, name: 'Fox Premium' },
+        { id: 350, name: 'Apple TV Plus' },
+        { id: 484, name: 'NOW' },
+        { id: 68, name: 'Microsoft Store' },
+      ],
+    });
   },
 };

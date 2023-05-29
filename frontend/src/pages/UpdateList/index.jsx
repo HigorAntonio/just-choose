@@ -1,12 +1,5 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useContext,
-  useCallback,
-} from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import axios from 'axios';
 
 import { LayoutContext } from '../../context/LayoutContext';
 import { AuthContext } from '../../context/AuthContext';
@@ -18,6 +11,7 @@ import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import AvailableContent from './AvailableContent';
 import justChooseApi from '../../services/justChooseApi';
+import useQuery from '../../hooks/useQuery';
 import sharingOptions from '../../utils/sharingOptions';
 
 import {
@@ -52,10 +46,6 @@ const UpdateList = () => {
     setDuration: setAlertTimeout,
   } = useContext(AlertContext);
 
-  const [loading, setLoading] = useState(true);
-  const [loadingError, setLoadingError] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState('');
   const [description, setDescription] = useState('');
@@ -76,7 +66,6 @@ const UpdateList = () => {
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
   const mounted = useRef();
-  const source = useRef();
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
@@ -85,78 +74,72 @@ const UpdateList = () => {
     }
   }, [contentWrapperRef]);
 
-  const loadContentListContent = useCallback(async () => {
-    try {
-      for (let page = 1; ; page++) {
-        const { data } = await justChooseApi.get(
-          `/contentlists/${listId}/content`,
-          {
-            cancelToken: source.current.token,
-            params: { page, page_size: 100 },
-          }
-        );
-        setContentList((prevState) => [
-          ...prevState,
-          ...data.results.map((c) => ({
-            content_platform_id: c.content_platform_id,
-            title: c.title,
-            poster_path: c.poster_path,
-            type: c.type,
-          })),
-        ]);
-        if (page === data.total_pages) {
-          break;
-        }
-      }
-    } catch (error) {
-      throw error;
-    }
-  }, [listId]);
-
   useEffect(() => {
     mounted.current = true;
-    source.current = axios.CancelToken.source();
 
-    (async () => {
-      try {
-        clearState();
-        const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
-          cancelToken: source.current.token,
-        });
-        if (authentication && authentication.profile.id !== data.profile_id) {
-          setDenyAccess(true);
-          setLoading(false);
-          return;
-        }
-        setTitle(data.title);
-        setDescription(data.description);
-        setSharingOption(data.sharing_option);
-        setThumbPreview(data.thumbnail);
-        await loadContentListContent();
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        if (error.response && error.response.status === 400) {
-          setNotFound(true);
-        } else if (error.response && error.response.status === 403) {
-          setDenyAccess(true);
-        } else {
-          setLoadingError(true);
-        }
-        setLoading(false);
-      }
-    })();
+    clearState();
 
     return () => {
       mounted.current = false;
-      source.current.cancel();
     };
-  }, [listId, authentication, loadContentListContent]);
+  }, []);
+
+  const { isFetching, error, data } = useQuery(
+    ['updateList/contentList', listId, authentication],
+    async () => {
+      const response = await justChooseApi.get(`/contentlists/${listId}`);
+      return response.data;
+    },
+    { retry: false }
+  );
+
+  const { isFetching: isFetchingContent, data: content } = useQuery(
+    ['updateList/contentList/content', listId],
+    async () => {
+      let data = [];
+      for (let page = 1; ; page++) {
+        const response = await justChooseApi.get(
+          `/contentlists/${listId}/content`,
+          {
+            params: { page, page_size: 100 },
+          }
+        );
+        data = [
+          ...data,
+          ...response.data.results.map((content) => ({
+            content_platform_id: content.content_platform_id,
+            title: content.title,
+            poster_path: content.poster_path,
+            type: content.type,
+          })),
+        ];
+        if (page === response.data.total_pages) {
+          break;
+        }
+      }
+      return data;
+    }
+  );
 
   useEffect(() => {
-    setContentError('');
+    if (mounted.current) {
+      setContentList(content);
+    }
+  }, [setContentList, content]);
+
+  useEffect(() => {
+    if (mounted.current) {
+      setTitle(data?.title || '');
+      setDescription(data?.description || '');
+      setSharingOption(data?.sharing_option || '');
+      setThumbPreview(data?.thumbnail || '');
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (mounted.current) {
+      setContentError('');
+    }
   }, [contentList]);
 
   useEffect(() => {
@@ -175,10 +158,6 @@ const UpdateList = () => {
   }, [updating, errorOnUpdate, updatedSuccessfully, setMessage, setSeverity]);
 
   const clearState = () => {
-    setLoading(true);
-    setLoadingError(false);
-    setNotFound(false);
-    setDenyAccess(false);
     setTitle('');
     setTitleError('');
     setDescription('');
@@ -338,14 +317,19 @@ const UpdateList = () => {
     contentWrapperRef.current.scrollTo(0, 0);
   };
 
-  if (loadingError) {
-    return <SomethingWentWrong />;
+  if (
+    (authentication &&
+      data &&
+      parseInt(authentication.profile.id) !== parseInt(data.profile_id)) ||
+    error?.response?.status === 403
+  ) {
+    return <AccessDenied />;
   }
-  if (notFound) {
+  if (error?.response?.status === 400) {
     return <NotFound />;
   }
-  if (denyAccess) {
-    return <AccessDenied />;
+  if (error) {
+    return <SomethingWentWrong />;
   }
 
   return (
@@ -467,32 +451,38 @@ const UpdateList = () => {
         </div>
         <h3>Conteúdo</h3>
         {contentError && <p className="error">{contentError}</p>}
-        <div className="content-list">
-          <AvailableContent
-            contentType={contentType}
-            setContentType={setContentType}
-            contentList={contentList}
-            setContentList={setContentList}
-            showListPreview={showListPreview}
-            setShowListPreview={setShowListPreview}
-            loading={loading}
-          />
-          <CreationOptions>
-            <div>
-              <ClearButton onClick={handleClearList}>Limpar lista</ClearButton>
+        {authentication &&
+          data &&
+          parseInt(authentication.profile.id) === parseInt(data.profile_id) && (
+            <div className="content-list">
+              <AvailableContent
+                contentType={contentType}
+                setContentType={setContentType}
+                contentList={contentList}
+                setContentList={setContentList}
+                showListPreview={showListPreview}
+                setShowListPreview={setShowListPreview}
+                isFetching={isFetchingContent}
+              />
+              <CreationOptions>
+                <div>
+                  <ClearButton onClick={handleClearList}>
+                    Limpar lista
+                  </ClearButton>
+                </div>
+                <div>
+                  {contentType && (
+                    <PreviewButton onClick={handlePreviewList}>
+                      {showListPreview ? 'Todos os conteúdos' : 'Minha lista'}
+                    </PreviewButton>
+                  )}
+                  <CreateButton onClick={handleUpdateList} disabled={updating}>
+                    Aplicar alterações
+                  </CreateButton>
+                </div>
+              </CreationOptions>
             </div>
-            <div>
-              {contentType && (
-                <PreviewButton onClick={handlePreviewList}>
-                  {showListPreview ? 'Todos os conteúdos' : 'Minha lista'}
-                </PreviewButton>
-              )}
-              <CreateButton onClick={handleUpdateList} disabled={updating}>
-                Aplicar alterações
-              </CreateButton>
-            </div>
-          </CreationOptions>
-        </div>
+          )}
       </Main>
     </Container>
   );

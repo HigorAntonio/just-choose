@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useContext,
-  useCallback,
-} from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import axios from 'axios';
 
@@ -16,9 +10,9 @@ import NotFound from '../../components/NotFound';
 import SomethingWentWrong from '../../components/SomethingWentWrong';
 import AccessDenied from '../../components/AccessDenied';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
-import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
+import ContentList from './ContentList';
 import justChooseApi from '../../services/justChooseApi';
-import useInfiniteQuery from '../../hooks/useInfiniteQuery';
+import useQuery from '../../hooks/useQuery';
 import sharingOptions from '../../utils/sharingOptions';
 
 import {
@@ -53,9 +47,6 @@ const CreatePoll = () => {
   } = useContext(AlertContext);
   const { contentWrapperRef } = useContext(LayoutContext);
 
-  const [loadingError, setLoadingError] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [denyAccess, setDenyAccess] = useState(false);
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState('');
   const [description, setDescription] = useState('');
@@ -68,7 +59,6 @@ const CreatePoll = () => {
   const [creating, setCreating] = useState(false);
   const [errorOnCreate, setErrorOnCreate] = useState(false);
   const [createdSuccessfully, setCreatedSuccessfully] = useState(false);
-  const [params] = useState({ page_size: 30 });
 
   const contentListWrapperRef = useRef();
   const thumbInputFileRef = useRef();
@@ -82,61 +72,26 @@ const CreatePoll = () => {
     }
   }, [contentWrapperRef]);
 
+  const { isFetching, error, data } = useQuery(
+    ['createPoll/contentList', listId, authentication],
+    async () => {
+      const response = await justChooseApi.get(`/contentlists/${listId}`);
+      return response.data;
+    },
+    { retry: false }
+  );
+
   useEffect(() => {
     mounted.current = true;
     source.current = axios.CancelToken.source();
 
-    (async () => {
-      try {
-        clearState();
-        const { data } = await justChooseApi.get(`/contentlists/${listId}`, {
-          cancelToken: source.current.token,
-        });
-        if (authentication && authentication.profile.id !== data.profile_id) {
-          setDenyAccess(true);
-          return;
-        }
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        if (error.response && error.response.status === 400) {
-          setNotFound(true);
-        } else if (error.response && error.response.status === 403) {
-          setDenyAccess(true);
-        } else {
-          setLoadingError(true);
-        }
-      }
-    })();
+    clearState();
 
     return () => {
       mounted.current = false;
       source.current.cancel();
     };
-  }, [listId, authentication]);
-
-  const getContentList = useCallback(
-    async ({ pageParam = 1 }) => {
-      const response = await justChooseApi.get(
-        `/contentlists/${listId}/content`,
-        {
-          params: { ...params, page: pageParam },
-        }
-      );
-      return response.data;
-    },
-    [listId, params]
-  );
-
-  const { isFetching, isFetchingNextPage, data, lastElementRef } =
-    useInfiniteQuery(['createPoll/getContentList', params], getContentList, {
-      getNextPageParam: (lastPage, pages) => {
-        return lastPage.page < lastPage.total_pages
-          ? pages.length + 1
-          : undefined;
-      },
-    });
+  }, []);
 
   useEffect(() => {
     if (creating) {
@@ -154,9 +109,6 @@ const CreatePoll = () => {
   }, [creating, errorOnCreate, createdSuccessfully, setMessage, setSeverity]);
 
   const clearState = () => {
-    setLoadingError(false);
-    setNotFound(false);
-    setDenyAccess(false);
     setTitle('');
     setTitleError('');
     setDescription('');
@@ -296,14 +248,19 @@ const CreatePoll = () => {
     contentWrapperRef.current.scrollTo(0, 0);
   };
 
-  if (loadingError) {
-    return <SomethingWentWrong />;
+  if (
+    (authentication &&
+      data &&
+      parseInt(authentication.profile.id) !== parseInt(data.profile_id)) ||
+    error?.response?.status === 403
+  ) {
+    return <AccessDenied />;
   }
-  if (notFound) {
+  if (error?.response?.status === 400) {
     return <NotFound />;
   }
-  if (denyAccess) {
-    return <AccessDenied />;
+  if (error) {
+    return <SomethingWentWrong />;
   }
 
   return (
@@ -426,13 +383,10 @@ const CreatePoll = () => {
         <div className="content-list">
           <ContentListContainer>
             <ContentListWrapper ref={contentListWrapperRef} tabIndex="-1">
-              <InfinityLoadContentGrid
-                isFetching={isFetching}
-                isFetchingNextPage={isFetchingNextPage}
-                data={data}
-                lastElementRef={lastElementRef}
-                tabIndex="-1"
-              />
+              {authentication &&
+                data &&
+                parseInt(authentication.profile.id) ===
+                  parseInt(data.profile_id) && <ContentList listId={listId} />}
             </ContentListWrapper>
           </ContentListContainer>
           <CreationOptions>

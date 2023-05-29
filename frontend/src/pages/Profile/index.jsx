@@ -5,7 +5,6 @@ import {
   useRouteMatch,
   useLocation,
 } from 'react-router-dom';
-import axios from 'axios';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
 import { LayoutContext } from '../../context/LayoutContext';
@@ -14,6 +13,7 @@ import { AlertContext } from '../../context/AlertContext';
 import { FollowingProfilesContext } from '../../context/FollowingProfilesContext';
 
 import justChooseApi from '../../services/justChooseApi';
+import useQuery from '../../hooks/useQuery';
 import NotFound from '../../components/NotFound';
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import Start from './Start';
@@ -61,23 +61,29 @@ const Profile = () => {
   const { refetchFollowingProfilesData } = useContext(FollowingProfilesContext);
   const { contentWrapperRef } = useContext(LayoutContext);
 
-  const [loading, setLoading] = useState(true);
-  const [loadingError, setLoadingError] = useState(false);
-  const [following, setFollowing] = useState(false);
   const [profile, setProfile] = useState({});
+  const [following, setFollowing] = useState(false);
   const [profileImageError, setProfileImageError] = useState(false);
   const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
 
   const mounted = useRef();
-  const source = useRef();
 
   const clearState = () => {
-    setLoadingError(false);
-    setFollowing(false);
     setProfile({});
+    setFollowing(false);
     setProfileImageError(false);
     setShowUnfollowDialog(false);
   };
+
+  useEffect(() => {
+    mounted.current = true;
+
+    clearState();
+
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (
@@ -105,52 +111,46 @@ const Profile = () => {
     contentWrapperRef.current.scrollTo(0, 0);
   }, [contentWrapperRef, location]);
 
-  useEffect(() => {
-    mounted.current = true;
-    source.current = axios.CancelToken.source();
+  const {
+    isFetching: isFetchingProfile,
+    error: errorProfile,
+    data: profileData,
+  } = useQuery(
+    ['profile/profileData', profileToShowName],
+    async () => {
+      const response = await justChooseApi.get(
+        `/profiles/${profileToShowName}`
+      );
+      return response.data;
+    },
+    { retry: false }
+  );
 
-    (async () => {
-      try {
-        setLoading(true);
-        clearState();
-        const { data } = await justChooseApi.get(
-          `/profiles/${profileToShowName}`,
-          {
-            cancelToken: source.current.token,
-          }
-        );
-        setProfile(data);
-        const { id: profileToShowId } = data;
-        if (
-          authentication &&
-          authentication.profile &&
-          authentication.profile.is_active
-        ) {
-          const {
-            data: { following },
-          } = await justChooseApi.get(
-            `/profiles/following/${profileToShowId}`,
-            {
-              cancelToken: source.current.token,
-            }
-          );
-          setFollowing(following);
-        }
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        setLoading(false);
-        setLoadingError(true);
+  const { data: followingData } = useQuery(
+    ['profile/followingProfileData', authentication, profile],
+    async () => {
+      if (authentication?.profile?.is_active !== true || !profile?.id) {
+        return false;
       }
-    })();
+      const response = await justChooseApi.get(
+        `/profiles/following/${profile?.id}`
+      );
+      return response.data;
+    },
+    { retry: false }
+  );
 
-    return () => {
-      mounted.current = false;
-      source.current.cancel();
-    };
-  }, [profileToShowName, authentication]);
+  useEffect(() => {
+    if (mounted.current && profileData !== undefined) {
+      setProfile(profileData);
+    }
+  }, [profileData]);
+
+  useEffect(() => {
+    if (mounted.current && followingData !== undefined) {
+      setFollowing(followingData.following);
+    }
+  }, [followingData]);
 
   const handleUnfollow = async () => {
     setShowUnfollowDialog(false);
@@ -211,10 +211,10 @@ const Profile = () => {
     history.push(path);
   };
 
-  if (loading) {
+  if (isFetchingProfile) {
     return <></>;
   }
-  if (loadingError) {
+  if (errorProfile) {
     return <NotFound />;
   }
   return (

@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
 
 import { ViewportContext } from '../../../context/ViewportContext';
 
 import justChooseApi from '../../../services/justChooseApi';
+import useQuery from '../../../hooks/useQuery';
 import ListCard from '../../../components/ListCard';
 
 import {
@@ -19,38 +19,22 @@ const StartLists = ({ profileToShowId }) => {
   const { width } = useContext(ViewportContext);
 
   const [lastContentIndex, setLastContentIndex] = useState(0);
-  const [content, setContent] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    let source = axios.CancelToken.source();
-
-    (async () => {
-      try {
-        const { data } = await justChooseApi.get('/contentlists', {
-          params: {
-            profile_id: profileToShowId,
-            page: 1,
-            page_size: 6,
-            sort_by: 'updated.desc',
-          },
-          cancelToken: source.token,
-        });
-        setContent(data.results);
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        setLoading(false);
-      }
-    })();
-
-    return () => {
-      source.cancel();
-    };
-  }, [profileToShowId]);
+  const { isFetching, data } = useQuery(
+    ['profile/start/lists', profileToShowId],
+    async () => {
+      const response = await justChooseApi.get('/contentlists', {
+        params: {
+          profile_id: profileToShowId,
+          page: 1,
+          page_size: 6,
+          sort_by: 'updated.desc',
+        },
+      });
+      return response.data;
+    },
+    { retry: false }
+  );
 
   useEffect(() => {
     if (width < 547) {
@@ -72,17 +56,17 @@ const StartLists = ({ profileToShowId }) => {
 
   return (
     <Container>
-      {content.length > 0 && (
+      {data?.results?.length > 0 && (
         <>
           <TitleWrapper>
             <Title>Listas</Title>
           </TitleWrapper>
           <Main>
             {[...Array(6).keys()].map((_, i) => {
-              if (i < lastContentIndex && content[i]) {
+              if (i < lastContentIndex && data?.results[i]) {
                 return (
-                  <div key={`profileStarList${content[i].id}`}>
-                    <ListCard contentList={content[i]} />
+                  <div key={`profileStarList${data?.results[i].id}`}>
+                    <ListCard contentList={data?.results[i]} />
                   </div>
                 );
               }

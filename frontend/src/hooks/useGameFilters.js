@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 
 import justChooseApi from '../services/justChooseApi';
+import useQuery from './useQuery';
 
 const useGameFilters = () => {
   const [sortBy, setSortBy] = useState({
     key: 'Popularidade (maior)',
     value: '-added',
   });
-  const [platforms, setPlatforms] = useState();
-  const [genres, setGenres] = useState();
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [releaseDateGte, setReleaseDateGte] = useState();
@@ -38,37 +36,30 @@ const useGameFilters = () => {
     setSortBy({ key: 'Popularidade (maior)', value: '-added' });
   };
 
-  useEffect(() => {
-    let source = axios.CancelToken.source();
+  const { isFetching: isFetchingPlatforms, data: platforms } = useQuery(
+    'useGameFilters/games/platforms',
+    async () => {
+      const response = await justChooseApi.get('/games/platforms');
+      return response.data;
+    }
+  );
 
-    (async () => {
-      try {
-        const { data } = await justChooseApi.get('/games/platforms', {
-          cancelToken: source.token,
-        });
-        setPlatforms(data.platforms);
-      } catch (error) {}
-      try {
-        const { data } = await justChooseApi.get('/games/genres', {
-          cancelToken: source.token,
-        });
-        setGenres(data.genres);
-      } catch (error) {}
-    })();
-
-    return () => {
-      source.cancel();
-    };
-  }, [setPlatforms, setGenres]);
+  const { isFetching: isFetchingGenres, data: genres } = useQuery(
+    'useGameFilters/games/genres',
+    async () => {
+      const response = await justChooseApi.get('/games/genres');
+      return response.data;
+    }
+  );
 
   return {
     sortByList,
     sortBy,
     setSortBy,
+    isFetchingPlatforms,
     platforms,
-    setPlatforms,
+    isFetchingGenres,
     genres,
-    setGenres,
     selectedPlatforms,
     setSelectedPlatforms,
     selectedGenres,

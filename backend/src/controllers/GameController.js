@@ -54,11 +54,11 @@ module.exports = {
 
       const responseData = await redisClient.get(key);
       if (!responseData) {
-        const data = { platforms: [] };
+        const data = { results: [] };
         while (true) {
           const { data: responseData } = await rawgApi.get(url, { params });
           const { results, next } = responseData;
-          data.platforms = [...data.platforms, ...results];
+          data.results = [...data.results, ...results];
           if (!next) {
             break;
           }
@@ -89,11 +89,11 @@ module.exports = {
 
       const responseData = await redisClient.get(key);
       if (!responseData) {
-        const data = { genres: [] };
+        const data = { results: [] };
         while (true) {
           const { data: responseData } = await rawgApi.get(url, { params });
           const { results, next } = responseData;
-          data.genres = [...data.genres, ...results];
+          data.results = [...data.results, ...results];
           if (!next) {
             break;
           }

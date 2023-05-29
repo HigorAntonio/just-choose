@@ -1,44 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 
 import justChooseApi from '../../../services/justChooseApi';
+import useQuery from '../../../hooks/useQuery';
 import TrendingLists from '../TrendingLists';
 
 import { Container, LineWrapper, Line } from './styles';
 
 const Trending = () => {
-  const [contentLists, setContentLists] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    let source = axios.CancelToken.source();
-
-    (async () => {
-      try {
-        const { data } = await justChooseApi.get('/trending', {
-          cancelToken: source.token,
-        });
-        setContentLists(data.results.content_lists.results);
-        setLoading(false);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          return;
-        }
-        setLoading(false);
-      }
-    })();
-
-    return () => {
-      source.cancel();
-    };
-  }, []);
+  const { isFetching, error, data } = useQuery(
+    ['home/trending'],
+    async () => {
+      const response = await justChooseApi.get('/trending');
+      return response.data;
+    },
+    { retry: false }
+  );
 
   return (
     <Container>
-      {contentLists.length > 0 && (
+      {data?.results?.content_lists?.results?.length > 0 && (
         <>
-          <TrendingLists content={contentLists} />
+          <TrendingLists content={data.results.content_lists.results} />
           <LineWrapper>
             <Line />
           </LineWrapper>

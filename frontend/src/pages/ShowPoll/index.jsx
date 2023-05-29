@@ -1,13 +1,6 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useParams, useHistory, Link, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { useQueryClient } from 'react-query';
 import queryString from 'query-string';
 import { ThemeContext } from 'styled-components';
 import { IoMdListBox } from 'react-icons/io';
@@ -23,10 +16,7 @@ import { AlertContext } from '../../context/AlertContext';
 import justChooseApi from '../../services/justChooseApi';
 import NotFound from '../../components/NotFound';
 import SomethingWentWrong from '../../components/SomethingWentWrong';
-import NoContent from './NoContent';
-import Result from './Result';
 import AccessDenied from '../../components/AccessDenied';
-import InfinityLoadContentGrid from '../../components/InfinityLoadContentGrid';
 import SingleOptionSelect from '../../components/SingleOptionSelect';
 import Modal from '../../components/Modal';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
@@ -35,7 +25,8 @@ import contentTypesUtility from '../../utils/contentTypes';
 import { formatCreationDate } from '../../utils/dataUtility';
 import removeQueryParamAndGetNewUrl from '../../utils/removeQueryParamAndGetNewUrl';
 import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
-import useInfiniteQuery from '../../hooks/useInfiniteQuery';
+import ContentGrid from './ContentGrid';
+import useQuery from '../../hooks/useQuery';
 
 import {
   Container,
@@ -78,21 +69,12 @@ const ShowPoll = () => {
   const { colors } = useContext(ThemeContext);
   const { contentWrapperRef } = useContext(LayoutContext);
 
-  const [poll, setPoll] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [loadingError, setLoadingError] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [denyAccess, setDenyAccess] = useState(false);
-  const [createdAt, setCreatedAt] = useState();
-  const [contentTypes, setContentTypes] = useState([]);
+  const queryClient = useQueryClient();
+
   const [showListOption, setShowListOption] = useState(false);
   const [showTypeOptions, setShowTypeOptions] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [vote, setVote] = useState({});
   const [params, setParams] = useState({ page_size: 30, type: contentType });
-
-  const mounted = useRef();
-  const source = useRef();
 
   useEffect(() => {
     contentWrapperRef.current.scrollTo(0, 0);
@@ -101,31 +83,6 @@ const ShowPoll = () => {
   useEffect(() => {
     setParams((prevState) => ({ ...prevState, type: contentType }));
   }, [contentType]);
-
-  useEffect(() => {
-    if (poll && poll.is_active === false) {
-      setParams((prevState) => ({ ...prevState, sort_by: 'votes.desc' }));
-    } else {
-      setParams((prevState) => {
-        delete prevState.sort_by;
-        return { ...prevState };
-      });
-    }
-  }, [poll]);
-
-  const clearState = () => {
-    setPoll({});
-    setLoading(true);
-    setLoadingError(false);
-    setNotFound(false);
-    setDenyAccess(false);
-    setCreatedAt(null);
-    setContentTypes([]);
-    setShowListOption(false);
-    setShowTypeOptions(false);
-    setShowDeleteDialog(false);
-    setVote({});
-  };
 
   useEffect(() => {
     if (
@@ -138,151 +95,86 @@ const ShowPoll = () => {
     }
   }, [contentType, history, location, queryParams]);
 
-  const getPageData = useCallback(async () => {
-    try {
-      clearState();
-      const { data: pollData } = await justChooseApi.get(`/polls/${pollId}`, {
-        cancelToken: source.current.token,
-      });
-      setPoll(pollData);
-      setCreatedAt(new Date(pollData.created_at));
-      if (pollData && pollData.content_types) {
-        setContentTypes(['all', ...pollData.content_types]);
-      }
-      if (
-        pollData &&
-        JSON.stringify(pollData) !== '{}' &&
-        pollData.is_active &&
-        authentication
-      ) {
-        const { data: vote } = await justChooseApi.get(
-          `/polls/${pollData.id}/votes`,
-          {
-            cancelToken: source.current.token,
-          }
-        );
-        if (vote) {
-          setVote(vote);
-        }
-      }
-      if (
-        pollData &&
-        pollData.content_lists[0] &&
-        pollData.content_lists[0].sharing_option === 'public'
-      ) {
-        setShowListOption(true);
-      }
-      if (
-        pollData &&
-        pollData.content_lists[0] &&
-        pollData.content_lists[0].sharing_option === 'followed_profiles' &&
-        authentication
-      ) {
-        try {
-          const isFollower = await justChooseApi.get(
-            `/profiles/followers/${pollData.profile_id}`,
-            {
-              cancelToken: source.current.token,
-            }
-          );
-          setShowListOption(isFollower);
-        } catch (error) {}
-      }
-      if (
-        pollData &&
-        pollData.content_lists[0] &&
-        pollData.content_lists[0].sharing_option === 'private' &&
-        authentication
-      ) {
-        setShowListOption(
-          parseInt(authentication.profile.id) === parseInt(pollData.profile_id)
-        );
-      }
-      setLoading(false);
-    } catch (error) {
-      if (axios.isCancel(error)) {
-        return;
-      }
-      if (error.response && error.response.status === 400) {
-        setNotFound(true);
-      } else if (error.response && error.response.status === 403) {
-        setDenyAccess(true);
-      } else {
-        setLoadingError(true);
-      }
-      setLoading(false);
-    }
-  }, [pollId, authentication]);
-
-  useEffect(() => {
-    mounted.current = true;
-    source.current = axios.CancelToken.source();
-
-    (async () => await getPageData())();
-
-    return () => {
-      mounted.current = false;
-      source.current.cancel();
-    };
-  }, [getPageData]);
-
-  const getPollContent = useCallback(
-    async ({ pageParam = 1 }) => {
-      const response = await justChooseApi.get(`/polls/${pollId}/content`, {
-        params: { ...params, page: pageParam },
-      });
-      return response.data;
+  const { isFetching, error, data } = useQuery(
+    ['showPoll/poll', { pollId, authentication }],
+    async () => {
+      const response = await justChooseApi.get(`/polls/${pollId}`);
+      return {
+        ...response.data,
+        content_types: ['all', ...response.data.content_types],
+      };
     },
-    [pollId, params]
+    { retry: false }
   );
 
-  const { isFetching, isFetchingNextPage, data, lastElementRef } =
-    useInfiniteQuery(['showPoll/getPollContent', params], getPollContent, {
-      getNextPageParam: (lastPage, pages) => {
-        return lastPage.page < lastPage.total_pages
-          ? pages.length + 1
-          : undefined;
-      },
-    });
+  const { data: isFollower } = useQuery(
+    ['showPoll/isFollowing', { pollId, authentication }],
+    async () => {
+      const response = await justChooseApi.get(
+        `/profiles/followers/${data?.profile_id}`
+      );
+      return response.data;
+    },
+    { retry: false, enabled: !!data && !!authentication }
+  );
+
+  useEffect(() => {
+    if (data?.is_active === false) {
+      setParams((prevState) => ({ ...prevState, sort_by: 'votes.desc' }));
+    } else {
+      setParams((prevState) => {
+        delete prevState.sort_by;
+        return { ...prevState };
+      });
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data?.content_lists[0]?.sharing_option === 'public') {
+      setShowListOption(true);
+    }
+    if (data?.content_lists[0]?.sharing_option === 'followed_profiles') {
+      setShowListOption(isFollower);
+    }
+    if (data?.content_lists[0]?.sharing_option === 'private') {
+      setShowListOption(+authentication?.profile.id === +data?.profile_id);
+    }
+  }, [data, isFollower, authentication]);
 
   const handleActive = async () => {
     if (!authentication) {
       return;
     }
     try {
-      setLoading(true);
       clearTimeout(alertTimeout);
       setMessage(
-        poll.is_active
+        data?.is_active
           ? 'Por favor, aguarde. Fechando votação...'
           : 'Por favor, aguarde. Abrindo votação...'
       );
       setSeverity('info');
       setShowAlert(true);
       const formData = new FormData();
-      formData.append('data', JSON.stringify({ isActive: !poll.is_active }));
+      formData.append('data', JSON.stringify({ isActive: !data?.is_active }));
       await justChooseApi({
         url: `/polls/${pollId}`,
         method: 'PUT',
         data: formData,
       });
-      if (mounted.current) {
-        await getPageData();
-        setLoading(false);
-      }
+      queryClient.invalidateQueries([
+        'showPoll/poll',
+        { pollId, authentication },
+      ]);
       setMessage(
-        poll.is_active
+        data?.is_active
           ? 'Votação fechada com sucesso.'
           : 'Votação aberta com sucesso.'
       );
       setSeverity('success');
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
     } catch (error) {
-      if (mounted.current) {
-        setLoading(false);
-      }
       setMessage(
-        poll.is_active
+        data?.is_active
           ? 'Não foi possível fechar a votação. Por favor, tente novamente.'
           : 'Não foi possível abrir a votação. Por favor, tente novamente.'
       );
@@ -315,83 +207,35 @@ const ShowPoll = () => {
     }
   };
 
-  const handleVote = async (e, content) => {
-    e.preventDefault();
-    if (!authentication) {
-      setShowDeleteDialog(false);
-      clearTimeout(alertTimeout);
-      setMessage('Faça login para poder votar.');
-      setSeverity('info');
-      setShowAlert(true);
-      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-      return;
-    }
-    if (
-      authentication &&
-      authentication.profile &&
-      authentication.profile.is_active === false
-    ) {
-      setShowDeleteDialog(false);
-      clearTimeout(alertTimeout);
-      setMessage('Confirme seu e-mail para poder votar.');
-      setSeverity('info');
-      setShowAlert(true);
-      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-      return;
-    }
-    try {
-      if (vote && JSON.stringify(vote) !== '{}') {
-        await justChooseApi.delete(`/polls/${pollId}/votes`);
-      }
-
-      if (
-        mounted.current &&
-        vote.content_id === content.content_id &&
-        vote.type === content.type
-      ) {
-        setVote({});
-        return;
-      }
-
-      await justChooseApi.post(`/polls/${pollId}/votes`, {
-        contentId: content.content_id,
-        type: content.type,
-      });
-      if (mounted.current) {
-        setVote(content);
-      }
-    } catch (error) {}
-  };
-
-  const handleSelectContentType = (ct) => {
+  const handleSelectContentType = (type) => {
     setShowTypeOptions(false);
     if (
-      ct === contentType ||
-      (ct === 'all' && typeof contentType === 'undefined')
+      type === contentType ||
+      (type === 'all' && typeof contentType === 'undefined')
     )
       return;
-    if (ct === 'all') {
+    if (type === 'all') {
       history.push(
         removeQueryParamAndGetNewUrl(location.pathname, queryParams, 'type')
       );
       return;
     }
     history.push(
-      setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', ct)
+      setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', type)
     );
   };
 
-  if (loading) {
+  if (isFetching) {
     return <Skeleton />;
   }
-  if (loadingError) {
-    return <SomethingWentWrong />;
-  }
-  if (notFound) {
+  if (error?.response?.status === 400) {
     return <NotFound />;
   }
-  if (denyAccess) {
+  if (error?.response?.status === 403) {
     return <AccessDenied />;
+  }
+  if (error) {
+    return <SomethingWentWrong />;
   }
 
   return (
@@ -399,12 +243,12 @@ const ShowPoll = () => {
       <Header>
         <HeaderRow>
           <TitleWrapper>
-            <h1 title={poll.title}>{poll.title}</h1>
+            <h1 title={data?.title}>{data?.title}</h1>
           </TitleWrapper>
           <HeaderButtons>
             <div>
               {showListOption && (
-                <Link to={`/lists/${poll.content_lists[0].id}`} tabIndex="-1">
+                <Link to={`/lists/${data?.content_lists[0]?.id}`} tabIndex="-1">
                   <HeaderButton title="Visualizar lista de conteúdo">
                     <IoMdListBox
                       size={'25px'}
@@ -413,19 +257,19 @@ const ShowPoll = () => {
                   </HeaderButton>
                 </Link>
               )}
-              {authentication && authentication.profile.id === poll.profile_id && (
+              {+authentication?.profile.id === +data.profile_id && (
                 <>
                   <HeaderButton
-                    title={poll.is_active ? 'Fechar votação' : 'Abrir votação'}
+                    title={data?.is_active ? 'Fechar votação' : 'Abrir votação'}
                     onClick={handleActive}
                   >
-                    {!poll.is_active && (
+                    {data?.is_active === false && (
                       <FaPlay
                         size={'25px'}
                         style={{ flexShrink: 0, margin: '0 5px' }}
                       />
                     )}
-                    {poll.is_active && (
+                    {data?.is_active && (
                       <FaStop
                         size={'25px'}
                         style={{ flexShrink: 0, margin: '0 5px' }}
@@ -457,32 +301,35 @@ const ShowPoll = () => {
         <ListInfo>
           <CreatedAt>
             <span>Criada em</span>&nbsp;
-            {createdAt ? formatCreationDate(createdAt) : '-'}
+            {data?.created_at
+              ? formatCreationDate(new Date(data?.created_at))
+              : '-'}
             &nbsp;
           </CreatedAt>
           <CreatedBy>
             <span>por</span>&nbsp;
-            <Link to={`/profiles/${poll.profile_name}`}>
+            <Link to={`/profiles/${data?.profile_name}`}>
               <ProfileImageWrapper>
                 <ProfileImage
-                  src={poll.profile_image_url}
+                  src={data?.profile_image_url}
                   alt=""
                   onError={(e) => (e.target.style.display = 'none')}
                 />
               </ProfileImageWrapper>
               &nbsp;
-              {poll.profile_display_name}&nbsp;
+              {data?.profile_display_name}&nbsp;
             </Link>
           </CreatedBy>
         </ListInfo>
-        <Description>{poll.description}</Description>
+        <Description>{data?.description}</Description>
         <Filters>
-          {contentTypes.length > 2 && (
+          {data?.content_types.length > 2 && (
             <>
               <label>Tipo</label>
               <SingleOptionSelect
                 label={
-                  !contentType || !contentTypes.find((ct) => ct === contentType)
+                  !contentType ||
+                  !data?.content_types.find((type) => type === contentType)
                     ? 'Todos'
                     : contentTypesUtility.options.find(
                         (e) => e.value === contentType
@@ -495,7 +342,7 @@ const ShowPoll = () => {
                 hover={colors['background-700']}
               >
                 <TypeOptions>
-                  {contentTypes.map((ct, i) => (
+                  {data?.content_types.map((ct, i) => (
                     <Option
                       key={`typeFilter${i}`}
                       onClick={() => handleSelectContentType(ct)}
@@ -513,39 +360,17 @@ const ShowPoll = () => {
         </Filters>
       </Header>
       <Main>
-        {poll.is_active && data?.pages[0]?.total_results === 0 && (
-          <NoContent
-            type={
-              contentType
-                ? contentTypesUtility.options
-                    .find((e) => e.value === contentType)
-                    .key.toLowerCase()
-                : ''
-            }
-          />
-        )}
-        {poll.is_active && (
-          <InfinityLoadContentGrid
-            isFetching={isFetching}
-            isFetchingNextPage={isFetchingNextPage}
-            data={data}
-            lastElementRef={lastElementRef}
-            checkbox
-            checkboxcheck={(c) =>
-              vote.content_id === c.content_id && vote.type === c.type
-            }
-            checkboxclick={handleVote}
-            tabIndex="-1"
-          />
-        )}
-        {!poll.is_active && (
-          <Result data={data} lastElementRef={lastElementRef} />
-        )}
+        <ContentGrid
+          poll={data}
+          authentication={authentication}
+          params={params}
+          contentType={contentType}
+        />
       </Main>
       <Modal show={showDeleteDialog} setShow={setShowDeleteDialog}>
         <ConfirmDeleteDialog
-          createdBy={poll.profile_display_name}
-          pollTitle={poll.title}
+          createdBy={data?.profile_display_name}
+          pollTitle={data?.title}
           handleDelete={handleDelete}
         />
       </Modal>
