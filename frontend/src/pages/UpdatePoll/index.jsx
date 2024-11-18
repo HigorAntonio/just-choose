@@ -81,7 +81,7 @@ const UpdatePoll = () => {
   }, []);
 
   const { isFetching, error, data } = useQuery(
-    ['updatePoll/poll', pollId, authentication],
+    ['updatePoll/poll', { pollId, authentication }],
     async () => {
       const response = await justChooseApi.get(`/polls/${pollId}`);
       return response.data;

@@ -56,10 +56,15 @@ export const Main = styled.div`
     font-weight: bold;
     font-size: 1.6rem;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       cursor: pointer;
       color: var(--white);
       background: var(--error);
+    }
+
+    &:focus-visible {
+      outline: 0.2rem solid var(--text);
     }
 
     &:disabled {

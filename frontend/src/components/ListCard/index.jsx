@@ -60,7 +60,11 @@ const ListCard = ({ contentList, showProfile = false }) => {
     >
       <CardWrapper>
         <Top>
-          <Link to={`/lists/${listId}`} data-prevent-container-click>
+          <Link
+            to={`/lists/${listId}`}
+            data-prevent-container-click
+            tabIndex="-1"
+          >
             <ThumbWrapper data-prevent-container-click>
               <Thumbnail
                 src={thumbnail}
@@ -87,6 +91,7 @@ const ListCard = ({ contentList, showProfile = false }) => {
               <Link
                 to={`/profiles/${profileName}`}
                 data-prevent-container-click
+                tabIndex="-1"
               >
                 <ProfileImage
                   src={profileImageUrl}
@@ -99,7 +104,11 @@ const ListCard = ({ contentList, showProfile = false }) => {
           )}
           <Meta>
             <Title title={title}>
-              <Link to={`/lists/${listId}`} data-prevent-container-click>
+              <Link
+                to={`/lists/${listId}`}
+                data-prevent-container-click
+                tabIndex="-1"
+              >
                 {title}
               </Link>
             </Title>

@@ -52,4 +52,8 @@ export const CloseModal = styled.button`
     background: #ffffff4d;
     cursor: pointer;
   }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--primary-400);
+  }
 `;

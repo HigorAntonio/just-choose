@@ -85,7 +85,7 @@ const UpdateList = () => {
   }, []);
 
   const { isFetching, error, data } = useQuery(
-    ['updateList/contentList', listId, authentication],
+    ['updateList/contentList', { listId, authentication }],
     async () => {
       const response = await justChooseApi.get(`/contentlists/${listId}`);
       return response.data;
@@ -167,7 +167,7 @@ const UpdateList = () => {
     setThumbnail(null);
     setThumbPreview(null);
     setThumbError('');
-    thumbInputFileRef.current = null;
+    // thumbInputFileRef.current = null;
     setContentType('');
     setContentList([]);
     setContentError('');

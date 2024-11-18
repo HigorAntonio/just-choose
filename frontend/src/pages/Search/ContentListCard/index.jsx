@@ -61,10 +61,13 @@ const ContentListCard = ({ contentList }) => {
     <Container
       onClick={handleContainerClick}
       onKeyPress={handleContainerOnKeyPress}
-      tabIndex="0"
     >
       <ThumbnailContainer>
-        <Link to={`/lists/${listId}`} data-prevent-container-click>
+        <Link
+          to={`/lists/${listId}`}
+          data-prevent-container-click
+          tabIndex="-1"
+        >
           <ThumbnailWrapper data-prevent-container-click>
             <Thumbnail
               src={thumbnail}
@@ -104,7 +107,11 @@ const ContentListCard = ({ contentList }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <Link to={`/profiles/${profileName}`} data-prevent-container-click>
+            <Link
+              to={`/profiles/${profileName}`}
+              data-prevent-container-click
+              tabIndex="-1"
+            >
               <ProfileImage
                 src={profileImageUrl}
                 onError={() => setProfileImageError(true)}

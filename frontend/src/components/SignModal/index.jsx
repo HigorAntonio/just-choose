@@ -34,6 +34,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
   const [signInPassword, setSignInPassword] = useState('');
   const [signUpErrors, setSignUpErrors] = useState([]);
   const [signInErrors, setSignInErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateSignUpName = (signUpName) => {
     setSignUpErrors((prevState) =>
@@ -135,6 +136,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
 
   const handleSignUp = async (e) => {
     try {
+      setIsLoading(true);
       e.preventDefault();
       await handleRegistration({
         name: signUpName,
@@ -152,11 +154,14 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
           setSignUpErrors([...errors]);
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSignIn = async (e) => {
     try {
+      setIsLoading(true);
       e.preventDefault();
       await handleLogin({ email: signInEmail, password: signInPassword });
       clearForm();
@@ -170,12 +175,14 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
           setSignInErrors([...errors]);
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const translateErrorMessage = (errorMessage) => {
     const errorMessages = {
-      'profile does not exist': 'Este nome de usuário não existe.',
+      'profile does not exist': 'Email não cadastrado.',
       '"email" must be a valid email': 'Informe um email válido.',
       'incorrect password': 'A senha estava incorreta. Tente novamente.',
       '"name" unavailable': 'Este nome de usuário está indisponível.',
@@ -220,6 +227,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
         <SignIn
           onClick={() => setNavOption('signIn')}
           className={navOption === 'signIn' ? 'active' : ''}
+          disabled={isLoading}
         >
           Entrar
         </SignIn>
@@ -262,7 +270,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
             </InputWithLabel>
             <SignFormButton
               type="submit"
-              disabled={isDisabledSignInButton()}
+              disabled={isDisabledSignInButton() || isLoading}
               onClick={(e) => handleSignIn(e)}
             >
               Entrar
@@ -314,7 +322,7 @@ const SignModal = ({ setShow, navOption, setNavOption }) => {
             </InputWithLabel>
             <SignFormButton
               type="submit"
-              disabled={isDisabledSignUpButton()}
+              disabled={isDisabledSignUpButton() || isLoading}
               onClick={(e) => handleSignUp(e)}
             >
               Cadastrar-se

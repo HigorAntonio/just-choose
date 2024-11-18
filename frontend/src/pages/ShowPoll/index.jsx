@@ -225,6 +225,16 @@ const ShowPoll = () => {
     );
   };
 
+  const handleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
+  };
+
   if (isFetching) {
     return <Skeleton />;
   }
@@ -346,6 +356,11 @@ const ShowPoll = () => {
                     <Option
                       key={`typeFilter${i}`}
                       onClick={() => handleSelectContentType(ct)}
+                      onKeyPress={(e) =>
+                        handleSelectOnPressEnter(e, handleSelectContentType, ct)
+                      }
+                      tabIndex="-1"
+                      data-select-option
                     >
                       {
                         contentTypesUtility.options.find((e) => e.value === ct)

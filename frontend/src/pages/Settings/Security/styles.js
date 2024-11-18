@@ -159,7 +159,7 @@ export const ButtonWrapper = styled.div`
   background: var(--background-600);
 `;
 
-export const ChangePasswordButton = styled.div`
+export const ChangePasswordButton = styled.button`
   display: flex;
   align-items: center;
   font-weight: bold;
@@ -173,8 +173,14 @@ export const ChangePasswordButton = styled.div`
   background: ${(props) =>
     props.disabled ? `var(--background-500)` : `var(--primary-400)`};
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     cursor: ${(props) => (props.disabled ? `not-allowed` : `pointer`)};
+    background: var(--primary-500);
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
   }
 `;
 

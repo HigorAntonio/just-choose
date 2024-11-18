@@ -246,7 +246,8 @@ export const Option = styled.div`
   padding: 1rem;
   border-radius: 0.5rem;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
   }

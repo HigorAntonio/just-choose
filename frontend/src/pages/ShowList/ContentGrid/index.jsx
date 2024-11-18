@@ -24,7 +24,7 @@ const ContentGrid = ({ listId, params, contentType }) => {
 
   const { isFetching, isFetchingNextPage, data, lastElementRef } =
     useInfiniteQuery(
-      ['showList/getListContent', listId, params],
+      ['showList/getListContent', { listId, params }],
       getListContent,
       {
         getNextPageParam: (lastPage, pages) => {

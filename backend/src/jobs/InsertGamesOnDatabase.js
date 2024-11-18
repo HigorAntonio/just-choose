@@ -7,6 +7,7 @@ module.exports = {
 
     const games = results.map((game) => ({
       rawg_id: game.id,
+      slug: game.slug,
       name: game.name,
       background_image: game.background_image,
     }));

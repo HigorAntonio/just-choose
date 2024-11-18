@@ -162,7 +162,8 @@ export const SearchButton = styled.button`
     background: transparent;
   }
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
   }
@@ -206,10 +207,16 @@ const navButtonCss = css`
 
   outline: none;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
   }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--primary-400);
+  }
+
   position: relative;
 `;
 
@@ -260,9 +267,14 @@ export const SignIn = styled.button`
   ${signButton}
   background: var(--background-300);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--primary-400);
   }
 `;
 
@@ -270,9 +282,15 @@ export const SignUp = styled.button`
   ${signButton}
   color: var(--white);
   background: var(--primary-400);
-  &:hover {
+
+  &:hover,
+  &:focus-visible {
     background: var(--primary-500);
     cursor: pointer;
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
   }
 `;
 

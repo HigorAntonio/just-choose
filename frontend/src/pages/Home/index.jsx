@@ -22,7 +22,7 @@ const Home = () => {
       <Wrapper>
         <Trending />
         {authentication?.profile?.is_active && <Following />}
-        {authentication && <Votes />}
+        {authentication?.profile?.is_active && <Votes />}
       </Wrapper>
     </Container>
   );

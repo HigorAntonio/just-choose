@@ -5,6 +5,7 @@ exports.up = async (knex) =>
     .createTable('games', (table) => {
       table.increments('id').primary();
       table.integer('rawg_id').unique().notNullable();
+      table.text('slug').unique().notNullable();
       table.text('name').notNullable();
       table.text('background_image');
 

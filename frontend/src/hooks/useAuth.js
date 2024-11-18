@@ -90,13 +90,14 @@ const useAuth = () => {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
       const body = { refresh_token: JSON.parse(refreshToken) };
-      await justChooseApi.delete('/logout', { data: body });
 
       setAuthentication(null);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
 
       delete justChooseApi.defaults.headers.Authorization;
+
+      await justChooseApi.delete('/logout', { data: body });
     } catch (error) {
       throw error;
     }

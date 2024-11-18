@@ -1,14 +1,14 @@
 import { useContext } from 'react';
-import { useQuery as useReactQuery } from 'react-query';
+import { useMutation as useReactQueryMutation } from 'react-query';
 
 import { AuthContext } from '../context/AuthContext';
 
-const useQuery = (queryKey, axiosGetFn, options) => {
+const useMutation = (axiosMutationFn, options) => {
   const { setAuthentication } = useContext(AuthContext);
 
-  const queryFn = async () => {
+  const mutationFn = async (...params) => {
     try {
-      return await axiosGetFn();
+      return await axiosMutationFn(...params);
     } catch (error) {
       if (
         error?.response?.data?.message === 'invalid "refresh_token"' ||
@@ -20,9 +20,9 @@ const useQuery = (queryKey, axiosGetFn, options) => {
     }
   };
 
-  const queryResult = useReactQuery(queryKey, queryFn, options);
+  const mutation = useReactQueryMutation(mutationFn, options);
 
-  return queryResult;
+  return mutation;
 };
 
-export default useQuery;
+export default useMutation;

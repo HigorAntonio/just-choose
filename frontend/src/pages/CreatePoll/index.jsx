@@ -73,7 +73,7 @@ const CreatePoll = () => {
   }, [contentWrapperRef]);
 
   const { isFetching, error, data } = useQuery(
-    ['createPoll/contentList', listId, authentication],
+    ['createPoll/contentList', { listId, authentication }],
     async () => {
       const response = await justChooseApi.get(`/contentlists/${listId}`);
       return response.data;
@@ -251,7 +251,7 @@ const CreatePoll = () => {
   if (
     (authentication &&
       data &&
-      parseInt(authentication.profile.id) !== parseInt(data.profile_id)) ||
+      +authentication.profile.id !== +data?.profile_id) ||
     error?.response?.status === 403
   ) {
     return <AccessDenied />;

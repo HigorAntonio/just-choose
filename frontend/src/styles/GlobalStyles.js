@@ -88,9 +88,9 @@ export default createGlobalStyle`
     color: var(--white);
     background: var(--primary-400);
   }
-  *:focus { //Estilo padrão (apenas para teste, enquanto não tiver um estilo de focus para cada elemento) TODO: Remover
+  /* *:focus-visible { //Estilo padrão (apenas para teste, enquanto não tiver um estilo de focus para cada elemento)
     outline: 2px solid var(--text) !important;
     -webkit-box-shadow: inset 0px 0px 0px 2px var(--text);
     box-shadow: inset 0px 0px 0px 2px var(--text);
-  }
+  } */
 `;

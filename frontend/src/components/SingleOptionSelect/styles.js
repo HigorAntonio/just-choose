@@ -21,13 +21,13 @@ export const Container = styled.div`
     }
 
     &:hover,
-    &:focus {
+    &:focus-visible {
       background: ${(props) =>
         props.hover ? props.hover : `var(--background-500)`};
       cursor: pointer;
     }
 
-    &:focus {
+    &:focus-visible {
       outline: 0.2rem solid var(--primary-400);
     }
 

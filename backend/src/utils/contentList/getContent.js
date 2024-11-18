@@ -9,7 +9,8 @@ module.exports = async (options) => {
       .from(function () {
         this.select(
           'm.id as content_id',
-          'm.tmdb_id as content_platform_id',
+          // 'm.tmdb_id as content_platform_id',
+          knex.raw('CAST(m.tmdb_id AS TEXT) AS content_platform_id'),
           'm.title',
           knex.raw(`COALESCE(m.poster_path, '') AS poster_path`),
           knex.raw(`'movie' AS type`)
@@ -20,7 +21,8 @@ module.exports = async (options) => {
           .union(function () {
             this.select(
               's.id as content_id',
-              's.tmdb_id as content_platform_id',
+              // 's.tmdb_id as content_platform_id',
+              knex.raw('CAST(s.tmdb_id AS TEXT) AS content_platform_id'),
               's.name as title',
               knex.raw(`COALESCE(s.poster_path, '') AS poster_path`),
               knex.raw(`'show' AS type`)
@@ -32,7 +34,8 @@ module.exports = async (options) => {
           .union(function () {
             this.select(
               'g.id as content_id',
-              'g.rawg_id as content_platform_id',
+              // 'g.rawg_id as content_platform_id',
+              'g.slug as content_platform_id',
               'g.name as title',
               knex.raw(`COALESCE(g.background_image, '') AS poster_path`),
               knex.raw(`'game' AS type`)

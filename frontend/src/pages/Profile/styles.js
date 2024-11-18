@@ -131,6 +131,11 @@ const buttonCss = css`
     background: var(--background-700);
     cursor: pointer;
   }
+
+  &:disabled {
+    background: var(--background-600);
+    cursor: not-allowed;
+  }
 `;
 
 export const FollowButton = styled.button`
@@ -146,7 +151,8 @@ export const FollowButton = styled.button`
     ${(props) => !props.following && `fill: var(--white);`}
   }
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     ${(props) =>
       props.following
         ? `background: var(--light-red);`
@@ -160,20 +166,31 @@ export const FollowButton = styled.button`
       ${(props) => props.following && `fill: var(--black);`}
     }
   }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
+  }
+
+  &:disabled {
+    background: var(--background-600);
+  }
 `;
 
 export const NavigationWrapper = styled.div`
   width: 100%;
-  height: 4rem;
+  height: 4.4rem;
   display: flex;
   align-items: center;
 `;
 
 export const Navigation = styled.div`
-  height: 4rem;
+  height: 4.4rem;
+  padding: 0.2rem;
   display: flex;
+  align-items: center;
 
   > div {
+    height: 100%;
     display: flex;
     align-items: center;
     font-size: 1.8rem;
@@ -191,6 +208,10 @@ export const Navigation = styled.div`
 
     &.active {
       border-bottom: 0.2rem solid var(--primary-400);
+    }
+
+    &:focus-visible {
+      outline: 0.2rem solid var(--text);
     }
   }
 

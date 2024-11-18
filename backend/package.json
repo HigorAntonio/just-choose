@@ -9,6 +9,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "start": "npm-run-all -p start:* | pino-pretty -c",
+    "start:server": "node src/server.js --ignore *.test.*",
+    "start:queue": "node src/queue.js --ignore *.test.*",
     "dev": "npm-run-all -p dev:* | pino-pretty -c",
     "dev:server": "nodemon src/server.js --ignore *.test.*",
     "dev:queue": "nodemon src/queue.js --ignore *.test.*",

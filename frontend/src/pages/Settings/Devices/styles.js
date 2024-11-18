@@ -62,9 +62,14 @@ export const ExitButton = styled.button`
   background: var(--background-400);
   border-radius: 0.5rem;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
   }
 
   &:disabled {

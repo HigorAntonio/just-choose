@@ -239,7 +239,6 @@ function Header() {
                         <Link
                           to={`/settings`}
                           onClick={() => setShowProfileDropDown(false)}
-                          tabIndex="-1"
                         >
                           <ProfileImage
                             src={

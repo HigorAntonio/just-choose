@@ -117,6 +117,8 @@ const metaChield = css`
 export const ProfileName = styled.span`
   ${metaChield}
   ${textOverflowEllipsis}
+  padding: 0.2rem;
+  margin: -0.2rem;
 
   > a {
     text-decoration: none;

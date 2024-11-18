@@ -61,10 +61,13 @@ const PollCard = ({ poll }) => {
     <Container
       onClick={handleContainerClick}
       onKeyPress={handleContainerOnKeyPress}
-      tabIndex="0"
     >
       <ThumbnailContainer>
-        <Link to={`/polls/${pollId}`} data-prevent-container-click>
+        <Link
+          to={`/polls/${pollId}`}
+          data-prevent-container-click
+          tabIndex="-1"
+        >
           <ThumbnailWrapper data-prevent-container-click>
             <Thumbnail
               src={thumbnail}
@@ -101,7 +104,11 @@ const PollCard = ({ poll }) => {
         </Meta>
         <ProfileInfo>
           <ProfileImageWrapper>
-            <Link to={`/profiles/${profileName}`} data-prevent-container-click>
+            <Link
+              to={`/profiles/${profileName}`}
+              data-prevent-container-click
+              tabIndex="-1"
+            >
               <ProfileImage
                 src={profileImageUrl}
                 onError={() => setProfileImageError(true)}

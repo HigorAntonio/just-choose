@@ -1,8 +1,8 @@
-import { createMuiTheme } from '@material-ui/core';
+import { createTheme } from '@material-ui/core';
 
 import dark from '../themes/dark';
 
-const theme = createMuiTheme({});
+const theme = createTheme({});
 
 theme.props = {
   MuiInputLabel: {
@@ -73,6 +73,10 @@ theme.overrides = {
       padding: '5px',
       '&:hover': {
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
+      },
+      '&:focus-visible': {
+        backgroundColor: `${dark.colors['background-100']}`,
+        border: `2px solid ${dark.colors['primary-400']}`,
       },
     },
   },

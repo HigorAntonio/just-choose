@@ -11,10 +11,6 @@ export const Logo = styled.img.attrs((props) => ({
 }))`
   height: 3.5rem;
   margin-left: 1rem;
-
-  &:hover {
-    cursor: pointer;
-  }
 `;
 
 export const Container = styled.div`
@@ -57,6 +53,10 @@ export const SignIn = styled.button`
   &.active {
     ${NavActiveCSS}
   }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--primary-400);
+  }
 `;
 
 export const SignUp = styled.button`
@@ -70,6 +70,10 @@ export const SignUp = styled.button`
 
   &.active {
     ${NavActiveCSS}
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--primary-400);
   }
 `;
 
@@ -118,9 +122,14 @@ export const SignFormButton = styled.button`
   outline: none;
   font-weight: bold;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     cursor: pointer;
     background: var(--primary-500);
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
   }
 
   &:disabled {

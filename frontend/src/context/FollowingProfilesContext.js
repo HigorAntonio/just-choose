@@ -20,9 +20,6 @@ export const FollowingProfilesContextProvider = ({ children }) => {
 
   const getFollowing = useCallback(
     async ({ pageParam = 1 }) => {
-      if (!authentication) {
-        return undefined;
-      }
       const response = await justChooseApi.get(
         `/profiles/${authentication?.profile?.id}/following`,
         {
@@ -44,6 +41,7 @@ export const FollowingProfilesContextProvider = ({ children }) => {
             ? pages?.length + 1
             : undefined;
         },
+        enabled: !!authentication,
       }
     );
 

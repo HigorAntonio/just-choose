@@ -90,11 +90,14 @@ export const Title = styled.h3`
   word-break: break-word;
   overflow: hidden;
   font-size: 1.9rem;
+  margin: -0.2rem;
+  padding: 0.2rem;
 
   > a {
     text-decoration: none;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       color: var(--primary-400);
     }
   }
@@ -127,7 +130,8 @@ export const ProfileName = styled.p`
   > a {
     text-decoration: none;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       color: var(--primary-400);
     }
   }

@@ -34,6 +34,7 @@ export const NavigationWrapper = styled.div`
 export const Navigation = styled.div`
   height: 100%;
   display: flex;
+  gap: 2rem;
 
   > div {
     display: flex;
@@ -54,10 +55,10 @@ export const Navigation = styled.div`
     &.active {
       border-bottom: 0.2rem solid var(--primary-400);
     }
-  }
 
-  > div + div {
-    margin-left: 2rem;
+    &:focus-visible {
+      margin: 0.2rem;
+    }
   }
 `;
 

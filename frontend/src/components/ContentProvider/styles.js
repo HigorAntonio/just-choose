@@ -11,7 +11,8 @@ export const Container = styled.div`
   border-radius: 0.5rem;
   padding: 1rem;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
   }

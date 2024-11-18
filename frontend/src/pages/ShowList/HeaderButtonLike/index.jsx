@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQueryClient } from 'react-query';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+
+import { AlertContext } from '../../../context/AlertContext';
 
 import justChooseApi from '../../../services/justChooseApi';
 import useQuery from '../../../hooks/useQuery';
@@ -10,6 +12,14 @@ import { HeaderButton } from '../styles';
 
 const HeaderButtonLike = ({ authentication, listId, contentList }) => {
   const queryClient = useQueryClient();
+
+  const {
+    setMessage,
+    setSeverity,
+    setShow: setShowAlert,
+    duration: alertTimeout,
+    setDuration: setAlertTimeout,
+  } = useContext(AlertContext);
 
   const { data: liked } = useQuery(
     ['showlist/like', { listId, authentication }],
@@ -21,7 +31,20 @@ const HeaderButtonLike = ({ authentication, listId, contentList }) => {
   );
 
   const handleLike = async () => {
-    if (!authentication || authentication?.profile?.is_active === false) {
+    if (!authentication) {
+      clearTimeout(alertTimeout);
+      setMessage('Faça login para deixar sua reação.');
+      setSeverity('error');
+      setShowAlert(true);
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+      return;
+    }
+    if (authentication?.profile?.is_active === false) {
+      clearTimeout(alertTimeout);
+      setMessage('Confirme seu e-mail para deixar sua reação.');
+      setSeverity('error');
+      setShowAlert(true);
+      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       return;
     }
     try {
@@ -47,18 +70,7 @@ const HeaderButtonLike = ({ authentication, listId, contentList }) => {
   };
 
   return (
-    <HeaderButton
-      title={
-        authentication
-          ? authentication?.profile?.is_active
-            ? liked
-              ? 'Não gostei'
-              : 'Gostei'
-            : 'Confirme seu e-mail para deixar sua reação'
-          : 'Faça login para deixar sua reação'
-      }
-      onClick={handleLike}
-    >
+    <HeaderButton title={liked ? 'Não gostei' : 'Gostei'} onClick={handleLike}>
       {!liked && <FaRegHeart size={'25px'} style={{ flexShrink: 0 }} />}
       {liked && <FaHeart size={'25px'} style={{ flexShrink: 0 }} />}
       <span>{formatCount(contentList?.likes || 0)}</span>

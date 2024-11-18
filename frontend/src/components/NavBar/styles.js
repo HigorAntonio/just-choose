@@ -41,7 +41,7 @@ export const Navigation = styled.div`
   display: flex;
   flex-direction: column;
 
-  padding: 1rem 0;
+  padding: 1rem 0.2rem;
   border-bottom: 0.1rem solid var(--background-700);
 
   > a {
@@ -62,7 +62,7 @@ export const NavOption = styled.div`
   justify-content: flex-start;
   height: 4.2rem;
 
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.8rem;
 
   &:hover {
     background: var(--background-600);
@@ -115,6 +115,7 @@ export const Header = styled.div`
 `;
 
 export const Profiles = styled.div`
+  padding: 0 0.2rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -129,7 +130,7 @@ export const Profile = styled.div`
   justify-content: flex-start;
   height: 4.2rem;
 
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.8rem;
 
   &:hover {
     background: var(--background-600);

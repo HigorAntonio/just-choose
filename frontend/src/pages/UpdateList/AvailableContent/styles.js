@@ -136,6 +136,8 @@ export const SearchInput = styled.div`
 `;
 
 export const ContentListWrapper = styled.div`
+  margin: -0.2rem;
+  padding: 0.2rem;
   max-height: 55rem;
   border-top: 0.01rem solid var(--background-600);
   overflow-y: scroll;

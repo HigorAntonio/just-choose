@@ -26,6 +26,7 @@ import setQueryParamAndGetNewUrl from '../../utils/setQueryParamAndGetNewUrl';
 import HeaderButtonLike from './HeaderButtonLike';
 import ContentGrid from './ContentGrid';
 import useQuery from '../../hooks/useQuery';
+import useMutation from '../../hooks/useMutation';
 
 import {
   Container,
@@ -103,51 +104,77 @@ const ShowList = () => {
     { retry: false }
   );
 
+  const createForkMutation = useMutation(
+    async (variables) => {
+      const { data } = await justChooseApi.post(
+        `/contentlists/${variables.listId}/fork/`
+      );
+      return data;
+    },
+    {
+      onMutate: () => {
+        clearTimeout(alertTimeout);
+        setMessage('Por favor, aguarde. Criando lista...');
+        setSeverity('info');
+        setShowAlert(true);
+      },
+      onSuccess: (data) => {
+        console.debug('mutationData:', data);
+        setMessage('Lista criada com sucesso.');
+        setSeverity('success');
+        setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+        history.push(`/lists/${data.forked_list_id}`);
+      },
+      onError: () => {
+        setMessage(
+          'Não foi possível criar a lista. Por favor, tente novamente.'
+        );
+        setSeverity('error');
+        setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+      },
+    }
+  );
+
+  const deleteListMutation = useMutation(
+    async (variables) => {
+      return await justChooseApi.delete(`/contentlists/${variables.listId}`);
+    },
+    {
+      onMutate: () => {
+        setShowDeleteDialog(false);
+        clearTimeout(alertTimeout);
+        setMessage('Por favor, aguarde. Excluindo lista...');
+        setSeverity('info');
+        setShowAlert(true);
+      },
+      onSuccess: () => {
+        setMessage('Lista excluída com sucesso.');
+        setSeverity('success');
+        setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+        history.push('/');
+      },
+      onError: () => {
+        setMessage(
+          'Não foi possível excluir a lista. Por favor, tente novamente.'
+        );
+        setSeverity('error');
+        setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
+      },
+    }
+  );
+
   const handleFork = async () => {
     if (!authentication || authentication?.profile?.is_active === false) {
       return;
     }
-    try {
-      clearTimeout(alertTimeout);
-      setMessage('Por favor, aguarde. Criando lista...');
-      setSeverity('info');
-      setShowAlert(true);
-      const { data } = await justChooseApi.post(
-        `/contentlists/${listId}/fork/`
-      );
-      setMessage('Lista criada com sucesso.');
-      setSeverity('success');
-      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-      history.push(`/lists/${data.forked_list_id}`);
-    } catch (error) {
-      setMessage('Não foi possível criar a lista. Por favor, tente novamente.');
-      setSeverity('error');
-      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    }
+    createForkMutation.mutate({ listId });
   };
 
   const handleDelete = async () => {
     if (!authentication || authentication?.profile?.is_active === false) {
       return;
     }
-    try {
-      setShowDeleteDialog(false);
-      clearTimeout(alertTimeout);
-      setMessage('Por favor, aguarde. Excluindo lista...');
-      setSeverity('info');
-      setShowAlert(true);
-      await justChooseApi.delete(`/contentlists/${listId}`);
-      setMessage('Lista excluída com sucesso.');
-      setSeverity('success');
-      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-      history.push('/');
-    } catch (error) {
-      setMessage(
-        'Não foi possível excluir a lista. Por favor, tente novamente.'
-      );
-      setSeverity('error');
-      setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
-    }
+    deleteListMutation.mutate({ listId });
   };
 
   const handleSelectContentType = (type) => {
@@ -166,6 +193,16 @@ const ShowList = () => {
     history.push(
       setQueryParamAndGetNewUrl(location.pathname, queryParams, 'type', type)
     );
+  };
+
+  const handleSelectOnPressEnter = (e, cb, option) => {
+    if (e.key === 'Enter') {
+      cb(option);
+      document.activeElement
+        .closest('[data-select]')
+        .querySelector('[data-select-button]')
+        .focus();
+    }
   };
 
   if (isFetching) {
@@ -288,6 +325,15 @@ const ShowList = () => {
                     <Option
                       key={`typeFilter${i}`}
                       onClick={() => handleSelectContentType(type)}
+                      onKeyPress={(e) =>
+                        handleSelectOnPressEnter(
+                          e,
+                          handleSelectContentType,
+                          type
+                        )
+                      }
+                      tabIndex="-1"
+                      data-select-option
                     >
                       {
                         contentTypesUtility.options.find(

@@ -336,11 +336,11 @@ export const ClearButton = styled.button`
   background: var(--background-400);
 
   &:hover,
-  &:focus {
+  &:focus-visible {
     background: var(--background-500);
   }
 
-  &:focus {
+  &:focus-visible {
     outline: 0.2rem solid var(--primary-400);
   }
 `;
@@ -350,11 +350,11 @@ export const PreviewButton = styled.button`
   background: var(--background-400);
 
   &:hover,
-  &:focus {
+  &:focus-visible {
     background: var(--background-500);
   }
 
-  &:focus {
+  &:focus-visible {
     outline: 0.2rem solid var(--primary-400);
   }
 `;
@@ -370,6 +370,6 @@ export const CreateButton = styled.button`
   }
 
   &:focus {
-    outline: 0.2rem solid var(--primary-400);
+    outline: 0.2rem solid var(--text);
   }
 `;

@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   useHistory,
   useParams,
   useRouteMatch,
   useLocation,
 } from 'react-router-dom';
+import { useQueryClient } from 'react-query';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 
 import { LayoutContext } from '../../context/LayoutContext';
@@ -14,6 +15,7 @@ import { FollowingProfilesContext } from '../../context/FollowingProfilesContext
 
 import justChooseApi from '../../services/justChooseApi';
 import useQuery from '../../hooks/useQuery';
+import useMutation from '../../hooks/useMutation';
 import NotFound from '../../components/NotFound';
 import HorizontalDragScrolling from '../../components/HorizontalDragScrolling';
 import Start from './Start';
@@ -61,29 +63,10 @@ const Profile = () => {
   const { refetchFollowingProfilesData } = useContext(FollowingProfilesContext);
   const { contentWrapperRef } = useContext(LayoutContext);
 
-  const [profile, setProfile] = useState({});
-  const [following, setFollowing] = useState(false);
+  const queryClient = useQueryClient();
+
   const [profileImageError, setProfileImageError] = useState(false);
   const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
-
-  const mounted = useRef();
-
-  const clearState = () => {
-    setProfile({});
-    setFollowing(false);
-    setProfileImageError(false);
-    setShowUnfollowDialog(false);
-  };
-
-  useEffect(() => {
-    mounted.current = true;
-
-    clearState();
-
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (
@@ -100,8 +83,7 @@ const Profile = () => {
           `${path.replace(':name', profileToShowName)}/about`) ||
       (location.pathname ===
         `${path.replace(':name', profileToShowName)}/votes` &&
-        authentication &&
-        authentication.profile.name !== profileToShowName)
+        authentication?.profile?.name !== profileToShowName)
     ) {
       history.replace(`${path.replace(':name', profileToShowName)}`);
     }
@@ -127,53 +109,72 @@ const Profile = () => {
   );
 
   const { data: followingData } = useQuery(
-    ['profile/followingProfileData', authentication, profile],
+    ['profile/followingProfileData', authentication, profileData],
     async () => {
-      if (authentication?.profile?.is_active !== true || !profile?.id) {
-        return false;
-      }
       const response = await justChooseApi.get(
-        `/profiles/following/${profile?.id}`
+        `/profiles/following/${profileData?.id}`
       );
-      return response.data;
+      return response.data.following;
     },
-    { retry: false }
+    {
+      retry: false,
+      enabled: !!authentication?.profile?.is_active && !!profileData?.id,
+    }
   );
 
-  useEffect(() => {
-    if (mounted.current && profileData !== undefined) {
-      setProfile(profileData);
+  const followMutation = useMutation(
+    async (variables) => {
+      return await justChooseApi.post(`/profiles/follow`, variables);
+    },
+    {
+      onSuccess: () => {
+        refetchFollowingProfilesData();
+        queryClient.setQueryData(
+          ['profile/profileData', profileToShowName],
+          (oldData) => ({
+            ...oldData,
+            followers_count: oldData.followers_count + 1,
+          })
+        );
+        queryClient.setQueryData(
+          ['profile/followingProfileData', authentication, profileData],
+          true
+        );
+      },
     }
-  }, [profileData]);
+  );
 
-  useEffect(() => {
-    if (mounted.current && followingData !== undefined) {
-      setFollowing(followingData.following);
+  const unfollowMutation = useMutation(
+    async (variables) => {
+      return await justChooseApi.delete(`/profiles/follow`, {
+        data: variables,
+      });
+    },
+    {
+      onSuccess: () => {
+        refetchFollowingProfilesData();
+        queryClient.setQueryData(
+          ['profile/profileData', profileToShowName],
+          (oldData) => ({
+            ...oldData,
+            followers_count: oldData.followers_count - 1,
+          })
+        );
+        queryClient.setQueryData(
+          ['profile/followingProfileData', authentication, profileData],
+          false
+        );
+      },
     }
-  }, [followingData]);
+  );
 
-  const handleUnfollow = async () => {
+  const handleUnfollow = () => {
     setShowUnfollowDialog(false);
-    await justChooseApi.delete(`/profiles/follow`, {
-      data: { followsId: profile.id },
-    });
-    if (mounted.current) {
-      setProfile((prevState) => ({
-        ...prevState,
-        followers_count: prevState.followers_count - 1,
-      }));
-      refetchFollowingProfilesData();
-      setFollowing(false);
-    }
+    unfollowMutation.mutate({ followsId: profileData?.id });
   };
 
-  const handleFollow = async () => {
-    if (
-      !authentication ||
-      (authentication &&
-        authentication.profile &&
-        authentication.profile.is_active === false)
-    ) {
+  const handleFollowButton = () => {
+    if (!authentication || authentication?.profile?.is_active === false) {
       clearTimeout(alertTimeout);
       setMessage(
         authentication
@@ -185,26 +186,11 @@ const Profile = () => {
       setAlertTimeout(setTimeout(() => setShowAlert(false), 4000));
       return;
     }
-    try {
-      if (!following) {
-        await justChooseApi.post(`/profiles/follow`, {
-          followsId: profile.id,
-        });
-        if (mounted.current) {
-          setProfile((prevState) => ({
-            ...prevState,
-            followers_count: prevState.followers_count + 1,
-          }));
-          refetchFollowingProfilesData();
-          setFollowing(true);
-        }
-      }
-      if (following) {
-        if (mounted.current) {
-          setShowUnfollowDialog(true);
-        }
-      }
-    } catch (error) {}
+    if (followingData) {
+      setShowUnfollowDialog(true);
+    } else {
+      followMutation.mutate({ followsId: profileData?.id });
+    }
   };
 
   const handlePush = (path) => {
@@ -226,35 +212,48 @@ const Profile = () => {
               <ProfileImageWrapper>
                 <ProfileImage
                   src={
-                    profile.profile_image_url ? profile.profile_image_url : ''
+                    profileData?.profile_image_url
+                      ? profileData?.profile_image_url
+                      : ''
                   }
                   onError={() => setProfileImageError(true)}
                   error={profileImageError}
                 />
               </ProfileImageWrapper>
               <ProfileMeta>
-                <ProfileName>{profile.display_name}</ProfileName>
-                <ProfileFollowers>{`${profile.followers_count} ${
-                  profile.followers_count === 1 ? 'seguidor' : 'seguidores'
+                <ProfileName>{profileData?.display_name}</ProfileName>
+                <ProfileFollowers>{`${profileData?.followers_count} ${
+                  profileData?.followers_count === 1 ? 'seguidor' : 'seguidores'
                 }`}</ProfileFollowers>
               </ProfileMeta>
             </ProfileWrapper>
-            {authentication &&
-              authentication.profile.name !== profileToShowName && (
-                <HeaderButtons>
-                  {!following ? (
-                    <FollowButton following={following} onClick={handleFollow}>
-                      <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
-                      <span>Seguir</span>
-                    </FollowButton>
-                  ) : (
-                    <FollowButton following={following} onClick={handleFollow}>
-                      <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
-                      <span>Seguindo</span>
-                    </FollowButton>
-                  )}
-                </HeaderButtons>
-              )}
+            {authentication?.profile?.name !== profileToShowName && (
+              <HeaderButtons>
+                {!followingData ? (
+                  <FollowButton
+                    following={followingData}
+                    onClick={handleFollowButton}
+                    disabled={
+                      followMutation.isLoading || unfollowMutation.isLoading
+                    }
+                  >
+                    <FaRegHeart size={'16px'} style={{ flexShrink: 0 }} />
+                    <span>Seguir</span>
+                  </FollowButton>
+                ) : (
+                  <FollowButton
+                    following={followingData}
+                    onClick={handleFollowButton}
+                    disabled={
+                      followMutation.isLoading || unfollowMutation.isLoading
+                    }
+                  >
+                    <FaHeart size={'16px'} style={{ flexShrink: 0 }} />
+                    <span>Seguindo</span>
+                  </FollowButton>
+                )}
+              </HeaderButtons>
+            )}
           </HeaderContainer>
           <NavigationWrapper>
             <HorizontalDragScrolling>
@@ -263,6 +262,7 @@ const Profile = () => {
                   className={location.pathname === `${url}` ? 'active' : ''}
                   onClick={() => handlePush(url)}
                   onAuxClick={(e) => navOnAuxClick(e, url)}
+                  tabIndex="0"
                 >
                   Início
                 </div>
@@ -272,6 +272,7 @@ const Profile = () => {
                   }
                   onClick={() => handlePush(`${url}/lists`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/lists`)}
+                  tabIndex="0"
                 >
                   Listas
                 </div>
@@ -281,27 +282,29 @@ const Profile = () => {
                   }
                   onClick={() => handlePush(`${url}/polls`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/polls`)}
+                  tabIndex="0"
                 >
                   Votações
                 </div>
-                {authentication &&
-                  authentication.profile.name === profileToShowName && (
-                    <div
-                      className={
-                        location.pathname === `${url}/votes` ? 'active' : ''
-                      }
-                      onClick={() => handlePush(`${url}/votes`)}
-                      onAuxClick={(e) => navOnAuxClick(e, `${url}/votes`)}
-                    >
-                      Votos
-                    </div>
-                  )}
+                {authentication?.profile?.name === profileToShowName && (
+                  <div
+                    className={
+                      location.pathname === `${url}/votes` ? 'active' : ''
+                    }
+                    onClick={() => handlePush(`${url}/votes`)}
+                    onAuxClick={(e) => navOnAuxClick(e, `${url}/votes`)}
+                    tabIndex="0"
+                  >
+                    Votos
+                  </div>
+                )}
                 <div
                   className={
                     location.pathname === `${url}/following` ? 'active' : ''
                   }
                   onClick={() => handlePush(`${url}/following`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/following`)}
+                  tabIndex="0"
                 >
                   Seguindo
                 </div>
@@ -311,6 +314,7 @@ const Profile = () => {
                   }
                   onClick={() => handlePush(`${url}/about`)}
                   onAuxClick={(e) => navOnAuxClick(e, `${url}/about`)}
+                  tabIndex="0"
                 >
                   Sobre
                 </div>
@@ -322,34 +326,37 @@ const Profile = () => {
       <Main>
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}` && (
-          <Start profileToShowId={profile.id} />
+          <Start profileToShowId={profileData?.id} />
         )}
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}/lists` && (
-          <Lists profileToShowId={profile.id} />
+          <Lists profileToShowId={profileData?.id} />
         )}
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}/polls` && (
-          <Polls profileToShowId={profile.id} />
+          <Polls profileToShowId={profileData?.id} />
         )}
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}/votes` &&
-          authentication &&
-          authentication.profile.name === profileToShowName && (
-            <Votes profileToShowId={profile.id} />
+          authentication?.profile?.name === profileToShowName && (
+            <Votes profileToShowId={profileData?.id} />
           )}
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}/following` && (
-          <Following profileToShowId={profile.id} />
+          <Following profileToShowId={profileData?.id} />
         )}
         {location.pathname ===
           `${path.replace(':name', profileToShowName)}/about` && (
-          <About profileAbout={profile.about} />
+          <About profileAbout={profileData?.about} />
         )}
       </Main>
-      <Modal show={showUnfollowDialog} setShow={setShowUnfollowDialog}>
+      <Modal
+        show={showUnfollowDialog}
+        setShow={setShowUnfollowDialog}
+        autoFocusCloseButton
+      >
         <ConfirmUnfollowDialog
-          profileDisplayName={profile.display_name}
+          profileDisplayName={profileData?.display_name}
           handleConfirm={handleUnfollow}
           handleCancel={() => setShowUnfollowDialog(false)}
         />

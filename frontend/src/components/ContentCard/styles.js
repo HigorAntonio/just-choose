@@ -18,55 +18,13 @@ export const Container = styled.div`
     right: 0.5rem;
     width: 3rem;
     height: 3rem;
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--background-900);
+    border-radius: 0 0 0.5rem 0.5rem;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 3rem;
-      left: 0;
-      border-top: 0.75rem solid rgba(0, 0, 0, 0.55);
-      border-right: 0.75rem solid transparent;
-      border-bottom: 0.75rem solid transparent;
-      border-left: 0.75rem solid rgba(0, 0, 0, 0.55);
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 3rem;
-      right: 0;
-      border-top: 0.75rem solid rgba(0, 0, 0, 0.55);
-      border-right: 0.75rem solid rgba(0, 0, 0, 0.55);
-      border-bottom: 0.75rem solid transparent;
-      border-left: 0.75rem solid transparent;
-    }
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.8);
+    &:hover,
+    &:focus-visible {
+      background: var(--primary-500);
       cursor: pointer;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 3rem;
-        left: 0;
-        border-top: 0.75rem solid rgba(0, 0, 0, 0.8);
-        border-right: 0.75rem solid transparent;
-        border-bottom: 0.75rem solid transparent;
-        border-left: 0.75rem solid rgba(0, 0, 0, 0.8);
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 3rem;
-        right: 0;
-        border-top: 0.75rem solid rgba(0, 0, 0, 0.8);
-        border-right: 0.75rem solid rgba(0, 0, 0, 0.8);
-        border-bottom: 0.75rem solid transparent;
-        border-left: 0.75rem solid transparent;
-      }
     }
   }
 `;

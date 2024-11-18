@@ -135,7 +135,8 @@ export const Option = styled.div`
   padding: 1rem;
   border-radius: 0.5rem;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
   }
@@ -241,9 +242,14 @@ export const SearchButton = styled.button`
   color: var(--white);
   background: var(--primary-400);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--primary-500);
     cursor: pointer;
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
   }
 `;
 
@@ -251,8 +257,13 @@ export const ClearButton = styled.button`
   ${buttonCss}
   background: var(--background-400);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--primary-400);
   }
 `;

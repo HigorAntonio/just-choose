@@ -128,7 +128,8 @@ export const ThumbnailWrapper = styled.div`
         background: var(--background-400);
         border-radius: 0.5rem;
 
-        &:hover {
+        &:hover,
+        &:focus-visible {
           background: var(--background-500);
           cursor: pointer;
         }
@@ -273,7 +274,8 @@ export const Option = styled.div`
   padding: 1rem;
   border-radius: 0.5rem;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--background-500);
     cursor: pointer;
   }
@@ -289,6 +291,8 @@ export const SharingOption = styled.div`
 `;
 
 export const ContentListWrapper = styled.div`
+  margin: -0.2rem;
+  padding: 0.2rem;
   max-height: 55rem;
   overflow-y: auto;
 
@@ -349,7 +353,12 @@ export const CreateButton = styled.button`
   color: var(--white);
   background: var(--primary-400);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--primary-500);
+  }
+
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
   }
 `;

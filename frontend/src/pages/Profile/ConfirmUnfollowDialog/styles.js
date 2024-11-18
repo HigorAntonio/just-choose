@@ -84,11 +84,11 @@ export const CancelButton = styled.button`
   background: var(--background-400);
 
   &:hover,
-  &:focus {
+  &:focus-visible {
     background: var(--background-500);
   }
 
-  &:focus {
+  &:focus-visible {
     outline: 0.2rem solid var(--primary-400);
   }
 `;
@@ -99,11 +99,11 @@ export const ConfirmButton = styled.button`
   background: var(--primary-400);
 
   &:hover,
-  &:focus {
+  &:focus-visible {
     background: var(--primary-500);
   }
 
-  &:focus {
-    outline: 0.2rem solid var(--primary-400);
+  &:focus-visible {
+    outline: 0.2rem solid var(--text);
   }
 `;

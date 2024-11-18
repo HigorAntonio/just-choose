@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 import Backdrop from '../Backdrop';
 
 import { Container, ModalWrapper, ModalContent, CloseModal } from './styles';
 
-const Modal = ({ show, setShow, children }) => {
+const Modal = ({ show, setShow, children, autoFocusCloseButton }) => {
+  const closeButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (autoFocusCloseButton) {
+      closeButtonRef.current?.focus();
+    }
+  }, [show, autoFocusCloseButton]);
+
   const handleClose = () => {
     setShow(false);
   };
@@ -24,8 +32,10 @@ const Modal = ({ show, setShow, children }) => {
           onKeyDown={handleKeyDown}
           tabIndex="-1"
         >
+          <CloseModal onClick={handleClose} tabIndex="0" ref={closeButtonRef}>
+            &#x2715;
+          </CloseModal>
           {children}
-          <CloseModal onClick={handleClose}>&#x2715;</CloseModal>
         </ModalContent>
         <Backdrop show={show} clicked={handleClose} />
       </ModalWrapper>

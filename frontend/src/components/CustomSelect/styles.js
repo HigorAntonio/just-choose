@@ -20,9 +20,14 @@ export const Container = styled.div`
       flex-shrink: 0;
     }
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       background: var(--background-500);
       cursor: pointer;
+    }
+
+    &:focus-visible {
+      outline: 0.2rem solid var(--primary-400);
     }
   }
 `;
